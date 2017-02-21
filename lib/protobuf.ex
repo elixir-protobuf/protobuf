@@ -1,0 +1,2 @@
+defmodule Protobuf do
+end
