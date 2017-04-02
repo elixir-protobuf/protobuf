@@ -4,14 +4,14 @@ defmodule Protobuf.DSLTest do
   defmodule User do
     use Protobuf
 
-    defstruct [:major, :minor, :patch, :suffix]
+    defstruct [:id, :name, :addrs]
 
     field :id, 1, required: true, type: :int32
     field :name, 2, optional: true, type: :string
     field :addrs, 4, repeated: true, type: :string
   end
 
-  test "works" do
+  test "creates __message_props__ function" do
     msg_props = User.__message_props__
     assert msg_props.tags_map == %{1 => 1, 2 => 2, 4 => 4}
     field_props = msg_props.field_props
