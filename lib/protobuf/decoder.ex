@@ -13,7 +13,7 @@ defmodule Protobuf.Decoder do
 
   @spec decode(binary, atom) :: any
   def decode(data, module) when is_atom(module) do
-    decode(data, module.__message_props__(), struct(module, %{}))
+    decode(data, module.__message_props__(), struct(module))
   end
 
   @spec decode(binary, MessageProps.t, struct) :: any
@@ -32,12 +32,15 @@ defmodule Protobuf.Decoder do
           :packed ->
             {}
           {:error, msg} -> raise DecodeError, message: msg
+          :unknown_field ->
+            {_, rest} = decode_varint(rest)
+            decode(rest, props, msg)
         end
       {:extention} ->
-        {}
+        msg
       {:oneof} ->
-        {}
-      _ -> {}
+        msg
+      _ -> raise(DecodeError, message: "can't decode field #{tag}")
     end
   end
   defp decode(<<>>, _, msg) do
@@ -53,7 +56,7 @@ defmodule Protobuf.Decoder do
        %{tags_map: %{^tag => _field_num}, field_props: %{^tag => prop}} -> {:field_num, prop}
        %{extendable?: true} -> {:extention}
        %{oneof?: true} -> {:oneof}
-       _ -> false
+       _ -> {:field_num, %FieldProps{}}
     end
   end
 
@@ -69,8 +72,11 @@ defmodule Protobuf.Decoder do
   def class_field(%{wire_type: wire}, wire) do
     :normal
   end
-  def class_field(prop, wire) do
-    {:error, "unknown field for #{prop_display(prop)}: got #{wire}, want #{prop.wire_type}"}
+  def class_field(%{wire_type: wire}, _) when is_nil(wire) do
+    :unknown_field
+  end
+  def class_field(%{wire_type: wire_type} = prop, wire) do
+    {:error, "wrong field for #{prop_display(prop)}: got #{wire}, want #{wire_type}"}
   end
 
   def decode_type(:int32, @wire_varint, bin) do
