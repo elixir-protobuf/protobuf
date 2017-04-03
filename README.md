@@ -7,9 +7,10 @@ A pure Elixir implementation of [Google Protobuf](https://developers.google.com/
 It will have some must-have and other cool features like:
 
 1. A protoc [plugin](https://developers.google.com/protocol-buffers/docs/reference/other)
-to generate Elixir code like what other official libs do.
-2. Use struct for messages instead Record.
-3. Generate **simple and explicit** code with the power of Macro. (test/protobuf/dsl_test.exs)
+  to generate Elixir code like what other official libs do.
+2. Use **structs** for messages instead Erlang records.
+3. Generate **simple and explicit** code with the power of Macro. (see
+  [test/protobuf/dsl_test.exs](https://github.com/tony612/protobuf-elixir/blob/master/test/protobuf/decoder_test.exs))
 4. Support Typespec in generated code.
 
 ## Installation
@@ -29,13 +30,13 @@ be found at [https://hexdocs.pm/protobuf](https://hexdocs.pm/protobuf).
 
 ## TODO
 
-[x] Define messages with DSL
-[x] Decode basic messages
-[x] Skip unknown fields
-[ ] Decode embedded messages
-[ ] Decode packed and repeated fields
-[ ] Encode messages
-[ ] protoc plugin
+* [x] Define messages with DSL
+* [x] Decode basic messages
+* [x] Skip unknown fields
+* [ ] Decode embedded messages
+* [ ] Decode packed and repeated fields
+* [ ] Encode messages
+* [ ] protoc plugin
 
 ## Acknowledgements
 
