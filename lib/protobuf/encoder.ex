@@ -19,4 +19,5 @@ defmodule Protobuf.Encoder do
   def wire_type(:fixed32),   do: 5
   def wire_type(:sfixed32),  do: 5
   def wire_type(:float),     do: 5
+  def wire_type(mod) when is_atom(mod), do: 2
 end
