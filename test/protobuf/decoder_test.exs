@@ -38,8 +38,13 @@ defmodule Protobuf.DecoderTest do
     end)
   end
 
-  test "skips unknown fields" do
+  test "skips unknown varint fields" do
     struct = Decoder.decode(<<8, 42, 32, 100, 45, 123, 0, 0, 0>>, Foo)
+    assert struct == %Foo{a: 42, d: 123}
+  end
+
+  test "skips unknown string fields" do
+    struct = Decoder.decode(<<8, 42, 34, 3, 115, 116, 114, 45, 123, 0, 0, 0>>, Foo)
     assert struct == %Foo{a: 42, d: 123}
   end
 end

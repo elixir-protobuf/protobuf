@@ -33,7 +33,7 @@ defmodule Protobuf.Decoder do
             {}
           {:error, msg} -> raise DecodeError, message: msg
           :unknown_field ->
-            {_, rest} = decode_varint(rest)
+            {_, rest} = decode_type(wire_type, rest)
             decode(rest, props, msg)
         end
       {:extention} ->
@@ -77,6 +77,24 @@ defmodule Protobuf.Decoder do
   end
   def class_field(%{wire_type: wire_type} = prop, wire) do
     {:error, "wrong field for #{prop_display(prop)}: got #{wire}, want #{wire_type}"}
+  end
+
+  # decode_type/2 can only be used to parse unknown fields With no type detail
+  def decode_type(@wire_varint, bin) do
+    decode_varint(bin)
+  end
+  def decode_type(@wire_64bits, bin) do
+    <<n::64, rest::binary>> = bin
+    {n, rest}
+  end
+  def decode_type(@wire_bytes, bin) do
+    {len, rest} = decode_varint(bin)
+    <<str::binary-size(len), rest2::binary>> = rest
+    {str, rest2}
+  end
+  def decode_type(@wire_32bits, bin) do
+    <<n::32, rest::binary>> = bin
+    {n, rest}
   end
 
   def decode_type(:int32, @wire_varint, bin) do
