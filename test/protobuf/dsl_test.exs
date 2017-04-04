@@ -30,6 +30,6 @@ defmodule Protobuf.DSLTest do
     assert %Protobuf.FieldProps{fnum: 4, name: "addrs", name_atom: :addrs,
       repeated: true, type: :string, wire_type: 2} = field_props[4]
     assert %Protobuf.FieldProps{fnum: 5, name: "job", name_atom: :job,
-      optional: true, type: User_Job, wire_type: 2} = field_props[5]
+      optional: true, type: User_Job, wire_type: 2, embedded: true} = field_props[5]
   end
 end

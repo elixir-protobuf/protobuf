@@ -33,7 +33,7 @@ be found at [https://hexdocs.pm/protobuf](https://hexdocs.pm/protobuf).
 * [x] Define messages with DSL
 * [x] Decode basic messages
 * [x] Skip unknown fields
-* [ ] Decode embedded messages
+* [x] Decode embedded messages
 * [ ] Decode packed and repeated fields
 * [ ] Encode messages
 * [ ] protoc plugin

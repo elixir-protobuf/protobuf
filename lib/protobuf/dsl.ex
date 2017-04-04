@@ -49,7 +49,13 @@ defmodule Protobuf.DSL do
     parse_field_opts(t, Map.put(acc, :repeated, true))
   end
   defp parse_field_opts([{:type, type}|t], acc) do
-    parse_field_opts(t, Map.merge(acc, %{type: type, wire_type: Protobuf.Encoder.wire_type(type)}))
+    props = Map.merge(acc, %{type: type, wire_type: Protobuf.Encoder.wire_type(type)})
+    props =
+      case to_string(type) do
+        "Elixir." <> _ -> Map.put(props, :embedded, true)
+        _              -> props
+      end
+    parse_field_opts(t, props)
   end
   defp parse_field_opts(_, acc), do: acc
 end

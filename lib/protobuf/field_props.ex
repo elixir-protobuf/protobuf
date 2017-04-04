@@ -8,6 +8,7 @@ defmodule Protobuf.FieldProps do
     required: boolean,
     optional: boolean,
     repeated: boolean,
+    embedded: boolean,
   }
   defstruct [
     fnum: nil,
@@ -18,5 +19,6 @@ defmodule Protobuf.FieldProps do
     required: false,
     optional: false,
     repeated: false,
+    embedded: false,
   ]
 end

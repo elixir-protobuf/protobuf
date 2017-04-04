@@ -3,16 +3,27 @@ defmodule Protobuf.DecoderTest do
 
   alias Protobuf.Decoder
 
+  defmodule Foo_Bar do
+    use Protobuf
+
+    defstruct [:a, :b]
+
+    field :a, 1, optional: true, type: :int32
+    field :b, 2, optional: true, type: :string
+  end
+
   defmodule Foo do
     use Protobuf
 
-    defstruct [:a, :b, :c, :d]
+    defstruct [:a, :b, :c, :d, :e, :f]
 
     field :a, 1, optional: true, type: :int32
     field :b, 2, optional: true, type: :fixed64
     field :c, 3, optional: true, type: :string
     # 4 is skipped for testing
     field :d, 5, optional: true, type: :fixed32
+    field :e, 6, optional: true, type: Foo_Bar
+    field :f, 7, optional: true, type: :int32
   end
 
   test "decodes one simple field" do
@@ -46,5 +57,10 @@ defmodule Protobuf.DecoderTest do
   test "skips unknown string fields" do
     struct = Decoder.decode(<<8, 42, 34, 3, 115, 116, 114, 45, 123, 0, 0, 0>>, Foo)
     assert struct == %Foo{a: 42, d: 123}
+  end
+
+  test "decodes embedded message" do
+    struct = Decoder.decode(<<8, 42, 50, 7, 8, 12, 18, 3, 97, 98, 99, 56, 13>>, Foo)
+    assert struct == %Foo{a: 42, e: %Foo_Bar{a: 12, b: "abc"}, f: 13}
   end
 end

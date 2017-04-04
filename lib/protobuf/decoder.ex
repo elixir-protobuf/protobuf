@@ -29,6 +29,11 @@ defmodule Protobuf.Decoder do
             {val, rest} = decode_type(prop.type, wire_type, rest)
             new_msg = struct(msg, [{prop.name_atom, val}])
             decode(rest, props, new_msg)
+          :embedded ->
+            {val, rest} = decode_type(:bytes, wire_type, rest)
+            embedded_msg = decode(val, prop.type)
+            new_msg = struct(msg, [{prop.name_atom, embedded_msg}])
+            decode(rest, props, new_msg)
           :packed ->
             {}
           {:error, msg} -> raise DecodeError, message: msg
@@ -68,6 +73,9 @@ defmodule Protobuf.Decoder do
       true ->
         {:error, "bad wiretype for #{prop_display(prop)}: got #{wire}, want #{wire_type}"}
     end
+  end
+  def class_field(%{wire_type: @wire_bytes, embedded: true}, @wire_bytes) do
+    :embedded
   end
   def class_field(%{wire_type: wire}, wire) do
     :normal
@@ -136,13 +144,13 @@ defmodule Protobuf.Decoder do
     <<n::little-float-64, rest::binary>> = bin
     {n, rest}
   end
-  def decode_type(:string, @wire_bytes, bin) do
+  def decode_type(:bytes, @wire_bytes, bin) do
     {len, rest} = decode_varint(bin)
     <<str::binary-size(len), rest2::binary>> = rest
     {str, rest2}
   end
-  def decode_type(:bytes, @wire_bytes, bin) do
-    decode_type(:string, @wire_bytes, bin)
+  def decode_type(:string, @wire_bytes, bin) do
+    decode_type(:bytes, @wire_bytes, bin)
   end
   def decode_type(:fixed32, @wire_32bits, bin) do
     <<n::little-32, rest::binary>> = bin
