@@ -63,4 +63,11 @@ defmodule Protobuf.DecoderTest do
     struct = Decoder.decode(<<8, 42, 50, 7, 8, 12, 18, 3, 97, 98, 99, 56, 13>>, Foo)
     assert struct == %Foo{a: 42, e: %Foo_Bar{a: 12, b: "abc"}, f: 13}
   end
+
+  test "merges singular embedded messages for multiple fields" do
+    # %{a: 12} + %{a: 21, b: "abc"}
+    bin = <<50, 2, 8, 12, 50, 7, 8, 21, 18, 3, 97, 98, 99>>
+    struct = Decoder.decode(bin, Foo)
+    assert struct == %Foo{e: %Foo_Bar{a: 21, b: "abc"}}
+  end
 end

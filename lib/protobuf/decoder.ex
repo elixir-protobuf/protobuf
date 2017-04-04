@@ -32,7 +32,9 @@ defmodule Protobuf.Decoder do
           :embedded ->
             {val, rest} = decode_type(:bytes, wire_type, rest)
             embedded_msg = decode(val, prop.type)
-            new_msg = struct(msg, [{prop.name_atom, embedded_msg}])
+            new_msg = Map.merge(msg, %{prop.name_atom => embedded_msg}, fn _k, v1, v2 ->
+              Map.merge(v1 || %{}, v2)
+            end)
             decode(rest, props, new_msg)
           :packed ->
             {}
