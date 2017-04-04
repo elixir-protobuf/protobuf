@@ -6,7 +6,7 @@ defmodule Protobuf.Decoder do
 
   @wire_varint       0
   @wire_64bits       1
-  @wire_bytes        2
+  @wire_delimited    2
   @wire_start_group  3
   @wire_end_group    4
   @wire_32bits       5
@@ -27,15 +27,19 @@ defmodule Protobuf.Decoder do
         case class_field(prop, wire_type) do
           :normal ->
             {val, rest} = decode_type(prop.type, wire_type, rest)
-            new_msg = struct(msg, [{prop.name_atom, val}])
+            new_msg = put_map(msg, prop.name_atom, val, fn _k, v1, v2 ->
+              merge_same_fields(v1, v2, prop.repeated, fn -> v2 end)
+            end)
             decode(rest, props, new_msg)
           :embedded ->
             {val, rest} = decode_type(:bytes, wire_type, rest)
             embedded_msg = decode(val, prop.type)
-            new_msg = Map.merge(msg, %{prop.name_atom => embedded_msg}, fn _k, v1, v2 ->
-              Map.merge(v1 || %{}, v2)
+            new_msg = put_map(msg, prop.name_atom, embedded_msg, fn _k, v1, v2 ->
+              merge_same_fields(v1, v2, prop.repeated, fn ->
+                if v1, do: Map.merge(v1, v2), else: v2
+              end)
             end)
-            decode(rest, props, new_msg)
+            decode(rest, props, struct(new_msg))
           :packed ->
             {}
           {:error, msg} -> raise DecodeError, message: msg
@@ -76,7 +80,7 @@ defmodule Protobuf.Decoder do
         {:error, "bad wiretype for #{prop_display(prop)}: got #{wire}, want #{wire_type}"}
     end
   end
-  def class_field(%{wire_type: @wire_bytes, embedded: true}, @wire_bytes) do
+  def class_field(%{wire_type: @wire_delimited, embedded: true}, @wire_delimited) do
     :embedded
   end
   def class_field(%{wire_type: wire}, wire) do
@@ -97,7 +101,7 @@ defmodule Protobuf.Decoder do
     <<n::64, rest::binary>> = bin
     {n, rest}
   end
-  def decode_type(@wire_bytes, bin) do
+  def decode_type(@wire_delimited, bin) do
     {len, rest} = decode_varint(bin)
     <<str::binary-size(len), rest2::binary>> = rest
     {str, rest2}
@@ -146,13 +150,13 @@ defmodule Protobuf.Decoder do
     <<n::little-float-64, rest::binary>> = bin
     {n, rest}
   end
-  def decode_type(:bytes, @wire_bytes, bin) do
+  def decode_type(:bytes, @wire_delimited, bin) do
     {len, rest} = decode_varint(bin)
     <<str::binary-size(len), rest2::binary>> = rest
     {str, rest2}
   end
-  def decode_type(:string, @wire_bytes, bin) do
-    decode_type(:bytes, @wire_bytes, bin)
+  def decode_type(:string, @wire_delimited, bin) do
+    decode_type(:bytes, @wire_delimited, bin)
   end
   def decode_type(:fixed32, @wire_32bits, bin) do
     <<n::little-32, rest::binary>> = bin
@@ -192,5 +196,21 @@ defmodule Protobuf.Decoder do
 
   defp prop_display(prop) do
     prop.name
+  end
+
+  defp put_map(map, key, val, func) when is_function(func, 3) do
+    case Map.fetch(map, key) do
+      {:ok, old_val} -> Map.put(map, key, func.(key, old_val, val))
+      :error         -> Map.put(map, key, val)
+    end
+  end
+
+  defp merge_same_fields(v1, v2, repeated, func) do
+    if repeated do
+      # TODO: optimize by reversing at the end
+      if v1, do: v1 ++ [v2], else: [v2]
+    else
+      func.()
+    end
   end
 end

@@ -15,7 +15,7 @@ defmodule Protobuf.DecoderTest do
   defmodule Foo do
     use Protobuf
 
-    defstruct [:a, :b, :c, :d, :e, :f]
+    defstruct [:a, :b, :c, :d, :e, :f, :g, :h]
 
     field :a, 1, optional: true, type: :int32
     field :b, 2, optional: true, type: :fixed64
@@ -24,6 +24,8 @@ defmodule Protobuf.DecoderTest do
     field :d, 5, optional: true, type: :fixed32
     field :e, 6, optional: true, type: Foo_Bar
     field :f, 7, optional: true, type: :int32
+    field :g, 8, repeated: true, type: :int32
+    field :h, 9, repeated: true, type: Foo_Bar
   end
 
   test "decodes one simple field" do
@@ -69,5 +71,16 @@ defmodule Protobuf.DecoderTest do
     bin = <<50, 2, 8, 12, 50, 7, 8, 21, 18, 3, 97, 98, 99>>
     struct = Decoder.decode(bin, Foo)
     assert struct == %Foo{e: %Foo_Bar{a: 21, b: "abc"}}
+  end
+
+  test "decodes repeated varint fields" do
+    struct = Decoder.decode(<<64, 12, 64, 13>>, Foo)
+    assert struct == %Foo{g: [12, 13]}
+  end
+
+  test "decodes repeated embedded fields" do
+    bin = <<74, 7, 8, 12, 18, 3, 97, 98, 99, 74, 2, 8, 13>>
+    struct = Decoder.decode(bin, Foo)
+    assert struct == %Foo{h: [%Foo_Bar{a: 12, b: "abc"}, %Foo_Bar{a: 13}]}
   end
 end
