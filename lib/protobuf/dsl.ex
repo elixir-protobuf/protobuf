@@ -68,5 +68,12 @@ defmodule Protobuf.DSL do
       end
     parse_field_opts(t, props)
   end
+  defp parse_field_opts([{:packed, true}|t], acc) do
+    if acc[:repeated] do
+      parse_field_opts(t, Map.put(acc, :packed, true))
+    else
+      raise ":packed must be used with :repeated"
+    end
+  end
   defp parse_field_opts(_, acc), do: acc
 end

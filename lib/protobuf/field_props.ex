@@ -9,6 +9,7 @@ defmodule Protobuf.FieldProps do
     optional: boolean,
     repeated: boolean,
     embedded: boolean,
+    packed: boolean,
   }
   defstruct [
     fnum: nil,
@@ -20,5 +21,6 @@ defmodule Protobuf.FieldProps do
     optional: false,
     repeated: false,
     embedded: false,
+    packed: false,
   ]
 end
