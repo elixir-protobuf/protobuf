@@ -9,12 +9,23 @@ defmodule Protobuf.DSL do
     fields = Module.get_attribute(env.module, :fields)
     quote do
       def __message_props__ do
-        %Protobuf.MessageProps{
-          tags_map: unquote(Macro.escape(tags_map(fields))),
-          field_props: unquote(Macro.escape(field_props_map(fields)))
-        }
+        unquote(Macro.escape(generate_msg_props(fields)))
       end
     end
+  end
+
+  defp generate_msg_props(fields) do
+    field_props = field_props_map(fields)
+    repeated_fields =
+      field_props
+      |> Map.values
+      |> Enum.filter(fn props -> props.repeated end)
+      |> Enum.map(fn props -> Map.get(props, :name_atom) end)
+    %Protobuf.MessageProps{
+      tags_map: tags_map(fields),
+      field_props: field_props,
+      repeated_fields: repeated_fields
+    }
   end
 
   defp tags_map(fields) do

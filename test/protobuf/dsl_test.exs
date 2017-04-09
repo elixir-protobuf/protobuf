@@ -17,11 +17,12 @@ defmodule Protobuf.DSLTest do
     # 3 is skipped
     field :addrs, 4, repeated: true, type: :string
     field :job, 5, optional: true, type: User_Job
+    field :jobs, 6, repeated: true, type: User_Job
   end
 
   test "creates __message_props__ function" do
     msg_props = User.__message_props__
-    assert msg_props.tags_map == %{1 => 1, 2 => 2, 4 => 4, 5 => 5}
+    assert msg_props.tags_map == %{1 => 1, 2 => 2, 4 => 4, 5 => 5, 6 => 6}
     field_props = msg_props.field_props
     assert %Protobuf.FieldProps{fnum: 1, name: "id", name_atom: :id,
       required: true, type: :int32, wire_type: 0} = field_props[1]
@@ -31,5 +32,10 @@ defmodule Protobuf.DSLTest do
       repeated: true, type: :string, wire_type: 2} = field_props[4]
     assert %Protobuf.FieldProps{fnum: 5, name: "job", name_atom: :job,
       optional: true, type: User_Job, wire_type: 2, embedded: true} = field_props[5]
+  end
+
+  test "has right repeated_fields" do
+    msg_props = User.__message_props__
+    assert msg_props.repeated_fields == [:addrs, :jobs]
   end
 end

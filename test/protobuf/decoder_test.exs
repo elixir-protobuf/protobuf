@@ -74,8 +74,8 @@ defmodule Protobuf.DecoderTest do
   end
 
   test "decodes repeated varint fields" do
-    struct = Decoder.decode(<<64, 12, 64, 13>>, Foo)
-    assert struct == %Foo{g: [12, 13]}
+    struct = Decoder.decode(<<64, 12, 64, 13, 64, 14>>, Foo)
+    assert struct == %Foo{g: [12, 13, 14]}
   end
 
   test "decodes repeated embedded fields" do

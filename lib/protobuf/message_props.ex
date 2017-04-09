@@ -3,9 +3,17 @@ defmodule Protobuf.MessageProps do
   @type t :: %__MODULE__{
     tags_map: %{integer => integer},
     field_props: %{integer => FieldProps.T},
+    repeated_fields: [atom],
 
     extendable?: boolean,
     oneof?: boolean
   }
-  defstruct [extendable?: false, tags_map: %{}, oneof?: false, field_props: %{}]
+  defstruct [
+    tags_map: %{},
+    field_props: %{},
+    repeated_fields: [],
+
+    oneof?: false,
+    extendable?: false,
+  ]
 end

@@ -54,8 +54,8 @@ defmodule Protobuf.Decoder do
       _ -> raise(DecodeError, message: "can't decode field #{tag}")
     end
   end
-  defp decode(<<>>, _, msg) do
-    msg
+  defp decode(<<>>, props, msg) do
+    reverse_repeated(msg, props.repeated_fields)
   end
 
   @spec find_field(MessageProps.t, integer) :: {atom, FieldProps.t} | {atom} | false
@@ -207,10 +207,18 @@ defmodule Protobuf.Decoder do
 
   defp merge_same_fields(v1, v2, repeated, func) do
     if repeated do
-      # TODO: optimize by reversing at the end
-      if v1, do: v1 ++ [v2], else: [v2]
+      if v1, do: [v2|v1], else: [v2]
     else
       func.()
     end
   end
+
+  defp reverse_repeated(msg, [h|t]) do
+    case msg do
+      %{^h => val} when is_list(val) ->
+        reverse_repeated(%{msg | h => Enum.reverse(val)}, t)
+      _ -> reverse_repeated(msg, t)
+    end
+  end
+  defp reverse_repeated(msg, []), do: msg
 end
