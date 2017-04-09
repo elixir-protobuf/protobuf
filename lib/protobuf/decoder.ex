@@ -7,8 +7,8 @@ defmodule Protobuf.Decoder do
   @wire_varint       0
   @wire_64bits       1
   @wire_delimited    2
-  @wire_start_group  3
-  @wire_end_group    4
+  # @wire_start_group  3
+  # @wire_end_group    4
   @wire_32bits       5
 
   @spec decode(binary, atom) :: any
@@ -41,7 +41,12 @@ defmodule Protobuf.Decoder do
             end)
             decode(rest, props, struct(new_msg))
           :packed ->
-            {}
+            {val, rest} = decode_type(:bytes, wire_type, rest)
+            vals = decode_packed(prop.type, Protobuf.Encoder.wire_type(prop.type), val)
+            new_msg = put_map(msg, prop.name_atom, vals, fn _k, v1, v2 ->
+              if v1, do: v2 ++ v1, else: v2
+            end)
+            decode(rest, props, struct(new_msg))
           {:error, msg} -> raise DecodeError, message: msg
           :unknown_field ->
             {_, rest} = decode_type(wire_type, rest)
@@ -72,19 +77,14 @@ defmodule Protobuf.Decoder do
   end
 
   @spec class_field(FieldProps.t, integer) :: atom | {:error, String.t}
-  def class_field(%{wire_type: wire_type, packed_dec: packed_dec} = prop, wire)
-      when wire != @wire_start_group and wire != wire_type do
-    cond do
-      wire == wire_type && packed_dec -> :packed
-      true ->
-        {:error, "bad wiretype for #{prop_display(prop)}: got #{wire}, want #{wire_type}"}
-    end
-  end
   def class_field(%{wire_type: @wire_delimited, embedded: true}, @wire_delimited) do
     :embedded
   end
   def class_field(%{wire_type: wire}, wire) do
     :normal
+  end
+  def class_field(%{repeated: true, packed: true}, @wire_delimited) do
+    :packed
   end
   def class_field(%{wire_type: wire}, _) when is_nil(wire) do
     :unknown_field
@@ -169,6 +169,15 @@ defmodule Protobuf.Decoder do
   def decode_type(:float, @wire_32bits, bin) do
     <<n::little-float-32, rest::binary>> = bin
     {n, rest}
+  end
+
+  def decode_packed(field_type, wire_type, bin) do
+    decode_packed(field_type, wire_type, bin, [])
+  end
+  def decode_packed(_, _, <<>>, acc), do: acc
+  def decode_packed(field_type, wire_type, bin, acc) do
+    {val, rest} = decode_type(field_type, wire_type, bin)
+    decode_packed(field_type, wire_type, rest, [val|acc])
   end
 
   def decode_zigzag(n) when band(n, 1) == 0, do: bsr(n, 1)

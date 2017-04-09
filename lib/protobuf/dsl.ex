@@ -69,10 +69,11 @@ defmodule Protobuf.DSL do
     parse_field_opts(t, props)
   end
   defp parse_field_opts([{:packed, true}|t], acc) do
-    if acc[:repeated] do
-      parse_field_opts(t, Map.put(acc, :packed, true))
-    else
-      raise ":packed must be used with :repeated"
+    # FIXME: these depends on options order
+    cond do
+      acc[:embedded] -> raise ":packed can't be used with :embedded field"
+      acc[:repeated] -> parse_field_opts(t, Map.put(acc, :packed, true))
+      true           -> raise ":packed must be used with :repeated"
     end
   end
   defp parse_field_opts(_, acc), do: acc

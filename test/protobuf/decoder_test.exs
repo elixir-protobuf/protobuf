@@ -15,7 +15,7 @@ defmodule Protobuf.DecoderTest do
   defmodule Foo do
     use Protobuf
 
-    defstruct [:a, :b, :c, :d, :e, :f, :g, :h]
+    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i]
 
     field :a, 1, optional: true, type: :int32
     field :b, 2, optional: true, type: :fixed64
@@ -26,6 +26,7 @@ defmodule Protobuf.DecoderTest do
     field :f, 7, optional: true, type: :int32
     field :g, 8, repeated: true, type: :int32
     field :h, 9, repeated: true, type: Foo_Bar
+    field :i, 10, repeated: true, type: :int32, packed: true
   end
 
   test "decodes one simple field" do
@@ -74,13 +75,23 @@ defmodule Protobuf.DecoderTest do
   end
 
   test "decodes repeated varint fields" do
-    struct = Decoder.decode(<<64, 12, 64, 13, 64, 14>>, Foo)
-    assert struct == %Foo{g: [12, 13, 14]}
+    struct = Decoder.decode(<<64, 12, 8, 123, 64, 13, 64, 14>>, Foo)
+    assert struct == %Foo{a: 123, g: [12, 13, 14]}
   end
 
   test "decodes repeated embedded fields" do
     bin = <<74, 7, 8, 12, 18, 3, 97, 98, 99, 74, 2, 8, 13>>
     struct = Decoder.decode(bin, Foo)
     assert struct == %Foo{h: [%Foo_Bar{a: 12, b: "abc"}, %Foo_Bar{a: 13}]}
+  end
+
+  test "decodes packed fields" do
+    struct = Decoder.decode(<<82, 2, 12, 13>>, Foo)
+    assert struct == %Foo{i: [12, 13]}
+  end
+
+  test "concat multiple packed fields" do
+    struct = Decoder.decode(<<82, 2, 12, 13, 82, 2, 14, 15>>, Foo)
+    assert struct == %Foo{i: [12, 13, 14, 15]}
   end
 end
