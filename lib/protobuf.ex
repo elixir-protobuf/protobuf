@@ -1,9 +1,10 @@
 defmodule Protobuf do
-  defmacro __using__(_opts) do
+  defmacro __using__(opts) do
     quote do
-      import Protobuf.DSL, only: [field: 3]
+      import Protobuf.DSL, only: [field: 3, field: 2]
       Module.register_attribute(__MODULE__, :fields, accumulate: true)
 
+      @options unquote(opts)
       unquote(encode_decode())
       @before_compile Protobuf.DSL
     end

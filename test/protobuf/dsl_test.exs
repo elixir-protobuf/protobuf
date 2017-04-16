@@ -21,6 +21,14 @@ defmodule Protobuf.DSLTest do
     field :f, 7, repeated: true, type: :int32, packed: true
   end
 
+  defmodule EnumFoo do
+    use Protobuf, enum: true
+
+    field :A, 1
+    field :B, 2
+    field :C, 4
+  end
+
   test "creates __message_props__ function" do
     msg_props = Foo.__message_props__
     assert %{1 => 1, 2 => 2, 4 => 4, 5 => 5, 6 => 6} = msg_props.tags_map
@@ -51,5 +59,13 @@ defmodule Protobuf.DSLTest do
     msg_props = Foo.__message_props__
     field_props = msg_props.field_props
     assert %Protobuf.FieldProps{fnum: 7, name: "f", repeated: true, packed: true} = field_props[7]
+  end
+
+  test "supports enum" do
+    msg_props = EnumFoo.__message_props__
+    assert msg_props.enum? == true
+    assert EnumFoo.val(:A) == 1
+    assert EnumFoo.val(:B) == 2
+    assert EnumFoo.val(:C) == 4
   end
 end
