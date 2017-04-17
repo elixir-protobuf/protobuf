@@ -28,14 +28,14 @@ defmodule Protobuf.Decoder do
           :normal ->
             {val, rest} = decode_type(prop.type, wire_type, rest)
             new_msg = put_map(msg, prop.name_atom, val, fn _k, v1, v2 ->
-              merge_same_fields(v1, v2, prop.repeated, fn -> v2 end)
+              merge_same_fields(v1, v2, prop.repeated?, fn -> v2 end)
             end)
             decode(rest, props, new_msg)
           :embedded ->
             {val, rest} = decode_type(:bytes, wire_type, rest)
             embedded_msg = decode(val, prop.type)
             new_msg = put_map(msg, prop.name_atom, embedded_msg, fn _k, v1, v2 ->
-              merge_same_fields(v1, v2, prop.repeated, fn ->
+              merge_same_fields(v1, v2, prop.repeated?, fn ->
                 if v1, do: Map.merge(v1, v2), else: v2
               end)
             end)
@@ -77,13 +77,13 @@ defmodule Protobuf.Decoder do
   end
 
   @spec class_field(FieldProps.t, integer) :: atom | {:error, String.t}
-  def class_field(%{wire_type: @wire_delimited, embedded: true}, @wire_delimited) do
+  def class_field(%{wire_type: @wire_delimited, embedded?: true}, @wire_delimited) do
     :embedded
   end
   def class_field(%{wire_type: wire}, wire) do
     :normal
   end
-  def class_field(%{repeated: true, packed: true}, @wire_delimited) do
+  def class_field(%{repeated?: true, packed?: true}, @wire_delimited) do
     :packed
   end
   def class_field(%{wire_type: wire}, _) when is_nil(wire) do

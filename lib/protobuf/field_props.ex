@@ -5,11 +5,13 @@ defmodule Protobuf.FieldProps do
     name_atom: atom,
     wire_type: 0..5,
     type: atom,
-    required: boolean,
-    optional: boolean,
-    repeated: boolean,
-    embedded: boolean,
-    packed: boolean,
+    enum_type: atom,
+
+    required?: boolean,
+    optional?: boolean,
+    repeated?: boolean,
+    embedded?: boolean,
+    packed?: boolean,
   }
   defstruct [
     fnum: nil,
@@ -17,10 +19,12 @@ defmodule Protobuf.FieldProps do
     name_atom: nil,
     wire_type: nil,
     type: nil,
-    required: false,
-    optional: false,
-    repeated: false,
-    embedded: false,
-    packed: false,
+    enum_type: nil,
+
+    required?: false,
+    optional?: false,
+    repeated?: false,
+    embedded?: false,
+    packed?: false,
   ]
 end

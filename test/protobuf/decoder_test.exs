@@ -15,7 +15,7 @@ defmodule Protobuf.DecoderTest do
   defmodule Foo do
     use Protobuf
 
-    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i]
+    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
 
     field :a, 1, optional: true, type: :int32
     field :b, 2, optional: true, type: :fixed64
@@ -27,6 +27,15 @@ defmodule Protobuf.DecoderTest do
     field :g, 8, repeated: true, type: :int32
     field :h, 9, repeated: true, type: Foo_Bar
     field :i, 10, repeated: true, type: :int32, packed: true
+    field :j, 11, optional: true, type: EnumFoo, enum: true
+  end
+
+  defmodule EnumFoo do
+    use Protobuf, enum: true
+
+    field :A, 1
+    field :B, 2
+    field :C, 4
   end
 
   test "decodes one simple field" do
@@ -93,5 +102,15 @@ defmodule Protobuf.DecoderTest do
   test "concat multiple packed fields" do
     struct = Decoder.decode(<<82, 2, 12, 13, 82, 2, 14, 15>>, Foo)
     assert struct == %Foo{i: [12, 13, 14, 15]}
+  end
+
+  test "decodes enum type" do
+    struct = Decoder.decode(<<88, 2>>, Foo)
+    assert struct == %Foo{j: 2}
+  end
+
+  test "decodes unknown enum type" do
+    struct = Decoder.decode(<<88, 3>>, Foo)
+    assert struct == %Foo{j: 3}
   end
 end
