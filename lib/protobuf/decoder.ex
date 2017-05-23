@@ -2,7 +2,7 @@ defmodule Protobuf.Decoder do
   import Bitwise, only: [bsl: 2, bsr: 2, band: 2]
   @mask64 bsl(1, 64) - 1
 
-  alias Protobuf.{DecodeError, FieldProps}
+  alias Protobuf.{DecodeError, MessageProps, FieldProps}
 
   @wire_varint       0
   @wire_64bits       1

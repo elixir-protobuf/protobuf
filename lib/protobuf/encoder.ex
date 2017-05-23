@@ -1,23 +1,133 @@
 defmodule Protobuf.Encoder do
-  def encode(struct) do
-    struct
+  import Bitwise, only: [bsr: 2, band: 2, bsl: 2, bor: 2]
+  alias Protobuf.{MessageProps, FieldProps}
+
+  @wire_varint       0
+  @wire_64bits       1
+  @wire_delimited    2
+  # @wire_start_group  3
+  # @wire_end_group    4
+  @wire_32bits       5
+
+  @spec encode(struct, keyword) :: iodata
+  def encode(%{__struct__: mod} = struct, opts \\ []) do
+    res = encode(struct, mod.__message_props__(), [])
+    res = Enum.reverse(res)
+    case Keyword.fetch(opts, :iolist) do
+      {:ok, true} -> res
+      _           -> IO.iodata_to_binary(res)
+    end
   end
 
-  def wire_type(:int32),     do: 0
-  def wire_type(:int64),     do: 0
-  def wire_type(:uint32),    do: 0
-  def wire_type(:uint64),    do: 0
-  def wire_type(:sint32),    do: 0
-  def wire_type(:sint64),    do: 0
-  def wire_type(:bool),      do: 0
-  def wire_type(:enum),      do: 0
-  def wire_type(:fixed64),   do: 1
-  def wire_type(:sfixed64),  do: 1
-  def wire_type(:double),    do: 1
-  def wire_type(:string),    do: 2
-  def wire_type(:bytes),     do: 2
-  def wire_type(:fixed32),   do: 5
-  def wire_type(:sfixed32),  do: 5
-  def wire_type(:float),     do: 5
-  def wire_type(mod) when is_atom(mod), do: 2
+  @spec encode(struct, MessageProps.t, iodata) :: iodata
+  def encode(struct, props, acc0) do
+    Enum.reduce props.ordered_tags, acc0, fn(tag, acc) ->
+      prop = props.field_props[tag]
+      val = Map.get(struct, prop.name_atom)
+      if val do
+        [encode_field(val, prop)|acc]
+      else
+        acc
+      end
+    end
+  end
+
+  @spec encode_field(any, FieldProps.t) :: iodata
+  def encode_field(val, %{type: type, fnum: fnum} = prop) do
+    case class_field(prop) do
+      :normal ->
+        map_or_not(val, prop.repeated?, fn(v)->
+          [encode_fnum(fnum, type), encode_type(type, v)]
+        end)
+      :embedded ->
+        map_or_not(val, prop.repeated?, fn(v)->
+          encoded = encode(v)
+          [encode_fnum(fnum, type), [encode_varint(byte_size(encoded)), encoded]]
+        end)
+      :packed ->
+        encoded = Enum.map(val, fn(v)-> encode_type(type, v) end)
+        encoded = IO.iodata_to_binary(encoded)
+        [encode_fnum(fnum, :bytes), [encode_varint(byte_size(encoded)), encoded]]
+    end
+  end
+
+  def class_field(%{wire_type: @wire_delimited, embedded?: true}) do
+    :embedded
+  end
+  def class_field(%{repeated?: true, packed?: true}) do
+    :packed
+  end
+  def class_field(_) do
+    :normal
+  end
+
+  def encode_fnum(fnum, type) do
+    fnum
+    |> bsl(3)
+    |> bor(wire_type(type))
+    |> encode_varint
+  end
+
+  def encode_type(:int32, n) when n >= 0, do: encode_varint(n)
+  def encode_type(:int32, n) when n < 0 do
+    <<n::64-unsigned-native>> = <<n::64-signed-native>>
+    encode_varint(n)
+  end
+  def encode_type(:int64, n) when n >= 0, do: encode_varint(n)
+  def encode_type(:int64, n) when n < 0 do
+    <<n::64-unsigned-native>> = <<n::64-signed-native>>
+    encode_varint(n)
+  end
+  def encode_type(:uint32, n), do: encode_varint(n)
+  def encode_type(:uint64, n), do: encode_varint(n)
+  def encode_type(:sint32, n), do: n |> encode_zigzag |> encode_varint
+  def encode_type(:sint64, n), do: n |> encode_zigzag |> encode_varint
+  def encode_type(:bool, n) when n == true, do: encode_varint(1)
+  def encode_type(:bool, n) when n == false, do: encode_varint(0)
+  def encode_type(:enum, n), do: encode_type(:int32, n)
+  def encode_type(:fixed64, n), do: <<n::64-little>>
+  def encode_type(:sfixed64, n), do: <<n::64-signed-little>>
+  def encode_type(:double, n), do: <<n::64-float-little>>
+  def encode_type(:bytes, n) do
+    bin = IO.iodata_to_binary(n)
+    len = bin |> byte_size |> encode_varint
+    <<len::binary, bin::binary>>
+  end
+  def encode_type(:string, n), do: encode_type(:bytes, n)
+  def encode_type(:fixed32, n), do: <<n::32-little>>
+  def encode_type(:sfixed32, n), do: <<n::32-signed-little>>
+  def encode_type(:float, n), do: <<n::32-float-little>>
+
+  def encode_zigzag(val) when val >= 0, do: val * 2
+  def encode_zigzag(val) when val < 0,  do: val * -2 - 1
+
+  def encode_varint(0), do: <<>>
+  def encode_varint(n) when n <= 127, do: <<n>>
+  def encode_varint(n) when n > 127, do: <<1::1, band(n, 127)::7, encode_varint(bsr(n, 7))::binary>>
+
+  def wire_type(:int32),     do: @wire_varint
+  def wire_type(:int64),     do: @wire_varint
+  def wire_type(:uint32),    do: @wire_varint
+  def wire_type(:uint64),    do: @wire_varint
+  def wire_type(:sint32),    do: @wire_varint
+  def wire_type(:sint64),    do: @wire_varint
+  def wire_type(:bool),      do: @wire_varint
+  def wire_type(:enum),      do: @wire_varint
+  def wire_type(:fixed64),   do: @wire_64bits
+  def wire_type(:sfixed64),  do: @wire_64bits
+  def wire_type(:double),    do: @wire_64bits
+  def wire_type(:string),    do: @wire_delimited
+  def wire_type(:bytes),     do: @wire_delimited
+  def wire_type(:fixed32),   do: @wire_32bits
+  def wire_type(:sfixed32),  do: @wire_32bits
+  def wire_type(:float),     do: @wire_32bits
+  def wire_type(mod) when is_atom(mod), do: @wire_delimited
+
+  defp map_or_not(val, repeated, func) do
+    if repeated do
+      Enum.map(val, func)
+    else
+      func.(val)
+    end
+  end
 end
