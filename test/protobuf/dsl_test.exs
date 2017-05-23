@@ -14,8 +14,8 @@ defmodule Protobuf.DSLTest do
 
     defstruct [:a, :b, :c, :d, :e, :f, :g]
 
-    field :a, 1, required: true, type: :int32
     field :b, 2, optional: true, type: :string
+    field :a, 1, required: true, type: :int32
     # 3 is skipped
     field :c, 4, repeated: true, type: :string
     field :d, 5, optional: true, type: Foo_Bar
@@ -42,6 +42,11 @@ defmodule Protobuf.DSLTest do
       optional?: true, type: :string, wire_type: 2} = field_props[2]
     assert %FieldProps{fnum: 4, name: "c", name_atom: :c,
       repeated?: true, type: :string, wire_type: 2} = field_props[4]
+  end
+
+  test "saves ordered tags" do
+    msg_props = Foo.__message_props__
+    assert [1, 2, 4, 5, 6, 7, 8] = msg_props.ordered_tags
   end
 
   test "supports embedded fields" do

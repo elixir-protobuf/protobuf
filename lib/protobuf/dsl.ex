@@ -40,6 +40,7 @@ defmodule Protobuf.DSL do
       |> Enum.map(fn props -> Map.get(props, :name_atom) end)
     %Protobuf.MessageProps{
       tags_map: tags_map(fields),
+      ordered_tags: ordered_tags(fields),
       field_props: field_props,
       repeated_fields: repeated_fields,
       enum?: Keyword.get(options, :enum) == true
@@ -50,6 +51,12 @@ defmodule Protobuf.DSL do
     fields
     |> Enum.map(fn ({_, fnum, _}) -> {fnum, fnum} end)
     |> Enum.into(%{})
+  end
+
+  defp ordered_tags(fields) do
+    fields
+    |> Enum.map(fn ({_, fnum, _}) -> fnum end)
+    |> Enum.sort
   end
 
   defp field_props_map(fields) do
