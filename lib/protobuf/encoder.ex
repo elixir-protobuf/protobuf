@@ -24,10 +24,10 @@ defmodule Protobuf.Encoder do
     Enum.reduce props.ordered_tags, acc0, fn(tag, acc) ->
       prop = props.field_props[tag]
       val = Map.get(struct, prop.name_atom)
-      if val do
-        [encode_field(val, prop)|acc]
-      else
+      if empty_val?(val) do
         acc
+      else
+        [encode_field(val, prop)|acc]
       end
     end
   end
@@ -101,7 +101,6 @@ defmodule Protobuf.Encoder do
   def encode_zigzag(val) when val >= 0, do: val * 2
   def encode_zigzag(val) when val < 0,  do: val * -2 - 1
 
-  def encode_varint(0), do: <<>>
   def encode_varint(n) when n <= 127, do: <<n>>
   def encode_varint(n) when n > 127, do: <<1::1, band(n, 127)::7, encode_varint(bsr(n, 7))::binary>>
 
@@ -129,5 +128,9 @@ defmodule Protobuf.Encoder do
     else
       func.(val)
     end
+  end
+
+  defp empty_val?(v) do
+    !v || v == 0 || v == ""
   end
 end

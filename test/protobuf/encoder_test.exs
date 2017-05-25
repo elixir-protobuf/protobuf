@@ -15,7 +15,7 @@ defmodule Protobuf.EncoderTest do
   defmodule Foo do
     use Protobuf
 
-    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k]
 
     field :a, 1, optional: true, type: :int32
     field :b, 2, optional: true, type: :fixed64
@@ -28,6 +28,7 @@ defmodule Protobuf.EncoderTest do
     field :h, 9, repeated: true, type: Foo_Bar
     field :i, 10, repeated: true, type: :int32, packed: true
     field :j, 11, optional: true, type: EnumFoo, enum: true
+    field :k, 12, optioanl: true, type: :bool
   end
 
   defmodule EnumFoo do
@@ -90,5 +91,19 @@ defmodule Protobuf.EncoderTest do
   test "encodes unknown enum type" do
     bin = Encoder.encode(%Foo{j: 3})
     assert bin == <<88, 3>>
+  end
+
+  test "encodes 0" do
+    assert Encoder.encode(%Foo{a: 0}) == <<>>
+    assert Encoder.encode(%Foo{b: 0}) == <<>>
+  end
+
+  test "encodes empty string" do
+    assert Encoder.encode(%Foo{c: ""}) == <<>>
+  end
+
+  test "encodes bool" do
+    assert Encoder.encode(%Foo{k: false}) == <<>>
+    assert Encoder.encode(%Foo{k: true}) == <<96, 1>>
   end
 end

@@ -35,8 +35,10 @@ be found at [https://hexdocs.pm/protobuf](https://hexdocs.pm/protobuf).
 * [x] Skip unknown fields
 * [x] Decode embedded messages
 * [x] Decode packed and repeated fields
-* [ ] Encode messages
+* [x] Encode messages
 * [ ] protoc plugin
+* [ ] map
+* [ ] oneof
 
 ## Acknowledgements
 

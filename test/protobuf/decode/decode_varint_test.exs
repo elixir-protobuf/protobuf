@@ -22,7 +22,7 @@ defmodule Protobuf.Decoder.DecodeVarintTest do
     assert rest == ""
   end
 
-  test "decode_varint/decode_type min int32" do
+  test "decode_varint+decode_type min int32" do
     {_, rest} = Decoder.decode_varint(<<8, 128, 128, 128, 128, 248, 255, 255, 255, 255, 1>>)
     {n, _} = Decoder.decode_varint(rest)
     <<n::signed-32>> = <<n::32>>
@@ -38,7 +38,7 @@ defmodule Protobuf.Decoder.DecodeVarintTest do
     assert n == 2147483647
   end
 
-  test "decode_varint/decode_type min int64" do
+  test "decode_varint+decode_type min int64" do
     {_, rest} = Decoder.decode_varint(<<8, 128, 128, 128, 128, 128, 128, 128, 128, 128, 1>>)
     {n, _} = Decoder.decode_varint(rest)
     <<n::signed-64>> = <<n::64>>

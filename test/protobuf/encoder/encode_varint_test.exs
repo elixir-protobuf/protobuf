@@ -12,6 +12,22 @@ defmodule Protobuf.Encoder.DecodeVarintTest do
   end
 
   test "encode_varint 0" do
-    assert Encoder.encode_varint(0) == <<>>
+    assert Encoder.encode_varint(0) == <<0>>
+  end
+
+  test "encode_varint max int32" do
+    assert Encoder.encode_varint(2147483647) == <<255, 255, 255, 255, 7>>
+  end
+
+  test "encode_varint max int64" do
+    assert Encoder.encode_varint(9223372036854775807) == <<255, 255, 255, 255, 255, 255, 255, 255, 127>>
+  end
+
+  test "encode_varint max uint32" do
+    assert Encoder.encode_varint(4294967295) == <<255, 255, 255, 255, 15>>
+  end
+
+  test "encode_varint max uint64" do
+    assert Encoder.encode_varint(18446744073709551615) == <<255, 255, 255, 255, 255, 255, 255, 255, 255, 1>>
   end
 end
