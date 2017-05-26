@@ -10,7 +10,7 @@ defmodule Protobuf do
     end
   end
 
-  def encode_decode() do
+  defp encode_decode() do
     quote do
       def decode(data), do: Protobuf.Decoder.decode(data, __MODULE__)
       def encode(struct), do: Protobuf.Encoder.encode(struct)
