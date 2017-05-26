@@ -1,13 +1,19 @@
 defmodule Protobuf.Mixfile do
   use Mix.Project
 
+  @version "0.1.0"
+
   def project do
     [app: :protobuf,
-     version: "0.1.0",
+     version: @version,
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps()]
+     deps: deps(),
+
+     description: description(),
+     package: package()
+    ]
   end
 
   # Configuration for the OTP application
@@ -31,4 +37,16 @@ defmodule Protobuf.Mixfile do
     [{:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
      {:credo, "~> 0.7", only: [:dev, :test], runtime: false}]
   end
+
+  defp description do
+    "A pure Elixir implementation of Google Protobuf."
+  end
+
+  defp package do
+    [maintainers: ["Tony Han"],
+     licenses: ["MIT"],
+     links: %{"GitHub" => "https://github.com/tony612/protobuf-elixir"},
+     files: ~w(mix.exs README.md CHANGELOG.md lib config)]
+  end
+
 end
