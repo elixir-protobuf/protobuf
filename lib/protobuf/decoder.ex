@@ -56,7 +56,6 @@ defmodule Protobuf.Decoder do
         msg
       {:oneof} ->
         msg
-      _ -> raise(DecodeError, message: "can't decode field #{tag}")
     end
   end
   defp decode(<<>>, props, msg) do
@@ -94,6 +93,7 @@ defmodule Protobuf.Decoder do
   end
 
   # decode_type/2 can only be used to parse unknown fields With no type detail
+  @spec decode_type(integer, binary) :: {binary, binary}
   def decode_type(@wire_varint, bin) do
     decode_varint(bin)
   end
@@ -111,6 +111,7 @@ defmodule Protobuf.Decoder do
     {n, rest}
   end
 
+  @spec decode_type(atom, integer, binary) :: {binary, binary}
   def decode_type(:int32, @wire_varint, bin) do
     {n, rest} = decode_varint(bin)
     <<n::signed-integer-32>> = <<n::32>>
@@ -171,15 +172,18 @@ defmodule Protobuf.Decoder do
     {n, rest}
   end
 
+  @spec decode_packed(atom, integer, binary) :: list
   def decode_packed(field_type, wire_type, bin) do
     decode_packed(field_type, wire_type, bin, [])
   end
+  @spec decode_packed(atom, integer, binary, list) :: list
   def decode_packed(_, _, <<>>, acc), do: acc
   def decode_packed(field_type, wire_type, bin, acc) do
     {val, rest} = decode_type(field_type, wire_type, bin)
     decode_packed(field_type, wire_type, rest, [val|acc])
   end
 
+  @spec decode_zigzag(integer) :: integer
   def decode_zigzag(n) when band(n, 1) == 0, do: bsr(n, 1)
   def decode_zigzag(n) when band(n, 1) == 1, do: -(bsr(n + 1, 1))
 

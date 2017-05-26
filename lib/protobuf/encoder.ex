@@ -36,21 +36,22 @@ defmodule Protobuf.Encoder do
   def encode_field(val, %{type: type, fnum: fnum} = prop) do
     case class_field(prop) do
       :normal ->
-        map_or_not(val, prop.repeated?, fn(v)->
+        map_or_not(val, prop.repeated?, fn(v) ->
           [encode_fnum(fnum, type), encode_type(type, v)]
         end)
       :embedded ->
-        map_or_not(val, prop.repeated?, fn(v)->
+        map_or_not(val, prop.repeated?, fn(v) ->
           encoded = encode(v)
           [encode_fnum(fnum, type), [encode_varint(byte_size(encoded)), encoded]]
         end)
       :packed ->
-        encoded = Enum.map(val, fn(v)-> encode_type(type, v) end)
+        encoded = Enum.map(val, fn(v) -> encode_type(type, v) end)
         encoded = IO.iodata_to_binary(encoded)
         [encode_fnum(fnum, :bytes), [encode_varint(byte_size(encoded)), encoded]]
     end
   end
 
+  @spec class_field(map) :: atom
   def class_field(%{wire_type: @wire_delimited, embedded?: true}) do
     :embedded
   end
@@ -61,6 +62,7 @@ defmodule Protobuf.Encoder do
     :normal
   end
 
+  @spec encode_fnum(integer, atom) :: iodata
   def encode_fnum(fnum, type) do
     fnum
     |> bsl(3)
@@ -68,6 +70,7 @@ defmodule Protobuf.Encoder do
     |> encode_varint
   end
 
+  @spec encode_type(atom, any) :: iodata
   def encode_type(:int32, n) when n >= 0, do: encode_varint(n)
   def encode_type(:int32, n) when n < 0 do
     <<n::64-unsigned-native>> = <<n::64-signed-native>>
@@ -98,12 +101,15 @@ defmodule Protobuf.Encoder do
   def encode_type(:sfixed32, n), do: <<n::32-signed-little>>
   def encode_type(:float, n), do: <<n::32-float-little>>
 
+  @spec encode_zigzag(integer) :: integer
   def encode_zigzag(val) when val >= 0, do: val * 2
   def encode_zigzag(val) when val < 0,  do: val * -2 - 1
 
+  @spec encode_varint(integer) :: iodata
   def encode_varint(n) when n <= 127, do: <<n>>
   def encode_varint(n) when n > 127, do: <<1::1, band(n, 127)::7, encode_varint(bsr(n, 7))::binary>>
 
+  @spec wire_type(atom) :: integer
   def wire_type(:int32),     do: @wire_varint
   def wire_type(:int64),     do: @wire_varint
   def wire_type(:uint32),    do: @wire_varint

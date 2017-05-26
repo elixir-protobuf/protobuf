@@ -73,7 +73,8 @@ defmodule Protobuf.DSL do
     }
     opts_map = Enum.into(opts, %{})
     parts =
-      parse_field_opts(opts)
+      opts
+      |> parse_field_opts
       |> cal_type(opts_map)
       |> cal_embedded(opts_map)
       |> cal_packed(opts_map)
