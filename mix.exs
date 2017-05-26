@@ -46,7 +46,7 @@ defmodule Protobuf.Mixfile do
     [maintainers: ["Tony Han"],
      licenses: ["MIT"],
      links: %{"GitHub" => "https://github.com/tony612/protobuf-elixir"},
-     files: ~w(mix.exs README.md CHANGELOG.md lib config)]
+     files: ~w(mix.exs README.md lib config LICENSE)]
   end
 
 end
