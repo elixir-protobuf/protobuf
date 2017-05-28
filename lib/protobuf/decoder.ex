@@ -47,7 +47,8 @@ defmodule Protobuf.Decoder do
               if v1, do: v2 ++ v1, else: v2
             end)
             decode(rest, props, struct(new_msg))
-          {:error, msg} -> raise DecodeError, message: msg
+          {:error, error_msg} ->
+            raise DecodeError, message: "#{inspect(msg.__struct__)}: " <> error_msg
           :unknown_field ->
             {_, rest} = decode_type(wire_type, rest)
             decode(rest, props, msg)

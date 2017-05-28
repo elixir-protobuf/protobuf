@@ -10,6 +10,7 @@ defmodule Protobuf.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps(),
+     escript: escript(),
 
      description: description(),
      package: package()
@@ -37,6 +38,12 @@ defmodule Protobuf.Mixfile do
     [{:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
      {:credo, "~> 0.7", only: [:dev, :test], runtime: false},
      {:ex_doc, "~> 0.14", only: :dev, runtime: false}]
+  end
+
+  defp escript do
+    [main_module: Protobuf.Protoc.CLI,
+     name: "protoc-gen-elixir",
+     app: nil]
   end
 
   defp description do
