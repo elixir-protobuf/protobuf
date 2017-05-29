@@ -99,6 +99,9 @@ defmodule Protobuf.DSL do
   defp parse_field_opts([{:type, type}|t], acc) do
     parse_field_opts(t, Map.put(acc, :type, type))
   end
+  defp parse_field_opts([{_, _}|t], acc) do
+    parse_field_opts(t, acc)
+  end
   defp parse_field_opts(_, acc), do: acc
 
   defp cal_type(%{enum?: true} = props, %{type: type}) do

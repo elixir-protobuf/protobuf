@@ -55,8 +55,8 @@ defmodule Protobuf.DecoderTest do
     assert struct == %Foo{a: 42, c: "str", d: 123}
   end
 
-  test "raises for wrong type field" do
-    assert_raise(Protobuf.DecodeError, "wrong field for a: got 1, want 0", fn ->
+  test "raises for wrong wire type" do
+    assert_raise(Protobuf.DecodeError, ~r{wrong wire_type for a: got 1, want 0}, fn ->
       Decoder.decode(<<9, 42, 0, 0, 0, 0, 0, 0, 0>>, Foo)
     end)
   end

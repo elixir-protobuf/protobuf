@@ -12,7 +12,7 @@ defmodule Protobuf.DSLTest do
   defmodule Foo do
     use Protobuf
 
-    defstruct [:a, :b, :c, :d, :e, :f, :g]
+    defstruct [:a, :b, :c, :d, :e, :f, :g, :h]
 
     field :b, 2, optional: true, type: :string
     field :a, 1, required: true, type: :int32
@@ -21,7 +21,8 @@ defmodule Protobuf.DSLTest do
     field :d, 5, optional: true, type: Foo_Bar
     field :e, 6, repeated: true, type: Foo_Bar
     field :f, 7, repeated: true, type: :int32, packed: true
-    field :g, 8, optional: true, type: EnumFoo, enum: true
+    field :g, 8, optional: true, type: Protobuf.DSLTest.EnumFoo, enum: true
+    field :h, 9, optional: true, type: Protobuf.DSLTest.EnumFoo, default: 1, enum: true
   end
 
   defmodule EnumFoo do
@@ -46,7 +47,7 @@ defmodule Protobuf.DSLTest do
 
   test "saves ordered tags" do
     msg_props = Foo.__message_props__
-    assert [1, 2, 4, 5, 6, 7, 8] = msg_props.ordered_tags
+    assert [1, 2, 4, 5, 6, 7, 8, 9] = msg_props.ordered_tags
   end
 
   test "supports embedded fields" do
@@ -76,5 +77,12 @@ defmodule Protobuf.DSLTest do
     assert EnumFoo.val(:B) == 2
     assert EnumFoo.val(:C) == 4
     assert %FieldProps{fnum: 8, type: :enum, wire_type: 0} = Foo.__message_props__.field_props[8]
+  end
+
+  test "ignores unknown options" do
+    msg_props = Foo.__message_props__
+    assert msg_props.field_props[9].wire_type == 0
+    assert msg_props.field_props[9].enum_type == EnumFoo
+    refute msg_props.field_props[9].embedded?
   end
 end

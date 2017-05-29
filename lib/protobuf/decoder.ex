@@ -90,7 +90,7 @@ defmodule Protobuf.Decoder do
     :unknown_field
   end
   def class_field(%{wire_type: wire_type} = prop, wire) do
-    {:error, "wrong field for #{prop_display(prop)}: got #{wire}, want #{wire_type}"}
+    {:error, "wrong wire_type for #{prop_display(prop)}: got #{wire}, want #{wire_type}"}
   end
 
   # decode_type/2 can only be used to parse unknown fields With no type detail
