@@ -1,4 +1,4 @@
-defmodule Google.Protobuf.Compiler.Version do
+defmodule Google_Protobuf_Compiler.Version do
   use Protobuf
 
   defstruct [:major, :minor, :patch, :suffix]
@@ -9,27 +9,27 @@ defmodule Google.Protobuf.Compiler.Version do
   field :suffix, 4, optional: true, type: :string
 end
 
-defmodule Google.Protobuf.Compiler.CodeGeneratorRequest do
+defmodule Google_Protobuf_Compiler.CodeGeneratorRequest do
   use Protobuf
 
   defstruct [:file_to_generate, :parameter, :proto_file, :compiler_version]
 
   field :file_to_generate, 1, repeated: true, type: :string
   field :parameter, 2, optional: true, type: :string
-  field :proto_file, 15, repeated: true, type: Google.Protobuf.FileDescriptorProto
-  field :compiler_version, 3, optional: true, type: Google.Protobuf.Compiler.Version
+  field :proto_file, 15, repeated: true, type: FileDescriptorProto
+  field :compiler_version, 3, optional: true, type: Google_Protobuf_Compiler.Version
 end
 
-defmodule Google.Protobuf.Compiler.CodeGeneratorResponse do
+defmodule Google_Protobuf_Compiler.CodeGeneratorResponse do
   use Protobuf
 
   defstruct [:error, :file]
 
   field :error, 1, optional: true, type: :string
-  field :file, 15, repeated: true, type: Google.Protobuf.Compiler.CodeGeneratorResponse_File
+  field :file, 15, repeated: true, type: Google_Protobuf_Compiler.CodeGeneratorResponse.File
 end
 
-defmodule Google.Protobuf.Compiler.CodeGeneratorResponse_File do
+defmodule Google_Protobuf_Compiler.CodeGeneratorResponse.File do
   use Protobuf
 
   defstruct [:name, :insertion_point, :content]

@@ -3,7 +3,7 @@ defmodule Protobuf.EncoderTest do
 
   alias Protobuf.Encoder
 
-  defmodule Foo_Bar do
+  defmodule Foo.Bar do
     use Protobuf
 
     defstruct [:a, :b]
@@ -22,10 +22,10 @@ defmodule Protobuf.EncoderTest do
     field :c, 3, optional: true, type: :string
     # 4 is skipped for testing
     field :d, 5, optional: true, type: :fixed32
-    field :e, 6, optional: true, type: Foo_Bar
+    field :e, 6, optional: true, type: Foo.Bar
     field :f, 7, optional: true, type: :int32
     field :g, 8, repeated: true, type: :int32
-    field :h, 9, repeated: true, type: Foo_Bar
+    field :h, 9, repeated: true, type: Foo.Bar
     field :i, 10, repeated: true, type: :int32, packed: true
     field :j, 11, optional: true, type: EnumFoo, enum: true
     field :k, 12, optioanl: true, type: :bool
@@ -63,7 +63,7 @@ defmodule Protobuf.EncoderTest do
   # end
 
   test "encodes embedded message" do
-    bin = Encoder.encode(%Foo{a: 42, e: %Foo_Bar{a: 12, b: "abc"}, f: 13})
+    bin = Encoder.encode(%Foo{a: 42, e: %Foo.Bar{a: 12, b: "abc"}, f: 13})
     assert bin == <<8, 42, 50, 7, 8, 12, 18, 3, 97, 98, 99, 56, 13>>
   end
 
@@ -74,7 +74,7 @@ defmodule Protobuf.EncoderTest do
 
   test "encodes repeated embedded fields" do
     bin = <<74, 7, 8, 12, 18, 3, 97, 98, 99, 74, 2, 8, 13>>
-    res = Encoder.encode(%Foo{h: [%Foo_Bar{a: 12, b: "abc"}, %Foo_Bar{a: 13}]})
+    res = Encoder.encode(%Foo{h: [%Foo.Bar{a: 12, b: "abc"}, %Foo.Bar{a: 13}]})
     assert res == bin
   end
 

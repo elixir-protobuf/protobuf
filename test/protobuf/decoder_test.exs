@@ -3,7 +3,7 @@ defmodule Protobuf.DecoderTest do
 
   alias Protobuf.Decoder
 
-  defmodule Foo_Bar do
+  defmodule Foo.Bar do
     use Protobuf
 
     defstruct [:a, :b]
@@ -22,10 +22,10 @@ defmodule Protobuf.DecoderTest do
     field :c, 3, optional: true, type: :string
     # 4 is skipped for testing
     field :d, 5, optional: true, type: :fixed32
-    field :e, 6, optional: true, type: Foo_Bar
+    field :e, 6, optional: true, type: Foo.Bar
     field :f, 7, optional: true, type: :int32
     field :g, 8, repeated: true, type: :int32
-    field :h, 9, repeated: true, type: Foo_Bar
+    field :h, 9, repeated: true, type: Foo.Bar
     field :i, 10, repeated: true, type: :int32, packed: true
     field :j, 11, optional: true, type: EnumFoo, enum: true
   end
@@ -73,14 +73,14 @@ defmodule Protobuf.DecoderTest do
 
   test "decodes embedded message" do
     struct = Decoder.decode(<<8, 42, 50, 7, 8, 12, 18, 3, 97, 98, 99, 56, 13>>, Foo)
-    assert struct == %Foo{a: 42, e: %Foo_Bar{a: 12, b: "abc"}, f: 13}
+    assert struct == %Foo{a: 42, e: %Foo.Bar{a: 12, b: "abc"}, f: 13}
   end
 
   test "merges singular embedded messages for multiple fields" do
     # %{a: 12} + %{a: 21, b: "abc"}
     bin = <<50, 2, 8, 12, 50, 7, 8, 21, 18, 3, 97, 98, 99>>
     struct = Decoder.decode(bin, Foo)
-    assert struct == %Foo{e: %Foo_Bar{a: 21, b: "abc"}}
+    assert struct == %Foo{e: %Foo.Bar{a: 21, b: "abc"}}
   end
 
   test "decodes repeated varint fields" do
@@ -91,7 +91,7 @@ defmodule Protobuf.DecoderTest do
   test "decodes repeated embedded fields" do
     bin = <<74, 7, 8, 12, 18, 3, 97, 98, 99, 74, 2, 8, 13>>
     struct = Decoder.decode(bin, Foo)
-    assert struct == %Foo{h: [%Foo_Bar{a: 12, b: "abc"}, %Foo_Bar{a: 13}]}
+    assert struct == %Foo{h: [%Foo.Bar{a: 12, b: "abc"}, %Foo.Bar{a: 13}]}
   end
 
   test "decodes packed fields" do

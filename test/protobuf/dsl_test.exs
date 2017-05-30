@@ -3,7 +3,7 @@ defmodule Protobuf.DSLTest do
 
   alias Protobuf.FieldProps
 
-  defmodule Foo_Bar do
+  defmodule Foo.Bar do
     use Protobuf
     defstruct [:b]
     field :b, 1, required: true, type: :string
@@ -18,8 +18,8 @@ defmodule Protobuf.DSLTest do
     field :a, 1, required: true, type: :int32
     # 3 is skipped
     field :c, 4, repeated: true, type: :string
-    field :d, 5, optional: true, type: Foo_Bar
-    field :e, 6, repeated: true, type: Foo_Bar
+    field :d, 5, optional: true, type: Foo.Bar
+    field :e, 6, repeated: true, type: Foo.Bar
     field :f, 7, repeated: true, type: :int32, packed: true
     field :g, 8, optional: true, type: Protobuf.DSLTest.EnumFoo, enum: true
     field :h, 9, optional: true, type: Protobuf.DSLTest.EnumFoo, default: 1, enum: true
@@ -54,9 +54,9 @@ defmodule Protobuf.DSLTest do
     msg_props = Foo.__message_props__
     field_props = msg_props.field_props
     assert %FieldProps{fnum: 5, name: "d", name_atom: :d,
-      optional?: true, type: Foo_Bar, wire_type: 2, embedded?: true} = field_props[5]
+      optional?: true, type: Foo.Bar, wire_type: 2, embedded?: true} = field_props[5]
     assert %FieldProps{fnum: 6, name: "e", name_atom: :e,
-      repeated?: true, type: Foo_Bar, wire_type: 2, embedded?: true} = field_props[6]
+      repeated?: true, type: Foo.Bar, wire_type: 2, embedded?: true} = field_props[6]
   end
 
   test "supports repeated_fields" do
