@@ -67,8 +67,8 @@ defmodule Google_Protobuf.FieldDescriptorProto do
 
   field :name, 1, optional: true, type: :string
   field :number, 3, optional: true, type: :int32
-  field :label, 4, optional: true, type: Label
-  field :type, 5, optional: true, type: Type
+  field :label, 4, optional: true, type: Google_Protobuf.FieldDescriptorProto.Label, enum: true
+  field :type, 5, optional: true, type: Google_Protobuf.FieldDescriptorProto.Type, enum: true
   field :type_name, 6, optional: true, type: :string
   field :extendee, 2, optional: true, type: :string
   field :default_value, 7, optional: true, type: :string
@@ -315,7 +315,7 @@ defmodule Google_Protobuf.SourceCodeInfo do
 
   defstruct [:location]
 
-  field :location, 1, repeated: true, type: Location
+  field :location, 1, repeated: true, type: Google_Protobuf.SourceCodeInfo.Location
 end
 
 defmodule Google_Protobuf.SourceCodeInfo.Location do

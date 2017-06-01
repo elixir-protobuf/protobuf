@@ -16,7 +16,7 @@ defmodule Google_Protobuf_Compiler.CodeGeneratorRequest do
 
   field :file_to_generate, 1, repeated: true, type: :string
   field :parameter, 2, optional: true, type: :string
-  field :proto_file, 15, repeated: true, type: FileDescriptorProto
+  field :proto_file, 15, repeated: true, type: Google_Protobuf.FileDescriptorProto
   field :compiler_version, 3, optional: true, type: Google_Protobuf_Compiler.Version
 end
 
