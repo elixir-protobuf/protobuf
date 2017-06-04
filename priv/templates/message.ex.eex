@@ -1,0 +1,9 @@
+defmodule <%= name %> do
+  use Protobuf
+
+  defstruct [<%= struct_fields %>]
+
+  <%= Enum.map fields, fn(field) -> %>
+  field <%= field %>
+  <% end %>
+end

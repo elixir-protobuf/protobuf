@@ -25,6 +25,7 @@ defmodule Google_Protobuf.FileDescriptorProto do
   field :syntax, 12, optional: true, type: :string
 end
 
+# message_type
 defmodule Google_Protobuf.DescriptorProto do
   use Protobuf
 
@@ -35,10 +36,10 @@ defmodule Google_Protobuf.DescriptorProto do
   field :extension, 6, repeated: true, type: Google_Protobuf.FieldDescriptorProto
   field :nested_type, 3, repeated: true, type: Google_Protobuf.DescriptorProto
   field :enum_type, 4, repeated: true, type: Google_Protobuf.EnumDescriptorProto
-  field :extension_range, 5, repeated: true, type: ExtensionRange
+  field :extension_range, 5, repeated: true, type: Google_Protobuf.DescriptorProto.ExtensionRange
   field :oneof_decl, 8, repeated: true, type: Google_Protobuf.OneofDescriptorProto
   field :options, 7, optional: true, type: Google_Protobuf.MessageOptions
-  field :reserved_range, 9, repeated: true, type: ReservedRange
+  field :reserved_range, 9, repeated: true, type: Google_Protobuf.DescriptorProto.ReservedRange
   field :reserved_name, 10, repeated: true, type: :string
 end
 
@@ -60,6 +61,7 @@ defmodule Google_Protobuf.DescriptorProto.ReservedRange do
   field :end, 2, optional: true, type: :int32
 end
 
+# field, extension
 defmodule Google_Protobuf.FieldDescriptorProto do
   use Protobuf
 
@@ -117,6 +119,7 @@ defmodule Google_Protobuf.OneofDescriptorProto do
   field :options, 2, optional: true, type: Google_Protobuf.OneofOptions
 end
 
+# enum_type
 defmodule Google_Protobuf.EnumDescriptorProto do
   use Protobuf
 
@@ -137,6 +140,7 @@ defmodule Google_Protobuf.EnumValueDescriptorProto do
   field :options, 3, optional: true, type: Google_Protobuf.EnumValueOptions
 end
 
+# service
 defmodule Google_Protobuf.ServiceDescriptorProto do
   use Protobuf
 
@@ -147,6 +151,7 @@ defmodule Google_Protobuf.ServiceDescriptorProto do
   field :options, 3, optional: true, type: Google_Protobuf.ServiceOptions
 end
 
+# service method
 defmodule Google_Protobuf.MethodDescriptorProto do
   use Protobuf
 
@@ -170,7 +175,7 @@ defmodule Google_Protobuf.FileOptions do
   field :java_multiple_files, 10, optional: true, type: :bool, default: false
   field :java_generate_equals_and_hash, 20, optional: true, type: :bool, deprecated: true
   field :java_string_check_utf8, 27, optional: true, type: :bool, default: false
-  field :optimize_for, 9, optional: true, type: OptimizeMode, default: SPEED
+  field :optimize_for, 9, optional: true, type: OptimizeMode, default: 1
   field :go_package, 11, optional: true, type: :string
   field :cc_generic_services, 16, optional: true, type: :bool, default: false
   field :java_generic_services, 17, optional: true, type: :bool, default: false
@@ -208,9 +213,9 @@ defmodule Google_Protobuf.FieldOptions do
 
   defstruct [:ctype, :packed, :jstype, :lazy, :deprecated, :weak, :uninterpreted_option]
 
-  field :ctype, 1, optional: true, type: CType, default: STRING
+  field :ctype, 1, optional: true, type: Google_Protobuf.FieldOptions.CType, default: 0
   field :packed, 2, optional: true, type: :bool
-  field :jstype, 6, optional: true, type: JSType, default: JS_NORMAL
+  field :jstype, 6, optional: true, type: Google_Protobuf.FieldOptions.JSType, default: 0
   field :lazy, 5, optional: true, type: :bool, default: false
   field :deprecated, 3, optional: true, type: :bool, default: false
   field :weak, 10, optional: true, type: :bool, default: false
@@ -275,7 +280,7 @@ defmodule Google_Protobuf.MethodOptions do
   defstruct [:deprecated, :idempotency_level, :uninterpreted_option]
 
   field :deprecated, 33, optional: true, type: :bool, default: false
-  field :idempotency_level, 34, optional: true, type: IdempotencyLevel, default: IDEMPOTENCY_UNKNOWN
+  field :idempotency_level, 34, optional: true, type: IdempotencyLevel, default: 0
   field :uninterpreted_option, 999, repeated: true, type: Google_Protobuf.UninterpretedOption
 end
 
