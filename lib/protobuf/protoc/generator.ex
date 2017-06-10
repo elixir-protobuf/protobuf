@@ -6,7 +6,7 @@ defmodule Protobuf.Protoc.Generator do
 
   def generate_content(desc) do
     list = Enum.map(desc.message_type || [], fn(msg_desc) -> generate_msg(msg_desc, []) end) ++
-      Enum.map(desc.message_type || [], fn(enum_desc) -> generate_enum(enum_desc, []) end) ++
+      Enum.map(desc.enum_type || [], fn(enum_desc) -> generate_enum(enum_desc, []) end) ++
       Enum.map(desc.service || [], fn(svc_desc) -> generate_service(svc_desc) end) ++
       Enum.map(desc.extension || [], fn(ext_desc) -> generate_extension(ext_desc) end)
     Enum.join(list, "\n")
@@ -15,11 +15,11 @@ defmodule Protobuf.Protoc.Generator do
   def generate_msg(desc, _namespace) do
     name = desc.name
     structs = Enum.map_join(desc.field, ", ", fn(f) -> ":#{f.name}" end)
-    fields = Enum.map(desc.field, fn(f) -> generate_field(f) end)
+    fields = Enum.map(desc.field, fn(f) -> generate_message_field(f) end)
     Protobuf.Protoc.Template.message(name, structs, fields)
   end
 
-  def generate_field(f) do
+  def generate_message_field(f) do
     opts_str = field_options(f)
     if String.length(opts_str) > 0 do
       ":#{f.name}, #{f.number}, #{label_name(f.label)}: true, type: :#{type_name(f)}, #{field_options(f)}"
@@ -29,7 +29,14 @@ defmodule Protobuf.Protoc.Generator do
   end
 
   def generate_enum(desc, namespace) do
-    ""
+    name = desc.name
+    fields = Enum.map(desc.value, fn(f) -> generate_enum_field(f) end)
+    Protobuf.Protoc.Template.enum(name, fields)
+  end
+
+  def generate_enum_field(f) do
+    # TODO: options
+    ":#{f.name}, #{f.number}"
   end
 
   def generate_service(svc) do
