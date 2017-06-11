@@ -3,7 +3,7 @@ defmodule <%= name %> do
 
   defstruct [<%= struct_fields %>]
 
-  <%= Enum.map fields, fn(field) -> %>
+<%= Enum.map fields, fn(field) -> %>
   field <%= field %>
-  <% end %>
+<% end %>
 end

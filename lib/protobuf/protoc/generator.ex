@@ -9,14 +9,19 @@ defmodule Protobuf.Protoc.Generator do
       Enum.map(desc.enum_type || [], fn(enum_desc) -> generate_enum(enum_desc, []) end) ++
       Enum.map(desc.service || [], fn(svc_desc) -> generate_service(svc_desc) end) ++
       Enum.map(desc.extension || [], fn(ext_desc) -> generate_extension(ext_desc) end)
-    Enum.join(list, "\n")
+    list
+    |> List.flatten
+    |> Enum.join("\n")
   end
 
-  def generate_msg(desc, _namespace) do
+  def generate_msg(desc, namespace) do
     name = desc.name
-    structs = Enum.map_join(desc.field, ", ", fn(f) -> ":#{f.name}" end)
-    fields = Enum.map(desc.field, fn(f) -> generate_message_field(f) end)
-    Protobuf.Protoc.Template.message(name, structs, fields)
+    new_namespace = namespace ++ [name]
+    structs = Enum.map_join(desc.field || [], ", ", fn(f) -> ":#{f.name}" end)
+    fields = Enum.map(desc.field || [], fn(f) -> generate_message_field(f) end)
+    [Protobuf.Protoc.Template.message(join_name(new_namespace), structs, fields)] ++
+      Enum.map(desc.nested_type || [], fn(nested_msg_desc) -> generate_msg(nested_msg_desc, new_namespace) end) ++
+      Enum.map(desc.enum_type || [], fn(enum_desc) -> generate_enum(enum_desc, new_namespace) end)
   end
 
   def generate_message_field(f) do
@@ -31,7 +36,7 @@ defmodule Protobuf.Protoc.Generator do
   def generate_enum(desc, namespace) do
     name = desc.name
     fields = Enum.map(desc.value, fn(f) -> generate_enum_field(f) end)
-    Protobuf.Protoc.Template.enum(name, fields)
+    Protobuf.Protoc.Template.enum(join_name(namespace ++ [name]), fields)
   end
 
   def generate_enum_field(f) do
@@ -97,6 +102,10 @@ defmodule Protobuf.Protoc.Generator do
     opts
     |> Enum.filter_map(fn({_, v}) -> v end, fn({k, v}) -> "#{k}: #{v}" end)
     |> Enum.join(", ")
+  end
+
+  defp join_name(list) do
+    Enum.join(list, ".")
   end
 
 end

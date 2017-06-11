@@ -1,7 +1,7 @@
 defmodule <%= name %> do
   use Protobuf, enum: true
 
-  <%= Enum.map fields, fn(field) -> %>
+<%= Enum.map fields, fn(field) -> %>
   field <%= field %>
-  <% end %>
+<% end %>
 end
