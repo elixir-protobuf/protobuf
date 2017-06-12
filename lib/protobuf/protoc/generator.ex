@@ -68,11 +68,6 @@ defmodule Protobuf.Protoc.Generator do
     |> String.replace_suffix(".proto", ".pb.ex")
   end
 
-  def fail(reason) do
-    IO.write("protoc-gen-elixir: #{reason}")
-    System.halt(1)
-  end
-
   defp label_name(1), do: "optional"
   defp label_name(2), do: "required"
   defp label_name(3), do: "repeated"
