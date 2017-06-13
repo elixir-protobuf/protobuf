@@ -3,9 +3,10 @@ defmodule Protobuf.Protoc.GeneratorTest do
 
   alias Protobuf.Protoc.{Generator, Context}
 
-  test "generate/1 works" do
+  test "generate/2 works" do
+    ctx = %Context{}
     desc = %Google_Protobuf.FileDescriptorProto{name: "name"}
-    assert Generator.generate(desc) == %Google_Protobuf_Compiler.CodeGeneratorResponse.File{name: "name", content: ""}
+    assert Generator.generate(ctx, desc) == %Google_Protobuf_Compiler.CodeGeneratorResponse.File{name: "name", content: ""}
   end
 
   test "generate_msg/2 has right name" do

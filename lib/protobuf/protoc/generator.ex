@@ -1,13 +1,13 @@
 defmodule Protobuf.Protoc.Generator do
   alias Protobuf.Protoc.Context
 
-  def generate(desc) do
+  def generate(ctx, desc) do
     name = new_file_name(desc.name)
-    %Google_Protobuf_Compiler.CodeGeneratorResponse.File{name: name, content: generate_content(desc)}
+    %Google_Protobuf_Compiler.CodeGeneratorResponse.File{name: name, content: generate_content(ctx, desc)}
   end
 
-  def generate_content(desc) do
-    ctx = %Context{package: desc.package, namespace: []}
+  def generate_content(ctx, desc) do
+    ctx = %{ctx | package: desc.package}
     list = Enum.map(desc.message_type || [], fn(msg_desc) -> generate_msg(ctx, msg_desc) end) ++
       Enum.map(desc.enum_type || [], fn(enum_desc) -> generate_enum(ctx, enum_desc) end) ++
       Enum.map(desc.service || [], fn(svc_desc) -> generate_service(ctx, svc_desc) end) ++
