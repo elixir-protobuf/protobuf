@@ -37,6 +37,26 @@ defmodule Protobuf.Protoc.GeneratorTest do
     assert msg =~ "field :a, 1, optional: true, type: :int32, default: 42\n"
   end
 
+  test "generate_msg/2 supports option :packed" do
+    ctx = %Context{package: ""}
+    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
+      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 5, label: 1,
+        options: %Google_Protobuf.FieldOptions{packed: true}}
+    ]}
+    [msg] = Generator.generate_msg(ctx, desc)
+    assert msg =~ "field :a, 1, optional: true, type: :int32, packed: true\n"
+  end
+
+  test "generate_msg/2 supports option :deprecated" do
+    ctx = %Context{package: ""}
+    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
+      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 5, label: 1,
+      options: %Google_Protobuf.FieldOptions{deprecated: true}}
+    ]}
+    [msg] = Generator.generate_msg(ctx, desc)
+    assert msg =~ "field :a, 1, optional: true, type: :int32, deprecated: true\n"
+  end
+
   test "generate_msg/2 supports enum" do
     ctx = %Context{package: "a_b.c_d"}
     desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [

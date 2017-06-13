@@ -95,11 +95,16 @@ defmodule Protobuf.Protoc.Generator do
   defp field_options(f) do
     opts = %{enum: f.type == 14, default: f.default_value}
     if f.options do
-      opts = opts
-        |> Map.put(:packed, f.options.packed)
-        |> Map.put(:deprecated, f.options.deprecated)
+      opts |> merge_field_options(f) |> options_to_str
+    else
+      options_to_str(opts)
     end
-    options_to_str(opts)
+  end
+
+  defp merge_field_options(opts, f) do
+    opts
+      |> Map.put(:packed, f.options.packed)
+      |> Map.put(:deprecated, f.options.deprecated)
   end
 
   defp options_to_str(opts) do
