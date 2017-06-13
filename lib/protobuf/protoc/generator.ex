@@ -2,7 +2,7 @@ defmodule Protobuf.Protoc.Generator do
   alias Protobuf.Protoc.Context
 
   def generate(desc) do
-    name = new_name(desc.name)
+    name = new_file_name(desc.name)
     %Google_Protobuf_Compiler.CodeGeneratorResponse.File{name: name, content: generate_content(desc)}
   end
 
@@ -61,11 +61,8 @@ defmodule Protobuf.Protoc.Generator do
     ""
   end
 
-  defp new_name(name) do
-    name
-    |> String.split("/")
-    |> List.last
-    |> String.replace_suffix(".proto", ".pb.ex")
+  defp new_file_name(name) do
+    String.replace_suffix(name, ".proto", ".pb.ex")
   end
 
   defp label_name(1), do: "optional"
