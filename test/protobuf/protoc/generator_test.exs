@@ -59,12 +59,12 @@ defmodule Protobuf.Protoc.GeneratorTest do
   end
 
   test "generate_msg/2 supports enum" do
-    ctx = %Context{package: "a_b.c_d"}
+    ctx = %Context{package: "foo_bar.ab_cd"}
     desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
-      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 14, label: 1, type_name: ".a_b.c_d.EnumFoo"}
+      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 14, label: 1, type_name: ".foo_bar.ab_cd.EnumFoo"}
     ]}
     [msg] = Generator.generate_msg(ctx, desc)
-    assert msg =~ "field :a, 1, optional: true, type: EnumFoo, enum: true\n"
+    assert msg =~ "field :a, 1, optional: true, type: FooBar_AbCd.EnumFoo, enum: true\n"
   end
 
   test "generate_msg/2 supports nested messages" do
@@ -105,5 +105,24 @@ defmodule Protobuf.Protoc.GeneratorTest do
     assert msg =~ "use Protobuf, enum: true\n"
     refute msg =~ "defstruct "
     assert msg =~ "field :A, 0\n  field :B, 1\n"
+  end
+
+  test "generate_service/2 generates services" do
+    ctx = %Context{package: "foo"}
+    desc = %Google_Protobuf.ServiceDescriptorProto{name: "ServiceFoo",
+      method: [
+        %Google_Protobuf.MethodDescriptorProto{name: "MethodA", input_type: "Input0", output_type: "Output0"},
+        %Google_Protobuf.MethodDescriptorProto{name: "MethodB", input_type: "Input1", output_type: "Output1", client_streaming: true},
+        %Google_Protobuf.MethodDescriptorProto{name: "MethodC", input_type: "Input2", output_type: "Output2", server_streaming: true},
+        %Google_Protobuf.MethodDescriptorProto{name: "MethodD", input_type: "Input3", output_type: "Output3", client_streaming: true, server_streaming: true}
+      ]
+    }
+    msg = Generator.generate_service(ctx, desc)
+    assert msg =~ "defmodule Foo.ServiceFoo.Service do\n"
+    assert msg =~ "use GRPC.Service, name: \"foo.ServiceFoo\"\n"
+    assert msg =~ "rpc :MethodA, Foo.Input0, Foo.Output0\n"
+    assert msg =~ "rpc :MethodB, stream(Foo.Input1), Foo.Output1\n"
+    assert msg =~ "rpc :MethodC, Foo.Input2, stream(Foo.Output2)\n"
+    assert msg =~ "rpc :MethodD, stream(Foo.Input3), stream(Foo.Output3)\n"
   end
 end

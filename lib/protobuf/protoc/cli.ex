@@ -4,6 +4,8 @@ defmodule Protobuf.Protoc.CLI do
     :io.setopts(:standard_io, encoding: :latin1)
     bin = IO.binread(:all)
     request = Protobuf.Decoder.decode(bin, Google_Protobuf_Compiler.CodeGeneratorRequest)
+    # debug
+    # raise inspect(request, limit: :infinity)
     ctx = %Protobuf.Protoc.Context{}
     ctx = parse_params(ctx, request.parameter)
     files = Enum.map request.proto_file, fn(desc) ->

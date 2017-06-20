@@ -1,5 +1,5 @@
 defmodule Protobuf.Protoc.Generator do
-  alias Protobuf.Protoc.{Context, Template}
+  alias Protobuf.Protoc.Template
 
   def generate(ctx, desc) do
     name = new_file_name(desc.name)
@@ -25,12 +25,13 @@ defmodule Protobuf.Protoc.Generator do
     end
   end
 
-  def generate_msg(%{namespace: ns} = ctx, desc) do
-    name = desc.name
+  def generate_msg(%{namespace: ns, package: pkg} = ctx, desc) do
+    name = trans_name(desc.name)
     new_namespace = ns ++ [name]
     structs = Enum.map_join(desc.field || [], ", ", fn(f) -> ":#{f.name}" end)
     fields = Enum.map(desc.field || [], fn(f) -> generate_message_field(ctx, f) end)
-    [Template.message(join_name(new_namespace), structs, fields)] ++
+    msg_name = new_namespace |> join_name |> attach_pkg(pkg)
+    [Template.message(msg_name, structs, fields)] ++
       Enum.map(desc.nested_type || [], fn(nested_msg_desc) -> generate_msg(Map.put(ctx, :namespace, new_namespace), nested_msg_desc) end) ++
       Enum.map(desc.enum_type || [], fn(enum_desc) -> generate_enum(Map.put(ctx, :namespace, new_namespace), enum_desc) end)
   end
@@ -39,7 +40,7 @@ defmodule Protobuf.Protoc.Generator do
     opts_str = field_options(f)
     type = type_name(f)
     type = if type == :enum do
-      trim_package(f.type_name, ctx.package)
+      trans_type_name(f.type_name, ctx.package)
     else
       ":#{type}"
     end
@@ -50,10 +51,11 @@ defmodule Protobuf.Protoc.Generator do
     end
   end
 
-  def generate_enum(%{namespace: ns}, desc) do
-    name = desc.name
+  def generate_enum(%{namespace: ns, package: pkg}, desc) do
+    name = trans_name(desc.name)
     fields = Enum.map(desc.value, fn(f) -> generate_enum_field(f) end)
-    Template.enum(join_name(ns ++ [name]), fields)
+    msg_name = join_name(ns ++ [name]) |> attach_pkg(pkg)
+    Template.enum(msg_name, fields)
   end
 
   def generate_enum_field(f) do
@@ -62,15 +64,15 @@ defmodule Protobuf.Protoc.Generator do
   end
 
   def generate_service(ctx, svc) do
-    mod_name = Macro.camelize(svc.name)
+    mod_name = svc.name |> Macro.camelize |> attach_pkg(ctx.package)
     name = "#{ctx.package}.#{svc.name}"
     methods = Enum.map(svc.method, fn(m) -> generate_service_method(ctx, m) end)
     Template.service(mod_name, name, methods)
   end
 
-  defp generate_service_method(%{package: pkg} = ctx, m) do
-    input = service_arg(trim_package(m.input_type, pkg), m.client_streaming)
-    output = service_arg(trim_package(m.output_type, pkg), m.server_streaming)
+  defp generate_service_method(%{package: pkg}, m) do
+    input = service_arg(trans_type_name(m.input_type, pkg), m.client_streaming)
+    output = service_arg(trans_type_name(m.output_type, pkg), m.server_streaming)
     ":#{m.name}, #{input}, #{output}"
   end
 
@@ -134,8 +136,35 @@ defmodule Protobuf.Protoc.Generator do
     Enum.join(list, ".")
   end
 
-  defp trim_package(name, pkg) do
-    String.trim_leading(name, "." <> pkg <> ".")
+  def trans_name(name) do
+    Macro.camelize(name)
+  end
+
+  def attach_pkg(name, nil), do: name
+  def attach_pkg(name, ""), do: name
+  def attach_pkg(name, pkg), do: trans_pkg(pkg) <> "." <> name
+
+  defp trans_type_name(name, nil), do: trans_type_name(name, "")
+  defp trans_type_name(name, ""), do: name |> String.trim_leading(".") |> normalize_type_name
+  defp trans_type_name(name, pkg) do
+    name = name |> String.trim_leading("." <> pkg <> ".") |> normalize_type_name
+    trans_pkg(pkg) <> "." <> name
+  end
+
+  def trans_pkg(nil), do: ""
+  def trans_pkg(""), do: ""
+  def trans_pkg(pkg) do
+    pkg
+    |> String.split(".")
+    |> Enum.map(&Macro.camelize(&1))
+    |> Enum.join("_")
+  end
+
+  defp normalize_type_name(name) do
+    name
+    |> String.split(".")
+    |> Enum.map(&Macro.camelize(&1))
+    |> Enum.join(".")
   end
 
 end
