@@ -36,7 +36,7 @@ defmodule Protobuf.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [{:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
-     {:credo, "~> 0.7", only: [:dev, :test], runtime: false},
+     {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
      {:ex_doc, "~> 0.14", only: :dev, runtime: false}]
   end
 

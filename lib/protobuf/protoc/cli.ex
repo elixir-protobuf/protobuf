@@ -8,9 +8,12 @@ defmodule Protobuf.Protoc.CLI do
     # raise inspect(request, limit: :infinity)
     ctx = %Protobuf.Protoc.Context{}
     ctx = parse_params(ctx, request.parameter)
-    files = Enum.map request.proto_file, fn(desc) ->
+    ctx = find_package_names(ctx, request.proto_file)
+    files = Enum.filter_map(request.proto_file, fn(desc) ->
+      Enum.member?(request.file_to_generate, desc.name)
+    end, fn(desc) ->
       Protobuf.Protoc.Generator.generate(ctx, desc)
-    end
+    end)
     response = %Google_Protobuf_Compiler.CodeGeneratorResponse{file: files}
     IO.binwrite(Protobuf.Encoder.encode(response))
   end
@@ -26,4 +29,12 @@ defmodule Protobuf.Protoc.CLI do
     parse_params(ctx, t)
   end
   def parse_params(ctx, []), do: ctx
+
+  defp find_package_names(ctx, descs) do
+    find_package_names(ctx, descs, %{})
+  end
+  defp find_package_names(ctx, [], acc), do: %{ctx|pkg_mapping: acc}
+  defp find_package_names(ctx, [desc|t], acc) do
+    find_package_names(ctx, t, Map.put(acc, desc.name, desc.package))
+  end
 end

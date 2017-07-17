@@ -7,7 +7,7 @@ defmodule Protobuf.Protoc.Generator do
   end
 
   def generate_content(ctx, desc) do
-    ctx = %{ctx | package: desc.package}
+    ctx = %{ctx | package: desc.package || "", dep_pkgs: get_dep_pkgs(ctx, desc.dependency || [])}
     list = Enum.map(desc.message_type || [], fn(msg_desc) -> generate_msg(ctx, msg_desc) end) ++
       Enum.map(desc.enum_type || [], fn(enum_desc) -> generate_enum(ctx, enum_desc) end) ++
       generate_services(ctx, desc) ++
@@ -15,6 +15,12 @@ defmodule Protobuf.Protoc.Generator do
     list
     |> List.flatten
     |> Enum.join("\n")
+  end
+
+  defp get_dep_pkgs(%{pkg_mapping: mapping}, deps) do
+    deps
+    |> Enum.map(fn(dep) -> mapping[dep] end)
+    |> Enum.sort(&(byte_size(&2) <= byte_size(&1)))
   end
 
   def generate_services(ctx, desc) do
@@ -39,8 +45,8 @@ defmodule Protobuf.Protoc.Generator do
   def generate_message_field(ctx, f) do
     opts_str = field_options(f)
     type = type_name(f)
-    type = if type == :enum do
-      trans_type_name(f.type_name, ctx.package)
+    type = if type == :enum || type == :message do
+      trans_type_name(f.type_name, ctx)
     else
       ":#{type}"
     end
@@ -70,16 +76,16 @@ defmodule Protobuf.Protoc.Generator do
     Template.service(mod_name, name, methods)
   end
 
-  defp generate_service_method(%{package: pkg}, m) do
-    input = service_arg(trans_type_name(m.input_type, pkg), m.client_streaming)
-    output = service_arg(trans_type_name(m.output_type, pkg), m.server_streaming)
+  defp generate_service_method(ctx, m) do
+    input = service_arg(trans_type_name(m.input_type, ctx), m.client_streaming)
+    output = service_arg(trans_type_name(m.output_type, ctx), m.server_streaming)
     ":#{m.name}, #{input}, #{output}"
   end
 
   defp service_arg(type, true), do: "stream(#{type})"
   defp service_arg(type, _), do: type
 
-  def generate_extension(ctx, desc) do
+  def generate_extension(_, _) do
     ""
   end
 
@@ -140,20 +146,36 @@ defmodule Protobuf.Protoc.Generator do
     Macro.camelize(name)
   end
 
-  def attach_pkg(name, nil), do: name
   def attach_pkg(name, ""), do: name
-  def attach_pkg(name, pkg), do: trans_pkg(pkg) <> "." <> name
+  def attach_pkg(name, pkg), do: normalize_pkg_name(pkg) <> "." <> name
 
-  defp trans_type_name(name, nil), do: trans_type_name(name, "")
-  defp trans_type_name(name, ""), do: name |> String.trim_leading(".") |> normalize_type_name
-  defp trans_type_name(name, pkg) do
-    name = name |> String.trim_leading("." <> pkg <> ".") |> normalize_type_name
-    trans_pkg(pkg) <> "." <> name
+  defp trans_type_name(name, ctx) do
+    case find_type_package(name, ctx) do
+      "" -> name |> String.trim_leading(".") |> normalize_type_name
+      found_pkg ->
+        name = name |> String.trim_leading("." <> found_pkg <> ".") |> normalize_type_name
+        normalize_pkg_name(found_pkg) <> "." <> name
+    end
   end
 
-  def trans_pkg(nil), do: ""
-  def trans_pkg(""), do: ""
-  def trans_pkg(pkg) do
+  defp find_type_package("." <> name, %{dep_pkgs: pkgs, package: pkg}) do
+    case find_package_in_deps(name, pkgs) do
+      nil -> pkg
+      found_pkg -> found_pkg
+    end
+  end
+  defp find_type_package(_, %{package: pkg}), do: pkg
+
+  def find_package_in_deps(_, []), do: nil
+  def find_package_in_deps(name, [pkg|tail]) do
+    if String.starts_with?(name, pkg <> ".") do
+      pkg
+    else
+      find_package_in_deps(name, tail)
+    end
+  end
+
+  def normalize_pkg_name(pkg) do
     pkg
     |> String.split(".")
     |> Enum.map(&Macro.camelize(&1))

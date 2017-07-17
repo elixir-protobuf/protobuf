@@ -10,11 +10,18 @@ defmodule Protobuf.Protoc.GeneratorTest do
   end
 
   test "generate_msg/2 has right name" do
-    ctx = %Context{}
+    ctx = %Context{package: ""}
     desc = %Google_Protobuf.DescriptorProto{name: "Foo"}
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
     assert msg =~ "use Protobuf\n"
+  end
+
+  test "generate_msg/2 has right name with package" do
+    ctx = %Context{package: "pkg.name"}
+    desc = %Google_Protobuf.DescriptorProto{name: "Foo"}
+    [msg] = Generator.generate_msg(ctx, desc)
+    assert msg =~ "defmodule Pkg_Name.Foo do\n"
   end
 
   test "generate_msg/2 has right fields" do
@@ -58,13 +65,22 @@ defmodule Protobuf.Protoc.GeneratorTest do
     assert msg =~ "field :a, 1, optional: true, type: :int32, deprecated: true\n"
   end
 
-  test "generate_msg/2 supports enum" do
+  test "generate_msg/2 supports enum field" do
     ctx = %Context{package: "foo_bar.ab_cd"}
     desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
       %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 14, label: 1, type_name: ".foo_bar.ab_cd.EnumFoo"}
     ]}
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: FooBar_AbCd.EnumFoo, enum: true\n"
+  end
+
+  test "generate_msg/2 generate right enum type name with different package" do
+    ctx = %Context{package: "foo_bar.ab_cd", dep_pkgs: ["other_pkg"]}
+    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
+      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 14, label: 1, type_name: ".other_pkg.EnumFoo"}
+    ]}
+    [msg] = Generator.generate_msg(ctx, desc)
+    assert msg =~ "field :a, 1, optional: true, type: OtherPkg.EnumFoo, enum: true\n"
   end
 
   test "generate_msg/2 supports nested messages" do
