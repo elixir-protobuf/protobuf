@@ -175,7 +175,7 @@ defmodule Google_Protobuf.FileOptions do
   field :java_multiple_files, 10, optional: true, type: :bool, default: false
   field :java_generate_equals_and_hash, 20, optional: true, type: :bool, deprecated: true
   field :java_string_check_utf8, 27, optional: true, type: :bool, default: false
-  field :optimize_for, 9, optional: true, type: OptimizeMode, default: 1
+  field :optimize_for, 9, optional: true, type: Google_Protobuf.FileOptions.OptimizeMode, default: 1, enum: true
   field :go_package, 11, optional: true, type: :string
   field :cc_generic_services, 16, optional: true, type: :bool, default: false
   field :java_generic_services, 17, optional: true, type: :bool, default: false

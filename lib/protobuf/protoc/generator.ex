@@ -11,7 +11,8 @@ defmodule Protobuf.Protoc.Generator do
   end
 
   def generate_content(ctx, desc) do
-    ctx = %{ctx | package: desc.package || "", dep_pkgs: get_dep_pkgs(ctx, desc.dependency || [])}
+    ctx = %{ctx | package: desc.package || ""}
+    ctx = %{ctx | dep_pkgs: get_dep_pkgs(ctx, desc.dependency || [])}
     list = Enum.map(desc.message_type || [], fn(msg_desc) -> generate_msg(ctx, msg_desc) end) ++
       Enum.map(desc.enum_type || [], fn(enum_desc) -> generate_enum(ctx, enum_desc) end) ++
       generate_services(ctx, desc) ++
@@ -22,10 +23,10 @@ defmodule Protobuf.Protoc.Generator do
   end
 
   @doc false
-  def get_dep_pkgs(%{pkg_mapping: mapping}, deps) do
-    deps
-    |> Enum.map(fn(dep) -> mapping[dep] end)
-    |> Enum.sort(&(byte_size(&2) <= byte_size(&1)))
+  def get_dep_pkgs(%{pkg_mapping: mapping, package: pkg}, deps) do
+    pkgs = deps |> Enum.map(fn(dep) -> mapping[dep] end)
+    pkgs = if pkg && String.length(pkg) > 0, do: [pkg | pkgs], else: pkgs
+    Enum.sort(pkgs, &(byte_size(&2) <= byte_size(&1)))
   end
 
   def generate_services(ctx, desc) do
@@ -51,7 +52,7 @@ defmodule Protobuf.Protoc.Generator do
     opts_str = field_options(f)
     type = type_name(f)
     type = if type == :enum || type == :message do
-      trans_type_name(f.type_name, ctx)
+      t = trans_type_name(f.type_name, ctx)
     else
       ":#{type}"
     end
