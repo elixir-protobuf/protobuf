@@ -6,6 +6,10 @@ defmodule Protobuf.Protoc.Generator do
     %Google_Protobuf_Compiler.CodeGeneratorResponse.File{name: name, content: generate_content(ctx, desc)}
   end
 
+  defp new_file_name(name) do
+    String.replace_suffix(name, ".proto", ".pb.ex")
+  end
+
   def generate_content(ctx, desc) do
     ctx = %{ctx | package: desc.package || "", dep_pkgs: get_dep_pkgs(ctx, desc.dependency || [])}
     list = Enum.map(desc.message_type || [], fn(msg_desc) -> generate_msg(ctx, msg_desc) end) ++
@@ -17,7 +21,8 @@ defmodule Protobuf.Protoc.Generator do
     |> Enum.join("\n")
   end
 
-  defp get_dep_pkgs(%{pkg_mapping: mapping}, deps) do
+  @doc false
+  def get_dep_pkgs(%{pkg_mapping: mapping}, deps) do
     deps
     |> Enum.map(fn(dep) -> mapping[dep] end)
     |> Enum.sort(&(byte_size(&2) <= byte_size(&1)))
@@ -89,10 +94,6 @@ defmodule Protobuf.Protoc.Generator do
     ""
   end
 
-  defp new_file_name(name) do
-    String.replace_suffix(name, ".proto", ".pb.ex")
-  end
-
   defp label_name(1), do: "optional"
   defp label_name(2), do: "required"
   defp label_name(3), do: "repeated"
@@ -146,8 +147,8 @@ defmodule Protobuf.Protoc.Generator do
     Macro.camelize(name)
   end
 
-  def attach_pkg(name, ""), do: name
-  def attach_pkg(name, pkg), do: normalize_pkg_name(pkg) <> "." <> name
+  defp attach_pkg(name, ""), do: name
+  defp attach_pkg(name, pkg), do: normalize_pkg_name(pkg) <> "." <> name
 
   defp trans_type_name(name, ctx) do
     case find_type_package(name, ctx) do
@@ -158,24 +159,7 @@ defmodule Protobuf.Protoc.Generator do
     end
   end
 
-  defp find_type_package("." <> name, %{dep_pkgs: pkgs, package: pkg}) do
-    case find_package_in_deps(name, pkgs) do
-      nil -> pkg
-      found_pkg -> found_pkg
-    end
-  end
-  defp find_type_package(_, %{package: pkg}), do: pkg
-
-  def find_package_in_deps(_, []), do: nil
-  def find_package_in_deps(name, [pkg|tail]) do
-    if String.starts_with?(name, pkg <> ".") do
-      pkg
-    else
-      find_package_in_deps(name, tail)
-    end
-  end
-
-  def normalize_pkg_name(pkg) do
+  defp normalize_pkg_name(pkg) do
     pkg
     |> String.split(".")
     |> Enum.map(&Macro.camelize(&1))
@@ -187,6 +171,23 @@ defmodule Protobuf.Protoc.Generator do
     |> String.split(".")
     |> Enum.map(&Macro.camelize(&1))
     |> Enum.join(".")
+  end
+
+  defp find_type_package("." <> name, %{dep_pkgs: pkgs, package: pkg}) do
+    case find_package_in_deps(name, pkgs) do
+      nil -> pkg
+      found_pkg -> found_pkg
+    end
+  end
+  defp find_type_package(_, %{package: pkg}), do: pkg
+
+  defp find_package_in_deps(_, []), do: nil
+  defp find_package_in_deps(name, [pkg|tail]) do
+    if String.starts_with?(name, pkg <> ".") do
+      pkg
+    else
+      find_package_in_deps(name, tail)
+    end
   end
 
 end

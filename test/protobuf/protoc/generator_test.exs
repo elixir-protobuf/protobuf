@@ -5,8 +5,13 @@ defmodule Protobuf.Protoc.GeneratorTest do
 
   test "generate/2 works" do
     ctx = %Context{}
-    desc = %Google_Protobuf.FileDescriptorProto{name: "name"}
-    assert Generator.generate(ctx, desc) == %Google_Protobuf_Compiler.CodeGeneratorResponse.File{name: "name", content: ""}
+    desc = %Google_Protobuf.FileDescriptorProto{name: "name.proto"}
+    assert Generator.generate(ctx, desc) == %Google_Protobuf_Compiler.CodeGeneratorResponse.File{name: "name.pb.ex", content: ""}
+  end
+
+  test "get_dep_pkgs/2 sort pkgs by length" do
+    ctx = %Context{pkg_mapping: %{"foo.proto" => "foo", "foo_bar.proto" => "foo.bar"}}
+    assert Generator.get_dep_pkgs(ctx, ["foo.proto", "foo_bar.proto"]) == ["foo.bar", "foo"]
   end
 
   test "generate_msg/2 has right name" do
@@ -81,6 +86,24 @@ defmodule Protobuf.Protoc.GeneratorTest do
     ]}
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: OtherPkg.EnumFoo, enum: true\n"
+  end
+
+  test "generate_msg/2 generate right message type name with different package" do
+    ctx = %Context{package: "foo_bar.ab_cd", dep_pkgs: ["other_pkg"]}
+    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
+      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 11, label: 1, type_name: ".other_pkg.MsgFoo"}
+    ]}
+    [msg] = Generator.generate_msg(ctx, desc)
+    assert msg =~ "field :a, 1, optional: true, type: OtherPkg.MsgFoo\n"
+  end
+
+  test "generate_msg/2 use longest package name for type" do
+    ctx = %Context{package: "foo_bar.ab_cd", dep_pkgs: ["foo.bar", "foo"]}
+    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
+      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 14, label: 1, type_name: ".foo.bar.EnumFoo"}
+    ]}
+    [msg] = Generator.generate_msg(ctx, desc)
+    assert msg =~ "field :a, 1, optional: true, type: Foo_Bar.EnumFoo, enum: true\n"
   end
 
   test "generate_msg/2 supports nested messages" do
