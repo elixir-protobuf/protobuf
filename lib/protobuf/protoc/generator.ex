@@ -52,7 +52,7 @@ defmodule Protobuf.Protoc.Generator do
     opts_str = field_options(f)
     type = type_name(f)
     type = if type == :enum || type == :message do
-      t = trans_type_name(f.type_name, ctx)
+      trans_type_name(f.type_name, ctx)
     else
       ":#{type}"
     end
@@ -114,18 +114,38 @@ defmodule Protobuf.Protoc.Generator do
   defp type_name(%{type: 15}), do: :sfixed32
   defp type_name(%{type: 16}), do: :sfixed64
   defp type_name(%{type: 17}), do: :sint32
-  defp type_name(%{type: 18}), do: :sint63
+  defp type_name(%{type: 18}), do: :sint64
 
   defp type_name(%{type: 11}), do: :message
   defp type_name(%{type: 14}), do: :enum
 
   defp field_options(f) do
-    opts = %{enum: f.type == 14, default: f.default_value}
+    opts = %{enum: f.type == 14, default: default_value(f.type, f.default_value)}
     if f.options do
       opts |> merge_field_options(f) |> options_to_str
     else
       options_to_str(opts)
     end
+  end
+
+  defp default_value(_, nil), do: nil
+  defp default_value(type, value) do
+    val = cond do
+      type <= 2 ->
+        case Float.parse(value) do
+          {v, _} -> v
+          :error -> value
+        end
+      type <= 7 || type == 13 || (type >= 15 && type <= 18) ->
+        case Integer.parse(value) do
+          {v, _} -> v
+          :error -> value
+        end
+      type == 8 -> String.to_atom(value)
+      type == 14 -> String.to_atom(value)
+      true -> value
+    end
+    inspect(val)
   end
 
   defp merge_field_options(opts, f) do
@@ -136,7 +156,8 @@ defmodule Protobuf.Protoc.Generator do
 
   defp options_to_str(opts) do
     opts
-    |> Enum.filter_map(fn({_, v}) -> v end, fn({k, v}) -> "#{k}: #{v}" end)
+    |> Enum.filter(fn({_, v}) -> v end)
+    |> Enum.map(fn({k, v}) -> "#{k}: #{v}" end)
     |> Enum.join(", ")
   end
 

@@ -44,7 +44,7 @@ defmodule Protobuf.Protoc.GeneratorTest do
   test "generate_msg/2 supports option :default" do
     ctx = %Context{package: ""}
     desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
-      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 5, label: 1, default_value: 42}
+      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 5, label: 1, default_value: "42"}
     ]}
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: :int32, default: 42\n"

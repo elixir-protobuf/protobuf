@@ -11,6 +11,7 @@ defmodule Protobuf.Mixfile do
      start_permanent: Mix.env == :prod,
      deps: deps(),
      escript: escript(),
+     aliases: ["test.integration": &test_integration/1],
 
      description: description(),
      package: package()
@@ -42,7 +43,7 @@ defmodule Protobuf.Mixfile do
 
   defp escript do
     [main_module: Protobuf.Protoc.CLI,
-     name: "protoc-gen-elixir",
+     path: "./priv/protoc-gen-elixir",
      app: nil]
   end
 
@@ -57,4 +58,23 @@ defmodule Protobuf.Mixfile do
      files: ~w(mix.exs README.md lib config LICENSE)]
   end
 
+  def test_integration(args) do
+    IO.puts "==> mix.escript.build"
+    {_, 0} = System.cmd "mix", ["escript.build"], into: IO.binstream(:stdio, :line)
+    test_path = "test/protobuf/protoc"
+    args1 = ["-I", "#{test_path}/proto", "--elixir_out=#{test_path}/proto_gen",
+      "--plugin=protoc-gen-elixir=priv/protoc-gen-elixir",
+      "#{test_path}/proto/test.proto"]
+    IO.puts "==> protoc #{Enum.join(args1, " ")}"
+    {_, 0} = System.cmd "protoc", args1, into: IO.binstream(:stdio, :line)
+    args = ["--only", "integration"|args]
+    args = if IO.ANSI.enabled?, do: ["--color"|args], else: ["--no-color"|args]
+    IO.puts "==> mix test #{Enum.join(args, " ")}"
+    {_, res} = System.cmd "mix", ["test"|args],
+                          into: IO.binstream(:stdio, :line)
+
+    if res > 0 do
+      System.at_exit(fn _ -> exit({:shutdown, 1}) end)
+    end
+  end
 end

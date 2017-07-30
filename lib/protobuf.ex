@@ -16,4 +16,12 @@ defmodule Protobuf do
       def encode(struct), do: Protobuf.Encoder.encode(struct)
     end
   end
+
+  def decode(%{__struct__: mod} = data) do
+    Protobuf.Decoder.decode(data, mod)
+  end
+
+  def encode(struct) do
+    Protobuf.Encoder.encode(struct)
+  end
 end
