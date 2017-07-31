@@ -71,16 +71,8 @@ defmodule Protobuf.Encoder do
   end
 
   @spec encode_type(atom, any) :: iodata
-  def encode_type(:int32, n) when n >= 0, do: encode_varint(n)
-  def encode_type(:int32, n) when n < 0 do
-    <<n::64-unsigned-native>> = <<n::64-signed-native>>
-    encode_varint(n)
-  end
-  def encode_type(:int64, n) when n >= 0, do: encode_varint(n)
-  def encode_type(:int64, n) when n < 0 do
-    <<n::64-unsigned-native>> = <<n::64-signed-native>>
-    encode_varint(n)
-  end
+  def encode_type(:int32, n), do: encode_varint(n)
+  def encode_type(:int64, n), do: encode_varint(n)
   def encode_type(:uint32, n), do: encode_varint(n)
   def encode_type(:uint64, n), do: encode_varint(n)
   def encode_type(:sint32, n), do: n |> encode_zigzag |> encode_varint
@@ -106,6 +98,10 @@ defmodule Protobuf.Encoder do
   def encode_zigzag(val) when val < 0,  do: val * -2 - 1
 
   @spec encode_varint(integer) :: iodata
+  def encode_varint(n) when n < 0 do
+    <<n::64-unsigned-native>> = <<n::64-signed-native>>
+    encode_varint(n)
+  end
   def encode_varint(n) when n <= 127, do: <<n>>
   def encode_varint(n) when n > 127, do: <<1::1, band(n, 127)::7, encode_varint(bsr(n, 7))::binary>>
 
