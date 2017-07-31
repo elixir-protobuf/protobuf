@@ -9,6 +9,7 @@ defmodule Protobuf.MessageProps do
     enum?: boolean,
     extendable?: boolean,
     oneof?: boolean,
+    map?: boolean,
   }
   defstruct [
     ordered_tags: [],
@@ -19,5 +20,6 @@ defmodule Protobuf.MessageProps do
     enum?: false,
     oneof?: false,
     extendable?: false,
+    map?: false,
   ]
 end

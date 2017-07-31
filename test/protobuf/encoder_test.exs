@@ -12,10 +12,26 @@ defmodule Protobuf.EncoderTest do
     field :b, 2, optional: true, type: :string
   end
 
+  defmodule EnumFoo do
+    use Protobuf, enum: true
+
+    field :A, 1
+    field :B, 2
+    field :C, 4
+  end
+
+  defmodule MapFoo do
+    use Protobuf, map: true
+
+    defstruct [:key, :value]
+    field :key, 1, optional: true, type: :string
+    field :value, 2, optional: true, type: :int32
+  end
+
   defmodule Foo do
     use Protobuf
 
-    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k]
+    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l]
 
     field :a, 1, optional: true, type: :int32
     field :b, 2, optional: true, type: :fixed64
@@ -29,14 +45,7 @@ defmodule Protobuf.EncoderTest do
     field :i, 10, repeated: true, type: :int32, packed: true
     field :j, 11, optional: true, type: EnumFoo, enum: true
     field :k, 12, optioanl: true, type: :bool
-  end
-
-  defmodule EnumFoo do
-    use Protobuf, enum: true
-
-    field :A, 1
-    field :B, 2
-    field :C, 4
+    field :l, 13, repeated: true, type: MapFoo, map: true
   end
 
   test "encodes one simple field" do
@@ -105,5 +114,10 @@ defmodule Protobuf.EncoderTest do
   test "encodes bool" do
     assert Encoder.encode(%Foo{k: false}) == <<>>
     assert Encoder.encode(%Foo{k: true}) == <<96, 1>>
+  end
+
+  test "encode map type" do
+    struct = %Foo{l: %{"foo_key" => 213}}
+    assert Encoder.encode(struct) == <<106, 12, 10, 7, 102, 111, 111, 95, 107, 101, 121, 16, 213, 1>>
   end
 end

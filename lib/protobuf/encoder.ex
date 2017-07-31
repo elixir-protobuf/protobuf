@@ -36,11 +36,12 @@ defmodule Protobuf.Encoder do
   def encode_field(val, %{type: type, fnum: fnum} = prop) do
     case class_field(prop) do
       :normal ->
-        map_or_not(val, prop.repeated?, fn(v) ->
+        repeated_or_not(val, prop.repeated?, fn(v) ->
           [encode_fnum(fnum, type), encode_type(type, v)]
         end)
       :embedded ->
-        map_or_not(val, prop.repeated?, fn(v) ->
+        repeated_or_not(val, prop.repeated? || prop.map?, fn(v) ->
+          v = if prop.map?, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
           encoded = encode(v)
           [encode_fnum(fnum, type), [encode_varint(byte_size(encoded)), encoded]]
         end)
@@ -124,7 +125,7 @@ defmodule Protobuf.Encoder do
   def wire_type(:float),     do: @wire_32bits
   def wire_type(mod) when is_atom(mod), do: @wire_delimited
 
-  defp map_or_not(val, repeated, func) do
+  defp repeated_or_not(val, repeated, func) do
     if repeated do
       Enum.map(val, func)
     else

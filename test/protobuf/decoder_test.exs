@@ -12,10 +12,26 @@ defmodule Protobuf.DecoderTest do
     field :b, 2, optional: true, type: :string
   end
 
+  defmodule EnumFoo do
+    use Protobuf, enum: true
+
+    field :A, 1
+    field :B, 2
+    field :C, 4
+  end
+
+  defmodule MapFoo do
+    use Protobuf, map: true
+
+    defstruct [:key, :value]
+    field :key, 1, optional: true, type: :string
+    field :value, 2, optional: true, type: :int32
+  end
+
   defmodule Foo do
     use Protobuf
 
-    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k]
 
     field :a, 1, optional: true, type: :int32
     field :b, 2, optional: true, type: :fixed64
@@ -28,14 +44,7 @@ defmodule Protobuf.DecoderTest do
     field :h, 9, repeated: true, type: Foo.Bar
     field :i, 10, repeated: true, type: :int32, packed: true
     field :j, 11, optional: true, type: EnumFoo, enum: true
-  end
-
-  defmodule EnumFoo do
-    use Protobuf, enum: true
-
-    field :A, 1
-    field :B, 2
-    field :C, 4
+    field :k, 12, repeated: true, type: MapFoo, map: true
   end
 
   test "decodes one simple field" do
@@ -112,5 +121,10 @@ defmodule Protobuf.DecoderTest do
   test "decodes unknown enum type" do
     struct = Decoder.decode(<<88, 3>>, Foo)
     assert struct == %Foo{j: 3}
+  end
+
+  test "decodes map type" do
+    struct = Decoder.decode(<<98, 12, 10, 7, 102, 111, 111, 95, 107, 101, 121, 16, 213, 1>>, Foo)
+    assert struct == %Foo{k: %{"foo_key" => 213}}
   end
 end

@@ -43,7 +43,8 @@ defmodule Protobuf.DSL do
       ordered_tags: ordered_tags(fields),
       field_props: field_props,
       repeated_fields: repeated_fields,
-      enum?: Keyword.get(options, :enum) == true
+      enum?: Keyword.get(options, :enum) == true,
+      map?: Keyword.get(options, :map) == true
     }
   end
 
@@ -78,6 +79,7 @@ defmodule Protobuf.DSL do
       |> cal_type(opts_map)
       |> cal_embedded(opts_map)
       |> cal_packed(opts_map)
+      |> cal_repeated(opts_map)
     struct(props, parts)
   end
 
@@ -90,11 +92,11 @@ defmodule Protobuf.DSL do
   defp parse_field_opts([{:required, true}|t], acc) do
     parse_field_opts(t, Map.put(acc, :required?, true))
   end
-  defp parse_field_opts([{:repeated, true}|t], acc) do
-    parse_field_opts(t, Map.put(acc, :repeated?, true))
-  end
   defp parse_field_opts([{:enum, true}|t], acc) do
     parse_field_opts(t, Map.put(acc, :enum?, true))
+  end
+  defp parse_field_opts([{:map, true}|t], acc) do
+    parse_field_opts(t, Map.put(acc, :map?, true))
   end
   defp parse_field_opts([{:type, type}|t], acc) do
     parse_field_opts(t, Map.put(acc, :type, type))
@@ -120,12 +122,16 @@ defmodule Protobuf.DSL do
   end
   defp cal_embedded(props, _), do: props
 
-  defp cal_packed(props, %{packed: true}) do
+  defp cal_packed(props, %{packed: true, repeated: repeated}) do
     cond do
       props[:embedded?] -> raise ":packed can't be used with :embedded field"
-      props[:repeated?] -> Map.put(props, :packed?, true)
+      repeated -> Map.put(props, :packed?, true)
       true           -> raise ":packed must be used with :repeated"
     end
   end
   defp cal_packed(props, _), do: props
+
+  defp cal_repeated(%{map?: true} = props, _), do: Map.put(props, :repeated?, false)
+  defp cal_repeated(props, %{repeated: true}), do: Map.put(props, :repeated?, true)
+  defp cal_repeated(props, _), do: props
 end

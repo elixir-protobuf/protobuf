@@ -28,7 +28,7 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/protobuf](https://hexdocs.pm/protobuf).
 
-## TODO
+## Features
 
 * [x] Define messages with DSL
 * [x] Decode basic messages
@@ -36,8 +36,10 @@ be found at [https://hexdocs.pm/protobuf](https://hexdocs.pm/protobuf).
 * [x] Decode embedded messages
 * [x] Decode packed and repeated fields
 * [x] Encode messages
-* [ ] protoc plugin
-* [ ] map
+* [x] protoc plugin
+* [x] map
+* [ ] Support default values
+* [ ] Validate values
 * [ ] oneof
 
 ## Acknowledgements

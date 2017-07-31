@@ -8,8 +8,8 @@ defmodule My_Test.Request do
   field :hat, 4, optional: true, type: My_Test.HatType, default: :FEDORA, enum: true
   field :deadline, 7, optional: true, type: :float, default: "inf"
   field :somegroup, 8, optional: true, type: :group
-  field :name_mapping, 14, repeated: true, type: My_Test.Request.NameMappingEntry
-  field :msg_mapping, 15, repeated: true, type: My_Test.Request.MsgMappingEntry
+  field :name_mapping, 14, repeated: true, type: My_Test.Request.NameMappingEntry, map: true
+  field :msg_mapping, 15, repeated: true, type: My_Test.Request.MsgMappingEntry, map: true
   field :reset, 12, optional: true, type: :int32
   field :get_key, 16, optional: true, type: :string
 end
@@ -23,7 +23,7 @@ defmodule My_Test.Request.SomeGroup do
 end
 
 defmodule My_Test.Request.NameMappingEntry do
-  use Protobuf
+  use Protobuf, map: true
 
   defstruct [:key, :value]
 
@@ -32,7 +32,7 @@ defmodule My_Test.Request.NameMappingEntry do
 end
 
 defmodule My_Test.Request.MsgMappingEntry do
-  use Protobuf
+  use Protobuf, map: true
 
   defstruct [:key, :value]
 

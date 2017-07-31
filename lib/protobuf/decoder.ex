@@ -34,7 +34,8 @@ defmodule Protobuf.Decoder do
           :embedded ->
             {val, rest} = decode_type(:bytes, wire_type, rest)
             embedded_msg = decode(val, prop.type)
-            new_msg = put_map(msg, prop.name_atom, embedded_msg, fn _k, v1, v2 ->
+            decoded = if prop.map?, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
+            new_msg = put_map(msg, prop.name_atom, decoded, fn _k, v1, v2 ->
               merge_same_fields(v1, v2, prop.repeated?, fn ->
                 if v1, do: Map.merge(v1, v2), else: v2
               end)

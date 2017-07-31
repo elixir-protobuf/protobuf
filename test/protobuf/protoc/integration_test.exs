@@ -8,10 +8,14 @@ defmodule Protobuf.Protoc.IntegrationTest do
     reply = %My_Test.Reply{found: [entry], compact_keys: [1, 2, 3]}
     input = %My_Test.Request{
       key: [123], hue: My_Test.Request.Color.val(:GREEN), hat: My_Test.HatType.val(:FEZ),
-      deadline: 123.0, name_mapping: [%My_Test.Request.NameMappingEntry{key: 321, value: "name"}],
-      msg_mapping: [%My_Test.Request.MsgMappingEntry{key: 1234, value: reply}]
+      deadline: 123.0, name_mapping: %{321 => "name"},
+      msg_mapping: %{1234 => reply}
     }
     output = My_Test.Request.encode(input)
+    assert My_Test.Request.__message_props__.field_props[14].map?
+    assert My_Test.Request.__message_props__.field_props[15].map?
+    assert My_Test.Request.NameMappingEntry.__message_props__.map?
+    assert My_Test.Request.MsgMappingEntry.__message_props__.map?
     assert My_Test.Request.decode(output) == input
   end
 end

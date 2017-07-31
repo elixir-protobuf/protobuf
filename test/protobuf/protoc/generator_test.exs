@@ -29,6 +29,13 @@ defmodule Protobuf.Protoc.GeneratorTest do
     assert msg =~ "defmodule Pkg_Name.Foo do\n"
   end
 
+  test "generate_msg/2 has right options" do
+    ctx = %Context{package: "pkg.name"}
+    desc = %Google_Protobuf.DescriptorProto{name: "Foo", options: %Google_Protobuf.MessageOptions{map_entry: true}}
+    [msg] = Generator.generate_msg(ctx, desc)
+    assert msg =~ "use Protobuf, map: true\n"
+  end
+
   test "generate_msg/2 has right fields" do
     ctx = %Context{package: ""}
     desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
@@ -68,6 +75,17 @@ defmodule Protobuf.Protoc.GeneratorTest do
     ]}
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: :int32, deprecated: true\n"
+  end
+
+  test "generate_msg/2 supports map field" do
+    ctx = %Context{package: "foo_bar.ab_cd"}
+    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
+      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 11, label: 3, type_name: ".foo_bar.ab_cd.Foo.ProjectsEntry"}
+    ], nested_type: [%Google_Protobuf.DescriptorProto{
+      name: "ProjectsEntry", options: %Google_Protobuf.MessageOptions{map_entry: true}
+    }]}
+    [msg, _] = Generator.generate_msg(ctx, desc)
+    assert msg =~ "field :a, 1, repeated: true, type: FooBar_AbCd.Foo.ProjectsEntry, map: true\n"
   end
 
   test "generate_msg/2 supports enum field" do

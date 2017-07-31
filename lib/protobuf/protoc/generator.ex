@@ -40,16 +40,38 @@ defmodule Protobuf.Protoc.Generator do
   def generate_msg(%{namespace: ns, package: pkg} = ctx, desc) do
     name = trans_name(desc.name)
     new_namespace = ns ++ [name]
+    msg_options = get_msg_opts(desc.options)
+    nested_maps = nested_maps([pkg|(ns ++ [desc.name])], desc.nested_type)
     structs = Enum.map_join(desc.field || [], ", ", fn(f) -> ":#{f.name}" end)
-    fields = Enum.map(desc.field || [], fn(f) -> generate_message_field(ctx, f) end)
+    fields = Enum.map(desc.field || [], fn(f) -> generate_message_field(ctx, f, nested_maps) end)
     msg_name = new_namespace |> join_name |> attach_pkg(pkg)
-    [Template.message(msg_name, structs, fields)] ++
+    [Template.message(msg_name, msg_options, structs, fields)] ++
       Enum.map(desc.nested_type || [], fn(nested_msg_desc) -> generate_msg(Map.put(ctx, :namespace, new_namespace), nested_msg_desc) end) ++
       Enum.map(desc.enum_type || [], fn(enum_desc) -> generate_enum(Map.put(ctx, :namespace, new_namespace), enum_desc) end)
   end
 
-  def generate_message_field(ctx, f) do
-    opts_str = field_options(f)
+  def get_msg_opts(opts) do
+    msg_options = opts || %Google_Protobuf.MessageOptions{}
+    opts = %{map: msg_options.map_entry, deprecated: msg_options.deprecated}
+    str = options_to_str(opts)
+    if String.length(str) > 0, do: ", " <> str, else: ""
+  end
+
+  defp nested_maps(ns, nested_types) do
+    prefix = "." <> join_name(ns)
+    Enum.reduce((nested_types || []), %{}, fn(desc, acc) ->
+      if (desc.options || %Google_Protobuf.MessageOptions{}).map_entry do
+        Map.put(acc, join_name([prefix, desc.name]), true)
+      else
+        acc
+      end
+    end)
+  end
+
+  def generate_message_field(ctx, f, nested_maps) do
+    opts = field_options(f)
+    opts = Map.put(opts, :map, nested_maps[f.type_name])
+    opts_str = options_to_str(opts)
     type = type_name(f)
     type = if type == :enum || type == :message do
       trans_type_name(f.type_name, ctx)
@@ -57,7 +79,7 @@ defmodule Protobuf.Protoc.Generator do
       ":#{type}"
     end
     if String.length(opts_str) > 0 do
-      ":#{f.name}, #{f.number}, #{label_name(f.label)}: true, type: #{type}, #{field_options(f)}"
+      ":#{f.name}, #{f.number}, #{label_name(f.label)}: true, type: #{type}, #{opts_str}"
     else
       ":#{f.name}, #{f.number}, #{label_name(f.label)}: true, type: #{type}"
     end
@@ -121,11 +143,7 @@ defmodule Protobuf.Protoc.Generator do
 
   defp field_options(f) do
     opts = %{enum: f.type == 14, default: default_value(f.type, f.default_value)}
-    if f.options do
-      opts |> merge_field_options(f) |> options_to_str
-    else
-      options_to_str(opts)
-    end
+    if f.options, do: merge_field_options(opts, f), else: opts
   end
 
   defp default_value(_, nil), do: nil
