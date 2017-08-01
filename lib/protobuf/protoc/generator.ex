@@ -11,12 +11,12 @@ defmodule Protobuf.Protoc.Generator do
   end
 
   def generate_content(ctx, desc) do
-    ctx = %{ctx | package: desc.package || ""}
-    ctx = %{ctx | dep_pkgs: get_dep_pkgs(ctx, desc.dependency || [])}
-    list = Enum.map(desc.message_type || [], fn(msg_desc) -> generate_msg(ctx, msg_desc) end) ++
-      Enum.map(desc.enum_type || [], fn(enum_desc) -> generate_enum(ctx, enum_desc) end) ++
+    ctx = %{ctx | package: desc.package}
+    ctx = %{ctx | dep_pkgs: get_dep_pkgs(ctx, desc.dependency )}
+    list = Enum.map(desc.message_type, fn(msg_desc) -> generate_msg(ctx, msg_desc) end) ++
+      Enum.map(desc.enum_type, fn(enum_desc) -> generate_enum(ctx, enum_desc) end) ++
       generate_services(ctx, desc) ++
-      Enum.map(desc.extension || [], fn(ext_desc) -> generate_extension(ctx, ext_desc) end)
+      Enum.map(desc.extension, fn(ext_desc) -> generate_extension(ctx, ext_desc) end)
     list
     |> List.flatten
     |> Enum.join("\n")
@@ -31,7 +31,7 @@ defmodule Protobuf.Protoc.Generator do
 
   def generate_services(ctx, desc) do
     if Enum.member?(ctx.plugins, "grpc") do
-      Enum.map(desc.service || [], fn(svc_desc) -> generate_service(ctx, svc_desc) end)
+      Enum.map(desc.service, fn(svc_desc) -> generate_service(ctx, svc_desc) end)
     else
       []
     end
@@ -42,16 +42,16 @@ defmodule Protobuf.Protoc.Generator do
     new_namespace = ns ++ [name]
     msg_options = get_msg_opts(desc.options)
     nested_maps = nested_maps([pkg|(ns ++ [desc.name])], desc.nested_type)
-    structs = Enum.map_join(desc.field || [], ", ", fn(f) -> ":#{f.name}" end)
-    fields = Enum.map(desc.field || [], fn(f) -> generate_message_field(ctx, f, nested_maps) end)
+    structs = Enum.map_join(desc.field, ", ", fn(f) -> ":#{f.name}" end)
+    fields = Enum.map(desc.field, fn(f) -> generate_message_field(ctx, f, nested_maps) end)
     msg_name = new_namespace |> join_name |> attach_pkg(pkg)
     [Template.message(msg_name, msg_options, structs, fields)] ++
-      Enum.map(desc.nested_type || [], fn(nested_msg_desc) -> generate_msg(Map.put(ctx, :namespace, new_namespace), nested_msg_desc) end) ++
-      Enum.map(desc.enum_type || [], fn(enum_desc) -> generate_enum(Map.put(ctx, :namespace, new_namespace), enum_desc) end)
+      Enum.map(desc.nested_type, fn(nested_msg_desc) -> generate_msg(Map.put(ctx, :namespace, new_namespace), nested_msg_desc) end) ++
+      Enum.map(desc.enum_type, fn(enum_desc) -> generate_enum(Map.put(ctx, :namespace, new_namespace), enum_desc) end)
   end
 
   def get_msg_opts(opts) do
-    msg_options = opts || %Google_Protobuf.MessageOptions{}
+    msg_options = opts
     opts = %{map: msg_options.map_entry, deprecated: msg_options.deprecated}
     str = options_to_str(opts)
     if String.length(str) > 0, do: ", " <> str, else: ""
@@ -59,8 +59,8 @@ defmodule Protobuf.Protoc.Generator do
 
   defp nested_maps(ns, nested_types) do
     prefix = "." <> join_name(ns)
-    Enum.reduce((nested_types || []), %{}, fn(desc, acc) ->
-      if (desc.options || %Google_Protobuf.MessageOptions{}).map_entry do
+    Enum.reduce(nested_types, %{}, fn(desc, acc) ->
+      if (desc.options).map_entry do
         Map.put(acc, join_name([prefix, desc.name]), true)
       else
         acc
@@ -146,7 +146,7 @@ defmodule Protobuf.Protoc.Generator do
     if f.options, do: merge_field_options(opts, f), else: opts
   end
 
-  defp default_value(_, nil), do: nil
+  defp default_value(_, ""), do: nil
   defp default_value(type, value) do
     val = cond do
       type <= 2 ->
@@ -160,10 +160,11 @@ defmodule Protobuf.Protoc.Generator do
           :error -> value
         end
       type == 8 -> String.to_atom(value)
+      type == 9 || type == 12 -> value
       type == 14 -> String.to_atom(value)
-      true -> value
+      true -> nil
     end
-    inspect(val)
+    if val == nil, do: val, else: inspect(val)
   end
 
   defp merge_field_options(opts, f) do

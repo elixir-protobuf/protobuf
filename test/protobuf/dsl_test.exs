@@ -4,6 +4,11 @@ defmodule Protobuf.DSLTest do
 
   alias Protobuf.FieldProps
 
+  test "decode/2 supports false :use_default" do
+    struct = TestMsg.Foo.decode(<<8, 42>>, use_default: false)
+    assert struct == %TestMsg.Foo{a: 42}
+  end
+
   test "creates __message_props__ function" do
     msg_props = TestMsg.Foo.__message_props__
     tags_map = Enum.reduce([1, 2, 3] ++ Enum.to_list(5..13), %{}, fn(i, acc) -> Map.put(acc, i, i) end)

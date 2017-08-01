@@ -25,7 +25,6 @@ defmodule Google_Protobuf.FileDescriptorProto do
   field :syntax, 12, optional: true, type: :string
 end
 
-# message_type
 defmodule Google_Protobuf.DescriptorProto do
   use Protobuf
 
@@ -61,7 +60,6 @@ defmodule Google_Protobuf.DescriptorProto.ReservedRange do
   field :end, 2, optional: true, type: :int32
 end
 
-# field, extension
 defmodule Google_Protobuf.FieldDescriptorProto do
   use Protobuf
 
@@ -119,7 +117,6 @@ defmodule Google_Protobuf.OneofDescriptorProto do
   field :options, 2, optional: true, type: Google_Protobuf.OneofOptions
 end
 
-# enum_type
 defmodule Google_Protobuf.EnumDescriptorProto do
   use Protobuf
 
@@ -140,7 +137,6 @@ defmodule Google_Protobuf.EnumValueDescriptorProto do
   field :options, 3, optional: true, type: Google_Protobuf.EnumValueOptions
 end
 
-# service
 defmodule Google_Protobuf.ServiceDescriptorProto do
   use Protobuf
 
@@ -151,7 +147,6 @@ defmodule Google_Protobuf.ServiceDescriptorProto do
   field :options, 3, optional: true, type: Google_Protobuf.ServiceOptions
 end
 
-# service method
 defmodule Google_Protobuf.MethodDescriptorProto do
   use Protobuf
 
@@ -213,9 +208,9 @@ defmodule Google_Protobuf.FieldOptions do
 
   defstruct [:ctype, :packed, :jstype, :lazy, :deprecated, :weak, :uninterpreted_option]
 
-  field :ctype, 1, optional: true, type: Google_Protobuf.FieldOptions.CType, default: 0
+  field :ctype, 1, optional: true, type: Google_Protobuf.FieldOptions.CType, default: 0, enum: true
   field :packed, 2, optional: true, type: :bool
-  field :jstype, 6, optional: true, type: Google_Protobuf.FieldOptions.JSType, default: 0
+  field :jstype, 6, optional: true, type: Google_Protobuf.FieldOptions.JSType, default: 0, enum: true
   field :lazy, 5, optional: true, type: :bool, default: false
   field :deprecated, 3, optional: true, type: :bool, default: false
   field :weak, 10, optional: true, type: :bool, default: false
@@ -280,7 +275,7 @@ defmodule Google_Protobuf.MethodOptions do
   defstruct [:deprecated, :idempotency_level, :uninterpreted_option]
 
   field :deprecated, 33, optional: true, type: :bool, default: false
-  field :idempotency_level, 34, optional: true, type: IdempotencyLevel, default: 0
+  field :idempotency_level, 34, optional: true, type: Google_Protobuf.MethodOptions.IdempotencyLevel, default: 0, enum: true
   field :uninterpreted_option, 999, repeated: true, type: Google_Protobuf.UninterpretedOption
 end
 
@@ -297,7 +292,7 @@ defmodule Google_Protobuf.UninterpretedOption do
 
   defstruct [:name, :identifier_value, :positive_int_value, :negative_int_value, :double_value, :string_value, :aggregate_value]
 
-  field :name, 2, repeated: true, type: NamePart
+  field :name, 2, repeated: true, type: Google_Protobuf.UninterpretedOption.NamePart
   field :identifier_value, 3, optional: true, type: :string
   field :positive_int_value, 4, optional: true, type: :uint64
   field :negative_int_value, 5, optional: true, type: :int64
@@ -340,7 +335,7 @@ defmodule Google_Protobuf.GeneratedCodeInfo do
 
   defstruct [:annotation]
 
-  field :annotation, 1, repeated: true, type: Annotation
+  field :annotation, 1, repeated: true, type: Google_Protobuf.GeneratedCodeInfo.Annotation
 end
 
 defmodule Google_Protobuf.GeneratedCodeInfo.Annotation do

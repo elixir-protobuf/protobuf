@@ -16,7 +16,6 @@ defmodule Protobuf.Protoc.CLI do
     IO.binwrite(Protobuf.Encoder.encode(response))
   end
 
-  def parse_params(ctx, nil), do: ctx
   def parse_params(ctx, params_str) when is_binary(params_str) do
     params = String.split(params_str, ",")
     parse_params(ctx, params)
@@ -26,7 +25,7 @@ defmodule Protobuf.Protoc.CLI do
     ctx = %{ctx|plugins: plugins}
     parse_params(ctx, t)
   end
-  def parse_params(ctx, []), do: ctx
+  def parse_params(ctx, _), do: ctx
 
   defp find_package_names(ctx, descs) do
     find_package_names(ctx, descs, %{})

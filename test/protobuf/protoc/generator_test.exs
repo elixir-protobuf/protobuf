@@ -5,7 +5,7 @@ defmodule Protobuf.Protoc.GeneratorTest do
 
   test "generate/2 works" do
     ctx = %Context{}
-    desc = %Google_Protobuf.FileDescriptorProto{name: "name.proto"}
+    desc = Google_Protobuf.FileDescriptorProto.new(name: "name.proto")
     assert Generator.generate(ctx, desc) == %Google_Protobuf_Compiler.CodeGeneratorResponse.File{name: "name.pb.ex", content: ""}
   end
 
@@ -16,7 +16,7 @@ defmodule Protobuf.Protoc.GeneratorTest do
 
   test "generate_msg/2 has right name" do
     ctx = %Context{package: ""}
-    desc = %Google_Protobuf.DescriptorProto{name: "Foo"}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo")
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
     assert msg =~ "use Protobuf\n"
@@ -24,24 +24,24 @@ defmodule Protobuf.Protoc.GeneratorTest do
 
   test "generate_msg/2 has right name with package" do
     ctx = %Context{package: "pkg.name"}
-    desc = %Google_Protobuf.DescriptorProto{name: "Foo"}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo")
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "defmodule Pkg_Name.Foo do\n"
   end
 
   test "generate_msg/2 has right options" do
     ctx = %Context{package: "pkg.name"}
-    desc = %Google_Protobuf.DescriptorProto{name: "Foo", options: %Google_Protobuf.MessageOptions{map_entry: true}}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo", options: Google_Protobuf.MessageOptions.new(map_entry: true))
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "use Protobuf, map: true\n"
   end
 
   test "generate_msg/2 has right fields" do
     ctx = %Context{package: ""}
-    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
-      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 5, label: 1},
-      %Google_Protobuf.FieldDescriptorProto{name: "b", number: 2, type: 9, label: 2}
-    ]}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo", field: [
+      Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 5, label: 1),
+      Google_Protobuf.FieldDescriptorProto.new(name: "b", number: 2, type: 9, label: 2)
+    ])
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "defstruct [:a, :b]\n"
     assert msg =~ "field :a, 1, optional: true, type: :int32\n"
@@ -50,85 +50,85 @@ defmodule Protobuf.Protoc.GeneratorTest do
 
   test "generate_msg/2 supports option :default" do
     ctx = %Context{package: ""}
-    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
-      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 5, label: 1, default_value: "42"}
-    ]}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo", field: [
+      Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 5, label: 1, default_value: "42")
+    ])
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: :int32, default: 42\n"
   end
 
   test "generate_msg/2 supports option :packed" do
     ctx = %Context{package: ""}
-    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
-      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 5, label: 1,
-        options: %Google_Protobuf.FieldOptions{packed: true}}
-    ]}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo", field: [
+      Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 5, label: 1,
+        options: %Google_Protobuf.FieldOptions{packed: true})
+    ])
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: :int32, packed: true\n"
   end
 
   test "generate_msg/2 supports option :deprecated" do
     ctx = %Context{package: ""}
-    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
-      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 5, label: 1,
-      options: %Google_Protobuf.FieldOptions{deprecated: true}}
-    ]}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo", field: [
+      Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 5, label: 1,
+      options: %Google_Protobuf.FieldOptions{deprecated: true})
+    ])
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: :int32, deprecated: true\n"
   end
 
   test "generate_msg/2 supports map field" do
     ctx = %Context{package: "foo_bar.ab_cd"}
-    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
-      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 11, label: 3, type_name: ".foo_bar.ab_cd.Foo.ProjectsEntry"}
-    ], nested_type: [%Google_Protobuf.DescriptorProto{
-      name: "ProjectsEntry", options: %Google_Protobuf.MessageOptions{map_entry: true}
-    }]}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo", field: [
+      Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 11, label: 3, type_name: ".foo_bar.ab_cd.Foo.ProjectsEntry")
+    ], nested_type: [Google_Protobuf.DescriptorProto.new(
+      name: "ProjectsEntry", options: Google_Protobuf.MessageOptions.new(map_entry: true)
+    )])
     [msg, _] = Generator.generate_msg(ctx, desc)
     assert msg =~ "field :a, 1, repeated: true, type: FooBar_AbCd.Foo.ProjectsEntry, map: true\n"
   end
 
   test "generate_msg/2 supports enum field" do
     ctx = %Context{package: "foo_bar.ab_cd"}
-    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
-      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 14, label: 1, type_name: ".foo_bar.ab_cd.EnumFoo"}
-    ]}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo", field: [
+      Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 14, label: 1, type_name: ".foo_bar.ab_cd.EnumFoo")
+    ])
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: FooBar_AbCd.EnumFoo, enum: true\n"
   end
 
   test "generate_msg/2 generate right enum type name with different package" do
     ctx = %Context{package: "foo_bar.ab_cd", dep_pkgs: ["other_pkg"]}
-    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
-      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 14, label: 1, type_name: ".other_pkg.EnumFoo"}
-    ]}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo", field: [
+      Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 14, label: 1, type_name: ".other_pkg.EnumFoo")
+    ])
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: OtherPkg.EnumFoo, enum: true\n"
   end
 
   test "generate_msg/2 generate right message type name with different package" do
     ctx = %Context{package: "foo_bar.ab_cd", dep_pkgs: ["other_pkg"]}
-    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
-      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 11, label: 1, type_name: ".other_pkg.MsgFoo"}
-    ]}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo", field: [
+      Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 11, label: 1, type_name: ".other_pkg.MsgFoo")
+    ])
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: OtherPkg.MsgFoo\n"
   end
 
   test "generate_msg/2 use longest package name for type" do
     ctx = %Context{package: "foo_bar.ab_cd", dep_pkgs: ["foo.bar", "foo"]}
-    desc = %Google_Protobuf.DescriptorProto{name: "Foo", field: [
-      %Google_Protobuf.FieldDescriptorProto{name: "a", number: 1, type: 14, label: 1, type_name: ".foo.bar.EnumFoo"}
-    ]}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo", field: [
+      Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 14, label: 1, type_name: ".foo.bar.EnumFoo")
+    ])
     [msg] = Generator.generate_msg(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: Foo_Bar.EnumFoo, enum: true\n"
   end
 
   test "generate_msg/2 supports nested messages" do
     ctx = %Context{package: ""}
-    desc = %Google_Protobuf.DescriptorProto{name: "Foo", nested_type: [
-      %Google_Protobuf.DescriptorProto{name: "Nested"}
-    ]}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo", nested_type: [
+      Google_Protobuf.DescriptorProto.new(name: "Nested")
+    ])
     [_, [msg]] = Generator.generate_msg(ctx, desc)
     assert msg =~ "defmodule Foo.Nested do\n"
     assert msg =~ "defstruct []\n"
@@ -136,14 +136,14 @@ defmodule Protobuf.Protoc.GeneratorTest do
 
   test "generate_msg/2 supports nested enum messages" do
     ctx = %Context{package: ""}
-    desc = %Google_Protobuf.DescriptorProto{name: "Foo", nested_type: [
-      %Google_Protobuf.DescriptorProto{enum_type: [
-        %Google_Protobuf.EnumDescriptorProto{name: "EnumFoo",
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo", nested_type: [
+      Google_Protobuf.DescriptorProto.new(enum_type: [
+        Google_Protobuf.EnumDescriptorProto.new(name: "EnumFoo",
           value: [%Google_Protobuf.EnumValueDescriptorProto{name: "A", number: 0},
                   %Google_Protobuf.EnumValueDescriptorProto{name: "B", number: 1}]
-        }
-      ], name: "Nested"}
-    ]}
+        )
+      ], name: "Nested")
+    ])
     [_, [_, msg]] = Generator.generate_msg(ctx, desc)
     assert msg =~ "defmodule Foo.Nested.EnumFoo do\n"
     assert msg =~ "use Protobuf, enum: true\n"
