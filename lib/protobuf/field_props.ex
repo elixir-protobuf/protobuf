@@ -6,6 +6,7 @@ defmodule Protobuf.FieldProps do
     wire_type: 0..5,
     type: atom,
     enum_type: atom,
+    default: any,
 
     required?: boolean,
     optional?: boolean,
@@ -21,6 +22,7 @@ defmodule Protobuf.FieldProps do
     wire_type: nil,
     type: nil,
     enum_type: nil,
+    default: nil,
 
     required?: false,
     optional?: false,

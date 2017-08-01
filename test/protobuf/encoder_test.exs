@@ -10,14 +10,14 @@ defmodule Protobuf.EncoderTest do
   end
 
   test "encodes full fields" do
-    bin = <<8, 42, 17, 100, 0, 0, 0, 0, 0, 0, 0, 26, 3, 115, 116, 114, 45, 123, 0, 0, 0>>
-    res = Encoder.encode(%TestMsg.Foo{a: 42, b: 100, c: "str", d: 123})
+    bin = <<8, 42, 17, 100, 0, 0, 0, 0, 0, 0, 0, 26, 3, 115, 116, 114, 45, 0, 0, 247, 66>>
+    res = Encoder.encode(%TestMsg.Foo{a: 42, b: 100, c: "str", d: 123.5})
     assert res == bin
   end
 
   test "skips a known fields" do
-    bin = <<8, 42, 26, 3, 115, 116, 114, 45, 123, 0, 0, 0>>
-    res = Encoder.encode(%TestMsg.Foo{a: 42, c: "str", d: 123})
+    bin = <<8, 42, 26, 3, 115, 116, 114, 45, 0, 0, 247, 66>>
+    res = Encoder.encode(%TestMsg.Foo{a: 42, c: "str", d: 123.5})
     assert res == bin
   end
 

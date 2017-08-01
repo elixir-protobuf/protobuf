@@ -14,22 +14,33 @@ defmodule Protobuf.DSL do
     fields = Module.get_attribute(env.module, :fields)
     options = Module.get_attribute(env.module, :options)
     msg_props = generate_msg_props(options, fields)
+    default_fields = generate_default_fields(msg_props)
+    embedded_fields = embedded_fields(msg_props)
     quote do
       def __message_props__ do
         unquote(Macro.escape(msg_props))
       end
-      unquote(def_functions(msg_props))
+
+      unquote(def_enum_functions(msg_props))
+
+      def __default_struct__ do
+        struct = __MODULE__
+        |> struct(unquote(Macro.escape(default_fields)))
+        Enum.reduce(unquote(embedded_fields), struct, fn({name, type}, acc) ->
+          struct(acc, %{name => type.__default_struct__()})
+        end)
+      end
     end
   end
 
-  defp def_functions(%{enum?: true, field_props: props}) do
+  defp def_enum_functions(%{enum?: true, field_props: props}) do
     Enum.map(props, fn({_, %{fnum: fnum, name_atom: name_atom}}) ->
       quote do
         def val(unquote(name_atom)), do: unquote(fnum)
       end
     end)
   end
-  defp def_functions(_), do: nil
+  defp def_enum_functions(_), do: nil
 
   defp generate_msg_props(options, fields) do
     field_props = field_props_map(fields)
@@ -101,6 +112,9 @@ defmodule Protobuf.DSL do
   defp parse_field_opts([{:type, type}|t], acc) do
     parse_field_opts(t, Map.put(acc, :type, type))
   end
+  defp parse_field_opts([{:default, default}|t], acc) do
+    parse_field_opts(t, Map.put(acc, :default, default))
+  end
   defp parse_field_opts([{_, _}|t], acc) do
     parse_field_opts(t, acc)
   end
@@ -134,4 +148,19 @@ defmodule Protobuf.DSL do
   defp cal_repeated(%{map?: true} = props, _), do: Map.put(props, :repeated?, false)
   defp cal_repeated(props, %{repeated: true}), do: Map.put(props, :repeated?, true)
   defp cal_repeated(props, _), do: props
+
+  def generate_default_fields(msg_props) do
+    msg_props.field_props
+    |> Map.values()
+    |> Enum.reduce(%{}, fn(props, acc) ->
+         Map.put(acc, props.name_atom, Protobuf.Builder.field_default(props))
+       end)
+  end
+
+  def embedded_fields(msg_props) do
+    msg_props.field_props
+    |> Map.values
+    |> Enum.filter(fn(props) -> props.embedded? && !props.repeated? && !props.map? end)
+    |> Enum.map(fn(props) -> {props.name_atom, props.type} end)
+  end
 end

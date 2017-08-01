@@ -29,11 +29,11 @@ defmodule TestMsg do
 
     defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l]
 
-    field :a, 1, optional: true, type: :int32
-    field :b, 2, optional: true, type: :fixed64
+    field :a, 1, required: true, type: :int32
+    field :b, 2, optional: true, type: :fixed64, default: 5
     field :c, 3, optional: true, type: :string
     # 4 is skipped for testing
-    field :d, 5, optional: true, type: :fixed32
+    field :d, 5, optional: true, type: :float
     field :e, 6, optional: true, type: Foo.Bar
     field :f, 7, optional: true, type: :int32
     field :g, 8, repeated: true, type: :int32

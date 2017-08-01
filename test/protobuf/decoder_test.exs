@@ -10,15 +10,15 @@ defmodule Protobuf.DecoderTest do
   end
 
   test "decodes full fields" do
-    bin = <<8, 42, 17, 100, 0, 0, 0, 0, 0, 0, 0, 26, 3, 115, 116, 114, 45, 123, 0, 0, 0>>
+    bin = <<8, 42, 17, 100, 0, 0, 0, 0, 0, 0, 0, 26, 3, 115, 116, 114, 45, 0, 0, 247, 66>>
     struct = Decoder.decode(bin, TestMsg.Foo)
-    assert struct == %TestMsg.Foo{a: 42, b: 100, c: "str", d: 123}
+    assert struct == %TestMsg.Foo{a: 42, b: 100, c: "str", d: 123.5}
   end
 
   test "skips a known fields" do
-    bin = <<8, 42, 26, 3, 115, 116, 114, 45, 123, 0, 0, 0>>
+    bin = <<8, 42, 26, 3, 115, 116, 114, 45, 0, 0, 247, 66>>
     struct = Decoder.decode(bin, TestMsg.Foo)
-    assert struct == %TestMsg.Foo{a: 42, c: "str", d: 123}
+    assert struct == %TestMsg.Foo{a: 42, c: "str", d: 123.5}
   end
 
   test "raises for wrong wire type" do
@@ -28,13 +28,13 @@ defmodule Protobuf.DecoderTest do
   end
 
   test "skips unknown varint fields" do
-    struct = Decoder.decode(<<8, 42, 32, 100, 45, 123, 0, 0, 0>>, TestMsg.Foo)
-    assert struct == %TestMsg.Foo{a: 42, d: 123}
+    struct = Decoder.decode(<<8, 42, 32, 100, 45, 0, 0, 247, 66>>, TestMsg.Foo)
+    assert struct == %TestMsg.Foo{a: 42, d: 123.5}
   end
 
   test "skips unknown string fields" do
-    struct = Decoder.decode(<<8, 42, 34, 3, 115, 116, 114, 45, 123, 0, 0, 0>>, TestMsg.Foo)
-    assert struct == %TestMsg.Foo{a: 42, d: 123}
+    struct = Decoder.decode(<<8, 42, 45, 0, 0, 247, 66>>, TestMsg.Foo)
+    assert struct == %TestMsg.Foo{a: 42, d: 123.5}
   end
 
   test "decodes embedded message" do
