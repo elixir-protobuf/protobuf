@@ -16,6 +16,7 @@ defmodule Protobuf.DSL do
     msg_props = generate_msg_props(options, fields)
     default_fields = generate_default_fields(msg_props)
     embedded_fields = embedded_fields(msg_props)
+    enum_fields = enum_fields(msg_props)
     quote do
       def __message_props__ do
         unquote(Macro.escape(msg_props))
@@ -26,8 +27,11 @@ defmodule Protobuf.DSL do
       def __default_struct__ do
         struct = __MODULE__
         |> struct(unquote(Macro.escape(default_fields)))
-        Enum.reduce(unquote(embedded_fields), struct, fn({name, type}, acc) ->
+        struct = Enum.reduce(unquote(embedded_fields), struct, fn({name, type}, acc) ->
           struct(acc, %{name => type.__default_struct__()})
+        end)
+        Enum.reduce(unquote(Macro.escape(enum_fields)), struct, fn({name, type, default}, acc) ->
+          struct(acc, %{name => type.val(default)})
         end)
       end
     end
@@ -162,5 +166,12 @@ defmodule Protobuf.DSL do
     |> Map.values
     |> Enum.filter(fn(props) -> props.embedded? && !props.repeated? && !props.map? end)
     |> Enum.map(fn(props) -> {props.name_atom, props.type} end)
+  end
+
+  def enum_fields(msg_props) do
+    msg_props.field_props
+    |> Map.values
+    |> Enum.filter(fn(props) -> props.enum? && props.default end)
+    |> Enum.map(fn(props) -> {props.name_atom, props.enum_type, props.default} end)
   end
 end

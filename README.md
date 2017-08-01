@@ -38,7 +38,7 @@ be found at [https://hexdocs.pm/protobuf](https://hexdocs.pm/protobuf).
 * [x] Encode messages
 * [x] protoc plugin
 * [x] map
-* [ ] Support default values
+* [x] Support default values
 * [ ] Validate values
 * [ ] oneof
 

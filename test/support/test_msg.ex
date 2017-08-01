@@ -27,7 +27,7 @@ defmodule TestMsg do
   defmodule Foo do
     use Protobuf
 
-    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l]
+    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m]
 
     field :a, 1, required: true, type: :int32
     field :b, 2, optional: true, type: :fixed64, default: 5
@@ -42,5 +42,6 @@ defmodule TestMsg do
     field :j, 11, optional: true, type: EnumFoo, enum: true
     field :k, 12, optioanl: true, type: :bool
     field :l, 13, repeated: true, type: MapFoo, map: true
+    field :m, 14, optional: true, type: EnumFoo, default: :B, enum: true
   end
 end
