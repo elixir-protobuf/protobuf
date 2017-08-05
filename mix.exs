@@ -43,7 +43,7 @@ defmodule Protobuf.Mixfile do
 
   defp escript do
     [main_module: Protobuf.Protoc.CLI,
-     path: "./priv/protoc-gen-elixir",
+     name: "protoc-gen-elixir",
      app: nil]
   end
 
@@ -63,7 +63,7 @@ defmodule Protobuf.Mixfile do
     {_, 0} = System.cmd "mix", ["escript.build"], into: IO.binstream(:stdio, :line)
     test_path = "test/protobuf/protoc"
     args1 = ["-I", "#{test_path}/proto", "--elixir_out=#{test_path}/proto_gen",
-      "--plugin=protoc-gen-elixir=priv/protoc-gen-elixir",
+      "--plugin=protoc-gen-elixir=protoc-gen-elixir",
       "#{test_path}/proto/test.proto"]
     IO.puts "==> protoc #{Enum.join(args1, " ")}"
     {_, 0} = System.cmd "protoc", args1, into: IO.binstream(:stdio, :line)
