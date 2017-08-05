@@ -1,6 +1,6 @@
 # protobuf-elixir
 
-[![Hex.pm](https://img.shields.io/hexpm/v/protobuf.svg)]()
+[![Hex.pm](https://img.shields.io/hexpm/v/protobuf.svg)](https://hex.pm/packages/protobuf)
 
 A pure Elixir implementation of [Google Protobuf](https://developers.google.com/protocol-buffers/)
 
