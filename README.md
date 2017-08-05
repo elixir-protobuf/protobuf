@@ -39,7 +39,8 @@ be found at [https://hexdocs.pm/protobuf](https://hexdocs.pm/protobuf).
 * [x] protoc plugin
 * [x] map
 * [x] Support default values
-* [ ] Validate values
+* [x] Validate values
+* [ ] Generate typespecs
 * [ ] oneof
 
 ## Acknowledgements

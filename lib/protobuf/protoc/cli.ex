@@ -12,7 +12,7 @@ defmodule Protobuf.Protoc.CLI do
     files = request.proto_file
       |> Enum.filter(fn(desc) -> Enum.member?(request.file_to_generate, desc.name) end)
       |> Enum.map(fn(desc) -> Protobuf.Protoc.Generator.generate(ctx, desc) end)
-    response = %Google_Protobuf_Compiler.CodeGeneratorResponse{file: files}
+    response = Google_Protobuf_Compiler.CodeGeneratorResponse.new(file: files)
     IO.binwrite(Protobuf.Encoder.encode(response))
   end
 

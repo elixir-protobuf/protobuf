@@ -59,7 +59,7 @@ defmodule Protobuf.Mixfile do
   end
 
   def test_integration(args) do
-    IO.puts "==> mix.escript.build"
+    IO.puts "==> mix escript.build"
     {_, 0} = System.cmd "mix", ["escript.build"], into: IO.binstream(:stdio, :line)
     test_path = "test/protobuf/protoc"
     args1 = ["-I", "#{test_path}/proto", "--elixir_out=#{test_path}/proto_gen",

@@ -11,6 +11,7 @@ defmodule Protobuf.Encoder do
 
   @spec encode(struct, keyword) :: iodata
   def encode(%{__struct__: mod} = struct, opts \\ []) do
+    Protobuf.Validator.validate!(struct)
     res = encode(struct, mod.__message_props__(), [])
     res = Enum.reverse(res)
     case Keyword.fetch(opts, :iolist) do
