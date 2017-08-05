@@ -1,7 +1,7 @@
 defmodule Protobuf.Mixfile do
   use Mix.Project
 
-  @version "0.3.0"
+  @version "0.3.1"
 
   def project do
     [app: :protobuf,
@@ -55,7 +55,7 @@ defmodule Protobuf.Mixfile do
     [maintainers: ["Tony Han"],
      licenses: ["MIT"],
      links: %{"GitHub" => "https://github.com/tony612/protobuf-elixir"},
-     files: ~w(mix.exs README.md lib config LICENSE)]
+     files: ~w(mix.exs README.md lib config LICENSE priv/templates)]
   end
 
   def test_integration(args) do
