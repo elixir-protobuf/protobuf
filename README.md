@@ -1,6 +1,7 @@
 # protobuf-elixir
 
 [![Hex.pm](https://img.shields.io/hexpm/v/protobuf.svg)](https://hex.pm/packages/protobuf)
+[![Build Status](https://travis-ci.org/tony612/protobuf-elixir.svg?branch=master)](https://travis-ci.org/tony612/protobuf-elixir)
 
 A pure Elixir implementation of [Google Protobuf](https://developers.google.com/protocol-buffers/)
 
