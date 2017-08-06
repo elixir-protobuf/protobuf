@@ -15,5 +15,10 @@ install:
   - mix local.hex --force
   - mix deps.get
   - mix eqc.install --mini --force
+before_script:
+  - wget https://github.com/google/protobuf/releases/download/v3.3.0/protoc-3.3.0-linux-x86_64.zip
+  - unzip protoc-3.3.0-linux-x86_64.zip
+  - export PATH=$PATH:$PWD/bin/
 script:
   - mix test
+  - mix test.integration
