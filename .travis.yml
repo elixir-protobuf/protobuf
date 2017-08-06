@@ -1,0 +1,24 @@
+sudo: false
+language: elixir
+git:
+  depth: 3
+elixir:
+  - 1.4
+  - 1.5
+otp_release:
+  - 19.3
+  - 20.0
+env:
+  - MIX_ENV=test VERBOSE_TESTS=true
+install:
+  - mix local.rebar --force
+  - mix local.hex --force
+  - mix deps.get
+  - mix eqc.install --mini --force
+before_script:
+  - wget https://github.com/google/protobuf/releases/download/v3.3.0/protoc-3.3.0-linux-x86_64.zip
+  - unzip protoc-3.3.0-linux-x86_64.zip
+  - export PATH=$PATH:$PWD/bin/
+script:
+  - mix test
+  - mix test.integration
