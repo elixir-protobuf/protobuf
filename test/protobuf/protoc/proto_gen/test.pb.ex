@@ -151,5 +151,3 @@ defmodule My_Test.Days do
   field :TUESDAY, 2
   field :LUNDI, 1
 end
-
-
