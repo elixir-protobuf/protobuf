@@ -7,38 +7,67 @@ defmodule Protobuf.Protoc.Generator.Message do
     Enum.map(descs, fn(desc) -> generate(ctx, desc) end)
   end
 
-  def generate(%{namespace: ns, package: pkg} = ctx, desc) do
-    name = Util.trans_name(desc.name)
-    new_namespace = ns ++ [name]
-    msg_options = get_msg_opts(desc.options)
-    nested_maps = nested_maps([pkg|(ns ++ [desc.name])], desc.nested_type)
-    structs = Enum.map_join(desc.field, ", ", fn(f) -> ":#{f.name}" end)
-    fields = Enum.map(desc.field, fn(f) -> generate_message_field(ctx, f, nested_maps) end)
-    msg_name = new_namespace |> Util.join_name |> Util.attach_pkg(pkg)
-    [Protobuf.Protoc.Template.message(msg_name, msg_options, structs, fields)] ++
-      Enum.map(desc.nested_type, fn(nested_msg_desc) -> generate(Map.put(ctx, :namespace, new_namespace), nested_msg_desc) end) ++
-      Enum.map(desc.enum_type, fn(enum_desc) -> EnumGenerator.generate(Map.put(ctx, :namespace, new_namespace), enum_desc) end)
+  def generate(ctx, desc) do
+    msg_struct = parse_desc(ctx, desc)
+    ctx = %{ctx | namespace: msg_struct[:new_namespace]}
+    [gen_msg(msg_struct)] ++ gen_nested_msgs(ctx, desc) ++ gen_nested_enums(ctx, desc)
   end
 
-  def get_msg_opts(opts) do
+  def parse_desc(%{namespace: ns, package: pkg} = ctx, desc) do
+    new_ns = ns ++ [Util.trans_name(desc.name)]
+    %{
+      new_namespace: new_ns,
+      name: new_ns |> Util.join_name |> Util.attach_pkg(pkg),
+      options: msg_opts_str(desc.options),
+      structs: structs_str(desc.field),
+      fields: get_fields(ctx, desc)
+    }
+  end
+
+  defp gen_msg(msg_struct) do
+    Protobuf.Protoc.Template.message(
+      msg_struct[:name],
+      msg_struct[:options],
+      msg_struct[:structs],
+      gen_fields(msg_struct[:fields])
+    )
+  end
+
+  defp gen_nested_msgs(ctx, desc) do
+    Enum.map(desc.nested_type, fn(msg_desc) -> generate(ctx, msg_desc) end)
+  end
+
+  defp gen_nested_enums(ctx, desc) do
+    Enum.map(desc.enum_type, fn(enum_desc) -> EnumGenerator.generate(ctx, enum_desc) end)
+  end
+
+  defp gen_fields(fields) do
+    Enum.map(fields, fn(%{opts_str: opts_str} = f) ->
+      if String.length(opts_str) > 0 do
+        ":#{f[:name]}, #{f[:number]}, #{f[:label]}: true, type: #{f[:type]}, #{opts_str}"
+      else
+        ":#{f[:name]}, #{f[:number]}, #{f[:label]}: true, type: #{f[:type]}"
+      end
+    end)
+  end
+
+  def msg_opts_str(opts) do
     msg_options = opts
     opts = %{map: msg_options.map_entry, deprecated: msg_options.deprecated}
     str = Util.options_to_str(opts)
     if String.length(str) > 0, do: ", " <> str, else: ""
   end
 
-  defp nested_maps(ns, nested_types) do
-    prefix = "." <> Util.join_name(ns)
-    Enum.reduce(nested_types, %{}, fn(desc, acc) ->
-      if (desc.options).map_entry do
-        Map.put(acc, Util.join_name([prefix, desc.name]), true)
-      else
-        acc
-      end
-    end)
+  def structs_str(fields) do
+    Enum.map_join(fields, ", ", fn(f) -> ":#{f.name}" end)
   end
 
-  def generate_message_field(ctx, f, nested_maps) do
+  def get_fields(ctx, desc) do
+    nested_maps = nested_maps(ctx, desc)
+    Enum.map(desc.field, fn(f) -> get_field(ctx, f, nested_maps) end)
+  end
+
+  def get_field(ctx, f, nested_maps) do
     opts = field_options(f)
     opts = Map.put(opts, :map, nested_maps[f.type_name])
     opts_str = Util.options_to_str(opts)
@@ -48,11 +77,19 @@ defmodule Protobuf.Protoc.Generator.Message do
     else
       ":#{type}"
     end
-    if String.length(opts_str) > 0 do
-      ":#{f.name}, #{f.number}, #{label_name(f.label)}: true, type: #{type}, #{opts_str}"
-    else
-      ":#{f.name}, #{f.number}, #{label_name(f.label)}: true, type: #{type}"
-    end
+    %{name: f.name, number: f.number, label: label_name(f.label), type: type, opts_str: opts_str}
+  end
+
+  defp nested_maps(ctx, desc) do
+    full_name = Util.join_name [ctx.package|ctx.namespace] ++ [desc.name]
+    prefix = "." <> full_name
+    Enum.reduce(desc.nested_type, %{}, fn(desc, acc) ->
+      if desc.options.map_entry do
+        Map.put(acc, Util.join_name([prefix, desc.name]), true)
+      else
+        acc
+      end
+    end)
   end
 
   defp field_options(f) do
