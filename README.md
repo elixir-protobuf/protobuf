@@ -52,28 +52,31 @@ $ mix escript.install hex protobuf
 ```
 3. Generate Elixir code using protoc
 ```
-$ protoc --elixir_out=./lib foo.proto
+$ protoc --elixir_out=./lib helloword.proto
 ```
-4. Files `foo.pb.ex` will be generated, like:
+4. Files `helloworld.pb.ex` will be generated, like:
 
 ```elixir
-defmodule Foo.Bar do
+defmodule Helloworld.HelloRequest do
   use Protobuf
 
-  defstruct [:a, :b]
+  @type t :: %__MODULE__{
+    name: String.t
+  }
+  defstruct [:name]
 
-  field :a, 1, optional: true, type: :int32
-  field :b, 2, optional: true, type: :string
+  field :name, 1, optional: true, type: :string
 end
 
-defmodule Foo do
+defmodule Helloworld.HelloReply do
   use Protobuf
 
-  defstruct [:a, :b, :c]
+  @type t :: %__MODULE__{
+    message: String.t
+  }
+  defstruct [:message]
 
-  field :a, 1, required: true, type: :float
-  field :b, 2, optional: true, type: :fixed64, default: 5
-  field :e, 3, optional: true, type: Foo.Bar
+  field :message, 1, optional: true, type: :string
 end
 ```
 
