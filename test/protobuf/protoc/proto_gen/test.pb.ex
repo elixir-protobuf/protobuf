@@ -1,6 +1,17 @@
 defmodule My_Test.Request do
   use Protobuf
 
+  @type t :: %__MODULE__{
+    key:          [integer],
+    hue:          integer,
+    hat:          integer,
+    deadline:     float,
+    somegroup:    any,
+    name_mapping: %{integer => String.t},
+    msg_mapping:  %{integer => My_Test.Reply.t},
+    reset:        integer,
+    get_key:      String.t
+  }
   defstruct [:key, :hue, :hat, :deadline, :somegroup, :name_mapping, :msg_mapping, :reset, :get_key]
 
   field :key, 1, repeated: true, type: :int64
@@ -17,6 +28,9 @@ end
 defmodule My_Test.Request.SomeGroup do
   use Protobuf
 
+  @type t :: %__MODULE__{
+    group_field: integer
+  }
   defstruct [:group_field]
 
   field :group_field, 9, optional: true, type: :int32
@@ -25,6 +39,10 @@ end
 defmodule My_Test.Request.NameMappingEntry do
   use Protobuf, map: true
 
+  @type t :: %__MODULE__{
+    key:   integer,
+    value: String.t
+  }
   defstruct [:key, :value]
 
   field :key, 1, optional: true, type: :int32
@@ -34,6 +52,10 @@ end
 defmodule My_Test.Request.MsgMappingEntry do
   use Protobuf, map: true
 
+  @type t :: %__MODULE__{
+    key:   integer,
+    value: My_Test.Reply.t
+  }
   defstruct [:key, :value]
 
   field :key, 1, optional: true, type: :sint64
@@ -51,6 +73,10 @@ end
 defmodule My_Test.Reply do
   use Protobuf
 
+  @type t :: %__MODULE__{
+    found:        [My_Test.Reply.Entry.t],
+    compact_keys: [integer]
+  }
   defstruct [:found, :compact_keys]
 
   field :found, 1, repeated: true, type: My_Test.Reply.Entry
@@ -60,6 +86,11 @@ end
 defmodule My_Test.Reply.Entry do
   use Protobuf
 
+  @type t :: %__MODULE__{
+    key_that_needs_1234camel_CasIng: integer,
+    value:                           integer,
+    _my_field_name_2:                integer
+  }
   defstruct [:key_that_needs_1234camel_CasIng, :value, :_my_field_name_2]
 
   field :key_that_needs_1234camel_CasIng, 1, required: true, type: :int64
@@ -77,6 +108,9 @@ end
 defmodule My_Test.OtherBase do
   use Protobuf
 
+  @type t :: %__MODULE__{
+    name: String.t
+  }
   defstruct [:name]
 
   field :name, 1, optional: true, type: :string
@@ -92,6 +126,9 @@ end
 defmodule My_Test.OtherReplyExtensions do
   use Protobuf
 
+  @type t :: %__MODULE__{
+    key: integer
+  }
   defstruct [:key]
 
   field :key, 1, optional: true, type: :int32
@@ -107,6 +144,19 @@ end
 defmodule My_Test.Communique do
   use Protobuf
 
+  @type t :: %__MODULE__{
+    make_me_cry: boolean,
+    number:      integer,
+    name:        String.t,
+    data:        String.t,
+    temp_c:      float,
+    height:      float,
+    today:       integer,
+    maybe:       boolean,
+    delta:       integer,
+    msg:         My_Test.Reply.t,
+    somegroup:   any
+  }
   defstruct [:make_me_cry, :number, :name, :data, :temp_c, :height, :today, :maybe, :delta, :msg, :somegroup]
 
   field :make_me_cry, 1, optional: true, type: :bool
@@ -125,6 +175,9 @@ end
 defmodule My_Test.Communique.SomeGroup do
   use Protobuf
 
+  @type t :: %__MODULE__{
+    member: String.t
+  }
   defstruct [:member]
 
   field :member, 15, optional: true, type: :string

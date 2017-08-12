@@ -34,6 +34,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     ])
     [msg] = Generator.generate(ctx, desc)
     assert msg =~ "defstruct [:a, :b]\n"
+    assert msg =~ "a: integer"
+    assert msg =~ "b: String.t"
     assert msg =~ "field :a, 1, optional: true, type: :int32\n"
     assert msg =~ "field :b, 2, required: true, type: :string\n"
   end
@@ -44,6 +46,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 5, label: 1, default_value: "42")
     ])
     [msg] = Generator.generate(ctx, desc)
+    assert msg =~ "a: integer"
     assert msg =~ "field :a, 1, optional: true, type: :int32, default: 42\n"
   end
 
@@ -72,9 +75,14 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     desc = Google_Protobuf.DescriptorProto.new(name: "Foo", field: [
       Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 11, label: 3, type_name: ".foo_bar.ab_cd.Foo.ProjectsEntry")
     ], nested_type: [Google_Protobuf.DescriptorProto.new(
-      name: "ProjectsEntry", options: Google_Protobuf.MessageOptions.new(map_entry: true)
+      name: "ProjectsEntry", options: Google_Protobuf.MessageOptions.new(map_entry: true),
+      field: [
+        Google_Protobuf.FieldDescriptorProto.new(number: 1, label: 1, type: 5, type_name: "int32"),
+        Google_Protobuf.FieldDescriptorProto.new(number: 2, label: 1, type: 11, type_name: ".foo_bar.ab_cd.Bar")
+      ]
     )])
     [msg, _] = Generator.generate(ctx, desc)
+    assert msg =~ "a: %{integer => FooBar_AbCd.Bar.t}"
     assert msg =~ "field :a, 1, repeated: true, type: FooBar_AbCd.Foo.ProjectsEntry, map: true\n"
   end
 
@@ -84,6 +92,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 14, label: 1, type_name: ".foo_bar.ab_cd.EnumFoo")
     ])
     [msg] = Generator.generate(ctx, desc)
+    assert msg =~ "a: integer"
     assert msg =~ "field :a, 1, optional: true, type: FooBar_AbCd.EnumFoo, enum: true\n"
   end
 
@@ -102,6 +111,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 11, label: 1, type_name: ".other_pkg.MsgFoo")
     ])
     [msg] = Generator.generate(ctx, desc)
+    assert msg =~ "a: OtherPkg.MsgFoo.t"
     assert msg =~ "field :a, 1, optional: true, type: OtherPkg.MsgFoo\n"
   end
 
@@ -129,14 +139,14 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     desc = Google_Protobuf.DescriptorProto.new(name: "Foo", nested_type: [
       Google_Protobuf.DescriptorProto.new(enum_type: [
         Google_Protobuf.EnumDescriptorProto.new(name: "EnumFoo",
-          value: [%Google_Protobuf.EnumValueDescriptorProto{name: "A", number: 0},
-                  %Google_Protobuf.EnumValueDescriptorProto{name: "B", number: 1}]
+          value: [%Google_Protobuf.EnumValueDescriptorProto{name: "a", number: 0},
+                  %Google_Protobuf.EnumValueDescriptorProto{name: "b", number: 1}]
         )
       ], name: "Nested")
     ])
     [_, [_, msg]] = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo.Nested.EnumFoo do\n"
     assert msg =~ "use Protobuf, enum: true\n"
-    assert msg =~ "field :A, 0\n  field :B, 1\n"
+    assert msg =~ "field :a, 0\n  field :b, 1\n"
   end
 end

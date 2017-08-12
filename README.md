@@ -38,7 +38,7 @@ end
 * [x] map
 * [x] Support default values
 * [x] Validate values
-* [ ] Generate typespecs
+* [x] Generate typespecs
 * [ ] oneof
 
 ## Usage
