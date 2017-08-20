@@ -7,7 +7,7 @@ defmodule Protobuf.Protoc.IntegrationTest do
     entry = %My_Test.Reply.Entry{key_that_needs_1234camel_CasIng: 1, value: -12345, _my_field_name_2: 21}
     reply = %My_Test.Reply{found: [entry], compact_keys: [1, 2, 3]}
     input = My_Test.Request.new(
-      key: [123], hue: My_Test.Request.Color.val(:GREEN), hat: My_Test.HatType.val(:FEZ),
+      key: [123], hue: My_Test.Request.Color.value(:GREEN), hat: My_Test.HatType.value(:FEZ),
       deadline: 123.0, name_mapping: %{321 => "name"},
       msg_mapping: %{1234 => reply}
     )

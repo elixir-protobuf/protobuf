@@ -50,9 +50,12 @@ defmodule Protobuf.DSLTest do
   test "supports enum" do
     msg_props = TestMsg.EnumFoo.__message_props__
     assert msg_props.enum? == true
-    assert TestMsg.EnumFoo.val(:A) == 1
-    assert TestMsg.EnumFoo.val(:B) == 2
-    assert TestMsg.EnumFoo.val(:C) == 4
+    assert TestMsg.EnumFoo.value(:A) == 1
+    assert TestMsg.EnumFoo.value(:B) == 2
+    assert TestMsg.EnumFoo.value(:C) == 4
+    assert TestMsg.EnumFoo.key(1) == :A
+    assert TestMsg.EnumFoo.key(2) == :B
+    assert TestMsg.EnumFoo.key(4) == :C
     assert %FieldProps{fnum: 11, type: :enum, wire_type: 0} = TestMsg.Foo.__message_props__.field_props[11]
   end
 

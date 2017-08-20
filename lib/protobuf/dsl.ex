@@ -31,7 +31,7 @@ defmodule Protobuf.DSL do
           struct(acc, %{name => type.__default_struct__()})
         end)
         Enum.reduce(unquote(Macro.escape(enum_fields)), struct, fn({name, type, default}, acc) ->
-          struct(acc, %{name => type.val(default)})
+          struct(acc, %{name => type.value(default)})
         end)
       end
     end
@@ -40,7 +40,8 @@ defmodule Protobuf.DSL do
   defp def_enum_functions(%{enum?: true, field_props: props}) do
     Enum.map(props, fn({_, %{fnum: fnum, name_atom: name_atom}}) ->
       quote do
-        def val(unquote(name_atom)), do: unquote(fnum)
+        def value(unquote(name_atom)), do: unquote(fnum)
+        def key(unquote(fnum)), do: unquote(name_atom)
       end
     end)
   end
