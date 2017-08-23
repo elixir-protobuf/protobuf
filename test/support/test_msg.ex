@@ -70,4 +70,17 @@ defmodule TestMsg do
     field :l, 13, repeated: true, type: MapFoo, map: true
     # field :m, 14, optional: true, type: EnumFoo, default: :B, enum: true
   end
+
+  defmodule Oneof do
+    use Protobuf
+
+    defstruct [:one, :a, :b, :two, :c, :d]
+
+    oneof :first, 0
+    oneof :second, 1
+    field :a, 1, optional: true, type: :int32, oneof: 0
+    field :b, 2, optional: true, type: :string, oneof: 0
+    field :c, 3, optional: true, type: :int32, oneof: 1
+    field :d, 4, optional: true, type: :string, oneof: 1
+  end
 end

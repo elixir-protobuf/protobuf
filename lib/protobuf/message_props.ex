@@ -6,6 +6,7 @@ defmodule Protobuf.MessageProps do
     field_props: %{integer => FieldProps.T},
     repeated_fields: [atom],
     syntax: atom,
+    oneof: [{atom, non_neg_integer}],
 
     enum?: boolean,
     extendable?: boolean,
@@ -18,6 +19,7 @@ defmodule Protobuf.MessageProps do
     field_props: %{},
     repeated_fields: [],
     syntax: :proto2,
+    oneof: [],
 
     enum?: false,
     oneof?: false,

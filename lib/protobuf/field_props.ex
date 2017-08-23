@@ -7,6 +7,7 @@ defmodule Protobuf.FieldProps do
     type: atom,
     enum_type: atom,
     default: any,
+    oneof: non_neg_integer,
 
     required?: boolean,
     optional?: boolean,
@@ -24,6 +25,7 @@ defmodule Protobuf.FieldProps do
     type: nil,
     enum_type: nil,
     default: nil,
+    oneof: nil,
 
     required?: false,
     optional?: false,

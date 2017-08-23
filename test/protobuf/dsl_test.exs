@@ -110,4 +110,13 @@ defmodule Protobuf.DSLTest do
              g: [], h: [], i: [], j: 0, k: false, l: %{}} =
            TestMsg.Foo.new(%{a: 1, b: 42, c: "abc", e: TestMsg.Foo.Bar.new(a: 2, b: "asd")})
   end
+
+  test "set oneof of message props" do
+    msg_props = TestMsg.Oneof.__message_props__
+    assert %{oneof: [{:first, 0}, {:second, 1}]} = msg_props
+    assert msg_props.field_props[1].oneof == 0
+    assert msg_props.field_props[2].oneof == 0
+    assert msg_props.field_props[3].oneof == 1
+    assert msg_props.field_props[4].oneof == 1
+  end
 end

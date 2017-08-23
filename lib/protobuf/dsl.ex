@@ -10,11 +10,18 @@ defmodule Protobuf.DSL do
     end
   end
 
+  defmacro oneof(name, index) do
+    quote do
+      @oneofs {unquote(name), unquote(index)}
+    end
+  end
+
   defmacro __before_compile__(env) do
     fields = Module.get_attribute(env.module, :fields)
     options = Module.get_attribute(env.module, :options)
     syntax = Keyword.get(options, :syntax, :proto2)
-    msg_props = generate_msg_props(options, fields)
+    oneofs = Module.get_attribute(env.module, :oneofs)
+    msg_props = generate_msg_props(fields, oneofs, options)
     default_fields = generate_default_fields(syntax, msg_props)
     enum_fields = enum_fields(msg_props)
     quote do
@@ -49,7 +56,7 @@ defmodule Protobuf.DSL do
   end
   defp def_enum_functions(_), do: nil
 
-  defp generate_msg_props(options, fields) do
+  defp generate_msg_props(fields, oneofs, options) do
     syntax = Keyword.get(options, :syntax, :proto2)
     field_props = field_props_map(syntax, fields)
     repeated_fields =
@@ -63,6 +70,7 @@ defmodule Protobuf.DSL do
       field_props: field_props,
       repeated_fields: repeated_fields,
       syntax: syntax,
+      oneof: Enum.reverse(oneofs),
       enum?: Keyword.get(options, :enum) == true,
       map?: Keyword.get(options, :map) == true
     }
@@ -120,6 +128,9 @@ defmodule Protobuf.DSL do
   end
   defp parse_field_opts([{:default, default}|t], acc) do
     parse_field_opts(t, Map.put(acc, :default, default))
+  end
+  defp parse_field_opts([{:oneof, oneof}|t], acc) do
+    parse_field_opts(t, Map.put(acc, :oneof, oneof))
   end
   # skip unknown option
   defp parse_field_opts([{_, _}|t], acc) do
