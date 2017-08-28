@@ -157,19 +157,20 @@ defmodule My_Test.Communique do
     msg:         My_Test.Reply.t,
     somegroup:   any
   }
-  defstruct [:make_me_cry, :number, :name, :data, :temp_c, :height, :today, :maybe, :delta, :msg, :somegroup]
+  defstruct [:union, :make_me_cry, :number, :name, :data, :temp_c, :height, :today, :maybe, :delta, :msg, :somegroup]
 
-  field :make_me_cry, 1, optional: true, type: :bool
-  field :number, 5, optional: true, type: :int32
-  field :name, 6, optional: true, type: :string
-  field :data, 7, optional: true, type: :bytes
-  field :temp_c, 8, optional: true, type: :double
-  field :height, 9, optional: true, type: :float
-  field :today, 10, optional: true, type: My_Test.Days, enum: true
-  field :maybe, 11, optional: true, type: :bool
-  field :delta, 12, optional: true, type: :sint32
-  field :msg, 13, optional: true, type: My_Test.Reply
-  field :somegroup, 14, optional: true, type: :group
+  oneof :union, 0
+  field :make_me_cry, 1, optional: true, type: :bool, oneof: 0
+  field :number, 5, optional: true, type: :int32, oneof: 0
+  field :name, 6, optional: true, type: :string, oneof: 0
+  field :data, 7, optional: true, type: :bytes, oneof: 0
+  field :temp_c, 8, optional: true, type: :double, oneof: 0
+  field :height, 9, optional: true, type: :float, oneof: 0
+  field :today, 10, optional: true, type: My_Test.Days, enum: true, oneof: 0
+  field :maybe, 11, optional: true, type: :bool, oneof: 0
+  field :delta, 12, optional: true, type: :sint32, oneof: 0
+  field :msg, 13, optional: true, type: My_Test.Reply, oneof: 0
+  field :somegroup, 14, optional: true, type: :group, oneof: 0
 end
 
 defmodule My_Test.Communique.SomeGroup do

@@ -173,4 +173,25 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "use Protobuf, enum: true\n"
     assert msg =~ "field :a, 0\n  field :b, 1\n"
   end
+
+  test "generate/2 supports oneof" do
+    ctx = %Context{package: ""}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo", oneof_decl: [
+      Google_Protobuf.OneofDescriptorProto.new(name: "first"),
+      Google_Protobuf.OneofDescriptorProto.new(name: "second")
+    ], field: [
+      Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 5, label: 1, oneof_index: 0),
+      Google_Protobuf.FieldDescriptorProto.new(name: "b", number: 2, type: 5, label: 1, oneof_index: 0),
+      Google_Protobuf.FieldDescriptorProto.new(name: "c", number: 3, type: 5, label: 1, oneof_index: 1),
+      Google_Protobuf.FieldDescriptorProto.new(name: "d", number: 4, type: 5, label: 1, oneof_index: 1),
+    ])
+    [msg] = Generator.generate(ctx, desc)
+    assert msg =~ "defstruct [:first, :second, :a, :b, :c, :d]\n"
+    assert msg =~ "oneof :first, 0\n"
+    assert msg =~ "oneof :second, 1\n"
+    assert msg =~ "field :a, 1, optional: true, type: :int32, oneof: 0\n"
+    assert msg =~ "field :b, 2, optional: true, type: :int32, oneof: 0\n"
+    assert msg =~ "field :c, 3, optional: true, type: :int32, oneof: 1\n"
+    assert msg =~ "field :d, 4, optional: true, type: :int32, oneof: 1\n"
+  end
 end

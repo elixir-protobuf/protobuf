@@ -20,9 +20,10 @@ defmodule Protobuf.Protoc.Generator.Message do
       new_namespace: new_ns,
       name: new_ns |> Util.join_name |> Util.attach_pkg(pkg),
       options: msg_opts_str(ctx, desc.options),
-      structs: structs_str(desc.field || []),
+      structs: structs_str(desc),
       typespec: typespec_str(fields),
-      fields: fields
+      fields: fields,
+      oneofs: oneofs_str(desc.oneof_decl)
     }
   end
 
@@ -32,6 +33,7 @@ defmodule Protobuf.Protoc.Generator.Message do
       msg_struct[:options],
       msg_struct[:structs],
       msg_struct[:typespec],
+      msg_struct[:oneofs],
       gen_fields(syntax, msg_struct[:fields])
     )
   end
@@ -60,8 +62,8 @@ defmodule Protobuf.Protoc.Generator.Message do
     if String.length(str) > 0, do: ", " <> str, else: ""
   end
 
-  def structs_str(fields) do
-    Enum.map_join(fields, ", ", fn(f) -> ":#{f.name}" end)
+  def structs_str(struct) do
+    Enum.map_join(struct.oneof_decl ++ struct.field || [], ", ", fn(f) -> ":#{f.name}" end)
   end
 
   def typespec_str([]), do: ""
@@ -73,6 +75,14 @@ defmodule Protobuf.Protoc.Generator.Message do
     Enum.map_join(fields, ",\n", fn(f) ->
       "    #{fmt_type_name(f[:name], longest_width)} #{fmt_type(f)}"
     end) <> "\n  }\n"
+  end
+
+  defp oneofs_str(oneofs) do
+    oneofs
+    |> Enum.with_index
+    |> Enum.map(fn({oneof, index}) ->
+         "oneof :#{oneof.name}, #{index}"
+       end)
   end
 
   defp fmt_type_name(name, len) do
@@ -97,14 +107,16 @@ defmodule Protobuf.Protoc.Generator.Message do
   defp type_to_spec(num, _), do: TypeUtil.str_to_spec(num)
 
   def get_fields(ctx, desc) do
+    oneofs = Enum.map(desc.oneof_decl, &(&1.name))
     nested_maps = nested_maps(ctx, desc)
-    Enum.map(desc.field || [], fn(f) -> get_field(ctx, f, nested_maps) end)
+    Enum.map(desc.field || [], fn(f) -> get_field(ctx, f, nested_maps, oneofs) end)
   end
 
-  def get_field(ctx, f, nested_maps) do
+  def get_field(ctx, f, nested_maps, oneofs) do
     opts = field_options(f)
     map = nested_maps[f.type_name]
     opts = if map, do: Map.put(opts, :map, true), else: opts
+    opts = if length(oneofs) > 0, do: Map.put(opts, :oneof, f.oneof_index), else: opts
     type = TypeUtil.number_to_atom(f.type)
     type = if type == :enum || type == :message do
       Util.trans_type_name(f.type_name, ctx)

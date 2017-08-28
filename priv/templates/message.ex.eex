@@ -4,7 +4,7 @@ defmodule <%= name %> do
   <%= typespec %>
   defstruct [<%= struct_fields %>]
 
-<%= Enum.map fields, fn(field) -> %>
-  field <%= field %>
+<%= for v <- oneofs do %>  <%= v %>
+<% end %><%= for f <- fields do %>  field <%= f %>
 <% end %>
 end
