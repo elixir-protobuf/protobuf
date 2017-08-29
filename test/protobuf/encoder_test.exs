@@ -37,15 +37,30 @@ defmodule Protobuf.EncoderTest do
     assert bin == <<8, 123, 17, 5, 0, 0, 0, 0, 0, 0, 0, 64, 12, 64, 13, 64, 14, 112, 2>>
   end
 
+  test "encodes repeated varint fields with all 0" do
+    bin = Encoder.encode(TestMsg.Foo.new(g: [0, 0, 0]))
+    assert bin == <<17, 5, 0, 0, 0, 0, 0, 0, 0, 64, 0, 64, 0, 64, 0, 112, 2>>
+  end
+
   test "encodes repeated embedded fields" do
     bin = <<17, 5, 0, 0, 0, 0, 0, 0, 0, 74, 7, 8, 12, 18, 3, 97, 98, 99, 74, 2, 8, 13, 112, 2>>
     res = Encoder.encode(TestMsg.Foo.new(h: [%TestMsg.Foo.Bar{a: 12, b: "abc"}, TestMsg.Foo.Bar.new(a: 13)]))
     assert res == bin
   end
 
+  test "encodes repeated embedded fields with all empty struct" do
+    bin = Encoder.encode(TestMsg.Foo.new(h: [TestMsg.Foo.Bar.new(), TestMsg.Foo.Bar.new()]))
+    assert bin == <<17, 5, 0, 0, 0, 0, 0, 0, 0, 74, 0, 74, 0, 112, 2>>
+  end
+
   test "encodes packed fields" do
     bin = Encoder.encode(TestMsg.Foo.new(i: [12, 13, 14]))
     assert bin == <<17, 5, 0, 0, 0, 0, 0, 0, 0, 82, 3, 12, 13, 14, 112, 2>>
+  end
+
+  test "encodes packed fields with all 0" do
+    bin = Encoder.encode(TestMsg.Foo.new(i: [0, 0, 0]))
+    assert bin == <<17, 5, 0, 0, 0, 0, 0, 0, 0, 82, 3, 0, 0, 0, 112, 2>>
   end
 
   test "encodes enum type" do

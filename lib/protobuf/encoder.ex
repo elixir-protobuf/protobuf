@@ -41,17 +41,22 @@ defmodule Protobuf.Encoder do
           [encode_fnum(fnum, type), encode_type(type, v)]
         end)
       :embedded ->
-        repeated_or_not(val, prop.repeated? || prop.map?, fn(v) ->
+        repeated = prop.repeated? || prop.map?
+        repeated_or_not(val, repeated, fn(v) ->
           v = if prop.map?, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
           encoded = encode(v)
           byte_size = byte_size(encoded)
-          if byte_size == 0, do: "", else: [encode_fnum(fnum, type), [encode_varint(byte_size), encoded]]
+          if byte_size == 0 && (!repeated || val == []) do
+            []
+          else
+            [encode_fnum(fnum, type), [encode_varint(byte_size), encoded]]
+          end
         end)
       :packed ->
         encoded = Enum.map(val, fn(v) -> encode_type(type, v) end)
         encoded = IO.iodata_to_binary(encoded)
         byte_size = byte_size(encoded)
-        if byte_size == 0, do: "", else: [encode_fnum(fnum, :bytes), [encode_varint(byte_size), encoded]]
+        if byte_size == 0 && val == [], do: [], else: [encode_fnum(fnum, :bytes), [encode_varint(byte_size), encoded]]
     end
   end
 
