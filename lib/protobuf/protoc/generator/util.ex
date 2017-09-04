@@ -13,7 +13,7 @@ defmodule Protobuf.Protoc.Generator.Util do
   def options_to_str(opts) do
     opts
     |> Enum.filter(fn({_, v}) -> v end)
-    |> Enum.map(fn({k, v}) -> "#{k}: #{v}" end)
+    |> Enum.map(fn({k, v}) -> "#{k}: #{print(v)}" end)
     |> Enum.join(", ")
   end
 
@@ -56,4 +56,7 @@ defmodule Protobuf.Protoc.Generator.Util do
     |> Enum.map(&Macro.camelize(&1))
     |> Enum.join(".")
   end
+
+  def print(v) when is_atom(v), do: inspect(v)
+  def print(v), do: v
 end

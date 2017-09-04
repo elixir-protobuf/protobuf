@@ -12,6 +12,14 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "use Protobuf\n"
   end
 
+  test "generate/2 has right syntax" do
+    ctx = %Context{package: "", syntax: :proto3}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo")
+    [msg] = Generator.generate(ctx, desc)
+    assert msg =~ "defmodule Foo do\n"
+    assert msg =~ "use Protobuf, syntax: :proto3\n"
+  end
+
   test "generate/2 has right name with package" do
     ctx = %Context{package: "pkg.name"}
     desc = Google_Protobuf.DescriptorProto.new(name: "Foo")

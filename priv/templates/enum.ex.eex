@@ -1,5 +1,5 @@
 defmodule <%= name %> do
-  use Protobuf, enum: true
+  use Protobuf<%= options %>
 
 <%= Enum.map fields, fn(field) -> %>
   field <%= field %>

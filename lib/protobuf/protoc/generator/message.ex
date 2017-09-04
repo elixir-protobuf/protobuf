@@ -19,7 +19,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     %{
       new_namespace: new_ns,
       name: new_ns |> Util.join_name |> Util.attach_pkg(pkg),
-      options: msg_opts_str(desc.options),
+      options: msg_opts_str(ctx, desc.options),
       structs: structs_str(desc.field),
       typespec: typespec_str(fields),
       fields: fields
@@ -55,9 +55,9 @@ defmodule Protobuf.Protoc.Generator.Message do
     end)
   end
 
-  def msg_opts_str(opts) do
+  def msg_opts_str(%{syntax: syntax}, opts) do
     msg_options = opts
-    opts = %{map: msg_options.map_entry, deprecated: msg_options.deprecated}
+    opts = %{syntax: syntax, map: msg_options.map_entry, deprecated: msg_options.deprecated}
     str = Util.options_to_str(opts)
     if String.length(str) > 0, do: ", " <> str, else: ""
   end

@@ -1,5 +1,5 @@
 defmodule My_Test.Request do
-  use Protobuf
+  use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
     key:          [integer],
@@ -26,7 +26,7 @@ defmodule My_Test.Request do
 end
 
 defmodule My_Test.Request.SomeGroup do
-  use Protobuf
+  use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
     group_field: integer
@@ -37,7 +37,7 @@ defmodule My_Test.Request.SomeGroup do
 end
 
 defmodule My_Test.Request.NameMappingEntry do
-  use Protobuf, map: true
+  use Protobuf, map: true, syntax: :proto2
 
   @type t :: %__MODULE__{
     key:   integer,
@@ -50,7 +50,7 @@ defmodule My_Test.Request.NameMappingEntry do
 end
 
 defmodule My_Test.Request.MsgMappingEntry do
-  use Protobuf, map: true
+  use Protobuf, map: true, syntax: :proto2
 
   @type t :: %__MODULE__{
     key:   integer,
@@ -63,7 +63,7 @@ defmodule My_Test.Request.MsgMappingEntry do
 end
 
 defmodule My_Test.Request.Color do
-  use Protobuf, enum: true
+  use Protobuf, enum: true, syntax: :proto2
 
   field :RED, 0
   field :GREEN, 1
@@ -71,7 +71,7 @@ defmodule My_Test.Request.Color do
 end
 
 defmodule My_Test.Reply do
-  use Protobuf
+  use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
     found:        [My_Test.Reply.Entry.t],
@@ -84,7 +84,7 @@ defmodule My_Test.Reply do
 end
 
 defmodule My_Test.Reply.Entry do
-  use Protobuf
+  use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
     key_that_needs_1234camel_CasIng: integer,
@@ -99,14 +99,14 @@ defmodule My_Test.Reply.Entry do
 end
 
 defmodule My_Test.Reply.Entry.Game do
-  use Protobuf, enum: true
+  use Protobuf, enum: true, syntax: :proto2
 
   field :FOOTBALL, 1
   field :TENNIS, 2
 end
 
 defmodule My_Test.OtherBase do
-  use Protobuf
+  use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
     name: String.t
@@ -117,14 +117,14 @@ defmodule My_Test.OtherBase do
 end
 
 defmodule My_Test.ReplyExtensions do
-  use Protobuf
+  use Protobuf, syntax: :proto2
 
   defstruct []
 
 end
 
 defmodule My_Test.OtherReplyExtensions do
-  use Protobuf
+  use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
     key: integer
@@ -135,14 +135,14 @@ defmodule My_Test.OtherReplyExtensions do
 end
 
 defmodule My_Test.OldReply do
-  use Protobuf
+  use Protobuf, syntax: :proto2
 
   defstruct []
 
 end
 
 defmodule My_Test.Communique do
-  use Protobuf
+  use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
     make_me_cry: boolean,
@@ -173,7 +173,7 @@ defmodule My_Test.Communique do
 end
 
 defmodule My_Test.Communique.SomeGroup do
-  use Protobuf
+  use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
     member: String.t
@@ -184,21 +184,21 @@ defmodule My_Test.Communique.SomeGroup do
 end
 
 defmodule My_Test.Communique.Delta do
-  use Protobuf
+  use Protobuf, syntax: :proto2
 
   defstruct []
 
 end
 
 defmodule My_Test.HatType do
-  use Protobuf, enum: true
+  use Protobuf, enum: true, syntax: :proto2
 
   field :FEDORA, 1
   field :FEZ, 2
 end
 
 defmodule My_Test.Days do
-  use Protobuf, enum: true
+  use Protobuf, enum: true, syntax: :proto2
 
   field :MONDAY, 1
   field :TUESDAY, 2

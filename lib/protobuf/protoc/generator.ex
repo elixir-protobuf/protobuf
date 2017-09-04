@@ -13,7 +13,7 @@ defmodule Protobuf.Protoc.Generator do
   end
 
   def generate_content(ctx, desc) do
-    ctx = %{ctx | package: desc.package}
+    ctx = %{ctx | package: desc.package, syntax: syntax(desc.syntax)}
     ctx = %{ctx | dep_pkgs: get_dep_pkgs(ctx, desc.dependency )}
     list =
       MessageGenerator.generate_list(ctx, desc.message_type) ++
@@ -30,4 +30,7 @@ defmodule Protobuf.Protoc.Generator do
     pkgs = if pkg && String.length(pkg) > 0, do: [pkg | pkgs], else: pkgs
     Enum.sort(pkgs, &(byte_size(&2) <= byte_size(&1)))
   end
+
+  defp syntax("proto3"), do: :proto3
+  defp syntax(_), do: :proto2
 end
