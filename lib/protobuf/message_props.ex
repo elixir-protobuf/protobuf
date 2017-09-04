@@ -5,6 +5,7 @@ defmodule Protobuf.MessageProps do
     tags_map: %{integer => integer},
     field_props: %{integer => FieldProps.T},
     repeated_fields: [atom],
+    syntax: atom,
 
     enum?: boolean,
     extendable?: boolean,
@@ -16,6 +17,8 @@ defmodule Protobuf.MessageProps do
     tags_map: %{},
     field_props: %{},
     repeated_fields: [],
+    # not used now, reserved for using later
+    syntax: nil,
 
     enum?: false,
     oneof?: false,

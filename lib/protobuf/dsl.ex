@@ -59,6 +59,7 @@ defmodule Protobuf.DSL do
       ordered_tags: ordered_tags(fields),
       field_props: field_props,
       repeated_fields: repeated_fields,
+      syntax: Keyword.get(options, :syntax),
       enum?: Keyword.get(options, :enum) == true,
       map?: Keyword.get(options, :map) == true
     }

@@ -1,4 +1,9 @@
 defmodule TestMsg do
+  defmodule SyntaxOption do
+    use Protobuf, syntax: :proto3
+    defstruct []
+  end
+
   defmodule Foo.Bar do
     use Protobuf
 

@@ -9,6 +9,11 @@ defmodule Protobuf.DSLTest do
     assert struct == %TestMsg.Foo{a: 42}
   end
 
+  test "supports syntax option" do
+    msg_props = TestMsg.SyntaxOption.__message_props__
+    assert msg_props.syntax == :proto3
+  end
+
   test "creates __message_props__ function" do
     msg_props = TestMsg.Foo.__message_props__
     tags_map = Enum.reduce([1, 2, 3] ++ Enum.to_list(5..14), %{}, fn(i, acc) -> Map.put(acc, i, i) end)
