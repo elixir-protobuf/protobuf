@@ -10,7 +10,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   def generate(ctx, desc) do
     msg_struct = parse_desc(ctx, desc)
     ctx = %{ctx | namespace: msg_struct[:new_namespace]}
-    [gen_msg(msg_struct)] ++ gen_nested_msgs(ctx, desc) ++ gen_nested_enums(ctx, desc)
+    [gen_msg(ctx.syntax, msg_struct)] ++ gen_nested_msgs(ctx, desc) ++ gen_nested_enums(ctx, desc)
   end
 
   def parse_desc(%{namespace: ns, package: pkg} = ctx, desc) do
@@ -26,13 +26,13 @@ defmodule Protobuf.Protoc.Generator.Message do
     }
   end
 
-  defp gen_msg(msg_struct) do
+  defp gen_msg(syntax, msg_struct) do
     Protobuf.Protoc.Template.message(
       msg_struct[:name],
       msg_struct[:options],
       msg_struct[:structs],
       msg_struct[:typespec],
-      gen_fields(msg_struct[:fields])
+      gen_fields(syntax, msg_struct[:fields])
     )
   end
 
@@ -44,14 +44,12 @@ defmodule Protobuf.Protoc.Generator.Message do
     Enum.map(desc.enum_type || [], fn(enum_desc) -> EnumGenerator.generate(ctx, enum_desc) end)
   end
 
-  defp gen_fields(fields) do
+  defp gen_fields(syntax, fields) do
     Enum.map(fields, fn(%{opts: opts} = f) ->
       opts_str = Util.options_to_str(opts)
-      if opts_str != "" do
-        ":#{f[:name]}, #{f[:number]}, #{f[:label]}: true, type: #{f[:type]}, #{opts_str}"
-      else
-        ":#{f[:name]}, #{f[:number]}, #{f[:label]}: true, type: #{f[:type]}"
-      end
+      opts_str = if opts_str == "", do: "", else: ", " <> opts_str
+      label_str = if syntax == :proto3 && f[:label] != "repeated", do: "", else: "#{f[:label]}: true, "
+      ":#{f[:name]}, #{f[:number]}, #{label_str}type: #{f[:type]}#{opts_str}"
     end)
   end
 

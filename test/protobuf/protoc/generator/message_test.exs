@@ -48,6 +48,22 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "field :b, 2, required: true, type: :string\n"
   end
 
+  test "generate/2 has right fields for proto3" do
+    ctx = %Context{package: "", syntax: :proto3}
+    desc = Google_Protobuf.DescriptorProto.new(name: "Foo", field: [
+      Google_Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: 5, label: 1),
+      Google_Protobuf.FieldDescriptorProto.new(name: "b", number: 2, type: 9, label: 2),
+      Google_Protobuf.FieldDescriptorProto.new(name: "c", number: 3, type: 5, label: 3)
+    ])
+    [msg] = Generator.generate(ctx, desc)
+    assert msg =~ "defstruct [:a, :b, :c]\n"
+    assert msg =~ "a: integer"
+    assert msg =~ "b: String.t"
+    assert msg =~ "field :a, 1, type: :int32\n"
+    assert msg =~ "field :b, 2, type: :string\n"
+    assert msg =~ "field :c, 3, repeated: true, type: :int32\n"
+  end
+
   test "generate/2 supports option :default" do
     ctx = %Context{package: ""}
     desc = Google_Protobuf.DescriptorProto.new(name: "Foo", field: [
