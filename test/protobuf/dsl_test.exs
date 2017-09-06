@@ -4,6 +4,14 @@ defmodule Protobuf.DSLTest do
 
   alias Protobuf.FieldProps
 
+  defmodule DefaultSyntax do
+    use Protobuf
+  end
+
+  test "default syntax is proto2" do
+    assert DefaultSyntax.__message_props__.syntax == :proto2
+  end
+
   test "supports syntax option" do
     msg_props = TestMsg.SyntaxOption.__message_props__
     assert msg_props.syntax == :proto3

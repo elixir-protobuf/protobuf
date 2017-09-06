@@ -10,9 +10,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   def generate(ctx, desc) do
     msg_struct = parse_desc(ctx, desc)
     ctx = %{ctx | namespace: msg_struct[:new_namespace]}
-    [gen_msg(msg_struct)] ++
-    gen_nested_msgs(ctx, desc) ++
-    gen_nested_enums(ctx, desc)
+    [gen_msg(msg_struct)] ++ gen_nested_msgs(ctx, desc) ++ gen_nested_enums(ctx, desc)
   end
 
   def parse_desc(%{namespace: ns, package: pkg} = ctx, desc) do

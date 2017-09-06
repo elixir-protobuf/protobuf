@@ -92,4 +92,16 @@ defmodule Protobuf.EncoderTest do
     struct = TestMsg.Foo.new(l: %{"foo_key" => 213})
     assert Encoder.encode(struct) == bin
   end
+
+  test "encodes 0 for proto2" do
+    assert Encoder.encode(TestMsg.Foo2.new(a: 0)) == <<8, 0>>
+  end
+
+  test "encodes [] for proto2" do
+    assert Encoder.encode(TestMsg.Foo2.new(g: [])) == <<>>
+  end
+
+  test "encodes %{} for proto2" do
+    assert Encoder.encode(TestMsg.Foo2.new(l: %{})) == <<>>
+  end
 end
