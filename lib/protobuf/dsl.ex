@@ -15,7 +15,6 @@ defmodule Protobuf.DSL do
     options = Module.get_attribute(env.module, :options)
     msg_props = generate_msg_props(options, fields)
     default_fields = generate_default_fields(msg_props)
-    embedded_fields = embedded_fields(msg_props)
     enum_fields = enum_fields(msg_props)
     quote do
       def __message_props__ do
@@ -25,11 +24,7 @@ defmodule Protobuf.DSL do
       unquote(def_enum_functions(msg_props))
 
       def __default_struct__ do
-        struct = __MODULE__
-        |> struct(unquote(Macro.escape(default_fields)))
-        struct = Enum.reduce(unquote(embedded_fields), struct, fn({name, type}, acc) ->
-          struct(acc, %{name => type.__default_struct__()})
-        end)
+        struct = struct(__MODULE__, unquote(Macro.escape(default_fields)))
         Enum.reduce(unquote(Macro.escape(enum_fields)), struct, fn({name, type, default}, acc) ->
           struct(acc, %{name => type.value(default)})
         end)
@@ -59,7 +54,7 @@ defmodule Protobuf.DSL do
       ordered_tags: ordered_tags(fields),
       field_props: field_props,
       repeated_fields: repeated_fields,
-      syntax: Keyword.get(options, :syntax),
+      syntax: Keyword.get(options, :syntax, :proto2),
       enum?: Keyword.get(options, :enum) == true,
       map?: Keyword.get(options, :map) == true
     }

@@ -4,11 +4,6 @@ defmodule Protobuf.DSLTest do
 
   alias Protobuf.FieldProps
 
-  test "decode/2 supports false :use_default" do
-    struct = TestMsg.Foo.decode(<<8, 42>>, use_default: false)
-    assert struct == %TestMsg.Foo{a: 42}
-  end
-
   test "supports syntax option" do
     msg_props = TestMsg.SyntaxOption.__message_props__
     assert msg_props.syntax == :proto3
@@ -72,12 +67,12 @@ defmodule Protobuf.DSLTest do
   end
 
   test "generates __default_struct__ function" do
-    assert %TestMsg.Foo{a: 0, b: 5, c: "", d: 0.0, e: %TestMsg.Foo.Bar{a: 0, b: ""}, f: 0,
+    assert %TestMsg.Foo{a: 0, b: 5, c: "", d: 0.0, e: nil, f: 0,
       g: [], h: [], i: [], j: 0, k: false, l: %{}, m: 2} == TestMsg.Foo.__default_struct__
   end
 
   test "generates new function" do
-    assert %TestMsg.Foo{a: 0, b: 5, c: "", d: 0.0, e: %TestMsg.Foo.Bar{a: 0, b: ""}, f: 0,
+    assert %TestMsg.Foo{a: 0, b: 5, c: "", d: 0.0, e: nil, f: 0,
              g: [], h: [], i: [], j: 0, k: false, l: %{}} =
            TestMsg.Foo.new
     assert %TestMsg.Foo{a: 1, b: 42, c: "abc", d: 0.0, e: %TestMsg.Foo.Bar{a: 2, b: "asd"}, f: 0,

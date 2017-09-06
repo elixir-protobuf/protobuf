@@ -18,7 +18,7 @@ defmodule Protobuf.MessageProps do
     field_props: %{},
     repeated_fields: [],
     # not used now, reserved for using later
-    syntax: nil,
+    syntax: :proto2,
 
     enum?: false,
     oneof?: false,

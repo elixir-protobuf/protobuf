@@ -22,13 +22,14 @@ defmodule Protobuf.Encoder do
 
   @spec encode(struct, MessageProps.t, iodata) :: iodata
   def encode(struct, props, acc0) do
+    syntax = props.syntax
     Enum.reduce props.ordered_tags, acc0, fn(tag, acc) ->
       prop = props.field_props[tag]
       val = Map.get(struct, prop.name_atom)
-      if empty_val?(val) do
-        acc
-      else
-        [encode_field(val, prop)|acc]
+      cond do
+        syntax == :proto2 && (val == nil || val == [] || val == %{}) -> acc
+        syntax == :proto3 && empty_val?(val) -> acc
+        true -> [encode_field(val, prop)|acc]
       end
     end
   end
@@ -44,9 +45,9 @@ defmodule Protobuf.Encoder do
         repeated = prop.repeated? || prop.map?
         repeated_or_not(val, repeated, fn(v) ->
           v = if prop.map?, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
-          encoded = encode(v)
-          byte_size = byte_size(encoded)
-          if byte_size == 0 && (!repeated || val == []) do
+          encoded = encode(v, iolist: true)
+          byte_size = IO.iodata_length(encoded)
+          if byte_size == 0 && !repeated do
             []
           else
             [encode_fnum(fnum, type), [encode_varint(byte_size), encoded]]
@@ -54,9 +55,8 @@ defmodule Protobuf.Encoder do
         end)
       :packed ->
         encoded = Enum.map(val, fn(v) -> encode_type(type, v) end)
-        encoded = IO.iodata_to_binary(encoded)
-        byte_size = byte_size(encoded)
-        if byte_size == 0 && val == [], do: [], else: [encode_fnum(fnum, :bytes), [encode_varint(byte_size), encoded]]
+        byte_size = IO.iodata_length(encoded)
+        if byte_size == 0, do: [], else: [encode_fnum(fnum, :bytes), [encode_varint(byte_size), encoded]]
     end
   end
 
@@ -142,6 +142,6 @@ defmodule Protobuf.Encoder do
   end
 
   defp empty_val?(v) do
-    !v || v == 0 || v == ""
+    !v || v == 0 || v == "" || v == [] || v == %{}
   end
 end

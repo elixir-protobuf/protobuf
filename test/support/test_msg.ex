@@ -5,7 +5,7 @@ defmodule TestMsg do
   end
 
   defmodule Foo.Bar do
-    use Protobuf
+    use Protobuf, syntax: :proto3
 
     defstruct [:a, :b]
 
@@ -14,7 +14,7 @@ defmodule TestMsg do
   end
 
   defmodule EnumFoo do
-    use Protobuf, enum: true
+    use Protobuf, enum: true, syntax: :proto3
 
     field :A, 1
     field :B, 2
@@ -22,7 +22,7 @@ defmodule TestMsg do
   end
 
   defmodule MapFoo do
-    use Protobuf, map: true
+    use Protobuf, map: true, syntax: :proto3
 
     defstruct [:key, :value]
     field :key, 1, optional: true, type: :string
@@ -30,7 +30,7 @@ defmodule TestMsg do
   end
 
   defmodule Foo do
-    use Protobuf
+    use Protobuf, syntax: :proto3
 
     defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m]
 

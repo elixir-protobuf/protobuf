@@ -1,6 +1,11 @@
 defmodule Protobuf.Builder do
   def new(mod, attrs) do
-    struct(mod.__default_struct__, attrs)
+    props = mod.__message_props__
+    if props.syntax == :proto3 do
+      struct(mod.__default_struct__, attrs)
+    else
+      struct(mod, attrs)
+    end
   end
 
   def field_default(%{default: default}) when not is_nil(default), do: default
@@ -24,6 +29,5 @@ defmodule Protobuf.Builder do
   def type_default(:double), do: 0.0
   def type_default(:bytes), do: ""
   def type_default(:string), do: ""
-  def type_default(_) do
-  end
+  def type_default(_), do: nil
 end

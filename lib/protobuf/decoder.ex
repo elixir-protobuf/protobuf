@@ -12,13 +12,12 @@ defmodule Protobuf.Decoder do
   @wire_32bits       5
 
   @spec decode(binary, atom) :: any
-  def decode(data, module, opts \\ []) when is_atom(module) do
-    msg = if Keyword.get(opts, :use_default, true), do: module.new, else: struct(module)
-    do_decode(data, module.__message_props__(), msg, opts)
+  def decode(data, module) when is_atom(module) do
+    do_decode(data, module.__message_props__(), module.new)
   end
 
-  @spec do_decode(binary, MessageProps.t, struct, Keyword) :: any
-  defp do_decode(bin, props, msg, opts) when is_binary(bin) and byte_size(bin) > 0 do
+  @spec do_decode(binary, MessageProps.t, struct) :: any
+  defp do_decode(bin, props, msg) when is_binary(bin) and byte_size(bin) > 0 do
     {key, rest} = decode_varint(bin)
     tag = bsr(key, 3)
     wire_type = band(key, 7)
@@ -31,29 +30,29 @@ defmodule Protobuf.Decoder do
             new_msg = put_map(msg, prop.name_atom, val, fn _k, v1, v2 ->
               merge_same_fields(v1, v2, prop.repeated?, fn -> v2 end)
             end)
-            do_decode(rest, props, new_msg, opts)
+            do_decode(rest, props, new_msg)
           :embedded ->
             {val, rest} = decode_type(:bytes, wire_type, rest)
-            embedded_msg = decode(val, prop.type, opts)
+            embedded_msg = decode(val, prop.type)
             decoded = if prop.map?, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
             new_msg = put_map(msg, prop.name_atom, decoded, fn _k, v1, v2 ->
               merge_same_fields(v1, v2, prop.repeated?, fn ->
                 if v1, do: Map.merge(v1, v2), else: v2
               end)
             end)
-            do_decode(rest, props, struct(new_msg), opts)
+            do_decode(rest, props, struct(new_msg))
           :packed ->
             {val, rest} = decode_type(:bytes, wire_type, rest)
             vals = decode_packed(prop.type, Protobuf.Encoder.wire_type(prop.type), val)
             new_msg = put_map(msg, prop.name_atom, vals, fn _k, v1, v2 ->
               if v1, do: v2 ++ v1, else: v2
             end)
-            do_decode(rest, props, struct(new_msg), opts)
+            do_decode(rest, props, struct(new_msg))
           {:error, error_msg} ->
             raise DecodeError, message: "#{inspect(msg.__struct__)}: " <> error_msg
           :unknown_field ->
             {_, rest} = decode_type(wire_type, rest)
-            do_decode(rest, props, msg, opts)
+            do_decode(rest, props, msg)
         end
       {:extention} ->
         msg
@@ -61,7 +60,7 @@ defmodule Protobuf.Decoder do
         msg
     end
   end
-  defp do_decode(<<>>, props, msg, _) do
+  defp do_decode(<<>>, props, msg) do
     reverse_repeated(msg, props.repeated_fields)
   end
 

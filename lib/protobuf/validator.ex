@@ -8,8 +8,9 @@ defmodule Protobuf.Validator do
   end
 
   def valid?(%{__struct__: mod} = struct) do
-    Enum.reduce_while(mod.__message_props__.field_props, true, fn({_, props}, _) ->
-      if field_valid?(props, Map.get(struct, props.name_atom)) do
+    msg_props = mod.__message_props__
+    Enum.reduce_while(msg_props.field_props, true, fn({_, props}, _) ->
+      if field_valid?(%{syntax: msg_props.syntax}, props, Map.get(struct, props.name_atom)) do
         {:cont, true}
       else
         {:halt, {:invalid, "#{inspect mod}##{props.name_atom} is invalid!"}}
@@ -17,21 +18,27 @@ defmodule Protobuf.Validator do
     end)
   end
 
-  def field_valid?(%{repeated?: true, embedded?: true, type: type}, list) when is_list(list) do
+  def field_valid?(_, %{repeated?: true, embedded?: true, type: type}, list) when is_list(list) do
     Enum.all?(list, fn(val) -> match_and_valid?(type, val) end)
   end
-  def field_valid?(%{repeated?: true, embedded?: false, type: type}, list) when is_list(list) do
+  def field_valid?(_, %{repeated?: true, embedded?: false, type: type}, list) when is_list(list) do
     Enum.all?(list, fn(val) -> type_valid?(type, val) end)
   end
-  def field_valid?(%{map?: true, type: type}, map) when is_map(map) do
+  def field_valid?(_, %{map?: true, type: type}, map) when is_map(map) do
     key_type = type.__message_props__.field_props[1].type
     val_type = type.__message_props__.field_props[2].type
     Enum.all?(map, fn({k, v}) ->
       type_valid?(key_type, k) && match_and_valid?(val_type, v)
     end)
   end
-  def field_valid?(%{embedded?: true, type: type}, val), do: match_and_valid?(type, val)
-  def field_valid?(%{type: type}, val), do: type_valid?(type, val)
+  # nil is allowed for singular embedded message
+  def field_valid?(_, %{embedded?: true}, nil), do: true
+  def field_valid?(_, %{embedded?: true, type: type}, val) do
+    match_and_valid?(type, val)
+  end
+  # nil is allowed for proto2
+  def field_valid?(%{syntax: :proto2}, _, nil), do: true
+  def field_valid?(_, %{type: type}, val), do: type_valid?(type, val)
 
   defp match_and_valid?(mod, %{__struct__: mod} = val) do
     valid?(val)

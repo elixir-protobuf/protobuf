@@ -14,11 +14,11 @@ defmodule Protobuf.Protoc.Generator do
 
   def generate_content(ctx, desc) do
     ctx = %{ctx | package: desc.package, syntax: syntax(desc.syntax)}
-    ctx = %{ctx | dep_pkgs: get_dep_pkgs(ctx, desc.dependency )}
+    ctx = %{ctx | dep_pkgs: get_dep_pkgs(ctx, desc.dependency || [] )}
     list =
-      MessageGenerator.generate_list(ctx, desc.message_type) ++
-      EnumGenerator.generate_list(ctx, desc.enum_type) ++
-      ServiceGenerator.generate_list(ctx, desc.service)
+      MessageGenerator.generate_list(ctx, desc.message_type || []) ++
+      EnumGenerator.generate_list(ctx, desc.enum_type || []) ++
+      ServiceGenerator.generate_list(ctx, desc.service || [])
     list
     |> List.flatten
     |> Enum.join("\n")

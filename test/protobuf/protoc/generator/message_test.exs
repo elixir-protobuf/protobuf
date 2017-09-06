@@ -85,8 +85,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     ], nested_type: [Google_Protobuf.DescriptorProto.new(
       name: "ProjectsEntry", options: Google_Protobuf.MessageOptions.new(map_entry: true),
       field: [
-        Google_Protobuf.FieldDescriptorProto.new(number: 1, label: 1, type: 5, type_name: "int32"),
-        Google_Protobuf.FieldDescriptorProto.new(number: 2, label: 1, type: 11, type_name: ".foo_bar.ab_cd.Bar")
+        Google_Protobuf.FieldDescriptorProto.new(name: "key", number: 1, label: 1, type: 5, type_name: "int32"),
+        Google_Protobuf.FieldDescriptorProto.new(name: "value", number: 2, label: 1, type: 11, type_name: ".foo_bar.ab_cd.Bar")
       ]
     )])
     [msg, _] = Generator.generate(ctx, desc)

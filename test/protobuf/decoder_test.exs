@@ -15,12 +15,6 @@ defmodule Protobuf.DecoderTest do
     assert struct == TestMsg.Foo.new(a: 42, b: 100, c: "str", d: 123.5)
   end
 
-  test "don't use default when :use_default is false" do
-    bin = <<8, 42, 17, 100, 0, 0, 0, 0, 0, 0, 0, 26, 3, 115, 116, 114, 45, 0, 0, 247, 66>>
-    struct = Decoder.decode(bin, TestMsg.Foo, use_default: false)
-    assert struct == %TestMsg.Foo{a: 42, b: 100, c: "str", d: 123.5}
-  end
-
   test "skips a known fields" do
     bin = <<8, 42, 26, 3, 115, 116, 114, 45, 0, 0, 247, 66>>
     struct = Decoder.decode(bin, TestMsg.Foo)
