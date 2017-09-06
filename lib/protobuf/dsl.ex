@@ -43,7 +43,8 @@ defmodule Protobuf.DSL do
   defp def_enum_functions(_), do: nil
 
   defp generate_msg_props(options, fields) do
-    field_props = field_props_map(fields)
+    syntax = Keyword.get(options, :syntax, :proto2)
+    field_props = field_props_map(syntax, fields)
     repeated_fields =
       field_props
       |> Map.values
@@ -72,13 +73,13 @@ defmodule Protobuf.DSL do
     |> Enum.sort
   end
 
-  defp field_props_map(fields) do
+  defp field_props_map(syntax, fields) do
     fields
-    |> Enum.map(fn ({name, fnum, opts}) -> {fnum, field_props(name, fnum, opts)} end)
+    |> Enum.map(fn ({name, fnum, opts}) -> {fnum, field_props(syntax, name, fnum, opts)} end)
     |> Enum.into(%{})
   end
 
-  defp field_props(name, fnum, opts) do
+  defp field_props(syntax, name, fnum, opts) do
     props = %Protobuf.FieldProps{
       fnum: fnum,
       name: to_string(name),
@@ -88,6 +89,7 @@ defmodule Protobuf.DSL do
     parts =
       opts
       |> parse_field_opts
+      |> cal_label(syntax)
       |> cal_type(opts_map)
       |> cal_embedded(opts_map)
       |> cal_packed(opts_map)
@@ -120,6 +122,14 @@ defmodule Protobuf.DSL do
     parse_field_opts(t, acc)
   end
   defp parse_field_opts(_, acc), do: acc
+
+  defp cal_label(%{required?: true}, :proto3) do
+    raise Protobuf.InvalidError, message: "required can't be used in proto3"
+  end
+  defp cal_label(props, :proto3) do
+    Map.put(props, :optional?, true)
+  end
+  defp cal_label(props, _), do: props
 
   defp cal_type(%{enum?: true} = props, %{type: type}) do
     Map.merge(props, %{type: :enum, enum_type: type, wire_type: Protobuf.Encoder.wire_type(:enum)})

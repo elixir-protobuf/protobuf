@@ -23,11 +23,17 @@ defmodule Protobuf.DSLTest do
     assert tags_map == msg_props.tags_map
     field_props = msg_props.field_props
     assert %FieldProps{fnum: 1, name: "a", name_atom: :a,
-      required?: true, type: :int32, wire_type: 0} = field_props[1]
+      optional?: true, type: :int32, wire_type: 0} = field_props[1]
     assert %FieldProps{fnum: 2, name: "b", name_atom: :b,
       optional?: true, type: :fixed64, wire_type: 1} = field_props[2]
     assert %FieldProps{fnum: 8, name: "g", name_atom: :g,
       repeated?: true, type: :int32, wire_type: 0} = field_props[8]
+  end
+
+  test "required?/optional? can be set for proto2" do
+    msg_props = TestMsg.Foo2.__message_props__
+    assert %FieldProps{fnum: 1, required?: true} = msg_props.field_props[1]
+    assert %FieldProps{fnum: 3, optional?: true} = msg_props.field_props[3]
   end
 
   test "saves ordered tags" do

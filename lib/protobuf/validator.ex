@@ -18,6 +18,7 @@ defmodule Protobuf.Validator do
     end)
   end
 
+  def field_valid?(_, %{required?: true}, nil), do: false
   def field_valid?(_, %{repeated?: true, embedded?: true, type: type}, list) when is_list(list) do
     Enum.all?(list, fn(val) -> match_and_valid?(type, val) end)
   end

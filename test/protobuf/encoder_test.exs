@@ -98,10 +98,10 @@ defmodule Protobuf.EncoderTest do
   end
 
   test "encodes [] for proto2" do
-    assert Encoder.encode(TestMsg.Foo2.new(g: [])) == <<>>
+    assert Encoder.encode(TestMsg.Foo2.new(a: 0, g: [])) == <<8, 0>>
   end
 
   test "encodes %{} for proto2" do
-    assert Encoder.encode(TestMsg.Foo2.new(l: %{})) == <<>>
+    assert Encoder.encode(TestMsg.Foo2.new(a: 0, l: %{})) == <<8, 0>>
   end
 end
