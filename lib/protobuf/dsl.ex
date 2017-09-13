@@ -13,8 +13,9 @@ defmodule Protobuf.DSL do
   defmacro __before_compile__(env) do
     fields = Module.get_attribute(env.module, :fields)
     options = Module.get_attribute(env.module, :options)
+    syntax = Keyword.get(options, :syntax, :proto2)
     msg_props = generate_msg_props(options, fields)
-    default_fields = generate_default_fields(msg_props)
+    default_fields = generate_default_fields(syntax, msg_props)
     enum_fields = enum_fields(msg_props)
     quote do
       def __message_props__ do
@@ -23,11 +24,17 @@ defmodule Protobuf.DSL do
 
       unquote(def_enum_functions(msg_props))
 
-      def __default_struct__ do
-        struct = struct(__MODULE__, unquote(Macro.escape(default_fields)))
-        Enum.reduce(unquote(Macro.escape(enum_fields)), struct, fn({name, type, default}, acc) ->
-          struct(acc, %{name => type.value(default)})
-        end)
+      if unquote(syntax == :proto3) do
+        def __default_struct__ do
+          struct = struct(__MODULE__, unquote(Macro.escape(default_fields)))
+          Enum.reduce(unquote(Macro.escape(enum_fields)), struct, fn({name, type, default}, acc) ->
+            struct(acc, %{name => type.value(default)})
+          end)
+        end
+      else
+        def __default_struct__ do
+          struct(__MODULE__, unquote(Macro.escape(default_fields)))
+        end
       end
     end
   end
@@ -55,7 +62,7 @@ defmodule Protobuf.DSL do
       ordered_tags: ordered_tags(fields),
       field_props: field_props,
       repeated_fields: repeated_fields,
-      syntax: Keyword.get(options, :syntax, :proto2),
+      syntax: syntax,
       enum?: Keyword.get(options, :enum) == true,
       map?: Keyword.get(options, :map) == true
     }
@@ -173,11 +180,11 @@ defmodule Protobuf.DSL do
   defp cal_repeated(props, %{repeated: true}), do: Map.put(props, :repeated?, true)
   defp cal_repeated(props, _), do: props
 
-  def generate_default_fields(msg_props) do
+  def generate_default_fields(syntax, msg_props) do
     msg_props.field_props
     |> Map.values()
     |> Enum.reduce(%{}, fn(props, acc) ->
-         Map.put(acc, props.name_atom, Protobuf.Builder.field_default(props))
+         Map.put(acc, props.name_atom, Protobuf.Builder.field_default(syntax, props))
        end)
   end
 

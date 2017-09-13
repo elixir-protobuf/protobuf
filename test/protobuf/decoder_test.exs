@@ -84,4 +84,20 @@ defmodule Protobuf.DecoderTest do
     struct = Decoder.decode(<<106, 12, 10, 7, 102, 111, 111, 95, 107, 101, 121, 16, 213, 1>>, TestMsg.Foo)
     assert struct == TestMsg.Foo.new(l: %{"foo_key" => 213})
   end
+
+  test "decodes 0 for proto2" do
+    assert Decoder.decode(<<8, 0, 17, 5, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo2) == TestMsg.Foo2.new(a: 0)
+  end
+
+  test "decodes [] for proto2" do
+    assert Decoder.decode(<<8, 0, 17, 5, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo2) == TestMsg.Foo2.new(a: 0, g: [])
+  end
+
+  test "decodes %{} for proto2" do
+    assert Decoder.decode(<<8, 0, 17, 5, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo2) == TestMsg.Foo2.new(a: 0, l: %{})
+  end
+
+  test "decodes custom default message for proto2" do
+    assert Decoder.decode(<<8, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo2) == TestMsg.Foo2.new(a: 0, b: 0)
+  end
 end

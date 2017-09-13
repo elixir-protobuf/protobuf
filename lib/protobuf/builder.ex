@@ -1,17 +1,13 @@
 defmodule Protobuf.Builder do
   def new(mod, attrs) do
-    props = mod.__message_props__
-    if props.syntax == :proto3 do
-      struct(mod.__default_struct__, attrs)
-    else
-      struct(mod, attrs)
-    end
+    struct(mod.__default_struct__, attrs)
   end
 
-  def field_default(%{default: default}) when not is_nil(default), do: default
-  def field_default(%{repeated?: true}), do: []
-  def field_default(%{map?: true}), do: %{}
-  def field_default(props), do: type_default(props.type)
+  def field_default(_, %{default: default}) when not is_nil(default), do: default
+  def field_default(_, %{repeated?: true}), do: []
+  def field_default(_, %{map?: true}), do: %{}
+  def field_default(:proto3, props), do: type_default(props.type)
+  def field_default(_, _), do: nil
 
   def type_default(:int32), do: 0
   def type_default(:int64), do: 0
