@@ -55,8 +55,26 @@ defmodule Protobuf.DSLTest do
     assert msg_props.repeated_fields == [:g, :h, :i]
   end
 
-  test "supports packed option" do
+  test "packed? is true by default for proto3" do
     msg_props = TestMsg.Foo.__message_props__
+    field_props = msg_props.field_props
+    assert %FieldProps{fnum: 10, name: "i", repeated?: true, packed?: true} = field_props[10]
+  end
+
+  test "packed? can be set to false for proto3" do
+    msg_props = TestMsg.Foo.__message_props__
+    field_props = msg_props.field_props
+    assert %FieldProps{fnum: 8, name: "g", repeated?: true, packed?: false} = field_props[8]
+  end
+
+  test "packed? is false by default for proto2" do
+    msg_props = TestMsg.Foo2.__message_props__
+    field_props = msg_props.field_props
+    assert %FieldProps{fnum: 8, name: "g", repeated?: true, packed?: false} = field_props[8]
+  end
+
+  test "packed? can be set to true for proto2" do
+    msg_props = TestMsg.Foo2.__message_props__
     field_props = msg_props.field_props
     assert %FieldProps{fnum: 10, name: "i", repeated?: true, packed?: true} = field_props[10]
   end

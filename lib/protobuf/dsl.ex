@@ -94,7 +94,7 @@ defmodule Protobuf.DSL do
       |> cal_type()
       |> cal_default(syntax)
       |> cal_embedded()
-      |> cal_packed()
+      |> cal_packed(syntax)
       |> cal_repeated(opts_map)
     struct(props, parts)
   end
@@ -149,14 +149,25 @@ defmodule Protobuf.DSL do
   end
   defp cal_embedded(props), do: props
 
-  defp cal_packed(%{packed: true, repeated: repeated} = props) do
+  defp cal_packed(%{packed: true, repeated: repeated} = props, _) do
     cond do
       props[:embedded?] -> raise ":packed can't be used with :embedded field"
       repeated -> Map.put(props, :packed?, true)
       true           -> raise ":packed must be used with :repeated"
     end
   end
-  defp cal_packed(props), do: props
+  defp cal_packed(%{packed: false} = props, _) do
+    Map.put(props, :packed?, false)
+  end
+  defp cal_packed(%{repeated: repeated, type: type} = props, :proto3) do
+    packed = !props[:embedded?] && type_numeric?(type)
+    if packed && !repeated do
+      raise ":packed must be used with :repeated"
+    else
+      Map.put(props, :packed?, packed)
+    end
+  end
+  defp cal_packed(props, _), do: props
 
   defp cal_repeated(%{map?: true} = props, _), do: Map.put(props, :repeated?, false)
   defp cal_repeated(props, %{repeated: true}), do: Map.put(props, :repeated?, true)
@@ -183,4 +194,20 @@ defmodule Protobuf.DSL do
     |> Enum.filter(fn(props) -> props.enum? && props.default end)
     |> Enum.map(fn(props) -> {props.name_atom, props.enum_type, props.default} end)
   end
+
+  def type_numeric?(:int32), do: true
+  def type_numeric?(:int64), do: true
+  def type_numeric?(:uint32), do: true
+  def type_numeric?(:uint64), do: true
+  def type_numeric?(:sint32), do: true
+  def type_numeric?(:sint64), do: true
+  def type_numeric?(:bool), do: true
+  def type_numeric?(:enum), do: true
+  def type_numeric?(:fixed32), do: true
+  def type_numeric?(:sfixed32), do: true
+  def type_numeric?(:fixed64), do: true
+  def type_numeric?(:sfixed64), do: true
+  def type_numeric?(:float), do: true
+  def type_numeric?(:double), do: true
+  def type_numeric?(_), do: false
 end

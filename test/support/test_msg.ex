@@ -41,9 +41,9 @@ defmodule TestMsg do
     field :d, 5, type: :float
     field :e, 6, type: Foo.Bar
     field :f, 7, type: :int32
-    field :g, 8, repeated: true, type: :int32
+    field :g, 8, repeated: true, type: :int32, packed: false
     field :h, 9, repeated: true, type: Foo.Bar
-    field :i, 10, repeated: true, type: :int32, packed: true
+    field :i, 10, repeated: true, type: :int32
     field :j, 11, type: EnumFoo, enum: true
     field :k, 12, type: :bool
     field :l, 13, repeated: true, type: MapFoo, map: true
@@ -64,7 +64,7 @@ defmodule TestMsg do
     # field :f, 7, optional: true, type: :int32
     field :g, 8, repeated: true, type: :int32
     # field :h, 9, repeated: true, type: Foo.Bar
-    # field :i, 10, repeated: true, type: :int32, packed: true
+    field :i, 10, repeated: true, type: :int32, packed: true
     # field :j, 11, optional: true, type: EnumFoo, enum: true
     # field :k, 12, optioanl: true, type: :bool
     field :l, 13, repeated: true, type: MapFoo, map: true

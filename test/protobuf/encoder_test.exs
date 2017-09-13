@@ -32,7 +32,7 @@ defmodule Protobuf.EncoderTest do
     assert bin == <<8, 42, 50, 7, 8, 12, 18, 3, 97, 98, 99, 56, 13>>
   end
 
-  test "encodes repeated varint fields" do
+  test "encodes repeated non-packed varint fields" do
     bin = Encoder.encode(TestMsg.Foo.new(a: 123, g: [12, 13, 14]))
     assert bin == <<8, 123, 64, 12, 64, 13, 64, 14>>
   end
