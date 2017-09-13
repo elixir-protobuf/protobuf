@@ -17,7 +17,6 @@ defmodule Protobuf.MessageProps do
     tags_map: %{},
     field_props: %{},
     repeated_fields: [],
-    # not used now, reserved for using later
     syntax: :proto2,
 
     enum?: false,

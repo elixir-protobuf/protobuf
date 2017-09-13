@@ -81,14 +81,13 @@ defmodule Protobuf.DSLTest do
   end
 
   test "generates __default_struct__ function" do
-    assert %TestMsg.Foo{a: 0, b: 5, c: "", d: 0.0, e: nil, f: 0,
-      g: [], h: [], i: [], j: 0, k: false, l: %{}, m: 2} == TestMsg.Foo.__default_struct__
+    assert %TestMsg.Foo{a: 0, b: 0, c: "", d: 0.0, e: nil, f: 0,
+      g: [], h: [], i: [], j: 0, k: false, l: %{}, m: 0} == TestMsg.Foo.__default_struct__
   end
 
   test "generates new function" do
-    assert %TestMsg.Foo{a: 0, b: 5, c: "", d: 0.0, e: nil, f: 0,
-             g: [], h: [], i: [], j: 0, k: false, l: %{}} =
-           TestMsg.Foo.new
+    assert %TestMsg.Foo{a: 0, c: "", d: 0.0, e: nil, f: 0,
+             g: [], h: [], i: [], j: 0, k: false, l: %{}} = TestMsg.Foo.new
     assert %TestMsg.Foo{a: 1, b: 42, c: "abc", d: 0.0, e: %TestMsg.Foo.Bar{a: 2, b: "asd"}, f: 0,
              g: [], h: [], i: [], j: 0, k: false, l: %{}} =
            TestMsg.Foo.new(%{a: 1, b: 42, c: "abc", e: TestMsg.Foo.Bar.new(a: 2, b: "asd")})

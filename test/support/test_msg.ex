@@ -35,7 +35,7 @@ defmodule TestMsg do
     defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m]
 
     field :a, 1, type: :int32
-    field :b, 2, type: :fixed64, default: 5
+    field :b, 2, type: :fixed64
     field :c, 3, type: :string
     # 4 is skipped for testing
     field :d, 5, type: :float
@@ -47,7 +47,7 @@ defmodule TestMsg do
     field :j, 11, type: EnumFoo, enum: true
     field :k, 12, type: :bool
     field :l, 13, repeated: true, type: MapFoo, map: true
-    field :m, 14, type: EnumFoo, default: :B, enum: true
+    field :m, 14, type: EnumFoo, enum: true
   end
 
   defmodule Foo2 do

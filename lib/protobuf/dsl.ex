@@ -92,6 +92,7 @@ defmodule Protobuf.DSL do
       |> parse_field_opts(opts_map)
       |> cal_label(syntax)
       |> cal_type()
+      |> cal_default(syntax)
       |> cal_embedded()
       |> cal_packed()
       |> cal_repeated(opts_map)
@@ -134,6 +135,11 @@ defmodule Protobuf.DSL do
     Map.merge(props, %{type: type, wire_type: Protobuf.Encoder.wire_type(type)})
   end
   defp cal_type(props), do: props
+
+  defp cal_default(%{default: default}, :proto3) when not is_nil(default) do
+    raise Protobuf.InvalidError, message: "default can't be used in proto3"
+  end
+  defp cal_default(props, _), do: props
 
   defp cal_embedded(%{type: type} = props) do
     case to_string(type) do
