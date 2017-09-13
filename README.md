@@ -58,25 +58,25 @@ $ protoc --elixir_out=./lib helloword.proto
 
 ```elixir
 defmodule Helloworld.HelloRequest do
-  use Protobuf
+  use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
     name: String.t
   }
   defstruct [:name]
 
-  field :name, 1, optional: true, type: :string
+  field :name, 1, type: :string
 end
 
 defmodule Helloworld.HelloReply do
-  use Protobuf
+  use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
     message: String.t
   }
   defstruct [:message]
 
-  field :message, 1, optional: true, type: :string
+  field :message, 1, type: :string
 end
 ```
 
