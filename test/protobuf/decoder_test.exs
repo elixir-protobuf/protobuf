@@ -99,5 +99,6 @@ defmodule Protobuf.DecoderTest do
 
   test "decodes custom default message for proto2" do
     assert Decoder.decode(<<8, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo2) == TestMsg.Foo2.new(a: 0, b: 0)
+    assert Decoder.decode(<<8, 0>>, TestMsg.Foo2) == TestMsg.Foo2.new(a: 0, b: 5)
   end
 end
