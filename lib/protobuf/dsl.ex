@@ -86,20 +86,18 @@ defmodule Protobuf.DSL do
       name_atom: name
     }
     opts_map = Enum.into(opts, %{})
+    # parse simple fields then calculate others in cal_*
     parts =
       opts
-      |> parse_field_opts
+      |> parse_field_opts(opts_map)
       |> cal_label(syntax)
-      |> cal_type(opts_map)
-      |> cal_embedded(opts_map)
-      |> cal_packed(opts_map)
+      |> cal_type()
+      |> cal_embedded()
+      |> cal_packed()
       |> cal_repeated(opts_map)
     struct(props, parts)
   end
 
-  defp parse_field_opts(opts) do
-    parse_field_opts(opts, %{})
-  end
   defp parse_field_opts([{:optional, true}|t], acc) do
     parse_field_opts(t, Map.put(acc, :optional?, true))
   end
@@ -112,12 +110,10 @@ defmodule Protobuf.DSL do
   defp parse_field_opts([{:map, true}|t], acc) do
     parse_field_opts(t, Map.put(acc, :map?, true))
   end
-  defp parse_field_opts([{:type, type}|t], acc) do
-    parse_field_opts(t, Map.put(acc, :type, type))
-  end
   defp parse_field_opts([{:default, default}|t], acc) do
     parse_field_opts(t, Map.put(acc, :default, default))
   end
+  # skip unknown option
   defp parse_field_opts([{_, _}|t], acc) do
     parse_field_opts(t, acc)
   end
@@ -131,30 +127,30 @@ defmodule Protobuf.DSL do
   end
   defp cal_label(props, _), do: props
 
-  defp cal_type(%{enum?: true} = props, %{type: type}) do
+  defp cal_type(%{enum?: true, type: type} = props) do
     Map.merge(props, %{type: :enum, enum_type: type, wire_type: Protobuf.Encoder.wire_type(:enum)})
   end
-  defp cal_type(props, %{type: type}) do
+  defp cal_type(%{type: type} = props) do
     Map.merge(props, %{type: type, wire_type: Protobuf.Encoder.wire_type(type)})
   end
-  defp cal_type(props, _), do: props
+  defp cal_type(props), do: props
 
-  defp cal_embedded(%{type: type} = props, _) do
+  defp cal_embedded(%{type: type} = props) do
     case to_string(type) do
       "Elixir." <> _ -> Map.put(props, :embedded?, !props[:enum?])
       _              -> props
     end
   end
-  defp cal_embedded(props, _), do: props
+  defp cal_embedded(props), do: props
 
-  defp cal_packed(props, %{packed: true, repeated: repeated}) do
+  defp cal_packed(%{packed: true, repeated: repeated} = props) do
     cond do
       props[:embedded?] -> raise ":packed can't be used with :embedded field"
       repeated -> Map.put(props, :packed?, true)
       true           -> raise ":packed must be used with :repeated"
     end
   end
-  defp cal_packed(props, _), do: props
+  defp cal_packed(props), do: props
 
   defp cal_repeated(%{map?: true} = props, _), do: Map.put(props, :repeated?, false)
   defp cal_repeated(props, %{repeated: true}), do: Map.put(props, :repeated?, true)
