@@ -184,14 +184,20 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       Google_Protobuf.FieldDescriptorProto.new(name: "b", number: 2, type: 5, label: 1, oneof_index: 0),
       Google_Protobuf.FieldDescriptorProto.new(name: "c", number: 3, type: 5, label: 1, oneof_index: 1),
       Google_Protobuf.FieldDescriptorProto.new(name: "d", number: 4, type: 5, label: 1, oneof_index: 1),
+      Google_Protobuf.FieldDescriptorProto.new(name: "other", number: 4, type: 5, label: 1),
     ])
     [msg] = Generator.generate(ctx, desc)
-    assert msg =~ "defstruct [:first, :second, :a, :b, :c, :d]\n"
+    assert msg =~ "first: any,\n"
+    assert msg =~ "second: any,\n"
+    assert msg =~ "other: integer\n"
+    refute msg =~ "a: integer,\n"
+    assert msg =~ "defstruct [:first, :second, :other]\n"
     assert msg =~ "oneof :first, 0\n"
     assert msg =~ "oneof :second, 1\n"
     assert msg =~ "field :a, 1, optional: true, type: :int32, oneof: 0\n"
     assert msg =~ "field :b, 2, optional: true, type: :int32, oneof: 0\n"
     assert msg =~ "field :c, 3, optional: true, type: :int32, oneof: 1\n"
     assert msg =~ "field :d, 4, optional: true, type: :int32, oneof: 1\n"
+    assert msg =~ "field :other, 4, optional: true, type: :int32\n"
   end
 end

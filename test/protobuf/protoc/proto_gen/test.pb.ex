@@ -145,22 +145,13 @@ defmodule My_Test.Communique do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-    make_me_cry: boolean,
-    number:      integer,
-    name:        String.t,
-    data:        String.t,
-    temp_c:      float,
-    height:      float,
-    today:       integer,
-    maybe:       boolean,
-    delta:       integer,
-    msg:         My_Test.Reply.t,
-    somegroup:   any
+    union:       any,
+    make_me_cry: boolean
   }
-  defstruct [:union, :make_me_cry, :number, :name, :data, :temp_c, :height, :today, :maybe, :delta, :msg, :somegroup]
+  defstruct [:union, :make_me_cry]
 
   oneof :union, 0
-  field :make_me_cry, 1, optional: true, type: :bool, oneof: 0
+  field :make_me_cry, 1, optional: true, type: :bool
   field :number, 5, optional: true, type: :int32, oneof: 0
   field :name, 6, optional: true, type: :string, oneof: 0
   field :data, 7, optional: true, type: :bytes, oneof: 0

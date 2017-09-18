@@ -118,5 +118,6 @@ defmodule Protobuf.DSLTest do
     assert msg_props.field_props[2].oneof == 0
     assert msg_props.field_props[3].oneof == 1
     assert msg_props.field_props[4].oneof == 1
+    refute msg_props.field_props[5].oneof
   end
 end

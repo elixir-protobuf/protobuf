@@ -21,7 +21,7 @@ defmodule Protobuf.Protoc.Generator.Message do
       name: new_ns |> Util.join_name |> Util.attach_pkg(pkg),
       options: msg_opts_str(ctx, desc.options),
       structs: structs_str(desc),
-      typespec: typespec_str(fields),
+      typespec: typespec_str(fields, desc.oneof_decl),
       fields: fields,
       oneofs: oneofs_str(desc.oneof_decl)
     }
@@ -39,11 +39,11 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp gen_nested_msgs(ctx, desc) do
-    Enum.map(desc.nested_type || [], fn(msg_desc) -> generate(ctx, msg_desc) end)
+    Enum.map(desc.nested_type, fn(msg_desc) -> generate(ctx, msg_desc) end)
   end
 
   defp gen_nested_enums(ctx, desc) do
-    Enum.map(desc.enum_type || [], fn(enum_desc) -> EnumGenerator.generate(ctx, enum_desc) end)
+    Enum.map(desc.enum_type, fn(enum_desc) -> EnumGenerator.generate(ctx, enum_desc) end)
   end
 
   defp gen_fields(syntax, fields) do
@@ -63,17 +63,24 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   def structs_str(struct) do
-    Enum.map_join(struct.oneof_decl ++ struct.field || [], ", ", fn(f) -> ":#{f.name}" end)
+    fields = Enum.filter(struct.field, fn(f) -> !f.oneof_index end)
+    Enum.map_join(struct.oneof_decl ++ fields, ", ", fn(f) -> ":#{f.name}" end)
   end
 
-  def typespec_str([]), do: ""
-  def typespec_str(fields) do
+  def typespec_str([], []), do: ""
+  def typespec_str(fields, oneofs) do
     longest_field = fields |> Enum.max_by(&(String.length(&1[:name])))
     longest_width = String.length(longest_field[:name])
+    fields = Enum.filter(fields, fn(f) -> !f[:oneof] end)
+    types = Enum.map(oneofs, fn(f) ->
+      {fmt_type_name(f.name, longest_width), "any"}
+    end) ++ Enum.map(fields, fn(f) ->
+      {fmt_type_name(f[:name], longest_width), fmt_type(f)}
+    end)
 
     "  @type t :: %__MODULE__{\n" <>
-    Enum.map_join(fields, ",\n", fn(f) ->
-      "    #{fmt_type_name(f[:name], longest_width)} #{fmt_type(f)}"
+    Enum.map_join(types, ",\n", fn({k, v}) ->
+      "    #{k} #{v}"
     end) <> "\n  }\n"
   end
 
@@ -109,28 +116,28 @@ defmodule Protobuf.Protoc.Generator.Message do
   def get_fields(ctx, desc) do
     oneofs = Enum.map(desc.oneof_decl, &(&1.name))
     nested_maps = nested_maps(ctx, desc)
-    Enum.map(desc.field || [], fn(f) -> get_field(ctx, f, nested_maps, oneofs) end)
+    Enum.map(desc.field, fn(f) -> get_field(ctx, f, nested_maps, oneofs) end)
   end
 
   def get_field(ctx, f, nested_maps, oneofs) do
     opts = field_options(f)
     map = nested_maps[f.type_name]
     opts = if map, do: Map.put(opts, :map, true), else: opts
-    opts = if length(oneofs) > 0, do: Map.put(opts, :oneof, f.oneof_index), else: opts
+    opts = if length(oneofs) > 0 && f.oneof_index, do: Map.put(opts, :oneof, f.oneof_index), else: opts
     type = TypeUtil.number_to_atom(f.type)
     type = if type == :enum || type == :message do
       Util.trans_type_name(f.type_name, ctx)
     else
       ":#{type}"
     end
-    %{name: f.name, number: f.number, label: label_name(f.label), type: type, type_num: f.type, opts: opts, map: map}
+    %{name: f.name, number: f.number, label: label_name(f.label), type: type, type_num: f.type, opts: opts, map: map, oneof: f.oneof_index}
   end
 
   # Map of protobuf are actually nested(one level) messages
   defp nested_maps(ctx, desc) do
     full_name = Util.join_name [ctx.package|ctx.namespace] ++ [desc.name]
     prefix = "." <> full_name
-    Enum.reduce(desc.nested_type || [], %{}, fn(desc, acc) ->
+    Enum.reduce(desc.nested_type, %{}, fn(desc, acc) ->
       cond do
         desc.options && desc.options.map_entry ->
           [k, v] = Enum.sort(desc.field, &(&1.number < &2.number))
