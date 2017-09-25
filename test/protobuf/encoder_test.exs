@@ -32,6 +32,11 @@ defmodule Protobuf.EncoderTest do
     assert bin == <<8, 42, 50, 7, 8, 12, 18, 3, 97, 98, 99, 56, 13>>
   end
 
+  test "encodes empty embedded message" do
+    bin = Encoder.encode(TestMsg.Foo.new(a: 42, e: TestMsg.Foo.Bar.new))
+    assert bin == <<8, 42, 50, 0>>
+  end
+
   test "encodes repeated non-packed varint fields" do
     bin = Encoder.encode(TestMsg.Foo.new(a: 123, g: [12, 13, 14]))
     assert bin == <<8, 123, 64, 12, 64, 13, 64, 14>>
@@ -106,5 +111,12 @@ defmodule Protobuf.EncoderTest do
 
   test "encodes custom default message for proto2" do
     assert Encoder.encode(TestMsg.Foo2.new(a: 0, b: 0)) == <<8, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0>>
+  end
+
+  test "encodes oneof fields" do
+    msg = %TestMsg.Oneof{first: {:a, 42}, second: {:d, "abc"}, other: "other"}
+    assert Encoder.encode(msg) == <<42, 5, 111, 116, 104, 101, 114, 8, 42, 34, 3, 97, 98, 99>>
+    msg = %TestMsg.Oneof{first: {:b, "abc"}, second: {:c, 123}, other: "other"}
+    assert Encoder.encode(msg) == <<42, 5, 111, 116, 104, 101, 114, 18, 3, 97, 98, 99, 24, 123>>
   end
 end

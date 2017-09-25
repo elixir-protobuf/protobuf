@@ -29,35 +29,30 @@ defmodule Protobuf.Encoder do
       cond do
         syntax == :proto2 && (val == nil || val == [] || val == %{}) -> acc
         syntax == :proto3 && empty_val?(val) -> acc
-        true -> [encode_field(val, prop)|acc]
+        true -> [encode_field(class_field(prop), val, prop)|acc]
       end
     end
   end
 
-  @spec encode_field(any, FieldProps.t) :: iodata
-  def encode_field(val, %{type: type, fnum: fnum} = prop) do
-    case class_field(prop) do
-      :normal ->
-        repeated_or_not(val, prop.repeated?, fn(v) ->
-          [encode_fnum(fnum, type), encode_type(type, v)]
-        end)
-      :embedded ->
-        repeated = prop.repeated? || prop.map?
-        repeated_or_not(val, repeated, fn(v) ->
-          v = if prop.map?, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
-          encoded = encode(v, iolist: true)
-          byte_size = IO.iodata_length(encoded)
-          if byte_size == 0 && !repeated do
-            []
-          else
-            [encode_fnum(fnum, type), [encode_varint(byte_size), encoded]]
-          end
-        end)
-      :packed ->
-        encoded = Enum.map(val, fn(v) -> encode_type(type, v) end)
-        byte_size = IO.iodata_length(encoded)
-        if byte_size == 0, do: [], else: [encode_fnum(fnum, :bytes), [encode_varint(byte_size), encoded]]
-    end
+  @spec encode_field(atom, any, FieldProps.t) :: iodata
+  def encode_field(:normal, val, %{type: type, fnum: fnum} = prop) do
+    repeated_or_not(val, prop.repeated?, fn(v) ->
+      [encode_fnum(fnum, type), encode_type(type, v)]
+    end)
+  end
+  def encode_field(:embedded, val, %{type: type, fnum: fnum} = prop) do
+    repeated = prop.repeated? || prop.map?
+    repeated_or_not(val, repeated, fn(v) ->
+      v = if prop.map?, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
+      encoded = encode(v, iolist: true)
+      byte_size = IO.iodata_length(encoded)
+      [encode_fnum(fnum, type), [encode_varint(byte_size), encoded]]
+    end)
+  end
+  def encode_field(:packed, val, %{type: type, fnum: fnum}) do
+    encoded = Enum.map(val, fn(v) -> encode_type(type, v) end)
+    byte_size = IO.iodata_length(encoded)
+    [encode_fnum(fnum, :bytes), [encode_varint(byte_size), encoded]]
   end
 
   @spec class_field(map) :: atom
