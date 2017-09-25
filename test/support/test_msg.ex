@@ -74,7 +74,7 @@ defmodule TestMsg do
   defmodule Oneof do
     use Protobuf
 
-    defstruct [:one, :a, :b, :two, :c, :d]
+    defstruct [:first, :second, :other]
 
     oneof :first, 0
     oneof :second, 1

@@ -115,8 +115,8 @@ defmodule Protobuf.EncoderTest do
 
   test "encodes oneof fields" do
     msg = %TestMsg.Oneof{first: {:a, 42}, second: {:d, "abc"}, other: "other"}
-    assert Encoder.encode(msg) == <<42, 5, 111, 116, 104, 101, 114, 8, 42, 34, 3, 97, 98, 99>>
+    assert Encoder.encode(msg) == <<8, 42, 34, 3, 97, 98, 99, 42, 5, 111, 116, 104, 101, 114>>
     msg = %TestMsg.Oneof{first: {:b, "abc"}, second: {:c, 123}, other: "other"}
-    assert Encoder.encode(msg) == <<42, 5, 111, 116, 104, 101, 114, 18, 3, 97, 98, 99, 24, 123>>
+    assert Encoder.encode(msg) == <<18, 3, 97, 98, 99, 24, 123, 42, 5, 111, 116, 104, 101, 114>>
   end
 end

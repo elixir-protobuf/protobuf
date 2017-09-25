@@ -25,29 +25,11 @@ defmodule Protobuf.Decoder do
     case find_field(props, tag) do
       {:field_num, prop} ->
         case class_field(prop, wire_type) do
-          :normal ->
-            {val, rest} = decode_type(prop.type, wire_type, rest)
-            new_msg = put_map(msg, prop.name_atom, val, fn _k, v1, v2 ->
-              merge_same_fields(v1, v2, prop.repeated?, fn -> v2 end)
-            end)
+          type when type in [:normal, :embedded, :packed] ->
+            {val, rest} = decode_type(type_to_decode(type, prop.type), wire_type, rest)
+            field_key = if prop.oneof, do: oneof_field(prop, props), else: prop.name_atom
+            new_msg = put_field(type, msg, prop, field_key, val)
             do_decode(rest, props, new_msg)
-          :embedded ->
-            {val, rest} = decode_type(:bytes, wire_type, rest)
-            embedded_msg = decode(val, prop.type)
-            decoded = if prop.map?, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
-            new_msg = put_map(msg, prop.name_atom, decoded, fn _k, v1, v2 ->
-              merge_same_fields(v1, v2, prop.repeated?, fn ->
-                if v1, do: Map.merge(v1, v2), else: v2
-              end)
-            end)
-            do_decode(rest, props, struct(new_msg))
-          :packed ->
-            {val, rest} = decode_type(:bytes, wire_type, rest)
-            vals = decode_packed(prop.type, Protobuf.Encoder.wire_type(prop.type), val)
-            new_msg = put_map(msg, prop.name_atom, vals, fn _k, v1, v2 ->
-              if v1, do: v2 ++ v1, else: v2
-            end)
-            do_decode(rest, props, struct(new_msg))
           {:error, error_msg} ->
             raise DecodeError, message: "#{inspect(msg.__struct__)}: " <> error_msg
           :unknown_field ->
@@ -62,6 +44,36 @@ defmodule Protobuf.Decoder do
   end
   defp do_decode(<<>>, props, msg) do
     reverse_repeated(msg, props.repeated_fields)
+  end
+
+  defp type_to_decode(:normal, prop_type), do: prop_type
+  defp type_to_decode(:embedded, _), do: :bytes
+  defp type_to_decode(:packed, _), do: :bytes
+
+  defp put_field(:normal, msg, prop, field_key, val) do
+    val = if prop.oneof, do: {prop.name_atom, val}, else: val
+    put_map(msg, field_key, val, fn _k, v1, v2 ->
+      merge_same_fields(v1, v2, prop.repeated?, fn -> v2 end)
+    end)
+  end
+  defp put_field(:embedded, msg, prop, field_key, val) do
+    embedded_msg = decode(val, prop.type)
+    decoded = if prop.map?, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
+    decoded = if prop.oneof, do: {prop.name_atom, decoded}, else: decoded
+    new_msg = put_map(msg, field_key, decoded, fn _k, v1, v2 ->
+      merge_same_fields(v1, v2, prop.repeated?, fn ->
+        if v1, do: Map.merge(v1, v2), else: v2
+      end)
+    end)
+    struct(new_msg)
+  end
+  defp put_field(:packed, msg, prop, field_key, val) do
+    vals = decode_packed(prop.type, Protobuf.Encoder.wire_type(prop.type), val)
+    vals = if prop.oneof, do: {prop.name_atom, vals}, else: vals
+    new_msg = put_map(msg, field_key, vals, fn _k, v1, v2 ->
+      if v1, do: v2 ++ v1, else: v2
+    end)
+    struct(new_msg)
   end
 
   @spec find_field(MessageProps.t, integer) :: {atom, FieldProps.t} | {atom} | false
@@ -236,4 +248,10 @@ defmodule Protobuf.Decoder do
     end
   end
   defp reverse_repeated(msg, []), do: msg
+
+  defp oneof_field(field_props, msg_props) do
+    index = field_props.oneof
+    {field, ^index} = Enum.at(msg_props.oneof, index)
+    field
+  end
 end

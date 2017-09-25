@@ -73,7 +73,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     longest_width = String.length(longest_field[:name])
     fields = Enum.filter(fields, fn(f) -> !f[:oneof] end)
     types = Enum.map(oneofs, fn(f) ->
-      {fmt_type_name(f.name, longest_width), "any"}
+      {fmt_type_name(f.name, longest_width), "{atom, any}"}
     end) ++ Enum.map(fields, fn(f) ->
       {fmt_type_name(f[:name], longest_width), fmt_type(f)}
     end)

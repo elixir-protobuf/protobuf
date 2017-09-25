@@ -187,8 +187,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       Google_Protobuf.FieldDescriptorProto.new(name: "other", number: 4, type: 5, label: 1),
     ])
     [msg] = Generator.generate(ctx, desc)
-    assert msg =~ "first: any,\n"
-    assert msg =~ "second: any,\n"
+    assert msg =~ "first: {atom, any},\n"
+    assert msg =~ "second: {atom, any},\n"
     assert msg =~ "other: integer\n"
     refute msg =~ "a: integer,\n"
     assert msg =~ "defstruct [:first, :second, :other]\n"

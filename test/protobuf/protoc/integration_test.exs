@@ -18,4 +18,14 @@ defmodule Protobuf.Protoc.IntegrationTest do
     assert My_Test.Request.MsgMappingEntry.__message_props__.map?
     assert My_Test.Request.decode(output) == input
   end
+
+  test "encode and decode My_Test.Communique(oneof)" do
+    unions = [number: 42, name: "abc", temp_c: 1.2, height: 2.5, today: 1, maybe: true,
+              delta: 123, msg: My_Test.Reply.new()]
+    Enum.each(unions, fn(union) ->
+      input = %My_Test.Communique{union: union}
+      output = My_Test.Communique.encode(input)
+      assert My_Test.Communique.decode(output) == input
+    end)
+  end
 end

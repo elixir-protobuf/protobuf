@@ -101,4 +101,11 @@ defmodule Protobuf.DecoderTest do
     assert Decoder.decode(<<8, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo2) == TestMsg.Foo2.new(a: 0, b: 0)
     assert Decoder.decode(<<8, 0>>, TestMsg.Foo2) == TestMsg.Foo2.new(a: 0, b: 5)
   end
+
+  test "oneof only sets oneof fields" do
+    assert Decoder.decode(<<42, 5, 111, 116, 104, 101, 114, 8, 42, 34, 3, 97, 98, 99>>, TestMsg.Oneof) ==
+      %TestMsg.Oneof{first: {:a, 42}, second: {:d, "abc"}, other: "other"}
+    assert Decoder.decode(<<42, 5, 111, 116, 104, 101, 114, 18, 3, 97, 98, 99, 24, 123>>, TestMsg.Oneof) ==
+      %TestMsg.Oneof{first: {:b, "abc"}, second: {:c, 123}, other: "other"}
+  end
 end

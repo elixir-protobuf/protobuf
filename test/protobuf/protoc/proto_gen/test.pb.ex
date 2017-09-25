@@ -145,7 +145,7 @@ defmodule My_Test.Communique do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-    union:       any,
+    union:       {atom, any},
     make_me_cry: boolean
   }
   defstruct [:union, :make_me_cry]

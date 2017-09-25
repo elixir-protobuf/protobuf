@@ -23,9 +23,11 @@ defmodule Protobuf.Encoder do
   @spec encode(struct, MessageProps.t, iodata) :: iodata
   def encode(struct, props, acc0) do
     syntax = props.syntax
+    oneofs = oneof_actual_vals(props, struct)
     Enum.reduce props.ordered_tags, acc0, fn(tag, acc) ->
       prop = props.field_props[tag]
       val = Map.get(struct, prop.name_atom)
+      val = if prop.oneof, do: oneofs[prop.name_atom], else: val
       cond do
         syntax == :proto2 && (val == nil || val == [] || val == %{}) -> acc
         syntax == :proto3 && empty_val?(val) -> acc
@@ -138,5 +140,14 @@ defmodule Protobuf.Encoder do
 
   defp empty_val?(v) do
     !v || v == 0 || v == "" || v == [] || v == %{}
+  end
+
+  defp oneof_actual_vals(props, struct) do
+    Enum.reduce(props.oneof, %{}, fn({field, _}, acc) ->
+      case Map.get(struct, field) do
+        {f, val} -> Map.put(acc, f, val)
+        nil -> acc
+      end
+    end)
   end
 end
