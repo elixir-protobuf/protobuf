@@ -9,13 +9,19 @@ defmodule Protobuf.Validator do
 
   def valid?(%{__struct__: mod} = struct) do
     msg_props = mod.__message_props__
-    Enum.reduce_while(msg_props.field_props, true, fn({_, props}, _) ->
-      if field_valid?(%{syntax: msg_props.syntax}, props, Map.get(struct, props.name_atom)) do
-        {:cont, true}
-      else
-        {:halt, {:invalid, "#{inspect mod}##{props.name_atom} is invalid!"}}
-      end
-    end)
+    valid = if Protobuf.MessageProps.has_oneof?(msg_props), do: oneof_valid?(struct, msg_props), else: true
+    ctx = %{syntax: msg_props.syntax}
+    if valid == true do
+      Enum.reduce_while(msg_props.field_props, true, fn({_, props}, _) ->
+        if field_valid?(ctx, props, Map.get(struct, props.name_atom)) do
+          {:cont, true}
+        else
+          {:halt, {:invalid, "#{inspect mod}##{props.name_atom} is invalid!"}}
+        end
+      end)
+    else
+      valid
+    end
   end
 
   def field_valid?(_, %{required?: true}, nil), do: false
@@ -65,4 +71,23 @@ defmodule Protobuf.Validator do
   # TODO
   defp type_valid?(:group, _), do: true
   defp type_valid?(_, _), do: false
+
+  defp oneof_valid?(struct, msg_props) do
+    field_tags = msg_props.field_tags
+    field_props = msg_props.field_props
+    ctx = %{syntax: msg_props.syntax}
+    Enum.reduce_while(msg_props.oneof, true, fn({oneof_name, index}, _) ->
+      case Map.get(struct, oneof_name) do
+        {field, val} ->
+          field_props = field_props[field_tags[field]]
+          cond do
+            field_props.oneof != index -> {:halt, {:invalid, ":#{field} doesn't match oneof field :#{oneof_name}"}}
+            !field_valid?(ctx, field_props, val) -> {:halt, {:invalid, ":#{field} of :#{oneof_name} is invalid"}}
+            true -> {:cont, true}
+          end
+        nil -> {:cont, true}
+        _ -> {:halt, {:invalid, ":#{oneof_name} should be a tuple {:field, val}"}}
+      end
+    end)
+  end
 end

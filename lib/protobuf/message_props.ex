@@ -11,7 +11,6 @@ defmodule Protobuf.MessageProps do
 
     enum?: boolean,
     extendable?: boolean,
-    oneof?: boolean,
     map?: boolean,
   }
   defstruct [
@@ -24,8 +23,11 @@ defmodule Protobuf.MessageProps do
     oneof: [],
 
     enum?: false,
-    oneof?: false,
     extendable?: false,
     map?: false,
   ]
+
+  def has_oneof?(props) do
+    length(props.oneof) > 0
+  end
 end

@@ -84,7 +84,6 @@ defmodule Protobuf.Decoder do
     case props do
        %{tags_map: %{^tag => _field_num}, field_props: %{^tag => prop}} -> {:field_num, prop}
        %{extendable?: true} -> {:extention}
-       %{oneof?: true} -> {:oneof}
        _ -> {:field_num, %FieldProps{}}
     end
   end
