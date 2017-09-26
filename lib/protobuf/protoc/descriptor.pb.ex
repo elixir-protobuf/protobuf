@@ -1,14 +1,31 @@
-defmodule Google_Protobuf.FileDescriptorSet do
-  use Protobuf
+defmodule Google.Protobuf.FileDescriptorSet do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    file: [Google.Protobuf.FileDescriptorProto.t]
+  }
   defstruct [:file]
 
-  field :file, 1, repeated: true, type: Google_Protobuf.FileDescriptorProto
+  field :file, 1, repeated: true, type: Google.Protobuf.FileDescriptorProto
 end
 
-defmodule Google_Protobuf.FileDescriptorProto do
-  use Protobuf
+defmodule Google.Protobuf.FileDescriptorProto do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    name:              String.t,
+    package:           String.t,
+    dependency:        [String.t],
+    public_dependency: [integer],
+    weak_dependency:   [integer],
+    message_type:      [Google.Protobuf.DescriptorProto.t],
+    enum_type:         [Google.Protobuf.EnumDescriptorProto.t],
+    service:           [Google.Protobuf.ServiceDescriptorProto.t],
+    extension:         [Google.Protobuf.FieldDescriptorProto.t],
+    options:           Google.Protobuf.FileOptions.t,
+    source_code_info:  Google.Protobuf.SourceCodeInfo.t,
+    syntax:            String.t
+  }
   defstruct [:name, :package, :dependency, :public_dependency, :weak_dependency, :message_type, :enum_type, :service, :extension, :options, :source_code_info, :syntax]
 
   field :name, 1, optional: true, type: :string
@@ -16,69 +33,101 @@ defmodule Google_Protobuf.FileDescriptorProto do
   field :dependency, 3, repeated: true, type: :string
   field :public_dependency, 10, repeated: true, type: :int32
   field :weak_dependency, 11, repeated: true, type: :int32
-  field :message_type, 4, repeated: true, type: Google_Protobuf.DescriptorProto
-  field :enum_type, 5, repeated: true, type: Google_Protobuf.EnumDescriptorProto
-  field :service, 6, repeated: true, type: Google_Protobuf.ServiceDescriptorProto
-  field :extension, 7, repeated: true, type: Google_Protobuf.FieldDescriptorProto
-  field :options, 8, optional: true, type: Google_Protobuf.FileOptions
-  field :source_code_info, 9, optional: true, type: Google_Protobuf.SourceCodeInfo
+  field :message_type, 4, repeated: true, type: Google.Protobuf.DescriptorProto
+  field :enum_type, 5, repeated: true, type: Google.Protobuf.EnumDescriptorProto
+  field :service, 6, repeated: true, type: Google.Protobuf.ServiceDescriptorProto
+  field :extension, 7, repeated: true, type: Google.Protobuf.FieldDescriptorProto
+  field :options, 8, optional: true, type: Google.Protobuf.FileOptions
+  field :source_code_info, 9, optional: true, type: Google.Protobuf.SourceCodeInfo
   field :syntax, 12, optional: true, type: :string
 end
 
-defmodule Google_Protobuf.DescriptorProto do
-  use Protobuf
+defmodule Google.Protobuf.DescriptorProto do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    name:            String.t,
+    field:           [Google.Protobuf.FieldDescriptorProto.t],
+    extension:       [Google.Protobuf.FieldDescriptorProto.t],
+    nested_type:     [Google.Protobuf.DescriptorProto.t],
+    enum_type:       [Google.Protobuf.EnumDescriptorProto.t],
+    extension_range: [Google.Protobuf.DescriptorProto.ExtensionRange.t],
+    oneof_decl:      [Google.Protobuf.OneofDescriptorProto.t],
+    options:         Google.Protobuf.MessageOptions.t,
+    reserved_range:  [Google.Protobuf.DescriptorProto.ReservedRange.t],
+    reserved_name:   [String.t]
+  }
   defstruct [:name, :field, :extension, :nested_type, :enum_type, :extension_range, :oneof_decl, :options, :reserved_range, :reserved_name]
 
   field :name, 1, optional: true, type: :string
-  field :field, 2, repeated: true, type: Google_Protobuf.FieldDescriptorProto
-  field :extension, 6, repeated: true, type: Google_Protobuf.FieldDescriptorProto
-  field :nested_type, 3, repeated: true, type: Google_Protobuf.DescriptorProto
-  field :enum_type, 4, repeated: true, type: Google_Protobuf.EnumDescriptorProto
-  field :extension_range, 5, repeated: true, type: Google_Protobuf.DescriptorProto.ExtensionRange
-  field :oneof_decl, 8, repeated: true, type: Google_Protobuf.OneofDescriptorProto
-  field :options, 7, optional: true, type: Google_Protobuf.MessageOptions
-  field :reserved_range, 9, repeated: true, type: Google_Protobuf.DescriptorProto.ReservedRange
+  field :field, 2, repeated: true, type: Google.Protobuf.FieldDescriptorProto
+  field :extension, 6, repeated: true, type: Google.Protobuf.FieldDescriptorProto
+  field :nested_type, 3, repeated: true, type: Google.Protobuf.DescriptorProto
+  field :enum_type, 4, repeated: true, type: Google.Protobuf.EnumDescriptorProto
+  field :extension_range, 5, repeated: true, type: Google.Protobuf.DescriptorProto.ExtensionRange
+  field :oneof_decl, 8, repeated: true, type: Google.Protobuf.OneofDescriptorProto
+  field :options, 7, optional: true, type: Google.Protobuf.MessageOptions
+  field :reserved_range, 9, repeated: true, type: Google.Protobuf.DescriptorProto.ReservedRange
   field :reserved_name, 10, repeated: true, type: :string
 end
 
-defmodule Google_Protobuf.DescriptorProto.ExtensionRange do
-  use Protobuf
+defmodule Google.Protobuf.DescriptorProto.ExtensionRange do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    start: integer,
+    end:   integer
+  }
   defstruct [:start, :end]
 
   field :start, 1, optional: true, type: :int32
   field :end, 2, optional: true, type: :int32
 end
 
-defmodule Google_Protobuf.DescriptorProto.ReservedRange do
-  use Protobuf
+defmodule Google.Protobuf.DescriptorProto.ReservedRange do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    start: integer,
+    end:   integer
+  }
   defstruct [:start, :end]
 
   field :start, 1, optional: true, type: :int32
   field :end, 2, optional: true, type: :int32
 end
 
-defmodule Google_Protobuf.FieldDescriptorProto do
-  use Protobuf
+defmodule Google.Protobuf.FieldDescriptorProto do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    name:          String.t,
+    number:        integer,
+    label:         integer,
+    type:          integer,
+    type_name:     String.t,
+    extendee:      String.t,
+    default_value: String.t,
+    oneof_index:   integer,
+    json_name:     String.t,
+    options:       Google.Protobuf.FieldOptions.t
+  }
   defstruct [:name, :number, :label, :type, :type_name, :extendee, :default_value, :oneof_index, :json_name, :options]
 
   field :name, 1, optional: true, type: :string
   field :number, 3, optional: true, type: :int32
-  field :label, 4, optional: true, type: Google_Protobuf.FieldDescriptorProto.Label, enum: true
-  field :type, 5, optional: true, type: Google_Protobuf.FieldDescriptorProto.Type, enum: true
+  field :label, 4, optional: true, type: Google.Protobuf.FieldDescriptorProto.Label, enum: true
+  field :type, 5, optional: true, type: Google.Protobuf.FieldDescriptorProto.Type, enum: true
   field :type_name, 6, optional: true, type: :string
   field :extendee, 2, optional: true, type: :string
   field :default_value, 7, optional: true, type: :string
   field :oneof_index, 9, optional: true, type: :int32
   field :json_name, 10, optional: true, type: :string
-  field :options, 8, optional: true, type: Google_Protobuf.FieldOptions
+  field :options, 8, optional: true, type: Google.Protobuf.FieldOptions
 end
 
-defmodule Google_Protobuf.FieldDescriptorProto.Type do
-  use Protobuf, enum: true
+defmodule Google.Protobuf.FieldDescriptorProto.Type do
+  use Protobuf, enum: true, syntax: :proto2
 
   field :TYPE_DOUBLE, 1
   field :TYPE_FLOAT, 2
@@ -100,69 +149,114 @@ defmodule Google_Protobuf.FieldDescriptorProto.Type do
   field :TYPE_SINT64, 18
 end
 
-defmodule Google_Protobuf.FieldDescriptorProto.Label do
-  use Protobuf, enum: true
+defmodule Google.Protobuf.FieldDescriptorProto.Label do
+  use Protobuf, enum: true, syntax: :proto2
 
   field :LABEL_OPTIONAL, 1
   field :LABEL_REQUIRED, 2
   field :LABEL_REPEATED, 3
 end
 
-defmodule Google_Protobuf.OneofDescriptorProto do
-  use Protobuf
+defmodule Google.Protobuf.OneofDescriptorProto do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    name:    String.t,
+    options: Google.Protobuf.OneofOptions.t
+  }
   defstruct [:name, :options]
 
   field :name, 1, optional: true, type: :string
-  field :options, 2, optional: true, type: Google_Protobuf.OneofOptions
+  field :options, 2, optional: true, type: Google.Protobuf.OneofOptions
 end
 
-defmodule Google_Protobuf.EnumDescriptorProto do
-  use Protobuf
+defmodule Google.Protobuf.EnumDescriptorProto do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    name:    String.t,
+    value:   [Google.Protobuf.EnumValueDescriptorProto.t],
+    options: Google.Protobuf.EnumOptions.t
+  }
   defstruct [:name, :value, :options]
 
   field :name, 1, optional: true, type: :string
-  field :value, 2, repeated: true, type: Google_Protobuf.EnumValueDescriptorProto
-  field :options, 3, optional: true, type: Google_Protobuf.EnumOptions
+  field :value, 2, repeated: true, type: Google.Protobuf.EnumValueDescriptorProto
+  field :options, 3, optional: true, type: Google.Protobuf.EnumOptions
 end
 
-defmodule Google_Protobuf.EnumValueDescriptorProto do
-  use Protobuf
+defmodule Google.Protobuf.EnumValueDescriptorProto do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    name:    String.t,
+    number:  integer,
+    options: Google.Protobuf.EnumValueOptions.t
+  }
   defstruct [:name, :number, :options]
 
   field :name, 1, optional: true, type: :string
   field :number, 2, optional: true, type: :int32
-  field :options, 3, optional: true, type: Google_Protobuf.EnumValueOptions
+  field :options, 3, optional: true, type: Google.Protobuf.EnumValueOptions
 end
 
-defmodule Google_Protobuf.ServiceDescriptorProto do
-  use Protobuf
+defmodule Google.Protobuf.ServiceDescriptorProto do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    name:    String.t,
+    method:  [Google.Protobuf.MethodDescriptorProto.t],
+    options: Google.Protobuf.ServiceOptions.t
+  }
   defstruct [:name, :method, :options]
 
   field :name, 1, optional: true, type: :string
-  field :method, 2, repeated: true, type: Google_Protobuf.MethodDescriptorProto
-  field :options, 3, optional: true, type: Google_Protobuf.ServiceOptions
+  field :method, 2, repeated: true, type: Google.Protobuf.MethodDescriptorProto
+  field :options, 3, optional: true, type: Google.Protobuf.ServiceOptions
 end
 
-defmodule Google_Protobuf.MethodDescriptorProto do
-  use Protobuf
+defmodule Google.Protobuf.MethodDescriptorProto do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    name:             String.t,
+    input_type:       String.t,
+    output_type:      String.t,
+    options:          Google.Protobuf.MethodOptions.t,
+    client_streaming: boolean,
+    server_streaming: boolean
+  }
   defstruct [:name, :input_type, :output_type, :options, :client_streaming, :server_streaming]
 
   field :name, 1, optional: true, type: :string
   field :input_type, 2, optional: true, type: :string
   field :output_type, 3, optional: true, type: :string
-  field :options, 4, optional: true, type: Google_Protobuf.MethodOptions
+  field :options, 4, optional: true, type: Google.Protobuf.MethodOptions
   field :client_streaming, 5, optional: true, type: :bool, default: false
   field :server_streaming, 6, optional: true, type: :bool, default: false
 end
 
-defmodule Google_Protobuf.FileOptions do
-  use Protobuf
+defmodule Google.Protobuf.FileOptions do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    java_package:                  String.t,
+    java_outer_classname:          String.t,
+    java_multiple_files:           boolean,
+    java_generate_equals_and_hash: boolean,
+    java_string_check_utf8:        boolean,
+    optimize_for:                  integer,
+    go_package:                    String.t,
+    cc_generic_services:           boolean,
+    java_generic_services:         boolean,
+    py_generic_services:           boolean,
+    deprecated:                    boolean,
+    cc_enable_arenas:              boolean,
+    objc_class_prefix:             String.t,
+    csharp_namespace:              String.t,
+    swift_prefix:                  String.t,
+    uninterpreted_option:          [Google.Protobuf.UninterpretedOption.t]
+  }
   defstruct [:java_package, :java_outer_classname, :java_multiple_files, :java_generate_equals_and_hash, :java_string_check_utf8, :optimize_for, :go_package, :cc_generic_services, :java_generic_services, :py_generic_services, :deprecated, :cc_enable_arenas, :objc_class_prefix, :csharp_namespace, :swift_prefix, :uninterpreted_option]
 
   field :java_package, 1, optional: true, type: :string
@@ -170,7 +264,7 @@ defmodule Google_Protobuf.FileOptions do
   field :java_multiple_files, 10, optional: true, type: :bool, default: false
   field :java_generate_equals_and_hash, 20, optional: true, type: :bool, deprecated: true
   field :java_string_check_utf8, 27, optional: true, type: :bool, default: false
-  field :optimize_for, 9, optional: true, type: Google_Protobuf.FileOptions.OptimizeMode, default: :SPEED, enum: true
+  field :optimize_for, 9, optional: true, type: Google.Protobuf.FileOptions.OptimizeMode, default: :SPEED, enum: true
   field :go_package, 11, optional: true, type: :string
   field :cc_generic_services, 16, optional: true, type: :bool, default: false
   field :java_generic_services, 17, optional: true, type: :bool, default: false
@@ -180,119 +274,165 @@ defmodule Google_Protobuf.FileOptions do
   field :objc_class_prefix, 36, optional: true, type: :string
   field :csharp_namespace, 37, optional: true, type: :string
   field :swift_prefix, 39, optional: true, type: :string
-  field :uninterpreted_option, 999, repeated: true, type: Google_Protobuf.UninterpretedOption
+  field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 end
 
-defmodule Google_Protobuf.FileOptions.OptimizeMode do
-  use Protobuf, enum: true
+defmodule Google.Protobuf.FileOptions.OptimizeMode do
+  use Protobuf, enum: true, syntax: :proto2
 
   field :SPEED, 1
   field :CODE_SIZE, 2
   field :LITE_RUNTIME, 3
 end
 
-defmodule Google_Protobuf.MessageOptions do
-  use Protobuf
+defmodule Google.Protobuf.MessageOptions do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    message_set_wire_format:         boolean,
+    no_standard_descriptor_accessor: boolean,
+    deprecated:                      boolean,
+    map_entry:                       boolean,
+    uninterpreted_option:            [Google.Protobuf.UninterpretedOption.t]
+  }
   defstruct [:message_set_wire_format, :no_standard_descriptor_accessor, :deprecated, :map_entry, :uninterpreted_option]
 
   field :message_set_wire_format, 1, optional: true, type: :bool, default: false
   field :no_standard_descriptor_accessor, 2, optional: true, type: :bool, default: false
   field :deprecated, 3, optional: true, type: :bool, default: false
   field :map_entry, 7, optional: true, type: :bool
-  field :uninterpreted_option, 999, repeated: true, type: Google_Protobuf.UninterpretedOption
+  field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 end
 
-defmodule Google_Protobuf.FieldOptions do
-  use Protobuf
+defmodule Google.Protobuf.FieldOptions do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    ctype:                integer,
+    packed:               boolean,
+    jstype:               integer,
+    lazy:                 boolean,
+    deprecated:           boolean,
+    weak:                 boolean,
+    uninterpreted_option: [Google.Protobuf.UninterpretedOption.t]
+  }
   defstruct [:ctype, :packed, :jstype, :lazy, :deprecated, :weak, :uninterpreted_option]
 
-  field :ctype, 1, optional: true, type: Google_Protobuf.FieldOptions.CType, default: :STRING, enum: true
+  field :ctype, 1, optional: true, type: Google.Protobuf.FieldOptions.CType, default: :STRING, enum: true
   field :packed, 2, optional: true, type: :bool
-  field :jstype, 6, optional: true, type: Google_Protobuf.FieldOptions.JSType, default: :JS_NORMAL, enum: true
+  field :jstype, 6, optional: true, type: Google.Protobuf.FieldOptions.JSType, default: :JS_NORMAL, enum: true
   field :lazy, 5, optional: true, type: :bool, default: false
   field :deprecated, 3, optional: true, type: :bool, default: false
   field :weak, 10, optional: true, type: :bool, default: false
-  field :uninterpreted_option, 999, repeated: true, type: Google_Protobuf.UninterpretedOption
+  field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 end
 
-defmodule Google_Protobuf.FieldOptions.CType do
-  use Protobuf, enum: true
+defmodule Google.Protobuf.FieldOptions.CType do
+  use Protobuf, enum: true, syntax: :proto2
 
   field :STRING, 0
   field :CORD, 1
   field :STRING_PIECE, 2
 end
 
-defmodule Google_Protobuf.FieldOptions.JSType do
-  use Protobuf, enum: true
+defmodule Google.Protobuf.FieldOptions.JSType do
+  use Protobuf, enum: true, syntax: :proto2
 
   field :JS_NORMAL, 0
   field :JS_STRING, 1
   field :JS_NUMBER, 2
 end
 
-defmodule Google_Protobuf.OneofOptions do
-  use Protobuf
+defmodule Google.Protobuf.OneofOptions do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    uninterpreted_option: [Google.Protobuf.UninterpretedOption.t]
+  }
   defstruct [:uninterpreted_option]
 
-  field :uninterpreted_option, 999, repeated: true, type: Google_Protobuf.UninterpretedOption
+  field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 end
 
-defmodule Google_Protobuf.EnumOptions do
-  use Protobuf
+defmodule Google.Protobuf.EnumOptions do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    allow_alias:          boolean,
+    deprecated:           boolean,
+    uninterpreted_option: [Google.Protobuf.UninterpretedOption.t]
+  }
   defstruct [:allow_alias, :deprecated, :uninterpreted_option]
 
   field :allow_alias, 2, optional: true, type: :bool
   field :deprecated, 3, optional: true, type: :bool, default: false
-  field :uninterpreted_option, 999, repeated: true, type: Google_Protobuf.UninterpretedOption
+  field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 end
 
-defmodule Google_Protobuf.EnumValueOptions do
-  use Protobuf
+defmodule Google.Protobuf.EnumValueOptions do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    deprecated:           boolean,
+    uninterpreted_option: [Google.Protobuf.UninterpretedOption.t]
+  }
   defstruct [:deprecated, :uninterpreted_option]
 
   field :deprecated, 1, optional: true, type: :bool, default: false
-  field :uninterpreted_option, 999, repeated: true, type: Google_Protobuf.UninterpretedOption
+  field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 end
 
-defmodule Google_Protobuf.ServiceOptions do
-  use Protobuf
+defmodule Google.Protobuf.ServiceOptions do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    deprecated:           boolean,
+    uninterpreted_option: [Google.Protobuf.UninterpretedOption.t]
+  }
   defstruct [:deprecated, :uninterpreted_option]
 
   field :deprecated, 33, optional: true, type: :bool, default: false
-  field :uninterpreted_option, 999, repeated: true, type: Google_Protobuf.UninterpretedOption
+  field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 end
 
-defmodule Google_Protobuf.MethodOptions do
-  use Protobuf
+defmodule Google.Protobuf.MethodOptions do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    deprecated:           boolean,
+    idempotency_level:    integer,
+    uninterpreted_option: [Google.Protobuf.UninterpretedOption.t]
+  }
   defstruct [:deprecated, :idempotency_level, :uninterpreted_option]
 
   field :deprecated, 33, optional: true, type: :bool, default: false
-  field :idempotency_level, 34, optional: true, type: Google_Protobuf.MethodOptions.IdempotencyLevel, default: :IDEMPOTENCY_UNKNOWN, enum: true
-  field :uninterpreted_option, 999, repeated: true, type: Google_Protobuf.UninterpretedOption
+  field :idempotency_level, 34, optional: true, type: Google.Protobuf.MethodOptions.IdempotencyLevel, default: :IDEMPOTENCY_UNKNOWN, enum: true
+  field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 end
 
-defmodule Google_Protobuf.MethodOptions.IdempotencyLevel do
-  use Protobuf, enum: true
+defmodule Google.Protobuf.MethodOptions.IdempotencyLevel do
+  use Protobuf, enum: true, syntax: :proto2
 
   field :IDEMPOTENCY_UNKNOWN, 0
   field :NO_SIDE_EFFECTS, 1
   field :IDEMPOTENT, 2
 end
 
-defmodule Google_Protobuf.UninterpretedOption do
-  use Protobuf
+defmodule Google.Protobuf.UninterpretedOption do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    name:               [Google.Protobuf.UninterpretedOption.NamePart.t],
+    identifier_value:   String.t,
+    positive_int_value: non_neg_integer,
+    negative_int_value: integer,
+    double_value:       float,
+    string_value:       String.t,
+    aggregate_value:    String.t
+  }
   defstruct [:name, :identifier_value, :positive_int_value, :negative_int_value, :double_value, :string_value, :aggregate_value]
 
-  field :name, 2, repeated: true, type: Google_Protobuf.UninterpretedOption.NamePart
+  field :name, 2, repeated: true, type: Google.Protobuf.UninterpretedOption.NamePart
   field :identifier_value, 3, optional: true, type: :string
   field :positive_int_value, 4, optional: true, type: :uint64
   field :negative_int_value, 5, optional: true, type: :int64
@@ -301,26 +441,40 @@ defmodule Google_Protobuf.UninterpretedOption do
   field :aggregate_value, 8, optional: true, type: :string
 end
 
-defmodule Google_Protobuf.UninterpretedOption.NamePart do
-  use Protobuf
+defmodule Google.Protobuf.UninterpretedOption.NamePart do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    name_part:    String.t,
+    is_extension: boolean
+  }
   defstruct [:name_part, :is_extension]
 
   field :name_part, 1, required: true, type: :string
   field :is_extension, 2, required: true, type: :bool
 end
 
-defmodule Google_Protobuf.SourceCodeInfo do
-  use Protobuf
+defmodule Google.Protobuf.SourceCodeInfo do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    location: [Google.Protobuf.SourceCodeInfo.Location.t]
+  }
   defstruct [:location]
 
-  field :location, 1, repeated: true, type: Google_Protobuf.SourceCodeInfo.Location
+  field :location, 1, repeated: true, type: Google.Protobuf.SourceCodeInfo.Location
 end
 
-defmodule Google_Protobuf.SourceCodeInfo.Location do
-  use Protobuf
+defmodule Google.Protobuf.SourceCodeInfo.Location do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    path:                      [integer],
+    span:                      [integer],
+    leading_comments:          String.t,
+    trailing_comments:         String.t,
+    leading_detached_comments: [String.t]
+  }
   defstruct [:path, :span, :leading_comments, :trailing_comments, :leading_detached_comments]
 
   field :path, 1, repeated: true, type: :int32, packed: true
@@ -330,17 +484,26 @@ defmodule Google_Protobuf.SourceCodeInfo.Location do
   field :leading_detached_comments, 6, repeated: true, type: :string
 end
 
-defmodule Google_Protobuf.GeneratedCodeInfo do
-  use Protobuf
+defmodule Google.Protobuf.GeneratedCodeInfo do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    annotation: [Google.Protobuf.GeneratedCodeInfo.Annotation.t]
+  }
   defstruct [:annotation]
 
-  field :annotation, 1, repeated: true, type: Google_Protobuf.GeneratedCodeInfo.Annotation
+  field :annotation, 1, repeated: true, type: Google.Protobuf.GeneratedCodeInfo.Annotation
 end
 
-defmodule Google_Protobuf.GeneratedCodeInfo.Annotation do
-  use Protobuf
+defmodule Google.Protobuf.GeneratedCodeInfo.Annotation do
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+    path:        [integer],
+    source_file: String.t,
+    begin:       integer,
+    end:         integer
+  }
   defstruct [:path, :source_file, :begin, :end]
 
   field :path, 1, repeated: true, type: :int32, packed: true

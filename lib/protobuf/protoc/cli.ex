@@ -3,7 +3,7 @@ defmodule Protobuf.Protoc.CLI do
     # https://groups.google.com/forum/#!topic/elixir-lang-talk/T5enez_BBTI
     :io.setopts(:standard_io, encoding: :latin1)
     bin = IO.binread(:all)
-    request = Protobuf.Decoder.decode(bin, Google_Protobuf_Compiler.CodeGeneratorRequest)
+    request = Protobuf.Decoder.decode(bin, Google.Protobuf.Compiler.CodeGeneratorRequest)
     # debug
     # raise inspect(request, limit: :infinity)
     ctx = %Protobuf.Protoc.Context{}
@@ -12,7 +12,7 @@ defmodule Protobuf.Protoc.CLI do
     files = request.proto_file
       |> Enum.filter(fn(desc) -> Enum.member?(request.file_to_generate, desc.name) end)
       |> Enum.map(fn(desc) -> Protobuf.Protoc.Generator.generate(ctx, desc) end)
-    response = Google_Protobuf_Compiler.CodeGeneratorResponse.new(file: files)
+    response = Google.Protobuf.Compiler.CodeGeneratorResponse.new(file: files)
     IO.binwrite(Protobuf.Encoder.encode(response))
   end
 

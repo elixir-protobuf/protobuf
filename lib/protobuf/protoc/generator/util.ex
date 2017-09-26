@@ -30,7 +30,7 @@ defmodule Protobuf.Protoc.Generator.Util do
     pkg
     |> String.split(".")
     |> Enum.map(&Macro.camelize(&1))
-    |> Enum.join("_")
+    |> Enum.join(".")
   end
 
   defp find_type_package("." <> name, %{dep_pkgs: pkgs, package: pkg}) do

@@ -5,7 +5,7 @@ defmodule Protobuf.Protoc.Generator do
 
   def generate(ctx, desc) do
     name = new_file_name(desc.name)
-    Google_Protobuf_Compiler.CodeGeneratorResponse.File.new(name: name, content: generate_content(ctx, desc))
+    Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(name: name, content: generate_content(ctx, desc))
   end
 
   defp new_file_name(name) do

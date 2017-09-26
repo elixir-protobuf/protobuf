@@ -5,8 +5,8 @@ defmodule Protobuf.Protoc.GeneratorTest do
 
   test "generate/2 works" do
     ctx = %Context{}
-    desc = Google_Protobuf.FileDescriptorProto.new(name: "name.proto")
-    assert Generator.generate(ctx, desc) == Google_Protobuf_Compiler.CodeGeneratorResponse.File.new(name: "name.pb.ex", content: "")
+    desc = Google.Protobuf.FileDescriptorProto.new(name: "name.proto")
+    assert Generator.generate(ctx, desc) == Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(name: "name.pb.ex", content: "")
   end
 
   test "get_dep_pkgs/2 sort pkgs by length" do
