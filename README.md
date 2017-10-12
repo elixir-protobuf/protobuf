@@ -7,7 +7,7 @@ A pure Elixir implementation of [Google Protobuf](https://developers.google.com/
 
 ## Why this instead of exprotobuf(gpb)?
 
-It have some must-have and other cool features like:
+It has some must-have and other cool features like:
 
 1. A protoc [plugin](https://developers.google.com/protocol-buffers/docs/cpptutorial#compiling-your-protocol-buffers) to generate Elixir code just like what other official libs do, which is powerful and reliable.
 2. Generate **simple and explicit** code with the power of Macro. (see [test/support/test_msg.ex](https://github.com/tony612/protobuf-elixir/blob/master/test/support/test_msg.ex))
