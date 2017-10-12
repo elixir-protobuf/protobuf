@@ -13,4 +13,8 @@ defmodule Protobuf.BuilderTest do
     assert TestMsg.Foo2.new.c == nil
     assert TestMsg.Foo2.new.e == nil
   end
+
+  test "works for circular reference" do
+    assert TestMsg.Parent.new.child == nil
+  end
 end

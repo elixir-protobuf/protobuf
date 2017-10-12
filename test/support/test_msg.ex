@@ -84,4 +84,16 @@ defmodule TestMsg do
     field :d, 4, optional: true, type: :string, oneof: 1
     field :other, 5, optional: true, type: :string
   end
+
+  defmodule Parent do
+    use Protobuf, syntax: :proto3
+    defstruct [:child]
+    field :child, 1, type: Parent.Child
+  end
+
+  defmodule Parent.Child do
+    use Protobuf, syntax: :proto3
+    defstruct [:parent]
+    field :parent, 1, type: Parent
+  end
 end
