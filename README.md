@@ -45,7 +45,7 @@ end
 
 ### Generate Elixir code
 
-1. Install `protoc` [here](https://developers.google.com/protocol-buffers/docs/downloads)
+1. Install `protoc`(cpp) [here](https://developers.google.com/protocol-buffers/docs/downloads)
 2. Install protoc plugin `protoc-gen-elixir` for Elixir . NOTE: You have to make sure `protoc-gen-elixir`(this name is important) is in your PATH.
 ```
 $ mix escript.install hex protobuf
