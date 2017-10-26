@@ -12,12 +12,18 @@ defmodule Protobuf.Decoder do
   @wire_32bits       5
 
   @spec decode(binary, atom, boolean()) :: any
-  def decode(data, module, run_extensions) when is_atom(module) do
-    do_decode(data, module.__message_props__(), module.__extension_message_props__(), module.new, run_extensions)
+  def decode(data, module) when is_atom(module) do
+    do_decode(data, module.__message_props__(), module.new)
   end
 
-  @spec do_decode(binary, MessageProps.t, MessageProps.t, struct, boolean()) :: any
-  defp do_decode(bin, props, ext_props, msg, run_extensions) when is_binary(bin) and byte_size(bin) > 0 do
+  def decode(data, module, run_extensions) when is_atom(module) do
+    do_decode(data, module.__message_props__(), module.new, {run_extensions, module.__extension_message_props__()})
+  end
+
+  @spec do_decode(binary, MessageProps.t, struct, nil | {boolean(), MessageProps.t}) :: any
+  defp do_decode(bin, props, msg, ext \\ nil)
+  defp do_decode(bin, props, msg, ext) when is_binary(bin) and byte_size(bin) > 0 do
+    {run_extensions, ext_props} = if ext, do: ext, else: {false, nil}
     {key, rest} = decode_varint(bin)
     tag = bsr(key, 3)
     wire_type = band(key, 7)
@@ -35,12 +41,12 @@ defmodule Protobuf.Decoder do
             field_key = if prop.oneof, do: oneof_field(prop, props), else: prop.name_atom
             new_msg = put_field(type, msg, prop, field_key, val, run_extensions)
 
-            do_decode(rest, props, ext_props, new_msg, run_extensions)
+            do_decode(rest, props, new_msg, ext)
           {:error, error_msg} ->
             raise DecodeError, message: "#{inspect(msg.__struct__)}: " <> error_msg
           :unknown_field ->
             {_, rest} = decode_type(wire_type, rest)
-            do_decode(rest, props, ext_props, msg, run_extensions)
+            do_decode(rest, props, msg, ext)
         end
       {:extention} ->
         msg
@@ -48,11 +54,20 @@ defmodule Protobuf.Decoder do
         msg
     end
 
+    if ext, do: handle_extensions(msg)
+
+    msg
+  end
+  defp do_decode(<<>>, props, msg, _ext) do
+    reverse_repeated(msg, props.repeated_fields)
+  end
+
+  defp handle_extensions(msg) do
     case msg do
-      %Google.Protobuf.FileDescriptorProto{ extension: extension } when extension != [] ->
+      %Google.Protobuf.FileDescriptorProto{extension: extension} when extension != [] ->
         for extension_item <- extension do
           case extension_item do
-            %Google.Protobuf.FieldDescriptorProto{ extendee: extendee } when not is_nil(extendee) ->
+            %Google.Protobuf.FieldDescriptorProto{extendee: extendee} when not is_nil(extendee) ->
               field_name = String.to_atom(extension_item.name)
 
               extender_module = get_module(extension_item.type_name)
@@ -63,16 +78,11 @@ defmodule Protobuf.Decoder do
         end
       _ -> nil
     end
-
-    msg
-  end
-  defp do_decode(<<>>, props, _ext_props, msg, _run_extensions) do
-    reverse_repeated(msg, props.repeated_fields)
   end
 
   defp get_module(str) do
     package_name = Protobuf.Protoc.Generator.Util.trans_type_name(str, %Protobuf.Protoc.Context{package: ""})
-    "Elixir.#{package_name}" |> String.to_atom
+    String.to_atom("Elixir.#{package_name}")
   end
 
   defp type_to_decode(:normal, prop_type), do: prop_type

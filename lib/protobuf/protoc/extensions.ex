@@ -1,4 +1,8 @@
 defmodule Protobuf.Extensions do
+  @moduledoc """
+  Module to globally track extensions.
+  """
+
   @extension_fields_table :extension_fields_table
   @extension_props_table :extension_props_table
 

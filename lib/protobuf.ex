@@ -17,13 +17,13 @@ defmodule Protobuf do
 
   defp encode_decode() do
     quote do
-      def decode(data), do: Protobuf.Decoder.decode(data, __MODULE__, true)
+      def decode(data), do: Protobuf.Decoder.decode(data, __MODULE__)
       def encode(struct), do: Protobuf.Encoder.encode(struct)
     end
   end
 
   def decode(%{__struct__: mod} = data) do
-    Protobuf.Decoder.decode(data, mod, true)
+    Protobuf.Decoder.decode(data, mod)
   end
 
   def encode(struct) do
