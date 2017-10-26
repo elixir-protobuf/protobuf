@@ -29,6 +29,10 @@ defmodule Protobuf.DSL do
         unquote(Macro.escape(msg_props))
       end
 
+      def __extension_message_props__ do
+        Protobuf.Extensions.get_extension_props(__MODULE__)
+      end
+
       unquote(def_enum_functions(msg_props))
 
       if unquote(syntax == :proto3) do
@@ -56,7 +60,7 @@ defmodule Protobuf.DSL do
   end
   defp def_enum_functions(_), do: nil
 
-  defp generate_msg_props(fields, oneofs, options) do
+  def generate_msg_props(fields, oneofs, options) do
     syntax = Keyword.get(options, :syntax, :proto2)
     field_props = field_props_map(syntax, fields)
     repeated_fields =

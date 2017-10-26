@@ -1,11 +1,9 @@
-defmodule <%= mod_name %>.Service do
-  use GRPC.Service, name: <%= inspect(name) %>
+defmodule <%= mod_name %> do
+  use Protobuf.Service
 
-<%= Enum.map methods, fn(method) -> %>
+<%= Enum.map methods, fn {method, nil} -> %>
   rpc <%= method %>
+<% {method, {type, path}} -> %>
+  rpc <%= method %>, <%= type %>: "<%= path %>"
 <% end %>
-end
-
-defmodule <%= mod_name %>.Stub do
-  use GRPC.Stub, service: <%= mod_name %>.Service
 end

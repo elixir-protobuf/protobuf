@@ -11,53 +11,82 @@ defmodule Protobuf.Decoder do
   # @wire_end_group    4
   @wire_32bits       5
 
-  @spec decode(binary, atom) :: any
-  def decode(data, module) when is_atom(module) do
-    do_decode(data, module.__message_props__(), module.new)
+  @spec decode(binary, atom, boolean()) :: any
+  def decode(data, module, run_extensions) when is_atom(module) do
+    do_decode(data, module.__message_props__(), module.__extension_message_props__(), module.new, run_extensions)
   end
 
-  @spec do_decode(binary, MessageProps.t, struct) :: any
-  defp do_decode(bin, props, msg) when is_binary(bin) and byte_size(bin) > 0 do
+  @spec do_decode(binary, MessageProps.t, MessageProps.t, struct, boolean()) :: any
+  defp do_decode(bin, props, ext_props, msg, run_extensions) when is_binary(bin) and byte_size(bin) > 0 do
     {key, rest} = decode_varint(bin)
     tag = bsr(key, 3)
     wire_type = band(key, 7)
     # TODO: handle EndGroup
-    case find_field(props, tag) do
+    prop_info = find_field(props, tag)
+    # Only load extension props if we're running extensions
+    prop_info = if run_extensions, do: prop_info || find_field(ext_props, tag), else: prop_info
+    prop_info = prop_info || {:field_num, %FieldProps{}}
+
+    msg = case prop_info do
       {:field_num, prop} ->
         case class_field(prop, wire_type) do
           type when type in [:normal, :embedded, :packed] ->
             {val, rest} = decode_type(type_to_decode(type, prop.type), wire_type, rest)
             field_key = if prop.oneof, do: oneof_field(prop, props), else: prop.name_atom
-            new_msg = put_field(type, msg, prop, field_key, val)
-            do_decode(rest, props, new_msg)
+            new_msg = put_field(type, msg, prop, field_key, val, run_extensions)
+
+            do_decode(rest, props, ext_props, new_msg, run_extensions)
           {:error, error_msg} ->
             raise DecodeError, message: "#{inspect(msg.__struct__)}: " <> error_msg
           :unknown_field ->
             {_, rest} = decode_type(wire_type, rest)
-            do_decode(rest, props, msg)
+            do_decode(rest, props, ext_props, msg, run_extensions)
         end
       {:extention} ->
         msg
       {:oneof} ->
         msg
     end
+
+    case msg do
+      %Google.Protobuf.FileDescriptorProto{ extension: extension } when extension != [] ->
+        for extension_item <- extension do
+          case extension_item do
+            %Google.Protobuf.FieldDescriptorProto{ extendee: extendee } when not is_nil(extendee) ->
+              field_name = String.to_atom(extension_item.name)
+
+              extender_module = get_module(extension_item.type_name)
+              extendee_module = get_module(extension_item.extendee)
+
+              Protobuf.Extensions.add_extension_prop(extendee_module, {field_name, extension_item.number, [type: extender_module]})
+          end
+        end
+      _ -> nil
+    end
+
+    msg
   end
-  defp do_decode(<<>>, props, msg) do
+  defp do_decode(<<>>, props, _ext_props, msg, _run_extensions) do
     reverse_repeated(msg, props.repeated_fields)
+  end
+
+  defp get_module(str) do
+    package_name = Protobuf.Protoc.Generator.Util.trans_type_name(str, %Protobuf.Protoc.Context{package: ""})
+    "Elixir.#{package_name}" |> String.to_atom
   end
 
   defp type_to_decode(:normal, prop_type), do: prop_type
   defp type_to_decode(:embedded, _), do: :bytes
   defp type_to_decode(:packed, _), do: :bytes
 
-  defp put_field(:normal, msg, prop, field_key, val) do
+  defp put_field(:normal, msg, prop, field_key, val, _run_extensions) do
     val = if prop.oneof, do: {prop.name_atom, val}, else: val
     put_map(msg, field_key, val, fn _k, v1, v2 ->
       merge_same_fields(v1, v2, prop.repeated?, fn -> v2 end)
     end)
   end
-  defp put_field(:embedded, msg, prop, field_key, val) do
-    embedded_msg = decode(val, prop.type)
+  defp put_field(:embedded, msg, prop, field_key, val, run_extensions) do
+    embedded_msg = decode(val, prop.type, run_extensions)
     decoded = if prop.map?, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
     decoded = if prop.oneof, do: {prop.name_atom, decoded}, else: decoded
     new_msg = put_map(msg, field_key, decoded, fn _k, v1, v2 ->
@@ -67,7 +96,7 @@ defmodule Protobuf.Decoder do
     end)
     struct(new_msg)
   end
-  defp put_field(:packed, msg, prop, field_key, val) do
+  defp put_field(:packed, msg, prop, field_key, val, _run_extensions) do
     vals = decode_packed(prop.type, Protobuf.Encoder.wire_type(prop.type), val)
     vals = if prop.oneof, do: {prop.name_atom, vals}, else: vals
     new_msg = put_map(msg, field_key, vals, fn _k, v1, v2 ->
@@ -76,7 +105,7 @@ defmodule Protobuf.Decoder do
     struct(new_msg)
   end
 
-  @spec find_field(MessageProps.t, integer) :: {atom, FieldProps.t} | {atom} | false
+  @spec find_field(MessageProps.t, integer) :: {atom, FieldProps.t} | {atom} | nil
   def find_field(_, tag) when tag < 0 do
     raise DecodeError, message: "decoded tag is less than 0"
   end
@@ -84,7 +113,7 @@ defmodule Protobuf.Decoder do
     case props do
        %{tags_map: %{^tag => _field_num}, field_props: %{^tag => prop}} -> {:field_num, prop}
        %{extendable?: true} -> {:extention}
-       _ -> {:field_num, %FieldProps{}}
+       _ -> nil
     end
   end
 
