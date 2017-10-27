@@ -12,7 +12,8 @@ defmodule Protobuf.Decoder do
   @wire_32bits       5
 
   @spec decode(binary, atom, boolean()) :: any
-  def decode(data, module) when is_atom(module) do
+  def decode(data, module, run_extensions \\ nil)
+  def decode(data, module, nil) when is_atom(module) do
     do_decode(data, module.__message_props__(), module.new)
   end
 
@@ -23,7 +24,7 @@ defmodule Protobuf.Decoder do
   @spec do_decode(binary, MessageProps.t, struct, nil | {boolean(), MessageProps.t}) :: any
   defp do_decode(bin, props, msg, ext \\ nil)
   defp do_decode(bin, props, msg, ext) when is_binary(bin) and byte_size(bin) > 0 do
-    {run_extensions, ext_props} = if ext, do: ext, else: {false, nil}
+    {run_extensions, ext_props} = if ext, do: ext, else: {nil, nil}
     {key, rest} = decode_varint(bin)
     tag = bsr(key, 3)
     wire_type = band(key, 7)
