@@ -12,6 +12,10 @@ defmodule Protobuf do
       def new(attrs \\ %{}) do
         Protobuf.Builder.new(__MODULE__, attrs)
       end
+
+      def from_params(params \\ %{}) do
+        Protobuf.Builder.from_params(__MODULE__, params)
+      end
     end
   end
 

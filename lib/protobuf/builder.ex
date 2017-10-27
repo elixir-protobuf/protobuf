@@ -3,6 +3,27 @@ defmodule Protobuf.Builder do
     struct(mod.__default_struct__, attrs)
   end
 
+  def from_params(mod, params) do
+    message_props = mod.__message_props__
+    field_props = message_props.field_props
+
+    Enum.reduce(params, mod.__default_struct__, fn {k, v}, buffer ->
+      case message_props.field_tags_str[k] do
+        nil -> buffer
+        field_num ->
+          case field_props[field_num] do
+            nil -> buffer
+            field_props ->
+              if field_props.embedded? do
+                Map.put(buffer, field_props.name_atom, Protobuf.Builder.from_params(field_props.type, v))
+              else
+                Map.put(buffer, field_props.name_atom, v)
+              end
+          end
+      end
+    end)
+  end
+
   def field_default(_, %{default: default}) when not is_nil(default), do: default
   def field_default(_, %{repeated?: true}), do: []
   def field_default(_, %{map?: true}), do: %{}

@@ -73,6 +73,7 @@ defmodule Protobuf.DSL do
       ordered_tags: ordered_tags(fields),
       field_props: field_props,
       field_tags: field_tags(fields),
+      field_tags_str: field_tags_str(fields),
       repeated_fields: repeated_fields,
       syntax: syntax,
       oneof: Enum.reverse(oneofs),
@@ -102,6 +103,12 @@ defmodule Protobuf.DSL do
   defp field_tags(fields) do
     fields
     |> Enum.map(fn ({name, fnum, _}) -> {name, fnum} end)
+    |> Enum.into(%{})
+  end
+
+  defp field_tags_str(fields) do
+    fields
+    |> Enum.map(fn ({name, fnum, _}) -> {to_string(name), fnum} end)
     |> Enum.into(%{})
   end
 
