@@ -85,6 +85,20 @@ defmodule TestMsg do
     field :other, 5, optional: true, type: :string
   end
 
+  defmodule OneofProto3 do
+    use Protobuf, syntax: :proto3
+
+    defstruct [:first, :second, :other]
+
+    oneof :first, 0
+    oneof :second, 1
+    field :a, 1, optional: true, type: :int32, oneof: 0
+    field :b, 2, optional: true, type: :string, oneof: 0
+    field :c, 3, optional: true, type: :int32, oneof: 1
+    field :d, 4, optional: true, type: :string, oneof: 1
+    field :other, 5, optional: true, type: :string
+  end
+
   defmodule Parent do
     use Protobuf, syntax: :proto3
     defstruct [:child]

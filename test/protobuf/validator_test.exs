@@ -7,6 +7,11 @@ defmodule Protobuf.ValidatorTest do
     assert true = Protobuf.Validator.valid?(msg)
   end
 
+  test "oneof valid for valid tuple and nil when syntax = proto3" do
+    msg = TestMsg.OneofProto3.new(first: {:a, 42})
+    assert true = Protobuf.Validator.valid?(msg)
+  end
+
   test "oneof invalid format" do
     msg = TestMsg.Oneof.new(first: 1)
     assert {:invalid, error} = Protobuf.Validator.valid?(msg)
