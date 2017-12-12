@@ -1,4 +1,5 @@
 defmodule <%= mod_name %>.Service do
+  @moduledoc false
   use GRPC.Service, name: <%= inspect(name) %>
 
 <%= Enum.map methods, fn(method) -> %>
@@ -7,5 +8,6 @@ defmodule <%= mod_name %>.Service do
 end
 
 defmodule <%= mod_name %>.Stub do
+  @moduledoc false
   use GRPC.Stub, service: <%= mod_name %>.Service
 end
