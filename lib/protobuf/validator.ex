@@ -38,6 +38,8 @@ defmodule Protobuf.Validator do
       type_valid?(key_type, k) && match_and_valid?(val_type, v)
     end)
   end
+  # oneof fields are not present in struct
+  def field_valid?(_, %{oneof: oneof}, nil) when is_integer(oneof), do: true
   # nil is allowed for singular embedded message
   def field_valid?(_, %{embedded?: true}, nil), do: true
   def field_valid?(_, %{embedded?: true, type: type}, val) do
