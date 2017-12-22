@@ -19,7 +19,7 @@ defmodule Protobuf.DSLTest do
 
   test "creates __message_props__ function" do
     msg_props = TestMsg.Foo.__message_props__
-    tags_map = Enum.reduce([1, 2, 3] ++ Enum.to_list(5..14), %{}, fn(i, acc) -> Map.put(acc, i, i) end)
+    tags_map = Enum.reduce([1, 2, 3] ++ Enum.to_list(5..15), %{}, fn(i, acc) -> Map.put(acc, i, i) end)
     assert tags_map == msg_props.tags_map
     field_props = msg_props.field_props
     assert %FieldProps{fnum: 1, name: "a", name_atom: :a,
@@ -38,7 +38,7 @@ defmodule Protobuf.DSLTest do
 
   test "saves ordered tags" do
     msg_props = TestMsg.Foo.__message_props__
-    assert [1, 2, 3] ++ Enum.to_list(5..14) == msg_props.ordered_tags
+    assert [1, 2, 3] ++ Enum.to_list(5..15) == msg_props.ordered_tags
   end
 
   test "supports embedded fields" do
@@ -100,7 +100,7 @@ defmodule Protobuf.DSLTest do
 
   test "generates __default_struct__ function" do
     assert %TestMsg.Foo{a: 0, b: 0, c: "", d: 0.0, e: nil, f: 0,
-      g: [], h: [], i: [], j: 0, k: false, l: %{}, m: 0} == TestMsg.Foo.__default_struct__
+      g: [], h: [], i: [], j: 0, k: false, l: %{}, m: 0, n: 0.0} == TestMsg.Foo.__default_struct__
   end
 
   test "generates new function" do
