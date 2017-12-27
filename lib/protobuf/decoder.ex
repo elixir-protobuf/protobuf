@@ -1,15 +1,9 @@
 defmodule Protobuf.Decoder do
+  import Protobuf.WireTypes
   import Bitwise, only: [bsl: 2, bsr: 2, band: 2]
   @mask64 bsl(1, 64) - 1
 
   alias Protobuf.{DecodeError, MessageProps, FieldProps}
-
-  @wire_varint       0
-  @wire_64bits       1
-  @wire_delimited    2
-  # @wire_start_group  3
-  # @wire_end_group    4
-  @wire_32bits       5
 
   @spec decode(binary, atom) :: any
   def decode(data, module) when is_atom(module) do
@@ -89,13 +83,13 @@ defmodule Protobuf.Decoder do
   end
 
   @spec class_field(FieldProps.t, integer) :: atom | {:error, String.t}
-  def class_field(%{wire_type: @wire_delimited, embedded?: true}, @wire_delimited) do
+  def class_field(%{wire_type: wire_delimited(), embedded?: true}, wire_delimited()) do
     :embedded
   end
   def class_field(%{wire_type: wire}, wire) do
     :normal
   end
-  def class_field(%{repeated?: true, packed?: true}, @wire_delimited) do
+  def class_field(%{repeated?: true, packed?: true}, wire_delimited()) do
     :packed
   end
   def class_field(%{wire_type: wire}, _) when is_nil(wire) do
@@ -107,80 +101,80 @@ defmodule Protobuf.Decoder do
 
   # decode_type/2 can only be used to parse unknown fields With no type detail
   @spec decode_type(integer, binary) :: {binary, binary}
-  def decode_type(@wire_varint, bin) do
+  def decode_type(wire_varint(), bin) do
     decode_varint(bin)
   end
-  def decode_type(@wire_64bits, bin) do
+  def decode_type(wire_64bits(), bin) do
     <<n::64, rest::binary>> = bin
     {n, rest}
   end
-  def decode_type(@wire_delimited, bin) do
+  def decode_type(wire_delimited(), bin) do
     {len, rest} = decode_varint(bin)
     <<str::binary-size(len), rest2::binary>> = rest
     {str, rest2}
   end
-  def decode_type(@wire_32bits, bin) do
+  def decode_type(wire_32bits(), bin) do
     <<n::32, rest::binary>> = bin
     {n, rest}
   end
 
   @spec decode_type(atom, integer, binary) :: {binary, binary}
-  def decode_type(:int32, @wire_varint, bin) do
+  def decode_type(:int32, wire_varint(), bin) do
     {n, rest} = decode_varint(bin)
     <<n::signed-integer-32>> = <<n::32>>
     {n, rest}
   end
-  def decode_type(:int64, @wire_varint, bin) do
+  def decode_type(:int64, wire_varint(), bin) do
     {n, rest} = decode_varint(bin)
     <<n::signed-integer-64>> = <<n::64>>
     {n, rest}
   end
-  def decode_type(:uint32, @wire_varint, bin), do: decode_varint(bin)
-  def decode_type(:uint64, @wire_varint, bin), do: decode_varint(bin)
-  def decode_type(:sint32, @wire_varint, bin) do
+  def decode_type(:uint32, wire_varint(), bin), do: decode_varint(bin)
+  def decode_type(:uint64, wire_varint(), bin), do: decode_varint(bin)
+  def decode_type(:sint32, wire_varint(), bin) do
     {n, rest} = decode_varint(bin)
     {decode_zigzag(n), rest}
   end
-  def decode_type(:sint64, @wire_varint, bin) do
+  def decode_type(:sint64, wire_varint(), bin) do
     {n, rest} = decode_varint(bin)
     {decode_zigzag(n), rest}
   end
-  def decode_type(:bool, @wire_varint, bin) do
+  def decode_type(:bool, wire_varint(), bin) do
     {n, rest} = decode_varint(bin)
     {n != 0, rest}
   end
-  def decode_type(:enum, @wire_varint, bin) do
-    decode_type(:int32, @wire_varint, bin)
+  def decode_type(:enum, wire_varint(), bin) do
+    decode_type(:int32, wire_varint(), bin)
   end
-  def decode_type(:fixed64, @wire_64bits, bin) do
+  def decode_type(:fixed64, wire_64bits(), bin) do
     <<n::little-64, rest::binary>> = bin
     {n, rest}
   end
-  def decode_type(:sfixed64, @wire_64bits, bin) do
+  def decode_type(:sfixed64, wire_64bits(), bin) do
     <<n::little-signed-64, rest::binary>> = bin
     {n, rest}
   end
-  def decode_type(:double, @wire_64bits, bin) do
+  def decode_type(:double, wire_64bits(), bin) do
     <<n::little-float-64, rest::binary>> = bin
     {n, rest}
   end
-  def decode_type(:bytes, @wire_delimited, bin) do
+  def decode_type(:bytes, wire_delimited(), bin) do
     {len, rest} = decode_varint(bin)
     <<str::binary-size(len), rest2::binary>> = rest
     {str, rest2}
   end
-  def decode_type(:string, @wire_delimited, bin) do
-    decode_type(:bytes, @wire_delimited, bin)
+  def decode_type(:string, wire_delimited(), bin) do
+    decode_type(:bytes, wire_delimited(), bin)
   end
-  def decode_type(:fixed32, @wire_32bits, bin) do
+  def decode_type(:fixed32, wire_32bits(), bin) do
     <<n::little-32, rest::binary>> = bin
     {n, rest}
   end
-  def decode_type(:sfixed32, @wire_32bits, bin) do
+  def decode_type(:sfixed32, wire_32bits(), bin) do
     <<n::little-signed-32, rest::binary>> = bin
     {n, rest}
   end
-  def decode_type(:float, @wire_32bits, bin) do
+  def decode_type(:float, wire_32bits(), bin) do
     <<n::little-float-32, rest::binary>> = bin
     {n, rest}
   end

@@ -1,13 +1,8 @@
 defmodule Protobuf.Encoder do
+  import Protobuf.WireTypes
   import Bitwise, only: [bsr: 2, band: 2, bsl: 2, bor: 2]
-  alias Protobuf.{MessageProps, FieldProps}
 
-  @wire_varint       0
-  @wire_64bits       1
-  @wire_delimited    2
-  # @wire_start_group  3
-  # @wire_end_group    4
-  @wire_32bits       5
+  alias Protobuf.{MessageProps, FieldProps}
 
   @spec encode(struct, keyword) :: iodata
   def encode(%{__struct__: mod} = struct, opts \\ []) do
@@ -58,7 +53,7 @@ defmodule Protobuf.Encoder do
   end
 
   @spec class_field(map) :: atom
-  def class_field(%{wire_type: @wire_delimited, embedded?: true}) do
+  def class_field(%{wire_type: wire_delimited(), embedded?: true}) do
     :embedded
   end
   def class_field(%{repeated?: true, packed?: true}) do
@@ -112,23 +107,23 @@ defmodule Protobuf.Encoder do
   def encode_varint(n) when n > 127, do: <<1::1, band(n, 127)::7, encode_varint(bsr(n, 7))::binary>>
 
   @spec wire_type(atom) :: integer
-  def wire_type(:int32),     do: @wire_varint
-  def wire_type(:int64),     do: @wire_varint
-  def wire_type(:uint32),    do: @wire_varint
-  def wire_type(:uint64),    do: @wire_varint
-  def wire_type(:sint32),    do: @wire_varint
-  def wire_type(:sint64),    do: @wire_varint
-  def wire_type(:bool),      do: @wire_varint
-  def wire_type(:enum),      do: @wire_varint
-  def wire_type(:fixed64),   do: @wire_64bits
-  def wire_type(:sfixed64),  do: @wire_64bits
-  def wire_type(:double),    do: @wire_64bits
-  def wire_type(:string),    do: @wire_delimited
-  def wire_type(:bytes),     do: @wire_delimited
-  def wire_type(:fixed32),   do: @wire_32bits
-  def wire_type(:sfixed32),  do: @wire_32bits
-  def wire_type(:float),     do: @wire_32bits
-  def wire_type(mod) when is_atom(mod), do: @wire_delimited
+  def wire_type(:int32),     do: wire_varint()
+  def wire_type(:int64),     do: wire_varint()
+  def wire_type(:uint32),    do: wire_varint()
+  def wire_type(:uint64),    do: wire_varint()
+  def wire_type(:sint32),    do: wire_varint()
+  def wire_type(:sint64),    do: wire_varint()
+  def wire_type(:bool),      do: wire_varint()
+  def wire_type(:enum),      do: wire_varint()
+  def wire_type(:fixed64),   do: wire_64bits()
+  def wire_type(:sfixed64),  do: wire_64bits()
+  def wire_type(:double),    do: wire_64bits()
+  def wire_type(:string),    do: wire_delimited()
+  def wire_type(:bytes),     do: wire_delimited()
+  def wire_type(:fixed32),   do: wire_32bits()
+  def wire_type(:sfixed32),  do: wire_32bits()
+  def wire_type(:float),     do: wire_32bits()
+  def wire_type(mod) when is_atom(mod), do: wire_delimited()
 
   defp repeated_or_not(val, repeated, func) do
     if repeated do
