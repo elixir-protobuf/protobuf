@@ -1,12 +1,13 @@
 defmodule Google.Protobuf.Compiler.Version do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-    major:  integer,
-    minor:  integer,
-    patch:  integer,
-    suffix: String.t
-  }
+          major: integer,
+          minor: integer,
+          patch: integer,
+          suffix: String.t()
+        }
   defstruct [:major, :minor, :patch, :suffix]
 
   field :major, 1, optional: true, type: :int32
@@ -16,14 +17,15 @@ defmodule Google.Protobuf.Compiler.Version do
 end
 
 defmodule Google.Protobuf.Compiler.CodeGeneratorRequest do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-    file_to_generate: [String.t],
-    parameter:        String.t,
-    proto_file:       [Google.Protobuf.FileDescriptorProto.t],
-    compiler_version: Google.Protobuf.Compiler.Version.t
-  }
+          file_to_generate: [String.t()],
+          parameter: String.t(),
+          proto_file: [Google.Protobuf.FileDescriptorProto.t()],
+          compiler_version: Google.Protobuf.Compiler.Version.t()
+        }
   defstruct [:file_to_generate, :parameter, :proto_file, :compiler_version]
 
   field :file_to_generate, 1, repeated: true, type: :string
@@ -33,12 +35,13 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorRequest do
 end
 
 defmodule Google.Protobuf.Compiler.CodeGeneratorResponse do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-    error: String.t,
-    file:  [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t]
-  }
+          error: String.t(),
+          file: [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()]
+        }
   defstruct [:error, :file]
 
   field :error, 1, optional: true, type: :string
@@ -46,13 +49,14 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorResponse do
 end
 
 defmodule Google.Protobuf.Compiler.CodeGeneratorResponse.File do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-    name:            String.t,
-    insertion_point: String.t,
-    content:         String.t
-  }
+          name: String.t(),
+          insertion_point: String.t(),
+          content: String.t()
+        }
   defstruct [:name, :insertion_point, :content]
 
   field :name, 1, optional: true, type: :string

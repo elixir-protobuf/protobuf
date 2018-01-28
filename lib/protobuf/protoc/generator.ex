@@ -28,6 +28,8 @@ defmodule Protobuf.Protoc.Generator do
     list
     |> List.flatten()
     |> Enum.join("\n")
+    |> Code.format_string!(locals_without_parens: [field: 2, field: 3, oneof: 2])
+    |> IO.iodata_to_binary()
   end
 
   @doc false
