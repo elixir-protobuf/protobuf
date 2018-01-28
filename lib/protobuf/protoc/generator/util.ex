@@ -12,14 +12,16 @@ defmodule Protobuf.Protoc.Generator.Util do
 
   def options_to_str(opts) do
     opts
-    |> Enum.filter(fn({_, v}) -> v end)
-    |> Enum.map(fn({k, v}) -> "#{k}: #{print(v)}" end)
+    |> Enum.filter(fn {_, v} -> v end)
+    |> Enum.map(fn {k, v} -> "#{k}: #{print(v)}" end)
     |> Enum.join(", ")
   end
 
   def trans_type_name(name, ctx) do
     case find_type_package(name, ctx) do
-      "" -> name |> String.trim_leading(".") |> normalize_type_name
+      "" ->
+        name |> String.trim_leading(".") |> normalize_type_name
+
       found_pkg ->
         name = name |> String.trim_leading("." <> found_pkg <> ".") |> normalize_type_name
         normalize_pkg_name(found_pkg) <> "." <> name
@@ -39,10 +41,12 @@ defmodule Protobuf.Protoc.Generator.Util do
       found_pkg -> found_pkg
     end
   end
+
   defp find_type_package(_, %{package: pkg}), do: pkg
 
   defp find_package_in_deps(_, []), do: nil
-  defp find_package_in_deps(name, [pkg|tail]) do
+
+  defp find_package_in_deps(name, [pkg | tail]) do
     if String.starts_with?(name, pkg <> ".") do
       pkg
     else

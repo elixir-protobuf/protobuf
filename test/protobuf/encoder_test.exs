@@ -1,4 +1,5 @@
 Code.require_file("../support/test_msg.ex", __DIR__)
+
 defmodule Protobuf.EncoderTest do
   use ExUnit.Case, async: true
 
@@ -33,7 +34,7 @@ defmodule Protobuf.EncoderTest do
   end
 
   test "encodes empty embedded message" do
-    bin = Encoder.encode(TestMsg.Foo.new(a: 42, e: TestMsg.Foo.Bar.new))
+    bin = Encoder.encode(TestMsg.Foo.new(a: 42, e: TestMsg.Foo.Bar.new()))
     assert bin == <<8, 42, 50, 0>>
   end
 
@@ -49,7 +50,12 @@ defmodule Protobuf.EncoderTest do
 
   test "encodes repeated embedded fields" do
     bin = <<74, 7, 8, 12, 18, 3, 97, 98, 99, 74, 2, 8, 13>>
-    res = Encoder.encode(TestMsg.Foo.new(h: [%TestMsg.Foo.Bar{a: 12, b: "abc"}, TestMsg.Foo.Bar.new(a: 13)]))
+
+    res =
+      Encoder.encode(
+        TestMsg.Foo.new(h: [%TestMsg.Foo.Bar{a: 12, b: "abc"}, TestMsg.Foo.Bar.new(a: 13)])
+      )
+
     assert res == bin
   end
 

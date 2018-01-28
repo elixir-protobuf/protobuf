@@ -1,4 +1,5 @@
 Code.require_file("../support/test_msg.ex", __DIR__)
+
 defmodule Protobuf.DecoderTest do
   use ExUnit.Case, async: true
 
@@ -57,7 +58,9 @@ defmodule Protobuf.DecoderTest do
   test "decodes repeated embedded fields" do
     bin = <<74, 7, 8, 12, 18, 3, 97, 98, 99, 74, 2, 8, 13>>
     struct = Decoder.decode(bin, TestMsg.Foo)
-    assert struct == TestMsg.Foo.new(h: [%TestMsg.Foo.Bar{a: 12, b: "abc"}, TestMsg.Foo.Bar.new(a: 13)])
+
+    assert struct ==
+             TestMsg.Foo.new(h: [%TestMsg.Foo.Bar{a: 12, b: "abc"}, TestMsg.Foo.Bar.new(a: 13)])
   end
 
   test "decodes packed fields" do
@@ -81,31 +84,46 @@ defmodule Protobuf.DecoderTest do
   end
 
   test "decodes map type" do
-    struct = Decoder.decode(<<106, 12, 10, 7, 102, 111, 111, 95, 107, 101, 121, 16, 213, 1>>, TestMsg.Foo)
+    struct =
+      Decoder.decode(
+        <<106, 12, 10, 7, 102, 111, 111, 95, 107, 101, 121, 16, 213, 1>>,
+        TestMsg.Foo
+      )
+
     assert struct == TestMsg.Foo.new(l: %{"foo_key" => 213})
   end
 
   test "decodes 0 for proto2" do
-    assert Decoder.decode(<<8, 0, 17, 5, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo2) == TestMsg.Foo2.new(a: 0)
+    assert Decoder.decode(<<8, 0, 17, 5, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo2) ==
+             TestMsg.Foo2.new(a: 0)
   end
 
   test "decodes [] for proto2" do
-    assert Decoder.decode(<<8, 0, 17, 5, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo2) == TestMsg.Foo2.new(a: 0, g: [])
+    assert Decoder.decode(<<8, 0, 17, 5, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo2) ==
+             TestMsg.Foo2.new(a: 0, g: [])
   end
 
   test "decodes %{} for proto2" do
-    assert Decoder.decode(<<8, 0, 17, 5, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo2) == TestMsg.Foo2.new(a: 0, l: %{})
+    assert Decoder.decode(<<8, 0, 17, 5, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo2) ==
+             TestMsg.Foo2.new(a: 0, l: %{})
   end
 
   test "decodes custom default message for proto2" do
-    assert Decoder.decode(<<8, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo2) == TestMsg.Foo2.new(a: 0, b: 0)
+    assert Decoder.decode(<<8, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo2) ==
+             TestMsg.Foo2.new(a: 0, b: 0)
+
     assert Decoder.decode(<<8, 0>>, TestMsg.Foo2) == TestMsg.Foo2.new(a: 0, b: 5)
   end
 
   test "oneof only sets oneof fields" do
-    assert Decoder.decode(<<42, 5, 111, 116, 104, 101, 114, 8, 42, 34, 3, 97, 98, 99>>, TestMsg.Oneof) ==
-      %TestMsg.Oneof{first: {:a, 42}, second: {:d, "abc"}, other: "other"}
-    assert Decoder.decode(<<42, 5, 111, 116, 104, 101, 114, 18, 3, 97, 98, 99, 24, 123>>, TestMsg.Oneof) ==
-      %TestMsg.Oneof{first: {:b, "abc"}, second: {:c, 123}, other: "other"}
+    assert Decoder.decode(
+             <<42, 5, 111, 116, 104, 101, 114, 8, 42, 34, 3, 97, 98, 99>>,
+             TestMsg.Oneof
+           ) == %TestMsg.Oneof{first: {:a, 42}, second: {:d, "abc"}, other: "other"}
+
+    assert Decoder.decode(
+             <<42, 5, 111, 116, 104, 101, 114, 18, 3, 97, 98, 99, 24, 123>>,
+             TestMsg.Oneof
+           ) == %TestMsg.Oneof{first: {:b, "abc"}, second: {:c, 123}, other: "other"}
   end
 end

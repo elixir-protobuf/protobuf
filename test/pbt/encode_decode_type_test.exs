@@ -6,10 +6,14 @@ defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
       property unquote(Atom.to_string(field_type)) <> " roundtrip" do
         forall {n, tail} <- {unquote(gen_func), binary()} do
           bin = Encoder.encode_type(unquote(field_type), n)
-          ensure {n, tail} == Decoder.decode_type(
-            unquote(field_type),
-            unquote(wire_type),
-            bin <> tail
+
+          ensure(
+            {n, tail} ==
+              Decoder.decode_type(
+                unquote(field_type),
+                unquote(wire_type),
+                bin <> tail
+              )
           )
         end
       end
@@ -23,17 +27,22 @@ defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
     quote do
       property unquote(Atom.to_string(field_type)) <> " canonical roundtrip" do
         forall {n, tail} <- {unquote(gen_func), binary()} do
-          {canonical_val, ""} = Decoder.decode_type(
-            unquote(field_type),
-            unquote(wire_type),
-            Encoder.encode_type(unquote(field_type), n)
-          )
+          {canonical_val, ""} =
+            Decoder.decode_type(
+              unquote(field_type),
+              unquote(wire_type),
+              Encoder.encode_type(unquote(field_type), n)
+            )
 
           bin = Encoder.encode_type(unquote(field_type), canonical_val)
-          ensure {canonical_val, tail} == Decoder.decode_type(
-            unquote(field_type),
-            unquote(wire_type),
-            bin <> tail
+
+          ensure(
+            {canonical_val, tail} ==
+              Decoder.decode_type(
+                unquote(field_type),
+                unquote(wire_type),
+                bin <> tail
+              )
           )
         end
       end
@@ -48,11 +57,11 @@ defmodule Protobuf.EncodeDecodeTypeTest do
   import Protobuf.EncodeDecodeTypeTest.PropertyGenerator
 
   defp uint32_gen do
-    let <<x::unsigned-integer-size(32)>> <- binary(4), do: return(x)
+    let(<<x::unsigned-integer-size(32)>> <- binary(4), do: return(x))
   end
 
   defp uint64_gen do
-    let <<x::unsigned-integer-size(64)>> <- binary(8), do: return(x)
+    let(<<x::unsigned-integer-size(64)>> <- binary(8), do: return(x))
   end
 
   make_property(int(), :int32, 0)

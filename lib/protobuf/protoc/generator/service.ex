@@ -3,16 +3,16 @@ defmodule Protobuf.Protoc.Generator.Service do
 
   def generate_list(ctx, descs) do
     if Enum.member?(ctx.plugins, "grpc") do
-      Enum.map(descs, fn(desc) -> generate(ctx, desc) end)
+      Enum.map(descs, fn desc -> generate(ctx, desc) end)
     else
       []
     end
   end
 
   def generate(ctx, desc) do
-    mod_name = desc.name |> Macro.camelize |> Util.attach_pkg(ctx.package)
+    mod_name = desc.name |> Macro.camelize() |> Util.attach_pkg(ctx.package)
     name = "#{ctx.package}.#{desc.name}"
-    methods = Enum.map(desc.method, fn(m) -> generate_service_method(ctx, m) end)
+    methods = Enum.map(desc.method, fn m -> generate_service_method(ctx, m) end)
     Protobuf.Protoc.Template.service(mod_name, name, methods)
   end
 
