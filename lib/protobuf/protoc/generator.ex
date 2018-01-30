@@ -28,8 +28,7 @@ defmodule Protobuf.Protoc.Generator do
     list
     |> List.flatten()
     |> Enum.join("\n")
-    |> Code.format_string!(locals_without_parens: [field: 2, field: 3, oneof: 2])
-    |> IO.iodata_to_binary()
+    |> format_code()
   end
 
   @doc false
@@ -41,4 +40,21 @@ defmodule Protobuf.Protoc.Generator do
 
   defp syntax("proto3"), do: :proto3
   defp syntax(_), do: :proto2
+
+  def format_code(code) do
+    formated =
+      if Code.ensure_loaded?(Code) && function_exported?(Code, :format_string!, 2) do
+        code
+        |> Code.format_string!(locals_without_parens: [field: 2, field: 3, oneof: 2])
+        |> IO.iodata_to_binary()
+      else
+        code
+      end
+
+    if formated == "" do
+      formated
+    else
+      formated <> "\n"
+    end
+  end
 end
