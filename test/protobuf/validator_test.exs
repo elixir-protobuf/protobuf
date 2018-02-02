@@ -1,4 +1,5 @@
 Code.require_file("../support/test_msg.ex", __DIR__)
+
 defmodule Protobuf.ValidatorTest do
   use ExUnit.Case, async: true
 

@@ -8,27 +8,31 @@ defmodule Protobuf.Encoder.DecodeTypeTest do
   end
 
   test "encode_type/2 min int32" do
-    assert Encoder.encode_type(:int32, -2147483648) == <<128, 128, 128, 128, 248, 255, 255, 255, 255, 1>>
+    assert Encoder.encode_type(:int32, -2_147_483_648) ==
+             <<128, 128, 128, 128, 248, 255, 255, 255, 255, 1>>
   end
 
   test "encode_type/2 min int64" do
-    assert Encoder.encode_type(:int64, -9223372036854775808) == <<128, 128, 128, 128, 128, 128, 128, 128, 128, 1>>
+    assert Encoder.encode_type(:int64, -9_223_372_036_854_775_808) ==
+             <<128, 128, 128, 128, 128, 128, 128, 128, 128, 1>>
   end
 
   test "encode_type/3 min sint32" do
-    assert Encoder.encode_type(:sint32, -2147483648) ==<<255, 255, 255, 255, 15>>
+    assert Encoder.encode_type(:sint32, -2_147_483_648) == <<255, 255, 255, 255, 15>>
   end
 
   test "encode_type/3 max sint32" do
-    assert Encoder.encode_type(:sint32, 2147483647) == <<254, 255, 255, 255, 15>>
+    assert Encoder.encode_type(:sint32, 2_147_483_647) == <<254, 255, 255, 255, 15>>
   end
 
   test "encode_type/3 min sint64" do
-    assert Encoder.encode_type(:sint64, -9223372036854775808) == <<255, 255, 255, 255, 255, 255, 255, 255, 255, 1>>
+    assert Encoder.encode_type(:sint64, -9_223_372_036_854_775_808) ==
+             <<255, 255, 255, 255, 255, 255, 255, 255, 255, 1>>
   end
 
   test "encode_type/3 max sint64" do
-    assert Encoder.encode_type(:sint64, 9223372036854775807)== <<254, 255, 255, 255, 255, 255, 255, 255, 255, 1>>
+    assert Encoder.encode_type(:sint64, 9_223_372_036_854_775_807) ==
+             <<254, 255, 255, 255, 255, 255, 255, 255, 255, 1>>
   end
 
   test "encode_type/3 bool false" do
@@ -40,19 +44,23 @@ defmodule Protobuf.Encoder.DecodeTypeTest do
   end
 
   test "encode_type/3 a fixed64" do
-    assert Encoder.encode_type(:fixed64, 8446744073709551615) == <<255, 255, 23, 118, 251, 220, 56, 117>>
+    assert Encoder.encode_type(:fixed64, 8_446_744_073_709_551_615) ==
+             <<255, 255, 23, 118, 251, 220, 56, 117>>
   end
 
   test "encode_type/3 max fixed64" do
-    assert Encoder.encode_type(:fixed64, 18446744073709551615) == <<255, 255, 255, 255, 255, 255, 255, 255>>
+    assert Encoder.encode_type(:fixed64, 18_446_744_073_709_551_615) ==
+             <<255, 255, 255, 255, 255, 255, 255, 255>>
   end
 
   test "encode_type/3 min sfixed64" do
-    assert Encoder.encode_type(:sfixed64, -9223372036854775808) == <<0, 0, 0, 0, 0, 0, 0, 128>>
+    assert Encoder.encode_type(:sfixed64, -9_223_372_036_854_775_808) ==
+             <<0, 0, 0, 0, 0, 0, 0, 128>>
   end
 
   test "encode_type/3 max sfixed64" do
-    assert Encoder.encode_type(:sfixed64, 9223372036854775807) == <<255, 255, 255, 255, 255, 255, 255, 127>>
+    assert Encoder.encode_type(:sfixed64, 9_223_372_036_854_775_807) ==
+             <<255, 255, 255, 255, 255, 255, 255, 127>>
   end
 
   test "encode_type/3 min double" do
@@ -60,7 +68,8 @@ defmodule Protobuf.Encoder.DecodeTypeTest do
   end
 
   test "encode_type/3 max double" do
-    assert Encoder.encode_type(:double, 1.7976931348623157e308) == <<255, 255, 255, 255, 255, 255, 239, 127>>
+    assert Encoder.encode_type(:double, 1.7976931348623157e308) ==
+             <<255, 255, 255, 255, 255, 255, 239, 127>>
   end
 
   test "encode_type/3 int as double" do
@@ -76,11 +85,11 @@ defmodule Protobuf.Encoder.DecodeTypeTest do
   end
 
   test "encode_type/3 fixed32" do
-    assert Encoder.encode_type(:fixed32, 4294967295) == <<255, 255, 255, 255>>
+    assert Encoder.encode_type(:fixed32, 4_294_967_295) == <<255, 255, 255, 255>>
   end
 
   test "encode_type/3 sfixed32" do
-    assert Encoder.encode_type(:sfixed32, 2147483647) == <<255, 255, 255, 127>>
+    assert Encoder.encode_type(:sfixed32, 2_147_483_647) == <<255, 255, 255, 127>>
   end
 
   test "encode_type/3 float" do

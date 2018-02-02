@@ -36,28 +36,28 @@ defmodule Protobuf.Decoder.DecodeTypeTest do
     {t, rest} = Decoder.decode_varint(<<8, 255, 255, 255, 255, 15>>)
     t = band(t, 7)
     {n, _} = Decoder.decode_type(:sint32, t, rest)
-    assert n == -2147483648
+    assert n == -2_147_483_648
   end
 
   test "decode_type/3 max sint32" do
     {t, rest} = Decoder.decode_varint(<<8, 254, 255, 255, 255, 15>>)
     t = band(t, 7)
     {n, _} = Decoder.decode_type(:sint32, t, rest)
-    assert n == 2147483647
+    assert n == 2_147_483_647
   end
 
   test "decode_type/3 min sint64" do
     {t, rest} = Decoder.decode_varint(<<8, 255, 255, 255, 255, 255, 255, 255, 255, 255, 1>>)
     t = band(t, 7)
     {n, _} = Decoder.decode_type(:sint64, t, rest)
-    assert n == -9223372036854775808
+    assert n == -9_223_372_036_854_775_808
   end
 
   test "decode_type/3 max sint64" do
     {t, rest} = Decoder.decode_varint(<<8, 254, 255, 255, 255, 255, 255, 255, 255, 255, 1>>)
     t = band(t, 7)
     {n, _} = Decoder.decode_type(:sint64, t, rest)
-    assert n == 9223372036854775807
+    assert n == 9_223_372_036_854_775_807
   end
 
   test "decode_type/3 bool false" do
@@ -78,28 +78,28 @@ defmodule Protobuf.Decoder.DecodeTypeTest do
     {t, rest} = Decoder.decode_varint(<<9, 255, 255, 23, 118, 251, 220, 56, 117>>)
     t = band(t, 7)
     {n, _} = Decoder.decode_type(:fixed64, t, rest)
-    assert n == 8446744073709551615
+    assert n == 8_446_744_073_709_551_615
   end
 
   test "decode_type/3 max fixed64" do
     {t, rest} = Decoder.decode_varint(<<9, 255, 255, 255, 255, 255, 255, 255, 255>>)
     t = band(t, 7)
     {n, _} = Decoder.decode_type(:fixed64, t, rest)
-    assert n == 18446744073709551615
+    assert n == 18_446_744_073_709_551_615
   end
 
   test "decode_type/3 min sfixed64" do
     {t, rest} = Decoder.decode_varint(<<9, 0, 0, 0, 0, 0, 0, 0, 128>>)
     t = band(t, 7)
     {n, _} = Decoder.decode_type(:sfixed64, t, rest)
-    assert n == -9223372036854775808
+    assert n == -9_223_372_036_854_775_808
   end
 
   test "decode_type/3 max sfixed64" do
     {t, rest} = Decoder.decode_varint(<<9, 255, 255, 255, 255, 255, 255, 255, 127>>)
     t = band(t, 7)
     {n, _} = Decoder.decode_type(:sfixed64, t, rest)
-    assert n == 9223372036854775807
+    assert n == 9_223_372_036_854_775_807
   end
 
   test "decode_type/3 min double" do
@@ -134,14 +134,14 @@ defmodule Protobuf.Decoder.DecodeTypeTest do
     {t, rest} = Decoder.decode_varint(<<13, 255, 255, 255, 255>>)
     t = band(t, 7)
     {n, _} = Decoder.decode_type(:fixed32, t, rest)
-    assert n == 4294967295
+    assert n == 4_294_967_295
   end
 
   test "decode_type/3 sfixed32" do
     {t, rest} = Decoder.decode_varint(<<13, 255, 255, 255, 127>>)
     t = band(t, 7)
     {n, _} = Decoder.decode_type(:sfixed32, t, rest)
-    assert n == 2147483647
+    assert n == 2_147_483_647
   end
 
   test "decode_type/3 float" do

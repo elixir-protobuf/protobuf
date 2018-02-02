@@ -1,2 +1,2 @@
-ExUnit.configure exclude: [integration: true]
+ExUnit.configure(exclude: [integration: true])
 ExUnit.start()

@@ -39,7 +39,7 @@ end
 * [x] Support default values
 * [x] Validate values
 * [x] Generate typespecs
-* [ ] oneof
+* [x] oneof
 
 ## Usage
 

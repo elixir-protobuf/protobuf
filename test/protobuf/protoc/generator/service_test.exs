@@ -6,14 +6,37 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
 
   test "generate/2 generates services" do
     ctx = %Context{package: "foo"}
-    desc = %Google.Protobuf.ServiceDescriptorProto{name: "ServiceFoo",
+
+    desc = %Google.Protobuf.ServiceDescriptorProto{
+      name: "ServiceFoo",
       method: [
-        %Google.Protobuf.MethodDescriptorProto{name: "MethodA", input_type: "Input0", output_type: "Output0"},
-        %Google.Protobuf.MethodDescriptorProto{name: "MethodB", input_type: "Input1", output_type: "Output1", client_streaming: true},
-        %Google.Protobuf.MethodDescriptorProto{name: "MethodC", input_type: "Input2", output_type: "Output2", server_streaming: true},
-        %Google.Protobuf.MethodDescriptorProto{name: "MethodD", input_type: "Input3", output_type: "Output3", client_streaming: true, server_streaming: true}
+        %Google.Protobuf.MethodDescriptorProto{
+          name: "MethodA",
+          input_type: "Input0",
+          output_type: "Output0"
+        },
+        %Google.Protobuf.MethodDescriptorProto{
+          name: "MethodB",
+          input_type: "Input1",
+          output_type: "Output1",
+          client_streaming: true
+        },
+        %Google.Protobuf.MethodDescriptorProto{
+          name: "MethodC",
+          input_type: "Input2",
+          output_type: "Output2",
+          server_streaming: true
+        },
+        %Google.Protobuf.MethodDescriptorProto{
+          name: "MethodD",
+          input_type: "Input3",
+          output_type: "Output3",
+          client_streaming: true,
+          server_streaming: true
+        }
       ]
     }
+
     msg = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo.ServiceFoo.Service do\n"
     assert msg =~ "use GRPC.Service, name: \"foo.ServiceFoo\"\n"

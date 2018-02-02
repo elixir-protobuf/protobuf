@@ -2,17 +2,27 @@ defmodule My.Test.Request do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-    key:          [integer],
-    hue:          integer,
-    hat:          integer,
-    deadline:     float,
-    somegroup:    any,
-    name_mapping: %{integer => String.t},
-    msg_mapping:  %{integer => My.Test.Reply.t},
-    reset:        integer,
-    get_key:      String.t
-  }
-  defstruct [:key, :hue, :hat, :deadline, :somegroup, :name_mapping, :msg_mapping, :reset, :get_key]
+          key: [integer],
+          hue: integer,
+          hat: integer,
+          deadline: float,
+          somegroup: any,
+          name_mapping: %{integer => String.t()},
+          msg_mapping: %{integer => My.Test.Reply.t()},
+          reset: integer,
+          get_key: String.t()
+        }
+  defstruct [
+    :key,
+    :hue,
+    :hat,
+    :deadline,
+    :somegroup,
+    :name_mapping,
+    :msg_mapping,
+    :reset,
+    :get_key
+  ]
 
   field :key, 1, repeated: true, type: :int64
   field :hue, 3, optional: true, type: My.Test.Request.Color, enum: true
@@ -29,8 +39,8 @@ defmodule My.Test.Request.SomeGroup do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-    group_field: integer
-  }
+          group_field: integer
+        }
   defstruct [:group_field]
 
   field :group_field, 9, optional: true, type: :int32
@@ -40,9 +50,9 @@ defmodule My.Test.Request.NameMappingEntry do
   use Protobuf, map: true, syntax: :proto2
 
   @type t :: %__MODULE__{
-    key:   integer,
-    value: String.t
-  }
+          key: integer,
+          value: String.t()
+        }
   defstruct [:key, :value]
 
   field :key, 1, optional: true, type: :int32
@@ -53,9 +63,9 @@ defmodule My.Test.Request.MsgMappingEntry do
   use Protobuf, map: true, syntax: :proto2
 
   @type t :: %__MODULE__{
-    key:   integer,
-    value: My.Test.Reply.t
-  }
+          key: integer,
+          value: My.Test.Reply.t()
+        }
   defstruct [:key, :value]
 
   field :key, 1, optional: true, type: :sint64
@@ -74,9 +84,9 @@ defmodule My.Test.Reply do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-    found:        [My.Test.Reply.Entry.t],
-    compact_keys: [integer]
-  }
+          found: [My.Test.Reply.Entry.t()],
+          compact_keys: [integer]
+        }
   defstruct [:found, :compact_keys]
 
   field :found, 1, repeated: true, type: My.Test.Reply.Entry
@@ -87,10 +97,10 @@ defmodule My.Test.Reply.Entry do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-    key_that_needs_1234camel_CasIng: integer,
-    value:                           integer,
-    _my_field_name_2:                integer
-  }
+          key_that_needs_1234camel_CasIng: integer,
+          value: integer,
+          _my_field_name_2: integer
+        }
   defstruct [:key_that_needs_1234camel_CasIng, :value, :_my_field_name_2]
 
   field :key_that_needs_1234camel_CasIng, 1, required: true, type: :int64
@@ -109,8 +119,8 @@ defmodule My.Test.OtherBase do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-    name: String.t
-  }
+          name: String.t()
+        }
   defstruct [:name]
 
   field :name, 1, optional: true, type: :string
@@ -120,15 +130,14 @@ defmodule My.Test.ReplyExtensions do
   use Protobuf, syntax: :proto2
 
   defstruct []
-
 end
 
 defmodule My.Test.OtherReplyExtensions do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-    key: integer
-  }
+          key: integer
+        }
   defstruct [:key]
 
   field :key, 1, optional: true, type: :int32
@@ -138,16 +147,15 @@ defmodule My.Test.OldReply do
   use Protobuf, syntax: :proto2
 
   defstruct []
-
 end
 
 defmodule My.Test.Communique do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-    union:       {atom, any},
-    make_me_cry: boolean
-  }
+          union: {atom, any},
+          make_me_cry: boolean
+        }
   defstruct [:union, :make_me_cry]
 
   oneof :union, 0
@@ -168,8 +176,8 @@ defmodule My.Test.Communique.SomeGroup do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-    member: String.t
-  }
+          member: String.t()
+        }
   defstruct [:member]
 
   field :member, 15, optional: true, type: :string
@@ -179,7 +187,6 @@ defmodule My.Test.Communique.Delta do
   use Protobuf, syntax: :proto2
 
   defstruct []
-
 end
 
 defmodule My.Test.HatType do
