@@ -30,4 +30,14 @@ defmodule Protobuf.ValidatorTest do
     assert {:invalid, error} = Protobuf.Validator.valid?(msg)
     assert error =~ ~r/:a of :first is invalid/
   end
+
+  test "int for float field is valid" do
+    msg = TestMsg.Foo.new(d: 9001)
+    assert true = Protobuf.Validator.valid?(msg)
+  end
+
+  test "int for double field is valid" do
+    msg = TestMsg.Foo.new(n: 2991929394939)
+    assert true = Protobuf.Validator.valid?(msg)
+  end
 end

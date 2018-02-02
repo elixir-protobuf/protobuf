@@ -79,8 +79,8 @@ defmodule Protobuf.Validator do
   defp type_valid?(:sfixed32, val) when is_integer(val), do: true
   defp type_valid?(:fixed64, val) when is_integer(val) and val >= 0, do: true
   defp type_valid?(:sfixed64, val) when is_integer(val), do: true
-  defp type_valid?(:float, val) when is_float(val), do: true
-  defp type_valid?(:double, val) when is_float(val), do: true
+  defp type_valid?(:float, val) when is_number(val), do: true
+  defp type_valid?(:double, val) when is_number(val), do: true
   defp type_valid?(:bytes, val) when is_binary(val), do: true
   defp type_valid?(:string, val) when is_binary(val), do: true
   # TODO
