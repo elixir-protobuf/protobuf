@@ -104,12 +104,14 @@ defmodule Google.Protobuf.DescriptorProto.ExtensionRange do
 
   @type t :: %__MODULE__{
           start: integer,
-          end: integer
+          end: integer,
+          options: Google.Protobuf.ExtensionRangeOptions.t()
         }
-  defstruct [:start, :end]
+  defstruct [:start, :end, :options]
 
   field :start, 1, optional: true, type: :int32
   field :end, 2, optional: true, type: :int32
+  field :options, 3, optional: true, type: Google.Protobuf.ExtensionRangeOptions
 end
 
 defmodule Google.Protobuf.DescriptorProto.ReservedRange do
@@ -124,6 +126,18 @@ defmodule Google.Protobuf.DescriptorProto.ReservedRange do
 
   field :start, 1, optional: true, type: :int32
   field :end, 2, optional: true, type: :int32
+end
+
+defmodule Google.Protobuf.ExtensionRangeOptions do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{
+          uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()]
+        }
+  defstruct [:uninterpreted_option]
+
+  field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 end
 
 defmodule Google.Protobuf.FieldDescriptorProto do
@@ -221,13 +235,35 @@ defmodule Google.Protobuf.EnumDescriptorProto do
   @type t :: %__MODULE__{
           name: String.t(),
           value: [Google.Protobuf.EnumValueDescriptorProto.t()],
-          options: Google.Protobuf.EnumOptions.t()
+          options: Google.Protobuf.EnumOptions.t(),
+          reserved_range: [Google.Protobuf.EnumDescriptorProto.EnumReservedRange.t()],
+          reserved_name: [String.t()]
         }
-  defstruct [:name, :value, :options]
+  defstruct [:name, :value, :options, :reserved_range, :reserved_name]
 
   field :name, 1, optional: true, type: :string
   field :value, 2, repeated: true, type: Google.Protobuf.EnumValueDescriptorProto
   field :options, 3, optional: true, type: Google.Protobuf.EnumOptions
+
+  field :reserved_range, 4,
+    repeated: true,
+    type: Google.Protobuf.EnumDescriptorProto.EnumReservedRange
+
+  field :reserved_name, 5, repeated: true, type: :string
+end
+
+defmodule Google.Protobuf.EnumDescriptorProto.EnumReservedRange do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{
+          start: integer,
+          end: integer
+        }
+  defstruct [:start, :end]
+
+  field :start, 1, optional: true, type: :int32
+  field :end, 2, optional: true, type: :int32
 end
 
 defmodule Google.Protobuf.EnumValueDescriptorProto do
@@ -299,11 +335,14 @@ defmodule Google.Protobuf.FileOptions do
           cc_generic_services: boolean,
           java_generic_services: boolean,
           py_generic_services: boolean,
+          php_generic_services: boolean,
           deprecated: boolean,
           cc_enable_arenas: boolean,
           objc_class_prefix: String.t(),
           csharp_namespace: String.t(),
           swift_prefix: String.t(),
+          php_class_prefix: String.t(),
+          php_namespace: String.t(),
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()]
         }
   defstruct [
@@ -317,11 +356,14 @@ defmodule Google.Protobuf.FileOptions do
     :cc_generic_services,
     :java_generic_services,
     :py_generic_services,
+    :php_generic_services,
     :deprecated,
     :cc_enable_arenas,
     :objc_class_prefix,
     :csharp_namespace,
     :swift_prefix,
+    :php_class_prefix,
+    :php_namespace,
     :uninterpreted_option
   ]
 
@@ -341,11 +383,14 @@ defmodule Google.Protobuf.FileOptions do
   field :cc_generic_services, 16, optional: true, type: :bool, default: false
   field :java_generic_services, 17, optional: true, type: :bool, default: false
   field :py_generic_services, 18, optional: true, type: :bool, default: false
+  field :php_generic_services, 42, optional: true, type: :bool, default: false
   field :deprecated, 23, optional: true, type: :bool, default: false
   field :cc_enable_arenas, 31, optional: true, type: :bool, default: false
   field :objc_class_prefix, 36, optional: true, type: :string
   field :csharp_namespace, 37, optional: true, type: :string
   field :swift_prefix, 39, optional: true, type: :string
+  field :php_class_prefix, 40, optional: true, type: :string
+  field :php_namespace, 41, optional: true, type: :string
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 end
 
