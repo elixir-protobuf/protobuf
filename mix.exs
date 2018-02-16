@@ -1,7 +1,7 @@
 defmodule Protobuf.Mixfile do
   use Mix.Project
 
-  @version "0.5.1"
+  @version "0.5.2"
 
   def project do
     [
@@ -57,7 +57,7 @@ defmodule Protobuf.Mixfile do
       maintainers: ["Tony Han"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/tony612/protobuf-elixir"},
-      files: ~w(mix.exs README.md lib config LICENSE priv/templates)
+      files: ~w(mix.exs README.md lib config LICENSE priv/templates .formatter.exs)
     ]
   end
 
