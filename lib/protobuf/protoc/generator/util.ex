@@ -8,6 +8,7 @@ defmodule Protobuf.Protoc.Generator.Util do
   end
 
   def attach_pkg(name, ""), do: name
+  def attach_pkg(name, nil), do: name
   def attach_pkg(name, pkg), do: normalize_pkg_name(pkg) <> "." <> name
 
   def options_to_str(opts) do
