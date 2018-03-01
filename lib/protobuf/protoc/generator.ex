@@ -45,7 +45,7 @@ defmodule Protobuf.Protoc.Generator do
     formated =
       if Code.ensure_loaded?(Code) && function_exported?(Code, :format_string!, 2) do
         code
-        |> Code.format_string!(locals_without_parens: [field: 2, field: 3, oneof: 2])
+        |> Code.format_string!(locals_without_parens: [field: 2, field: 3, oneof: 2, rpc: 3])
         |> IO.iodata_to_binary()
       else
         code
