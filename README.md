@@ -24,7 +24,7 @@ by adding `protobuf` to your list of dependencies in `mix.exs`:
 def deps do
   [
     {:protobuf, "~> 0.3.1"},
-    {:google_protobuf, "~> 0.1"}
+    {:google_protos, "~> 0.1"}
   ]
 end
 ```
