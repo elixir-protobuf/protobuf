@@ -17,13 +17,14 @@ It has some must-have and other cool features like:
 
 ## Installation
 
-The package can be installed
-by adding `protobuf` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `protobuf` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:protobuf, "~> 0.3.1"},
+    {:protobuf, "~> 0.5.3"},
+    # Only for files generated from Google's protos.
+    # Can be ignored if you don't use Google's protos.
     {:google_protos, "~> 0.1"}
   ]
 end
