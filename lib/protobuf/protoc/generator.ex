@@ -17,7 +17,7 @@ defmodule Protobuf.Protoc.Generator do
   end
 
   def generate_content(ctx, desc) do
-    ctx = %{ctx | package: desc.package, syntax: syntax(desc.syntax)}
+    ctx = %{ctx | package: desc.package || "", syntax: syntax(desc.syntax)}
     ctx = %{ctx | dep_pkgs: get_dep_pkgs(ctx, desc.dependency)}
 
     list =

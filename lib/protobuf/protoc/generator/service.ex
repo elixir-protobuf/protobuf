@@ -11,7 +11,7 @@ defmodule Protobuf.Protoc.Generator.Service do
 
   def generate(ctx, desc) do
     mod_name = desc.name |> Macro.camelize() |> Util.attach_pkg(ctx.package)
-    name = "#{ctx.package}.#{desc.name}"
+    name = Util.attach_raw_pkg(desc.name, ctx.package)
     methods = Enum.map(desc.method, fn m -> generate_service_method(ctx, m) end)
     Protobuf.Protoc.Template.service(mod_name, name, methods)
   end

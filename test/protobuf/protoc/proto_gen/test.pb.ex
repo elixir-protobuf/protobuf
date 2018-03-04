@@ -1,4 +1,5 @@
 defmodule My.Test.Request do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
@@ -36,6 +37,7 @@ defmodule My.Test.Request do
 end
 
 defmodule My.Test.Request.SomeGroup do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
@@ -47,6 +49,7 @@ defmodule My.Test.Request.SomeGroup do
 end
 
 defmodule My.Test.Request.NameMappingEntry do
+  @moduledoc false
   use Protobuf, map: true, syntax: :proto2
 
   @type t :: %__MODULE__{
@@ -60,6 +63,7 @@ defmodule My.Test.Request.NameMappingEntry do
 end
 
 defmodule My.Test.Request.MsgMappingEntry do
+  @moduledoc false
   use Protobuf, map: true, syntax: :proto2
 
   @type t :: %__MODULE__{
@@ -73,6 +77,7 @@ defmodule My.Test.Request.MsgMappingEntry do
 end
 
 defmodule My.Test.Request.Color do
+  @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
   field :RED, 0
@@ -81,6 +86,7 @@ defmodule My.Test.Request.Color do
 end
 
 defmodule My.Test.Reply do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
@@ -94,6 +100,7 @@ defmodule My.Test.Reply do
 end
 
 defmodule My.Test.Reply.Entry do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
@@ -109,6 +116,7 @@ defmodule My.Test.Reply.Entry do
 end
 
 defmodule My.Test.Reply.Entry.Game do
+  @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
   field :FOOTBALL, 1
@@ -116,6 +124,7 @@ defmodule My.Test.Reply.Entry.Game do
 end
 
 defmodule My.Test.OtherBase do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
@@ -127,12 +136,14 @@ defmodule My.Test.OtherBase do
 end
 
 defmodule My.Test.ReplyExtensions do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   defstruct []
 end
 
 defmodule My.Test.OtherReplyExtensions do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
@@ -144,12 +155,14 @@ defmodule My.Test.OtherReplyExtensions do
 end
 
 defmodule My.Test.OldReply do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   defstruct []
 end
 
 defmodule My.Test.Communique do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
@@ -173,6 +186,7 @@ defmodule My.Test.Communique do
 end
 
 defmodule My.Test.Communique.SomeGroup do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
@@ -184,12 +198,14 @@ defmodule My.Test.Communique.SomeGroup do
 end
 
 defmodule My.Test.Communique.Delta do
+  @moduledoc false
   use Protobuf, syntax: :proto2
 
   defstruct []
 end
 
 defmodule My.Test.HatType do
+  @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
   field :FEDORA, 1
@@ -197,6 +213,7 @@ defmodule My.Test.HatType do
 end
 
 defmodule My.Test.Days do
+  @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
   field :MONDAY, 1

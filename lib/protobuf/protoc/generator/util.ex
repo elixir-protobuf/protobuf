@@ -11,6 +11,10 @@ defmodule Protobuf.Protoc.Generator.Util do
   def attach_pkg(name, nil), do: name
   def attach_pkg(name, pkg), do: normalize_pkg_name(pkg) <> "." <> name
 
+  def attach_raw_pkg(name, ""), do: name
+  def attach_raw_pkg(name, nil), do: name
+  def attach_raw_pkg(name, pkg), do: pkg <> "." <> name
+
   def options_to_str(opts) do
     opts
     |> Enum.filter(fn {_, v} -> v end)

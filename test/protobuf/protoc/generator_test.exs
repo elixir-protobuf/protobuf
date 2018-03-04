@@ -15,7 +15,7 @@ defmodule Protobuf.Protoc.GeneratorTest do
   end
 
   test "get_dep_pkgs/2 sort pkgs by length" do
-    ctx = %Context{pkg_mapping: %{"foo.proto" => "foo", "foo_bar.proto" => "foo.bar"}}
-    assert Generator.get_dep_pkgs(ctx, ["foo.proto", "foo_bar.proto"]) == ["foo.bar", "foo"]
+    ctx = %Context{pkg_mapping: %{"foo.proto" => "foo", "foo_bar.proto" => "foo.bar", "no_pkg.proto" => ""}}
+    assert Generator.get_dep_pkgs(ctx, ["foo.proto", "foo_bar.proto", "no_pkg.proto"]) == ["foo.bar", "foo", ""]
   end
 end

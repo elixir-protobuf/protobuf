@@ -39,6 +39,6 @@ defmodule Protobuf.Protoc.CLI do
   defp find_package_names(ctx, [], acc), do: %{ctx | pkg_mapping: acc}
 
   defp find_package_names(ctx, [desc | t], acc) do
-    find_package_names(ctx, t, Map.put(acc, desc.name, desc.package))
+    find_package_names(ctx, t, Map.put(acc, desc.name, desc.package || ""))
   end
 end
