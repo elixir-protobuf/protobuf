@@ -27,6 +27,7 @@ defmodule Protobuf.Encoder do
       val = if prop.oneof, do: oneofs[prop.name_atom], else: val
 
       cond do
+        prop.oneof && val != nil -> [encode_field(class_field(prop), val, prop) | acc]
         syntax == :proto2 && (val == nil || val == [] || val == %{}) -> acc
         syntax == :proto3 && empty_val?(val) -> acc
         true -> [encode_field(class_field(prop), val, prop) | acc]

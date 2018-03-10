@@ -126,4 +126,12 @@ defmodule Protobuf.DecoderTest do
              TestMsg.Oneof
            ) == %TestMsg.Oneof{first: {:b, "abc"}, second: {:c, 123}, other: "other"}
   end
+
+  test "oneof only sets oneof fields for zero values" do
+    assert Decoder.decode(<<8, 0, 34, 0>>, TestMsg.Oneof) ==
+             TestMsg.Oneof.new(first: {:a, 0}, second: {:d, ""})
+
+    assert Decoder.decode(<<18, 0, 24, 0>>, TestMsg.Oneof) ==
+             TestMsg.Oneof.new(first: {:b, ""}, second: {:c, 0})
+  end
 end

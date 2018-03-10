@@ -37,7 +37,7 @@ defmodule Protobuf.ValidatorTest do
   end
 
   test "int for double field is valid" do
-    msg = TestMsg.Foo.new(n: 2991929394939)
+    msg = TestMsg.Foo.new(n: 2_991_929_394_939)
     assert true = Protobuf.Validator.valid?(msg)
   end
 end
