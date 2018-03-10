@@ -125,4 +125,11 @@ defmodule Protobuf.EncoderTest do
     msg = %TestMsg.Oneof{first: {:b, "abc"}, second: {:c, 123}, other: "other"}
     assert Encoder.encode(msg) == <<18, 3, 97, 98, 99, 24, 123, 42, 5, 111, 116, 104, 101, 114>>
   end
+
+  test "encodes oneof fields zero values" do
+    msg = TestMsg.Oneof.new(first: {:a, 0}, second: {:d, ""})
+    assert Encoder.encode(msg) == <<8, 0, 34, 0>>
+    msg = TestMsg.Oneof.new(first: {:b, ""}, second: {:c, 0})
+    assert Encoder.encode(msg) == <<18, 0, 24, 0>>
+  end
 end

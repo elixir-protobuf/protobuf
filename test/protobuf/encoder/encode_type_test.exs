@@ -73,7 +73,8 @@ defmodule Protobuf.Encoder.DecodeTypeTest do
   end
 
   test "encode_type/3 int as double" do
-    assert Encoder.encode_type(:double, -9223372036854775808) == <<0, 0, 0, 0, 0, 0, 224, 195>>
+    assert Encoder.encode_type(:double, -9_223_372_036_854_775_808) ==
+             <<0, 0, 0, 0, 0, 0, 224, 195>>
   end
 
   test "encode_type/3 string" do
