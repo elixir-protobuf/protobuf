@@ -115,6 +115,12 @@ $ protoc --elixir_out=./lib --plugin=./protoc-gen-elixir *.proto
 $ protoc -I protos --elixir_out=./lib protos/hello.proto
 ```
 
+## Sponsors
+
+This project is being sponsored by [Tubi](https://tubitv.com/). Thank you!
+
+<img src="https://user-images.githubusercontent.com/1253659/37473536-4db44048-28a9-11e8-90d5-f8a2f5a8d53c.jpg" height="80">
+
 ## Acknowledgements
 
 Many thanks to [gpb](https://github.com/tomas-abrahamsson/gpb) and
