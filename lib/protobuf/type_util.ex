@@ -35,5 +35,5 @@ defmodule Protobuf.TypeUtil do
   def str_to_spec(18), do: "integer"
   def str_to_spec(14), do: "integer"
   def str_to_spec(_), do: "any"
-  def str_to_spec(11, type), do: "#{type}.t"
+  def str_to_spec(11, type), do: "#{type}.t | nil"
 end

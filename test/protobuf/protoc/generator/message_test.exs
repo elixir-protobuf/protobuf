@@ -186,7 +186,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     [msg, _] = Generator.generate(ctx, desc)
-    assert msg =~ "a: %{integer => FooBar.AbCd.Bar.t}"
+    assert msg =~ "a: %{integer => FooBar.AbCd.Bar.t | nil}"
     assert msg =~ "field :a, 1, repeated: true, type: FooBar.AbCd.Foo.ProjectsEntry, map: true\n"
   end
 
