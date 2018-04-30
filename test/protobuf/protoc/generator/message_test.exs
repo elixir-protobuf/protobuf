@@ -146,6 +146,35 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "field :a, 1, optional: true, type: :int32, deprecated: true\n"
   end
 
+  test "generete/2 supports message type field" do
+    ctx = %Context{package: ""}
+
+    desc =
+      Google.Protobuf.DescriptorProto.new(
+        name: "Foo",
+        field: [
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "bar",
+            number: 1,
+            type: 11,
+            label: 1,
+            type_name: "Bar"
+          ),
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "baz",
+            number: 1,
+            type: 11,
+            label: 3,
+            type_name: "Baz"
+          )
+        ]
+      )
+
+    [msg] = Generator.generate(ctx, desc)
+    assert msg =~ "bar: Bar.t | nil"
+    assert msg =~ "baz: [Baz.t]"
+  end
+
   test "generate/2 supports map field" do
     ctx = %Context{package: "foo_bar.ab_cd"}
 
