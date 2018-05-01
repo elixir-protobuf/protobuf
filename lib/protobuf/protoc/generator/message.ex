@@ -120,15 +120,17 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp fmt_type(%{label: "repeated", type_num: type_num, type: type}) do
-    "[#{type_to_spec(type_num, type)}]"
+    "[#{type_to_spec(type_num, type, true)}]"
   end
 
   defp fmt_type(%{type_num: type_num, type: type}) do
     "#{type_to_spec(type_num, type)}"
   end
 
-  defp type_to_spec(11, type), do: TypeUtil.str_to_spec(11, type)
-  defp type_to_spec(num, _), do: TypeUtil.str_to_spec(num)
+  defp type_to_spec(num, type, repeated \\ false)
+  defp type_to_spec(11, type, true), do: TypeUtil.str_to_spec(11, type, true)
+  defp type_to_spec(11, type, false), do: TypeUtil.str_to_spec(11, type, false)
+  defp type_to_spec(num, _, _), do: TypeUtil.str_to_spec(num)
 
   def get_fields(ctx, desc) do
     oneofs = Enum.map(desc.oneof_decl, & &1.name)
