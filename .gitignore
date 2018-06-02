@@ -24,3 +24,5 @@ protoc-gen-elixir
 # QuickCheck artifacts
 .eqc-info
 *.eqc
+
+.elixir_ls

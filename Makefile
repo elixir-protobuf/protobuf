@@ -1,9 +1,15 @@
-gen_google_proto: build_protoc_plugin
-	protoc -I lib/google/protobuf/ --elixir_out=lib/google/protobuf/ --plugin=./protoc-gen-elixir lib/google/protobuf/descriptor.proto
-	protoc -I lib/google/protobuf/ --elixir_out=lib/google/protobuf/ --plugin=./protoc-gen-elixir lib/google/protobuf/plugin.proto
+ndef = $(if $(value $(1)),,$(error $(1) not set))
 
-build_protoc_plugin:
+# PROTO_LIB should be your local path to https://github.com/google/protobuf/tree/master/src/google/protobuf
+gen_google_proto: protoc-gen-elixir
+	$(call ndef,PROTO_LIB)
+	protoc -I $(PROTO_LIB) --elixir_out=lib/google --plugin=./protoc-gen-elixir $(PROTO_LIB)/descriptor.proto
+	protoc -I $(PROTO_LIB) --elixir_out=lib/google --plugin=./protoc-gen-elixir $(PROTO_LIB)/compiler/plugin.proto
+
+protoc-gen-elixir:
 	mix escript.build .
 
 clean:
 	rm protoc-gen-elixir
+
+.PHONY: clean gen_google_proto

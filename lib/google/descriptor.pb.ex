@@ -343,6 +343,8 @@ defmodule Google.Protobuf.FileOptions do
           swift_prefix: String.t(),
           php_class_prefix: String.t(),
           php_namespace: String.t(),
+          php_metadata_namespace: String.t(),
+          ruby_package: String.t(),
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()]
         }
   defstruct [
@@ -364,6 +366,8 @@ defmodule Google.Protobuf.FileOptions do
     :swift_prefix,
     :php_class_prefix,
     :php_namespace,
+    :php_metadata_namespace,
+    :ruby_package,
     :uninterpreted_option
   ]
 
@@ -391,6 +395,8 @@ defmodule Google.Protobuf.FileOptions do
   field :swift_prefix, 39, optional: true, type: :string
   field :php_class_prefix, 40, optional: true, type: :string
   field :php_namespace, 41, optional: true, type: :string
+  field :php_metadata_namespace, 44, optional: true, type: :string
+  field :ruby_package, 45, optional: true, type: :string
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 end
 
