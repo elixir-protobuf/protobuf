@@ -24,7 +24,7 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorRequest do
           file_to_generate: [String.t()],
           parameter: String.t(),
           proto_file: [Google.Protobuf.FileDescriptorProto.t()],
-          compiler_version: Google.Protobuf.Compiler.Version.t()
+          compiler_version: Google.Protobuf.Compiler.Version.t() | nil
         }
   defstruct [:file_to_generate, :parameter, :proto_file, :compiler_version]
 

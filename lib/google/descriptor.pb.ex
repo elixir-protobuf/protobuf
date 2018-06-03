@@ -24,8 +24,8 @@ defmodule Google.Protobuf.FileDescriptorProto do
           enum_type: [Google.Protobuf.EnumDescriptorProto.t()],
           service: [Google.Protobuf.ServiceDescriptorProto.t()],
           extension: [Google.Protobuf.FieldDescriptorProto.t()],
-          options: Google.Protobuf.FileOptions.t(),
-          source_code_info: Google.Protobuf.SourceCodeInfo.t(),
+          options: Google.Protobuf.FileOptions.t() | nil,
+          source_code_info: Google.Protobuf.SourceCodeInfo.t() | nil,
           syntax: String.t()
         }
   defstruct [
@@ -69,7 +69,7 @@ defmodule Google.Protobuf.DescriptorProto do
           enum_type: [Google.Protobuf.EnumDescriptorProto.t()],
           extension_range: [Google.Protobuf.DescriptorProto.ExtensionRange.t()],
           oneof_decl: [Google.Protobuf.OneofDescriptorProto.t()],
-          options: Google.Protobuf.MessageOptions.t(),
+          options: Google.Protobuf.MessageOptions.t() | nil,
           reserved_range: [Google.Protobuf.DescriptorProto.ReservedRange.t()],
           reserved_name: [String.t()]
         }
@@ -105,7 +105,7 @@ defmodule Google.Protobuf.DescriptorProto.ExtensionRange do
   @type t :: %__MODULE__{
           start: integer,
           end: integer,
-          options: Google.Protobuf.ExtensionRangeOptions.t()
+          options: Google.Protobuf.ExtensionRangeOptions.t() | nil
         }
   defstruct [:start, :end, :options]
 
@@ -154,7 +154,7 @@ defmodule Google.Protobuf.FieldDescriptorProto do
           default_value: String.t(),
           oneof_index: integer,
           json_name: String.t(),
-          options: Google.Protobuf.FieldOptions.t()
+          options: Google.Protobuf.FieldOptions.t() | nil
         }
   defstruct [
     :name,
@@ -220,7 +220,7 @@ defmodule Google.Protobuf.OneofDescriptorProto do
 
   @type t :: %__MODULE__{
           name: String.t(),
-          options: Google.Protobuf.OneofOptions.t()
+          options: Google.Protobuf.OneofOptions.t() | nil
         }
   defstruct [:name, :options]
 
@@ -235,7 +235,7 @@ defmodule Google.Protobuf.EnumDescriptorProto do
   @type t :: %__MODULE__{
           name: String.t(),
           value: [Google.Protobuf.EnumValueDescriptorProto.t()],
-          options: Google.Protobuf.EnumOptions.t(),
+          options: Google.Protobuf.EnumOptions.t() | nil,
           reserved_range: [Google.Protobuf.EnumDescriptorProto.EnumReservedRange.t()],
           reserved_name: [String.t()]
         }
@@ -273,7 +273,7 @@ defmodule Google.Protobuf.EnumValueDescriptorProto do
   @type t :: %__MODULE__{
           name: String.t(),
           number: integer,
-          options: Google.Protobuf.EnumValueOptions.t()
+          options: Google.Protobuf.EnumValueOptions.t() | nil
         }
   defstruct [:name, :number, :options]
 
@@ -289,7 +289,7 @@ defmodule Google.Protobuf.ServiceDescriptorProto do
   @type t :: %__MODULE__{
           name: String.t(),
           method: [Google.Protobuf.MethodDescriptorProto.t()],
-          options: Google.Protobuf.ServiceOptions.t()
+          options: Google.Protobuf.ServiceOptions.t() | nil
         }
   defstruct [:name, :method, :options]
 
@@ -306,7 +306,7 @@ defmodule Google.Protobuf.MethodDescriptorProto do
           name: String.t(),
           input_type: String.t(),
           output_type: String.t(),
-          options: Google.Protobuf.MethodOptions.t(),
+          options: Google.Protobuf.MethodOptions.t() | nil,
           client_streaming: boolean,
           server_streaming: boolean
         }
@@ -345,7 +345,6 @@ defmodule Google.Protobuf.FileOptions do
           php_namespace: String.t(),
           php_metadata_namespace: String.t(),
           ruby_package: String.t(),
-          elixir_module_prefix: String.t(),
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()]
         }
   defstruct [
