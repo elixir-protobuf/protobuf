@@ -21,7 +21,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generate/2 has right name with package" do
-    ctx = %Context{package: "pkg.name"}
+    ctx = %Context{package: "pkg.name", module_prefix: "Pkg.Name"}
     desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
     [msg] = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Pkg.Name.Foo do\n"
@@ -147,7 +147,13 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generete/2 supports message type field" do
-    ctx = %Context{package: ""}
+    ctx = %Context{
+      package: "",
+      dep_type_mapping: %{
+        ".Bar" => %{type_name: "Bar"},
+        ".Baz" => %{type_name: "Baz"}
+      }
+    }
 
     desc =
       Google.Protobuf.DescriptorProto.new(
@@ -158,14 +164,14 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
             number: 1,
             type: 11,
             label: 1,
-            type_name: "Bar"
+            type_name: ".Bar"
           ),
           Google.Protobuf.FieldDescriptorProto.new(
             name: "baz",
             number: 1,
             type: 11,
             label: 3,
-            type_name: "Baz"
+            type_name: ".Baz"
           )
         ]
       )
@@ -176,7 +182,14 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generate/2 supports map field" do
-    ctx = %Context{package: "foo_bar.ab_cd"}
+    ctx = %Context{
+      package: "foo_bar.ab_cd",
+      dep_type_mapping: %{
+        ".foo_bar.ab_cd.Foo.ProjectsEntry" => %{type_name: "FooBar.AbCd.Foo.ProjectsEntry"},
+        ".foo_bar.ab_cd.Bar" => %{type_name: "FooBar.AbCd.Bar"}
+      },
+      module_prefix: "FooBar.AbCd"
+    }
 
     desc =
       Google.Protobuf.DescriptorProto.new(
@@ -199,8 +212,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
                 name: "key",
                 number: 1,
                 label: 1,
-                type: 5,
-                type_name: "int32"
+                type: 5
               ),
               Google.Protobuf.FieldDescriptorProto.new(
                 name: "value",
@@ -220,7 +232,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generate/2 supports enum field" do
-    ctx = %Context{package: "foo_bar.ab_cd"}
+    ctx = %Context{
+      package: "foo_bar.ab_cd",
+      dep_type_mapping: %{
+        ".foo_bar.ab_cd.EnumFoo" => %{type_name: "FooBar.AbCd.EnumFoo"}
+      }
+    }
 
     desc =
       Google.Protobuf.DescriptorProto.new(
@@ -242,7 +259,10 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generate/2 generate right enum type name with different package" do
-    ctx = %Context{package: "foo_bar.ab_cd", dep_pkgs: ["other_pkg"]}
+    ctx = %Context{
+      package: "foo_bar.ab_cd",
+      dep_type_mapping: %{".other_pkg.EnumFoo" => %{type_name: "OtherPkg.EnumFoo"}}
+    }
 
     desc =
       Google.Protobuf.DescriptorProto.new(
@@ -263,7 +283,10 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generate/2 generate right message type name with different package" do
-    ctx = %Context{package: "foo_bar.ab_cd", dep_pkgs: ["other_pkg"]}
+    ctx = %Context{
+      package: "foo_bar.ab_cd",
+      dep_type_mapping: %{".other_pkg.MsgFoo" => %{type_name: "OtherPkg.MsgFoo"}}
+    }
 
     desc =
       Google.Protobuf.DescriptorProto.new(
@@ -282,27 +305,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     [msg] = Generator.generate(ctx, desc)
     assert msg =~ "a: OtherPkg.MsgFoo.t"
     assert msg =~ "field :a, 1, optional: true, type: OtherPkg.MsgFoo\n"
-  end
-
-  test "generate/2 use longest package name for type" do
-    ctx = %Context{package: "foo_bar.ab_cd", dep_pkgs: ["foo.bar", "foo"]}
-
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            number: 1,
-            type: 14,
-            label: 1,
-            type_name: ".foo.bar.EnumFoo"
-          )
-        ]
-      )
-
-    [msg] = Generator.generate(ctx, desc)
-    assert msg =~ "field :a, 1, optional: true, type: Foo.Bar.EnumFoo, enum: true\n"
   end
 
   test "generate/2 supports nested messages" do

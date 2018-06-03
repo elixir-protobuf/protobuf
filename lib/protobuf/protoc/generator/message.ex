@@ -146,14 +146,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     opts =
       if length(oneofs) > 0 && f.oneof_index, do: Map.put(opts, :oneof, f.oneof_index), else: opts
 
-    type = TypeUtil.number_to_atom(f.type)
-
-    type =
-      if f.type_name && (type == :enum || type == :message) do
-        Util.type_from_type_name(ctx, f.type_name)
-      else
-        ":#{type}"
-      end
+    type = field_type_name(ctx, f)
 
     %{
       name: f.name,
@@ -167,6 +160,16 @@ defmodule Protobuf.Protoc.Generator.Message do
     }
   end
 
+  defp field_type_name(ctx, f) do
+    type = TypeUtil.number_to_atom(f.type)
+
+    if f.type_name && (type == :enum || type == :message) do
+      Util.type_from_type_name(ctx, f.type_name)
+    else
+      ":#{type}"
+    end
+  end
+
   # Map of protobuf are actually nested(one level) messages
   defp nested_maps(ctx, desc) do
     full_name = Util.join_name([ctx.package | ctx.namespace] ++ [desc.name])
@@ -177,9 +180,7 @@ defmodule Protobuf.Protoc.Generator.Message do
         desc.options && desc.options.map_entry ->
           [k, v] = Enum.sort(desc.field, &(&1.number < &2.number))
 
-          pair =
-            {{k.type, Util.type_from_type_name(ctx, k.type_name)},
-             {v.type, Util.type_from_type_name(ctx, k.type_name)}}
+          pair = {{k.type, field_type_name(ctx, k)}, {v.type, field_type_name(ctx, v)}}
 
           Map.put(acc, Util.join_name([prefix, desc.name]), pair)
 

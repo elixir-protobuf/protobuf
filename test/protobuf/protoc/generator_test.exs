@@ -4,7 +4,7 @@ defmodule Protobuf.Protoc.GeneratorTest do
   alias Protobuf.Protoc.{Generator, Context}
 
   test "generate/2 works" do
-    ctx = %Context{}
+    ctx = %Context{global_type_mapping: %{"name.proto" => %{}}}
     desc = Google.Protobuf.FileDescriptorProto.new(name: "name.proto")
 
     assert Generator.generate(ctx, desc) ==
@@ -12,17 +12,5 @@ defmodule Protobuf.Protoc.GeneratorTest do
                name: "name.pb.ex",
                content: ""
              )
-  end
-
-  test "get_dep_pkgs/2 sort pkgs by length" do
-    ctx = %Context{
-      pkg_mapping: %{"foo.proto" => "foo", "foo_bar.proto" => "foo.bar", "no_pkg.proto" => ""}
-    }
-
-    assert Generator.get_dep_pkgs(ctx, ["foo.proto", "foo_bar.proto", "no_pkg.proto"]) == [
-             "foo.bar",
-             "foo",
-             ""
-           ]
   end
 end

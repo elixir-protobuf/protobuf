@@ -3,15 +3,15 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
 
   import Protobuf.Protoc.Generator.Util
 
-  test "attach_pkg can handle nil package" do
-    assert attach_pkg("name", nil) == "name"
+  test "mod_name can handle nil prefix" do
+    assert mod_name(%{module_prefix: nil}, ["Foo", "Bar"]) == "Foo.Bar"
   end
 
-  test "attach_pkg can handle empty package" do
-    assert attach_pkg("name", "") == "name"
+  test "mod_name can handle empty package" do
+    assert mod_name(%{module_prefix: ""}, ["Foo", "Bar"]) == "Foo.Bar"
   end
 
-  test "attach_pkg normolizes package name" do
-    assert attach_pkg("Name", "foo.bar") == "Foo.Bar.Name"
+  test "mod_name returns right name" do
+    assert mod_name(%{module_prefix: "custom.prefix"}, ["Foo", "Bar"]) == "Custom.Prefix.Foo.Bar"
   end
 end

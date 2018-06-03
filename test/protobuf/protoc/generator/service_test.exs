@@ -5,32 +5,45 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
   alias Protobuf.Protoc.Generator.Service, as: Generator
 
   test "generate/2 generates services" do
-    ctx = %Context{package: "foo"}
+    ctx = %Context{
+      package: "foo",
+      dep_type_mapping: %{
+        ".foo.Input0" => %{type_name: "Foo.Input0"},
+        ".foo.Input1" => %{type_name: "Foo.Input1"},
+        ".foo.Input2" => %{type_name: "Foo.Input2"},
+        ".foo.Input3" => %{type_name: "Foo.Input3"},
+        ".foo.Output0" => %{type_name: "Foo.Output0"},
+        ".foo.Output1" => %{type_name: "Foo.Output1"},
+        ".foo.Output2" => %{type_name: "Foo.Output2"},
+        ".foo.Output3" => %{type_name: "Foo.Output3"}
+      },
+      module_prefix: "Foo"
+    }
 
     desc = %Google.Protobuf.ServiceDescriptorProto{
       name: "ServiceFoo",
       method: [
         %Google.Protobuf.MethodDescriptorProto{
           name: "MethodA",
-          input_type: "Input0",
-          output_type: "Output0"
+          input_type: ".foo.Input0",
+          output_type: ".foo.Output0"
         },
         %Google.Protobuf.MethodDescriptorProto{
           name: "MethodB",
-          input_type: "Input1",
-          output_type: "Output1",
+          input_type: ".foo.Input1",
+          output_type: ".foo.Output1",
           client_streaming: true
         },
         %Google.Protobuf.MethodDescriptorProto{
           name: "MethodC",
-          input_type: "Input2",
-          output_type: "Output2",
+          input_type: ".foo.Input2",
+          output_type: ".foo.Output2",
           server_streaming: true
         },
         %Google.Protobuf.MethodDescriptorProto{
           name: "MethodD",
-          input_type: "Input3",
-          output_type: "Output3",
+          input_type: ".foo.Input3",
+          output_type: ".foo.Output3",
           client_streaming: true,
           server_streaming: true
         }
