@@ -57,7 +57,7 @@ defmodule Protobuf.Mixfile do
       maintainers: ["Bing Han"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/tony612/protobuf-elixir"},
-      files: ~w(mix.exs README.md lib config LICENSE priv/templates .formatter.exs)
+      files: ~w(mix.exs README.md lib src config LICENSE priv/templates .formatter.exs)
     ]
   end
 

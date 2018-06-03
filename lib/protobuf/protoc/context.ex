@@ -1,16 +1,22 @@
 defmodule Protobuf.Protoc.Context do
+  # Plugins passed by options
   defstruct plugins: [],
-            # For all files
-            # Plugins passed by options
-            # Mapping from file name to package name
-            pkg_mapping: %{},
 
-            # For a file
+            # All files scope
+
+            # Mapping from file name to (mapping from type name to metadata, like elixir type name)
+            # %{"example.proto" => %{".example.FooMsg" => %{type_name: "Example.FooMsg"}}}
+            global_type_mapping: %{},
+
+            # A file scope
+
             # Package name
             package: nil,
-            # Package names a file dependents on, sorting by length of names decreasingly
-            dep_pkgs: [],
+            module_prefix: nil,
             syntax: nil,
+            # Mapping from type_name to metadata. It's merged type mapping of dependencies files including itself
+            # %{".example.FooMsg" => %{type_name: "Example.FooMsg"}}
+            dep_type_mapping: %{},
 
             # For a message
             # Nested namespace when generating nested messages. It should be joined to get the full namespace

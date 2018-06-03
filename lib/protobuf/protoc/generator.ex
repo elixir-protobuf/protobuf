@@ -17,8 +17,14 @@ defmodule Protobuf.Protoc.Generator do
   end
 
   def generate_content(ctx, desc) do
-    ctx = %{ctx | package: desc.package || "", syntax: syntax(desc.syntax)}
-    ctx = %{ctx | dep_pkgs: get_dep_pkgs(ctx, desc.dependency)}
+    ctx = %{
+      ctx
+      | package: desc.package || "",
+        syntax: syntax(desc.syntax),
+        module_prefix: (desc.options && desc.options.elixir_module_prefix) || (desc.package || "")
+    }
+
+    ctx = %{ctx | dep_type_mapping: get_dep_type_mapping(ctx, desc.dependency, desc.name)}
 
     list =
       MessageGenerator.generate_list(ctx, desc.message_type) ++
@@ -36,6 +42,15 @@ defmodule Protobuf.Protoc.Generator do
     pkgs = deps |> Enum.map(fn dep -> mapping[dep] end)
     pkgs = if pkg && String.length(pkg) > 0, do: [pkg | pkgs], else: pkgs
     Enum.sort(pkgs, &(byte_size(&2) <= byte_size(&1)))
+  end
+
+  def get_dep_type_mapping(%{global_type_mapping: global_mapping}, deps, file_name) do
+    mapping =
+      Enum.reduce(deps, %{}, fn dep, acc ->
+        Map.merge(acc, global_mapping[dep])
+      end)
+
+    Map.merge(mapping, global_mapping[file_name])
   end
 
   defp syntax("proto3"), do: :proto3

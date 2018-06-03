@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.FileOptions {
+  // wait for Google's reply of appling for custom option number
+  optional string elixir_module_prefix = 50000;
+}

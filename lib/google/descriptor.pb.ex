@@ -368,7 +368,8 @@ defmodule Google.Protobuf.FileOptions do
     :php_namespace,
     :php_metadata_namespace,
     :ruby_package,
-    :uninterpreted_option
+    :uninterpreted_option,
+    :elixir_module_prefix
   ]
 
   field :java_package, 1, optional: true, type: :string
@@ -398,6 +399,8 @@ defmodule Google.Protobuf.FileOptions do
   field :php_metadata_namespace, 44, optional: true, type: :string
   field :ruby_package, 45, optional: true, type: :string
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
+
+  field :elixir_module_prefix, 50000, optional: true, type: :string
 end
 
 defmodule Google.Protobuf.FileOptions.OptimizeMode do

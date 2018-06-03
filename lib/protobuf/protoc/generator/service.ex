@@ -10,15 +10,16 @@ defmodule Protobuf.Protoc.Generator.Service do
   end
 
   def generate(ctx, desc) do
-    mod_name = desc.name |> Macro.camelize() |> Util.attach_pkg(ctx.package)
+    # service can't be nested
+    mod_name = Util.mod_name(ctx, [Util.trans_name(desc.name)])
     name = Util.attach_raw_pkg(desc.name, ctx.package)
     methods = Enum.map(desc.method, fn m -> generate_service_method(ctx, m) end)
     Protobuf.Protoc.Template.service(mod_name, name, methods)
   end
 
   defp generate_service_method(ctx, m) do
-    input = service_arg(Util.trans_type_name(m.input_type, ctx), m.client_streaming)
-    output = service_arg(Util.trans_type_name(m.output_type, ctx), m.server_streaming)
+    input = service_arg(Util.type_from_type_name(ctx, m.input_type), m.client_streaming)
+    output = service_arg(Util.type_from_type_name(ctx, m.output_type), m.server_streaming)
     ":#{m.name}, #{input}, #{output}"
   end
 

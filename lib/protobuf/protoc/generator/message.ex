@@ -13,13 +13,13 @@ defmodule Protobuf.Protoc.Generator.Message do
     [gen_msg(ctx.syntax, msg_struct)] ++ gen_nested_msgs(ctx, desc) ++ gen_nested_enums(ctx, desc)
   end
 
-  def parse_desc(%{namespace: ns, package: pkg} = ctx, desc) do
+  def parse_desc(%{namespace: ns} = ctx, desc) do
     new_ns = ns ++ [Util.trans_name(desc.name)]
     fields = get_fields(ctx, desc)
 
     %{
       new_namespace: new_ns,
-      name: new_ns |> Util.join_name() |> Util.attach_pkg(pkg),
+      name: Util.mod_name(ctx, new_ns),
       options: msg_opts_str(ctx, desc.options),
       structs: structs_str(desc),
       typespec: typespec_str(fields, desc.oneof_decl),
@@ -149,8 +149,8 @@ defmodule Protobuf.Protoc.Generator.Message do
     type = TypeUtil.number_to_atom(f.type)
 
     type =
-      if type == :enum || type == :message do
-        Util.trans_type_name(f.type_name, ctx)
+      if f.type_name && (type == :enum || type == :message) do
+        Util.type_from_type_name(ctx, f.type_name)
       else
         ":#{type}"
       end
@@ -178,8 +178,8 @@ defmodule Protobuf.Protoc.Generator.Message do
           [k, v] = Enum.sort(desc.field, &(&1.number < &2.number))
 
           pair =
-            {{k.type, Util.trans_type_name(k.type_name || "", ctx)},
-             {v.type, Util.trans_type_name(v.type_name || "", ctx)}}
+            {{k.type, Util.type_from_type_name(ctx, k.type_name)},
+             {v.type, Util.type_from_type_name(ctx, k.type_name)}}
 
           Map.put(acc, Util.join_name([prefix, desc.name]), pair)
 
