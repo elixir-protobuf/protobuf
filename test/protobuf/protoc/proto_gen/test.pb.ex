@@ -9,7 +9,7 @@ defmodule My.Test.Request do
           deadline: float,
           somegroup: any,
           name_mapping: %{integer => String.t()},
-          msg_mapping: %{integer => My.Test.Reply.t()},
+          msg_mapping: %{integer => My.Test.Reply.t() | nil},
           reset: integer,
           get_key: String.t()
         }
@@ -68,7 +68,7 @@ defmodule My.Test.Request.MsgMappingEntry do
 
   @type t :: %__MODULE__{
           key: integer,
-          value: My.Test.Reply.t()
+          value: My.Test.Reply.t() | nil
         }
   defstruct [:key, :value]
 

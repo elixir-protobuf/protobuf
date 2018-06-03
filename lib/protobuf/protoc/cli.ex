@@ -57,13 +57,13 @@ defmodule Protobuf.Protoc.CLI do
     |> find_types_in_proto(ctx, desc.enum_type)
   end
 
-  def find_types_in_proto(types, ctx, descs) when is_list(descs) do
+  defp find_types_in_proto(types, ctx, descs) when is_list(descs) do
     Enum.reduce(descs, types, fn desc, acc ->
       find_types_in_proto(acc, ctx, desc)
     end)
   end
 
-  def find_types_in_proto(types, ctx, %Google.Protobuf.DescriptorProto{name: name} = desc) do
+  defp find_types_in_proto(types, ctx, %Google.Protobuf.DescriptorProto{name: name} = desc) do
     new_ctx = append_ns(ctx, name)
 
     types
@@ -72,7 +72,7 @@ defmodule Protobuf.Protoc.CLI do
     |> find_types_in_proto(new_ctx, desc.nested_type)
   end
 
-  def find_types_in_proto(types, ctx, %Google.Protobuf.EnumDescriptorProto{name: name}) do
+  defp find_types_in_proto(types, ctx, %Google.Protobuf.EnumDescriptorProto{name: name}) do
     update_types(types, ctx, name)
   end
 
