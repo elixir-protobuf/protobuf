@@ -398,7 +398,7 @@ defmodule Google.Protobuf.FileOptions do
   field :php_namespace, 41, optional: true, type: :string
   field :php_metadata_namespace, 44, optional: true, type: :string
   field :ruby_package, 45, optional: true, type: :string
-  field :elixir_module_prefix, 50000, optional: true, type: :string
+  field :elixir_module_prefix, 54637, optional: true, type: :string
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 end
 
