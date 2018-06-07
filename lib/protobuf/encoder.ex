@@ -87,9 +87,9 @@ defmodule Protobuf.Encoder do
   def encode_type(:uint64, n), do: encode_varint(n)
   def encode_type(:sint32, n), do: n |> encode_zigzag |> encode_varint
   def encode_type(:sint64, n), do: n |> encode_zigzag |> encode_varint
-  def encode_type(:bool, n) when n == true, do: encode_varint(1)
-  def encode_type(:bool, n) when n == false, do: encode_varint(0)
-  def encode_type(:enum, n), do: encode_type(:int32, n)
+  def encode_type(:bool, true), do: encode_varint(1)
+  def encode_type(:bool, false), do: encode_varint(0)
+  def encode_type(:enum, n), do: encode_varint(n)
   def encode_type(:fixed64, n), do: <<n::64-little>>
   def encode_type(:sfixed64, n), do: <<n::64-signed-little>>
   def encode_type(:double, n), do: <<n::64-float-little>>
@@ -115,7 +115,7 @@ defmodule Protobuf.Encoder do
     encode_varint(n)
   end
 
-  def encode_varint(n) when n <= 127, do: <<n>>
+  def encode_varint(n) when n <= 127 and is_integer(n), do: <<n>>
 
   def encode_varint(n) when n > 127,
     do: <<1::1, band(n, 127)::7, encode_varint(bsr(n, 7))::binary>>
