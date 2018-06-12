@@ -6,8 +6,7 @@ defmodule Protobuf.Encoder do
 
   @spec encode(struct, keyword) :: iodata
   def encode(%{__struct__: mod} = struct, opts \\ []) do
-    Protobuf.Validator.validate!(struct)
-    res = encode(struct, mod.__message_props__(), [])
+    res = encode!(struct, mod.__message_props__(), [])
     res = Enum.reverse(res)
 
     case Keyword.fetch(opts, :iolist) do
@@ -16,21 +15,41 @@ defmodule Protobuf.Encoder do
     end
   end
 
-  @spec encode(struct, MessageProps.t(), iodata) :: iodata
-  def encode(struct, props, acc0) do
+  @spec encode!(struct, MessageProps.t(), iodata) :: iodata
+  def encode!(struct, props, acc0) do
     syntax = props.syntax
     oneofs = oneof_actual_vals(props, struct)
 
     Enum.reduce(props.ordered_tags, acc0, fn tag, acc ->
-      prop = props.field_props[tag]
-      val = Map.get(struct, prop.name_atom)
-      val = if prop.oneof, do: oneofs[prop.name_atom], else: val
+      try do
+        prop = props.field_props[tag]
+        val = Map.get(struct, prop.name_atom)
+        val = if prop.oneof, do: oneofs[prop.name_atom], else: val
 
-      cond do
-        prop.oneof && val != nil -> [encode_field(class_field(prop), val, prop) | acc]
-        syntax == :proto2 && (val == nil || val == [] || val == %{}) -> acc
-        syntax == :proto3 && empty_val?(val) -> acc
-        true -> [encode_field(class_field(prop), val, prop) | acc]
+        cond do
+          prop.oneof && val != nil ->
+            [encode_field(class_field(prop), val, prop) | acc]
+
+          syntax == :proto2 && ((val == nil && prop.optional?) || val == [] || val == %{}) ->
+            acc
+
+          syntax == :proto3 && empty_val?(val) ->
+            acc
+
+          true ->
+            [encode_field(class_field(prop), val, prop) | acc]
+        end
+      rescue
+        error ->
+          stacktrace = System.stacktrace()
+          prop = props.field_props[tag]
+
+          msg =
+            "Got error when encoding #{inspect(struct.__struct__)}##{prop.name_atom}: #{
+              inspect(error)
+            }"
+
+          reraise Protobuf.EncodeError, [message: msg], stacktrace
       end
     end)
   end
@@ -151,11 +170,28 @@ defmodule Protobuf.Encoder do
     !v || v == 0 || v == "" || v == [] || v == %{}
   end
 
-  defp oneof_actual_vals(props, struct) do
-    Enum.reduce(props.oneof, %{}, fn {field, _}, acc ->
+  defp oneof_actual_vals(msg_props, struct) do
+    field_tags = msg_props.field_tags
+    field_props = msg_props.field_props
+
+    Enum.reduce(msg_props.oneof, %{}, fn {field, index}, acc ->
       case Map.get(struct, field) do
-        {f, val} -> Map.put(acc, f, val)
-        nil -> acc
+        {f, val} ->
+          field_props = field_props[field_tags[f]]
+
+          if field_props.oneof != index do
+            raise Protobuf.EncodeError,
+              message: ":#{f} doesn't belongs to #{inspect(struct.__struct__)}##{field}"
+          else
+            Map.put(acc, f, val)
+          end
+
+        nil ->
+          acc
+
+        _ ->
+          raise Protobuf.EncodeError,
+            message: "#{inspect(struct.__struct__)}##{field} should be {key, val} or nil"
       end
     end)
   end

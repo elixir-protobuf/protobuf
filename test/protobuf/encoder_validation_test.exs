@@ -81,4 +81,72 @@ defmodule Protobuf.EncoderTest.Validation do
     assert_invalid.(:bytes, bytes_list)
     assert_invalid.(:string, bytes_list)
   end
+
+  test "field is invalid" do
+    msg = TestMsg.Foo.new(a: "abc")
+
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#a: %ArithmeticError/, fn ->
+      Protobuf.Encoder.encode(msg)
+    end
+  end
+
+  test "proto2 invalid when required field is nil" do
+    msg = TestMsg.Foo2.new(a: nil)
+
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo2#a: %ArithmeticError/, fn ->
+      Protobuf.Encoder.encode(msg)
+    end
+  end
+
+  test "proto2 valid optional field is nil" do
+    msg = TestMsg.Foo2.new(a: 1, c: nil)
+
+    assert Protobuf.Encoder.encode(msg)
+  end
+
+  test "oneof invalid format" do
+    msg = TestMsg.Oneof.new(first: 1)
+
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Oneof#first should be {key, val}/, fn ->
+      Protobuf.Encoder.encode(msg)
+    end
+  end
+
+  test "oneof field doesn't match" do
+    msg = TestMsg.Oneof.new(first: {:c, 42})
+
+    assert_raise Protobuf.EncodeError, ~r/:c doesn't belongs to TestMsg.Oneof#first/, fn ->
+      Protobuf.Encoder.encode(msg)
+    end
+  end
+
+  test "oneof field is invalid" do
+    msg = TestMsg.Oneof.new(first: {:a, "abc"})
+
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Oneof#a: %ArithmeticError/, fn ->
+      Protobuf.Encoder.encode(msg)
+    end
+  end
+
+  test "repeated field is not list" do
+    msg = TestMsg.Foo.new(g: 1)
+
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#g: %Protocol.UndefinedError/, fn ->
+      Protobuf.Encoder.encode(msg)
+    end
+
+    msg = TestMsg.Foo.new(h: TestMsg.Foo.Bar.new())
+
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#h: %Protocol.UndefinedError/, fn ->
+      Protobuf.Encoder.encode(msg)
+    end
+  end
+
+  test "embedded field is not right" do
+    msg = TestMsg.Foo.new(e: %{a: 1})
+
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#e: %FunctionClauseError/, fn ->
+      Protobuf.Encoder.encode(msg)
+    end
+  end
 end
