@@ -56,19 +56,22 @@ defmodule Protobuf.Encoder do
 
   @spec encode_field(atom, any, FieldProps.t()) :: iodata
   def encode_field(:normal, val, %{type: type, fnum: fnum} = prop) do
+    fnum = encode_fnum(fnum, type)
+
     repeated_or_not(val, prop.repeated?, fn v ->
-      [encode_fnum(fnum, type), encode_type(type, v)]
+      [fnum, encode_type(type, v)]
     end)
   end
 
   def encode_field(:embedded, val, %{type: type, fnum: fnum} = prop) do
     repeated = prop.repeated? || prop.map?
+    fnum = encode_fnum(fnum, type)
 
     repeated_or_not(val, repeated, fn v ->
       v = if prop.map?, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
       encoded = encode(v, iolist: true)
       byte_size = IO.iodata_length(encoded)
-      [encode_fnum(fnum, type), [encode_varint(byte_size), encoded]]
+      [fnum, [encode_varint(byte_size), encoded]]
     end)
   end
 
