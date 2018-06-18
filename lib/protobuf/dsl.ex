@@ -127,6 +127,7 @@ defmodule Protobuf.DSL do
       |> cal_repeated(opts_map)
 
     struct(props, parts)
+    |> cal_encoded_fnum()
   end
 
   defp parse_field_opts([{:optional, true} | t], acc) do
@@ -222,6 +223,20 @@ defmodule Protobuf.DSL do
   defp cal_repeated(%{map?: true} = props, _), do: Map.put(props, :repeated?, false)
   defp cal_repeated(props, %{repeated: true}), do: Map.put(props, :repeated?, true)
   defp cal_repeated(props, _), do: props
+
+  defp cal_encoded_fnum(%{fnum: fnum, packed?: true} = props) do
+    encoded_fnum = Protobuf.Encoder.encode_fnum(fnum, Protobuf.Encoder.wire_type(:bytes))
+    Map.put(props, :encoded_fnum, encoded_fnum)
+  end
+
+  defp cal_encoded_fnum(%{fnum: fnum, wire_type: wire} = props) when is_integer(wire) do
+    encoded_fnum = Protobuf.Encoder.encode_fnum(fnum, wire)
+    Map.put(props, :encoded_fnum, encoded_fnum)
+  end
+
+  defp cal_encoded_fnum(props) do
+    props
+  end
 
   def generate_default_fields(syntax, msg_props) do
     msg_props.field_props

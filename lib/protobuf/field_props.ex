@@ -14,7 +14,8 @@ defmodule Protobuf.FieldProps do
           enum?: boolean,
           embedded?: boolean,
           packed?: boolean,
-          map?: boolean
+          map?: boolean,
+          encoded_fnum: iodata
         }
   defstruct fnum: nil,
             name: nil,
@@ -30,5 +31,6 @@ defmodule Protobuf.FieldProps do
             enum?: false,
             embedded?: false,
             packed?: false,
-            map?: false
+            map?: false,
+            encoded_fnum: nil
 end

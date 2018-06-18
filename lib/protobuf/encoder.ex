@@ -55,17 +55,14 @@ defmodule Protobuf.Encoder do
   end
 
   @spec encode_field(atom, any, FieldProps.t()) :: iodata
-  def encode_field(:normal, val, %{type: type, fnum: fnum} = prop) do
-    fnum = encode_fnum(fnum, type)
-
+  def encode_field(:normal, val, %{type: type, encoded_fnum: fnum} = prop) do
     repeated_or_not(val, prop.repeated?, fn v ->
       [fnum, encode_type(type, v)]
     end)
   end
 
-  def encode_field(:embedded, val, %{type: type, fnum: fnum} = prop) do
+  def encode_field(:embedded, val, %{encoded_fnum: fnum} = prop) do
     repeated = prop.repeated? || prop.map?
-    fnum = encode_fnum(fnum, type)
 
     repeated_or_not(val, repeated, fn v ->
       v = if prop.map?, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
@@ -75,10 +72,10 @@ defmodule Protobuf.Encoder do
     end)
   end
 
-  def encode_field(:packed, val, %{type: type, fnum: fnum}) do
+  def encode_field(:packed, val, %{type: type, encoded_fnum: fnum}) do
     encoded = Enum.map(val, fn v -> encode_type(type, v) end)
     byte_size = IO.iodata_length(encoded)
-    [encode_fnum(fnum, :bytes), [encode_varint(byte_size), encoded]]
+    [fnum, [encode_varint(byte_size), encoded]]
   end
 
   @spec class_field(map) :: atom
@@ -94,11 +91,11 @@ defmodule Protobuf.Encoder do
     :normal
   end
 
-  @spec encode_fnum(integer, atom) :: iodata
-  def encode_fnum(fnum, type) do
+  @spec encode_fnum(integer, integer) :: iodata
+  def encode_fnum(fnum, wire_type) do
     fnum
     |> bsl(3)
-    |> bor(wire_type(type))
+    |> bor(wire_type)
     |> encode_varint
   end
 
