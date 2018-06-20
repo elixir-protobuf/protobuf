@@ -22,7 +22,7 @@ defmodule Protobuf do
     end
   end
 
-  def decode(%{__struct__: mod} = data) do
+  def decode(%mod{} = data) do
     Protobuf.Decoder.decode(data, mod)
   end
 

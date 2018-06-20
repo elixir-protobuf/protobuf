@@ -5,7 +5,7 @@ defmodule Protobuf.Encoder do
   alias Protobuf.{MessageProps, FieldProps}
 
   @spec encode(struct, keyword) :: iodata
-  def encode(%{__struct__: mod} = struct, opts \\ []) do
+  def encode(%mod{} = struct, opts \\ []) do
     res = encode!(struct, mod.__message_props__(), [])
     res = Enum.reverse(res)
 
@@ -16,20 +16,16 @@ defmodule Protobuf.Encoder do
   end
 
   @spec encode!(struct, MessageProps.t(), iodata) :: iodata
-  def encode!(struct, props, acc0) do
+  def encode!(struct, %{field_props: field_props} = props, acc0) do
     syntax = props.syntax
     oneofs = oneof_actual_vals(props, struct)
 
     Enum.reduce(props.ordered_tags, acc0, fn tag, acc ->
       try do
-        prop = props.field_props[tag]
-        val = Map.get(struct, prop.name_atom)
-        val = if prop.oneof, do: oneofs[prop.name_atom], else: val
+        prop = field_props[tag]
+        val = if prop.oneof, do: oneofs[prop.name_atom], else: Map.get(struct, prop.name_atom)
 
         cond do
-          prop.oneof && val != nil ->
-            [encode_field(class_field(prop), val, prop) | acc]
-
           syntax == :proto2 && ((val == nil && prop.optional?) || val == [] || val == %{}) ->
             acc
 
@@ -42,7 +38,7 @@ defmodule Protobuf.Encoder do
       rescue
         error ->
           stacktrace = System.stacktrace()
-          prop = props.field_props[tag]
+          prop = field_props[tag]
 
           msg =
             "Got error when encoding #{inspect(struct.__struct__)}##{prop.name_atom}: #{
@@ -61,11 +57,15 @@ defmodule Protobuf.Encoder do
     end)
   end
 
-  def encode_field(:embedded, val, %{encoded_fnum: fnum} = prop) do
-    repeated = prop.repeated? || prop.map?
+  def encode_field(
+        :embedded,
+        val,
+        %{encoded_fnum: fnum, repeated?: is_repeated, map?: is_map} = prop
+      ) do
+    repeated = is_repeated || is_map
 
     repeated_or_not(val, repeated, fn v ->
-      v = if prop.map?, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
+      v = if is_map, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
       encoded = encode(v, iolist: true)
       byte_size = IO.iodata_length(encoded)
       [fnum, [encode_varint(byte_size), encoded]]
