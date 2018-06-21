@@ -6,7 +6,7 @@ defmodule Protobuf.Encoder do
 
   @spec encode(struct, keyword) :: iodata
   def encode(%mod{} = struct, opts \\ []) do
-    res = encode!(struct, mod.__message_props__(), [])
+    res = encode!(struct, mod.__message_props__())
     res = Enum.reverse(res)
 
     case Keyword.fetch(opts, :iolist) do
@@ -15,17 +15,16 @@ defmodule Protobuf.Encoder do
     end
   end
 
-  @spec encode!(struct, MessageProps.t(), iodata) :: iodata
-  def encode!(struct, %{field_props: field_props} = props, acc0) do
+  @spec encode!(struct, MessageProps.t()) :: iodata
+  def encode!(struct, %{field_props: field_props} = props) do
     syntax = props.syntax
     oneofs = oneof_actual_vals(props, struct)
 
-    Enum.reduce(props.ordered_tags, acc0, fn tag, acc ->
+    Enum.reduce(Map.values(field_props), [], fn prop, acc ->
       try do
-        prop = field_props[tag]
+        %{name_atom: name, oneof: oneof} = prop
 
-        val =
-          if prop.oneof, do: oneofs[prop.name_atom], else: Map.get(struct, prop.name_atom, nil)
+        val = if oneof, do: oneofs[name], else: Map.get(struct, name, nil)
 
         cond do
           syntax == :proto2 && ((val == nil && prop.optional?) || val == [] || val == %{}) ->
@@ -40,7 +39,6 @@ defmodule Protobuf.Encoder do
       rescue
         error ->
           stacktrace = System.stacktrace()
-          prop = field_props[tag]
 
           msg =
             "Got error when encoding #{inspect(struct.__struct__)}##{prop.name_atom}: #{
@@ -53,8 +51,8 @@ defmodule Protobuf.Encoder do
   end
 
   @spec encode_field(atom, any, FieldProps.t()) :: iodata
-  def encode_field(:normal, val, %{type: type, encoded_fnum: fnum} = prop) do
-    repeated_or_not(val, prop.repeated?, fn v ->
+  def encode_field(:normal, val, %{encoded_fnum: fnum, type: type, repeated?: is_repeated}) do
+    repeated_or_not(val, is_repeated, fn v ->
       [fnum, encode_type(type, v)]
     end)
   end
@@ -172,16 +170,16 @@ defmodule Protobuf.Encoder do
     !v || v == 0 || v == "" || v == [] || v == %{}
   end
 
-  defp oneof_actual_vals(msg_props, struct) do
-    field_tags = msg_props.field_tags
-    field_props = msg_props.field_props
-
-    Enum.reduce(msg_props.oneof, %{}, fn {field, index}, acc ->
+  defp oneof_actual_vals(
+         %{field_tags: field_tags, field_props: field_props, oneof: oneof},
+         struct
+       ) do
+    Enum.reduce(oneof, %{}, fn {field, index}, acc ->
       case Map.get(struct, field, nil) do
         {f, val} ->
-          field_props = field_props[field_tags[f]]
+          %{oneof: oneof} = field_props[field_tags[f]]
 
-          if field_props.oneof != index do
+          if oneof != index do
             raise Protobuf.EncodeError,
               message: ":#{f} doesn't belongs to #{inspect(struct.__struct__)}##{field}"
           else
