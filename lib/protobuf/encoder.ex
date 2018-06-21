@@ -23,7 +23,9 @@ defmodule Protobuf.Encoder do
     Enum.reduce(props.ordered_tags, acc0, fn tag, acc ->
       try do
         prop = field_props[tag]
-        val = if prop.oneof, do: oneofs[prop.name_atom], else: Map.get(struct, prop.name_atom)
+
+        val =
+          if prop.oneof, do: oneofs[prop.name_atom], else: Map.get(struct, prop.name_atom, nil)
 
         cond do
           syntax == :proto2 && ((val == nil && prop.optional?) || val == [] || val == %{}) ->
@@ -175,7 +177,7 @@ defmodule Protobuf.Encoder do
     field_props = msg_props.field_props
 
     Enum.reduce(msg_props.oneof, %{}, fn {field, index}, acc ->
-      case Map.get(struct, field) do
+      case Map.get(struct, field, nil) do
         {f, val} ->
           field_props = field_props[field_tags[f]]
 
