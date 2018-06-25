@@ -9,7 +9,11 @@ defmodule Protobuf do
       unquote(encode_decode())
       @before_compile Protobuf.DSL
 
-      def new(attrs \\ %{}) do
+      def new() do
+        Protobuf.Builder.new(__MODULE__)
+      end
+
+      def new(attrs) do
         Protobuf.Builder.new(__MODULE__, attrs)
       end
     end

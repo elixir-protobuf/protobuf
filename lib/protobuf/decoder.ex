@@ -1,7 +1,9 @@
 defmodule Protobuf.Decoder do
   import Protobuf.WireTypes
   import Bitwise, only: [bsl: 2, bsr: 2, band: 2]
-  @mask64 bsl(1, 64) - 1
+
+  @max_bits 64
+  @mask64 bsl(1, @max_bits) - 1
 
   alias Protobuf.{DecodeError, MessageProps, FieldProps}
 
@@ -20,8 +22,9 @@ defmodule Protobuf.Decoder do
       {:field_num, prop} ->
         case class_field(prop, wire_type) do
           type when type in [:normal, :embedded, :packed] ->
-            {val, rest} = decode_type(type_to_decode(type, prop.type), wire_type, rest)
-            field_key = if prop.oneof, do: oneof_field(prop, props), else: prop.name_atom
+            %{type: prop_type, oneof: oneof} = prop
+            {val, rest} = decode_type(type_to_decode(type, prop_type), wire_type, rest)
+            field_key = if oneof, do: oneof_field(prop, props), else: prop.name_atom
             new_msg = put_field(type, msg, prop, field_key, val)
             do_decode(rest, props, new_msg)
 
@@ -41,40 +44,46 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  defp do_decode(<<>>, props, msg) do
-    reverse_repeated(msg, props.repeated_fields)
+  defp do_decode(<<>>, %{repeated_fields: repeated_fields}, msg) do
+    reverse_repeated(msg, repeated_fields)
   end
 
   defp type_to_decode(:normal, prop_type), do: prop_type
   defp type_to_decode(:embedded, _), do: :bytes
   defp type_to_decode(:packed, _), do: :bytes
 
-  defp put_field(:normal, msg, prop, field_key, val) do
-    val = if prop.oneof, do: {prop.name_atom, val}, else: val
+  defp put_field(:normal, msg, %{oneof: oneof, repeated?: is_repeated} = prop, field_key, val) do
+    val = if oneof, do: {prop.name_atom, val}, else: val
 
     put_map(msg, field_key, val, fn _k, v1, v2 ->
-      merge_same_fields(v1, v2, prop.repeated?, fn -> v2 end)
+      merge_same_fields(v1, v2, is_repeated, fn -> v2 end)
     end)
   end
 
-  defp put_field(:embedded, msg, prop, field_key, val) do
-    embedded_msg = decode(val, prop.type)
-    decoded = if prop.map?, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
-    decoded = if prop.oneof, do: {prop.name_atom, decoded}, else: decoded
+  defp put_field(
+         :embedded,
+         msg,
+         %{map?: is_map, type: type, oneof: oneof, repeated?: is_repeated} = prop,
+         field_key,
+         val
+       ) do
+    embedded_msg = decode(val, type)
+    decoded = if is_map, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
+    decoded = if oneof, do: {prop.name_atom, decoded}, else: decoded
 
     new_msg =
       put_map(msg, field_key, decoded, fn _k, v1, v2 ->
-        merge_same_fields(v1, v2, prop.repeated?, fn ->
+        merge_same_fields(v1, v2, is_repeated, fn ->
           if v1, do: Map.merge(v1, v2), else: v2
         end)
       end)
 
-    struct(new_msg)
+    new_msg
   end
 
-  defp put_field(:packed, msg, prop, field_key, val) do
-    vals = decode_packed(prop.type, Protobuf.Encoder.wire_type(prop.type), val)
-    vals = if prop.oneof, do: {prop.name_atom, vals}, else: vals
+  defp put_field(:packed, msg, %{type: type, oneof: oneof} = prop, field_key, val) do
+    vals = decode_packed(type, Protobuf.Encoder.wire_type(type), val)
+    vals = if oneof, do: {prop.name_atom, vals}, else: vals
 
     new_msg =
       put_map(msg, field_key, vals, fn _k, v1, v2 ->
@@ -234,35 +243,30 @@ defmodule Protobuf.Decoder do
 
   @spec decode_varint(binary) :: {number, binary}
   def decode_varint(<<>>), do: {0, <<>>}
-  def decode_varint(bin), do: decode_varint(bin, 64)
-  def decode_varint(bin, max_bits), do: decode_varint(bin, 0, 0, max_bits)
+  def decode_varint(bin), do: decode_varint(bin, 0, 0)
 
-  defp decode_varint(<<1::1, x::7, rest::binary>>, n, acc, max_bits) when n < max_bits - 7 do
-    decode_varint(rest, n + 7, bsl(x, n) + acc, max_bits)
+  defp decode_varint(<<>>, 0, 0), do: {0, <<>>}
+
+  defp decode_varint(<<1::1, x::7, rest::binary>>, n, acc) when n < @max_bits - 7 do
+    decode_varint(rest, n + 7, bsl(x, n) + acc)
   end
 
-  defp decode_varint(<<0::1, x::7, rest::binary>>, n, acc, max_bits) do
-    mask = mask(max_bits)
-    key = x |> bsl(n) |> Kernel.+(acc) |> band(mask)
+  defp decode_varint(<<0::1, x::7, rest::binary>>, n, acc) do
+    key = x |> bsl(n) |> Kernel.+(acc) |> band(@mask64)
     {key, rest}
-  end
-
-  defp mask(64) do
-    @mask64
-  end
-
-  defp mask(max_bits) do
-    Bitwise.bsl(1, max_bits) - 1
   end
 
   defp prop_display(prop) do
     prop.name
   end
 
-  defp put_map(map, key, val, func) when is_function(func, 3) do
-    case Map.fetch(map, key) do
-      {:ok, old_val} -> Map.put(map, key, func.(key, old_val, val))
-      :error -> Map.put(map, key, val)
+  defp put_map(map, key, val, func) do
+    case map do
+      %{^key => old_val} ->
+        Map.put(map, key, func.(key, old_val, val))
+
+      _ ->
+        Map.put(map, key, val)
     end
   end
 

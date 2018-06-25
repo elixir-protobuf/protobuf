@@ -25,6 +25,7 @@ defmodule Protobuf.DSL do
     msg_props = generate_msg_props(fields, oneofs, options)
     default_fields = generate_default_fields(syntax, msg_props)
     enum_fields = enum_fields(msg_props)
+    default_struct = Map.put(default_fields, :__struct__, env.module)
 
     quote do
       def __message_props__ do
@@ -35,15 +36,15 @@ defmodule Protobuf.DSL do
 
       if unquote(syntax == :proto3) do
         def __default_struct__ do
-          struct = struct(__MODULE__, unquote(Macro.escape(default_fields)))
+          struct = unquote(Macro.escape(default_struct))
 
           Enum.reduce(unquote(Macro.escape(enum_fields)), struct, fn {name, type, default}, acc ->
-            struct(acc, %{name => type.value(default)})
+            Map.put(struct, name, type.value(default))
           end)
         end
       else
         def __default_struct__ do
-          struct(__MODULE__, unquote(Macro.escape(default_fields)))
+          unquote(Macro.escape(default_struct))
         end
       end
     end
@@ -239,10 +240,19 @@ defmodule Protobuf.DSL do
   end
 
   def generate_default_fields(syntax, msg_props) do
-    msg_props.field_props
-    |> Map.values()
-    |> Enum.reduce(%{}, fn props, acc ->
-      Map.put(acc, props.name_atom, Protobuf.Builder.field_default(syntax, props))
+    fields =
+      msg_props.field_props
+      |> Map.values()
+      |> Enum.reduce(%{}, fn props, acc ->
+        if props.oneof do
+          acc
+        else
+          Map.put(acc, props.name_atom, Protobuf.Builder.field_default(syntax, props))
+        end
+      end)
+
+    Enum.reduce(msg_props.oneof, fields, fn {key, _}, acc ->
+      Map.put(acc, key, nil)
     end)
   end
 

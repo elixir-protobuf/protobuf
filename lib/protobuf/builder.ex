@@ -1,4 +1,8 @@
 defmodule Protobuf.Builder do
+  def new(mod) do
+    mod.__default_struct__
+  end
+
   def new(mod, attrs) do
     struct(mod.__default_struct__, attrs)
   end
