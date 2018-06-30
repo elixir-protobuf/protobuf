@@ -9,6 +9,13 @@ elixir:
 otp_release:
   - 19.3
   - 20.0
+  - 21.0
+matrix:
+  exclude:
+  - elixir: 1.4
+    otp_release: 21.0
+  - elixir: 1.5
+    otp_release: 21.0
 env:
   - MIX_ENV=test VERBOSE_TESTS=true
 install:
@@ -23,3 +30,4 @@ before_script:
 script:
   - mix test
   - mix test.integration
+  - mix hex.build
