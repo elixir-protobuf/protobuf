@@ -30,7 +30,7 @@ defmodule Protobuf.Encoder do
           syntax == :proto2 && ((val == nil && prop.optional?) || val == [] || val == %{}) ->
             acc
 
-          syntax == :proto3 && empty_val?(val) ->
+          syntax == :proto3 && ((empty_val?(val) && !oneof) || (oneof && is_nil(val))) ->
             acc
 
           true ->
