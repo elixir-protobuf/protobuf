@@ -10,6 +10,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     [msg] = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
     assert msg =~ "use Protobuf\n"
+    assert msg =~ "@type t :: %__MODULE__{}\n"
   end
 
   test "generate/2 has right syntax" do
@@ -18,6 +19,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     [msg] = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
     assert msg =~ "use Protobuf, syntax: :proto3\n"
+    assert msg =~ "@type t :: %__MODULE__{}\n"
   end
 
   test "generate/2 has right name with package" do
