@@ -77,7 +77,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     Enum.map_join(struct.oneof_decl ++ fields, ", ", fn f -> ":#{f.name}" end)
   end
 
-  def typespec_str([], []), do: ""
+  def typespec_str([], []), do: "  @type t :: %__MODULE__{}\n"
 
   def typespec_str(fields, oneofs) do
     longest_field = fields |> Enum.max_by(&String.length(&1[:name]))
