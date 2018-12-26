@@ -119,6 +119,7 @@ defmodule Protobuf.Encoder do
     <<len::binary, bin::binary>>
   end
 
+  def encode_type(:string, n) when is_atom(n), do: encode_type(:bytes, to_string(n))
   def encode_type(:string, n), do: encode_type(:bytes, n)
   def encode_type(:fixed32, n), do: <<n::32-little>>
   def encode_type(:sfixed32, n), do: <<n::32-signed-little>>
