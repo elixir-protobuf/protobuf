@@ -26,3 +26,4 @@ protoc-gen-elixir
 *.eqc
 
 .elixir_ls
+protoc-gen-goldorin

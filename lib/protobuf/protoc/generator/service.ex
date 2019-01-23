@@ -29,6 +29,7 @@ defmodule Protobuf.Protoc.Generator.Service do
   defp get_service_type("store" <> _), do: "mutation"
   defp get_service_type("recover" <> _), do: "mutation"
   defp get_service_type("remove" <> _), do: "mutation"
+  defp get_service_type("unsubscribe" <> _), do: "mutation"
   defp get_service_type("subscribe" <> _), do: "subscription"
   defp get_service_type(_), do: "query"
 end
