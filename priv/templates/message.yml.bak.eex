@@ -1,0 +1,22 @@
+<%= if Enum.count(oneofs) > 0 do %>
+<%= for {oneof, idx} <- oneofs do %>
+- name: <%= name %>_<%= oneof.name %>
+  meta: type=union resolver=get_<%= name %>_<%= oneof.name %>_type
+  fields:
+  <%= Enum.map(Map.get(fields, idx), fn {fname, _, opts} -> %>
+    - name: <%= fname %>
+      type: <%= if opts[:repeated] do %><%= "[#{opts[:type]}]" %><% else %><%= opts[:type] %><% end %>
+  <% end) %>
+<% end %>
+<% end %>
+- name: <%= name %>
+  type: <%= if String.starts_with?(name, "request") do %><%= "input" %><% else %><%= "output" %><% end %>
+  <%= if Enum.count(fields) > 0 and Enum.count(fields[nil]) > 0 do %>
+  fields:
+    <%= for {fname, _, opts} <- Map.get(fields, nil) do %>
+    - name: <%= fname %>
+      type: <%= if opts[:repeated] do %><%= "[#{opts[:type]}]" %><% else %><%= opts[:type] %><% end %>
+    <% end %>
+  <% else %>
+  fields: []
+  <% end %>

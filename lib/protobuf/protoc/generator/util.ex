@@ -1,6 +1,15 @@
 defmodule Protobuf.Protoc.Generator.Util do
   def trans_name(name) do
-    Macro.camelize(name)
+    Recase.to_snake(name)
+  end
+
+  def trans_type(type) do
+    type
+    |> atom_to_string()
+    |> String.split(".")
+    |> List.last()
+    |> Recase.to_snake()
+    |> to_gql()
   end
 
   def join_name(list) do
@@ -45,4 +54,16 @@ defmodule Protobuf.Protoc.Generator.Util do
 
   def print(v) when is_atom(v), do: inspect(v)
   def print(v), do: v
+
+  defp atom_to_string(s) when is_binary(s), do: s
+  defp atom_to_string(s), do: s |> Atom.to_string()
+
+  defp to_gql("bytes"), do: "string"
+  defp to_gql("bool"), do: "boolean"
+  defp to_gql("int32"), do: "int"
+  defp to_gql("uint32"), do: "int"
+  defp to_gql("uint64"), do: "int"
+  defp to_gql("sint64"), do: "int"
+  defp to_gql("int64"), do: "int"
+  defp to_gql(type), do: type
 end

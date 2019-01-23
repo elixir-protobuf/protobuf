@@ -1,0 +1,7 @@
+
+<%= Enum.map methods, fn {name, type, input, in_stream, output, out_stream} -> %>
+- name: <%= name %>
+  type: <%= type %>
+  return: <%= output %>
+  params: <%= input %>
+<% end %>

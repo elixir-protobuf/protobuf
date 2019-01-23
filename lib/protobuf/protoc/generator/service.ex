@@ -17,12 +17,18 @@ defmodule Protobuf.Protoc.Generator.Service do
     Protobuf.Protoc.Template.service(mod_name, name, methods)
   end
 
-  defp generate_service_method(ctx, m) do
-    input = service_arg(Util.type_from_type_name(ctx, m.input_type), m.client_streaming)
-    output = service_arg(Util.type_from_type_name(ctx, m.output_type), m.server_streaming)
-    ":#{m.name}, #{input}, #{output}"
+  defp generate_service_method(_ctx, m) do
+    {m.name, get_service_type(m.name), Util.trans_type(m.input_type), m.client_streaming,
+     Util.trans_type(m.output_type), m.server_streaming}
   end
 
-  defp service_arg(type, true), do: "stream(#{type})"
-  defp service_arg(type, _), do: type
+  defp get_service_type("create" <> _), do: "mutation"
+  defp get_service_type("declare" <> _), do: "mutation"
+  defp get_service_type("send" <> _), do: "mutation"
+  defp get_service_type("set" <> _), do: "mutation"
+  defp get_service_type("store" <> _), do: "mutation"
+  defp get_service_type("recover" <> _), do: "mutation"
+  defp get_service_type("remove" <> _), do: "mutation"
+  defp get_service_type("subscribe" <> _), do: "subscription"
+  defp get_service_type(_), do: "query"
 end

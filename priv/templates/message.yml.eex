@@ -1,0 +1,11 @@
+- name: <%= name %>
+  type: <%= if String.starts_with?(name, "request") do %><%= "input" %><% else %><%= "output" %><% end %>
+  <%= if Enum.count(fields) > 0 do %>
+  fields:
+    <%= for {fname, _, opts} <- fields do %>
+    - name: <%= fname %>
+      type: <%= if opts[:repeated] do %><%= "[#{opts[:type]}]" %><% else %><%= opts[:type] %><% end %>
+    <% end %>
+  <% else %>
+  fields: []
+  <% end %>

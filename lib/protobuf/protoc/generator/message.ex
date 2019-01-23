@@ -13,29 +13,51 @@ defmodule Protobuf.Protoc.Generator.Message do
     [gen_msg(ctx.syntax, msg_struct)] ++ gen_nested_msgs(ctx, desc) ++ gen_nested_enums(ctx, desc)
   end
 
+  @spec parse_desc(
+          %{namespace: [any()], package: any(), syntax: any()},
+          atom()
+          | %{
+              field: any(),
+              name: binary(),
+              nested_type: any(),
+              oneof_decl: [any()],
+              options: atom() | %{deprecated: any(), map_entry: any()}
+            }
+        ) :: %{
+          fields: [any()],
+          name: binary(),
+          new_namespace: [...],
+          oneofs: [any()],
+          options: binary(),
+          structs: binary(),
+          typespec: <<_::64, _::_*8>>
+        }
   def parse_desc(%{namespace: ns} = ctx, desc) do
     new_ns = ns ++ [Util.trans_name(desc.name)]
     fields = get_fields(ctx, desc)
 
     %{
       new_namespace: new_ns,
-      name: Util.mod_name(ctx, new_ns),
+      name: Util.trans_name(desc.name),
       options: msg_opts_str(ctx, desc.options),
       structs: structs_str(desc),
       typespec: typespec_str(fields, desc.oneof_decl),
       fields: fields,
-      oneofs: oneofs_str(desc.oneof_decl)
+      oneofs: desc.oneof_decl
     }
   end
 
-  defp gen_msg(syntax, msg_struct) do
+  defp gen_msg(_syntax, msg_struct) do
+    oneofs = Enum.with_index(msg_struct[:oneofs])
+
     Protobuf.Protoc.Template.message(
       msg_struct[:name],
       msg_struct[:options],
       msg_struct[:structs],
       msg_struct[:typespec],
-      msg_struct[:oneofs],
-      gen_fields(syntax, msg_struct[:fields])
+      oneofs,
+      # gen_fields(msg_struct[:name], oneofs, msg_struct[:fields])
+      gen_fields(msg_struct[:fields])
     )
   end
 
@@ -47,16 +69,31 @@ defmodule Protobuf.Protoc.Generator.Message do
     Enum.map(desc.enum_type, fn enum_desc -> EnumGenerator.generate(ctx, enum_desc) end)
   end
 
-  defp gen_fields(syntax, fields) do
-    Enum.map(fields, fn %{opts: opts} = f ->
-      opts_str = Util.options_to_str(opts)
-      opts_str = if opts_str == "", do: "", else: ", " <> opts_str
+  defp gen_fields(fields) do
+    fields
+    |> Enum.map(fn f ->
+      type = Util.trans_type(f[:type])
 
-      label_str =
-        if syntax == :proto3 && f[:label] != "repeated", do: "", else: "#{f[:label]}: true, "
-
-      ":#{f[:name]}, #{f[:number]}, #{label_str}type: #{f[:type]}#{opts_str}"
+      {f[:name], f[:number], repeated: f[:label] === "repeated", type: type, oneof: f[:oneof]}
     end)
+  end
+
+  defp gen_fields(name, oneofs, fields) do
+    grouped_fields =
+      fields
+      |> Enum.map(fn f ->
+        type = Util.trans_type(f[:type])
+
+        {f[:name], f[:number], repeated: f[:label] === "repeated", type: type, oneof: f[:oneof]}
+      end)
+      |> Enum.group_by(fn {_name, _num, opts} -> opts[:oneof] end, fn f -> f end)
+
+    none_one_of_fields =
+      Enum.reduce(oneofs, grouped_fields[nil] || [], fn {oneof, idx}, acc ->
+        [{oneof.name, idx, type: "#{name}_#{oneof.name}"} | acc]
+      end)
+
+    Map.put(grouped_fields, nil, none_one_of_fields)
   end
 
   def msg_opts_str(%{syntax: syntax}, opts) do

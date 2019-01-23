@@ -24,12 +24,13 @@ defmodule Protobuf.Mixfile do
       {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.14", only: :dev, runtime: false},
-      {:eqc_ex, "~> 1.4", only: [:dev, :test]}
+      {:eqc_ex, "~> 1.4", only: [:dev, :test]},
+      {:recase, "~> 0.4", only: :dev, runtime: false}
     ]
   end
 
   defp escript do
-    [main_module: Protobuf.Protoc.CLI, name: "protoc-gen-elixir", app: nil]
+    [main_module: Protobuf.Protoc.CLI, name: "protoc-gen-goldorin", app: nil]
   end
 
   defp description do
@@ -38,9 +39,9 @@ defmodule Protobuf.Mixfile do
 
   defp package do
     [
-      maintainers: ["Bing Han"],
+      maintainers: ["Bing Han", "Tyr Chen"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/tony612/protobuf-elixir"},
+      links: %{"GitHub" => "https://github.com/tyrchen/protobuf-elixir"},
       files:
         ~w(mix.exs README.md lib/google lib/protobuf lib/protobuf.ex src config LICENSE priv/templates .formatter.exs)
     ]

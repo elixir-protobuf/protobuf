@@ -1,0 +1,7 @@
+- name: <%= name %>
+  type: enum
+  fields:
+    <%= Enum.map fields, fn %{name: name, number: number} -> %>
+    - type: <%= name %>
+      meta: value=<%= number %>
+    <% end %>

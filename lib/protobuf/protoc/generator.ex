@@ -13,7 +13,7 @@ defmodule Protobuf.Protoc.Generator do
   end
 
   defp new_file_name(name) do
-    String.replace_suffix(name, ".proto", ".pb.ex")
+    String.replace_suffix(name, ".proto", ".yml")
   end
 
   def generate_content(ctx, desc) do
@@ -34,7 +34,6 @@ defmodule Protobuf.Protoc.Generator do
     list
     |> List.flatten()
     |> Enum.join("\n")
-    |> format_code()
   end
 
   @doc false
