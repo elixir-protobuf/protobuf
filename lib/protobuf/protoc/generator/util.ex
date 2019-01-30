@@ -65,5 +65,7 @@ defmodule Protobuf.Protoc.Generator.Util do
   defp to_gql("uint64"), do: "int"
   defp to_gql("sint64"), do: "int"
   defp to_gql("int64"), do: "int"
+  defp to_gql("big_uint"), do: "string"
+  defp to_gql("big_sint"), do: "string"
   defp to_gql(type), do: type
 end
