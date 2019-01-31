@@ -5,7 +5,7 @@ defmodule Protobuf.Protoc.CLI do
     bin = IO.binread(:all)
     request = Protobuf.Decoder.decode(bin, Google.Protobuf.Compiler.CodeGeneratorRequest)
     # debug
-    # raise inspect(request, limit: :infinity)
+     # raise inspect(request, limit: :infinity)
 
     ctx =
       %Protobuf.Protoc.Context{}

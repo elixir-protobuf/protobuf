@@ -2,6 +2,11 @@ defmodule <%= mod_name %>.Service do
   @moduledoc false
   use GRPC.Service, name: <%= inspect(name) %>
 
+  def descriptor do
+    <%= desc.__struct__.encode(desc |> Map.from_struct() |> Enum.filter(fn {_, x} -> x != nil end) |> desc.__struct__.new()) |> inspect(limit: :infinity) %>
+    |> <%= desc.__struct__ %>.decode()
+  end
+
 <%= Enum.map methods, fn(method) -> %>
   rpc <%= method %>
 <% end %>

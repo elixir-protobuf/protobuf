@@ -2,6 +2,11 @@ defmodule <%= name %> do
   @moduledoc false
   use Protobuf<%= options %>
 
+  def descriptor do
+    <%= desc.__struct__.encode(desc |> Map.from_struct() |> Enum.filter(fn {_, x} -> x != nil end) |> desc.__struct__.new()) |> inspect(limit: :infinity) %>
+    |> <%= desc.__struct__ %>.decode()
+  end
+
 <%= Enum.map fields, fn(field) -> %>
   field <%= field %>
 <% end %>

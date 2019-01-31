@@ -24,7 +24,8 @@ defmodule Protobuf.Protoc.Generator.Message do
       structs: structs_str(desc),
       typespec: typespec_str(fields, desc.oneof_decl),
       fields: fields,
-      oneofs: oneofs_str(desc.oneof_decl)
+      oneofs: oneofs_str(desc.oneof_decl),
+      desc: desc,
     }
   end
 
@@ -35,7 +36,8 @@ defmodule Protobuf.Protoc.Generator.Message do
       msg_struct[:structs],
       msg_struct[:typespec],
       msg_struct[:oneofs],
-      gen_fields(syntax, msg_struct[:fields])
+      gen_fields(syntax, msg_struct[:fields]),
+      msg_struct[:desc]
     )
   end
 
