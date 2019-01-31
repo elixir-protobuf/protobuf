@@ -11,8 +11,8 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
       name: "EnumFoo",
       options: nil,
       value: [
-        %Google.Protobuf.EnumValueDescriptorProto{name: "A", number: 0},
-        %Google.Protobuf.EnumValueDescriptorProto{name: "B", number: 1}
+        Google.Protobuf.EnumValueDescriptorProto.new(name: "A", number: 0),
+        Google.Protobuf.EnumValueDescriptorProto.new(name: "B", number: 1)
       ]
     }
 

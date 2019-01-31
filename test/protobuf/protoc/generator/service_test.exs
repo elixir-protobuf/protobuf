@@ -23,30 +23,30 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
     desc = %Google.Protobuf.ServiceDescriptorProto{
       name: "ServiceFoo",
       method: [
-        %Google.Protobuf.MethodDescriptorProto{
+        Google.Protobuf.MethodDescriptorProto.new(
           name: "MethodA",
           input_type: ".foo.Input0",
           output_type: ".foo.Output0"
-        },
-        %Google.Protobuf.MethodDescriptorProto{
+        ),
+        Google.Protobuf.MethodDescriptorProto.new(
           name: "MethodB",
           input_type: ".foo.Input1",
           output_type: ".foo.Output1",
           client_streaming: true
-        },
-        %Google.Protobuf.MethodDescriptorProto{
+        ),
+        Google.Protobuf.MethodDescriptorProto.new(
           name: "MethodC",
           input_type: ".foo.Input2",
           output_type: ".foo.Output2",
           server_streaming: true
-        },
-        %Google.Protobuf.MethodDescriptorProto{
+        ),
+        Google.Protobuf.MethodDescriptorProto.new(
           name: "MethodD",
           input_type: ".foo.Input3",
           output_type: ".foo.Output3",
           client_streaming: true,
           server_streaming: true
-        }
+        )
       ]
     }
 

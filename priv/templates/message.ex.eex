@@ -7,6 +7,7 @@ defmodule <%= name %> do
   defstruct [<%= struct_fields %>]
 
   def descriptor do
+    IO.inspect(desc)
     <%= desc.__struct__.encode(desc |> Map.from_struct() |> Enum.filter(fn {_, x} -> x != nil end) |> desc.__struct__.new()) |> inspect(limit: :infinity) %>
     |> <%= desc.__struct__ %>.decode()
   end
