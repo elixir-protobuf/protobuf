@@ -71,12 +71,19 @@ defmodule Protobuf.DSL do
       |> Enum.filter(fn props -> props.repeated? end)
       |> Enum.map(fn props -> Map.get(props, :name_atom) end)
 
+    embedded_fields =
+      field_props
+      |> Map.values()
+      |> Enum.filter(fn props -> props.embedded? && !props.map? end)
+      |> Enum.map(fn props -> Map.get(props, :name_atom) end)
+
     %Protobuf.MessageProps{
       tags_map: tags_map(fields),
       ordered_tags: ordered_tags(fields),
       field_props: field_props,
       field_tags: field_tags(fields),
       repeated_fields: repeated_fields,
+      embedded_fields: embedded_fields,
       syntax: syntax,
       oneof: Enum.reverse(oneofs),
       enum?: Keyword.get(options, :enum) == true,

@@ -25,8 +25,8 @@ defmodule Protobuf.Protoc.CLITest do
       FileDescriptorProto.new(
         name: "file1",
         package: "pkg",
-        message_type: DescriptorProto.new(name: "Msg"),
-        enum_type: EnumDescriptorProto.new(name: "Enum")
+        message_type: [DescriptorProto.new(name: "Msg")],
+        enum_type: [EnumDescriptorProto.new(name: "Enum")]
       )
 
     assert %{".pkg.Msg" => %{type_name: "Pkg.Msg"}, ".pkg.Enum" => %{type_name: "Pkg.Enum"}} =
@@ -38,12 +38,13 @@ defmodule Protobuf.Protoc.CLITest do
       FileDescriptorProto.new(
         name: "file1",
         package: "pkg",
-        message_type:
+        message_type: [
           DescriptorProto.new(
             name: "Msg",
-            nested_type: DescriptorProto.new(name: "NestedMsg"),
-            enum_type: EnumDescriptorProto.new(name: "NestedEnumMsg")
+            nested_type: [DescriptorProto.new(name: "NestedMsg")],
+            enum_type: [EnumDescriptorProto.new(name: "NestedEnumMsg")]
           )
+        ]
       )
 
     assert %{
@@ -58,15 +59,17 @@ defmodule Protobuf.Protoc.CLITest do
       FileDescriptorProto.new(
         name: "file1",
         package: "pkg",
-        message_type:
+        message_type: [
           DescriptorProto.new(
             name: "Msg",
-            nested_type:
+            nested_type: [
               DescriptorProto.new(
                 name: "NestedMsg",
-                nested_type: DescriptorProto.new(name: "NestedMsg2")
+                nested_type: [DescriptorProto.new(name: "NestedMsg2")]
               )
+            ]
           )
+        ]
       )
 
     assert %{
@@ -81,8 +84,8 @@ defmodule Protobuf.Protoc.CLITest do
       FileDescriptorProto.new(
         name: "file1",
         package: "pkg",
-        message_type: DescriptorProto.new(name: "Msg"),
-        enum_type: EnumDescriptorProto.new(name: "Enum"),
+        message_type: [DescriptorProto.new(name: "Msg")],
+        enum_type: [EnumDescriptorProto.new(name: "Enum")],
         options: Google.Protobuf.FileOptions.new(elixir_module_prefix: "foo_bar.prefix")
       )
 

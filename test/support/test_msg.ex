@@ -111,4 +111,11 @@ defmodule TestMsg do
     defstruct [:parent]
     field :parent, 1, type: Parent
   end
+
+  defmodule Link do
+    use Protobuf, syntax: :proto3
+    defstruct [:child, :value]
+    field :child, 1, type: Link
+    field :value, 2, type: :int32
+  end
 end

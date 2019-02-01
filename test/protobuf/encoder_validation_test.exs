@@ -135,7 +135,8 @@ defmodule Protobuf.EncoderTest.Validation do
       Protobuf.Encoder.encode(msg)
     end
 
-    msg = TestMsg.Foo.new(h: TestMsg.Foo.Bar.new())
+    msg = TestMsg.Foo.new()
+    msg = %{msg | h: TestMsg.Foo.Bar.new()}
 
     assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#h: %Protocol.UndefinedError/, fn ->
       Protobuf.Encoder.encode(msg)
@@ -143,7 +144,8 @@ defmodule Protobuf.EncoderTest.Validation do
   end
 
   test "embedded field is not right" do
-    msg = TestMsg.Foo.new(e: %{a: 1})
+    msg = TestMsg.Foo.new()
+    msg = %{msg | e: %{a: 1}}
 
     assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#e: %FunctionClauseError/, fn ->
       Protobuf.Encoder.encode(msg)

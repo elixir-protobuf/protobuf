@@ -1,10 +1,37 @@
 defmodule Protobuf.Builder do
   def new(mod) do
-    mod.__default_struct__
+    mod.__default_struct__()
   end
 
   def new(mod, attrs) do
-    struct(mod.__default_struct__, attrs)
+    case attrs do
+      %{__struct__: _} ->
+        attrs
+
+      _ ->
+        msg = struct(mod.__default_struct__(), attrs)
+        props = mod.__message_props__()
+
+        Enum.reduce(props.embedded_fields, msg, fn k, acc ->
+          case msg do
+            %{^k => v} when not is_nil(v) ->
+                f_props = props.field_props[props.field_tags[k]]
+
+                v = if f_props.embedded? do
+                  if f_props.repeated? do
+                    Enum.map(v, fn i -> f_props.type.new(i) end)
+                  else
+                    f_props.type.new(v)
+                  end
+                else
+                  v
+                end
+                Map.put(acc, k, v)
+            _ ->
+              acc
+          end
+        end)
+    end
   end
 
   def field_default(_, %{default: default}) when not is_nil(default), do: default
@@ -27,7 +54,7 @@ defmodule Protobuf.Builder do
   def type_default(:sfixed64), do: 0
   def type_default(:float), do: 0.0
   def type_default(:double), do: 0.0
-  def type_default(:bytes), do: ""
+  def type_default(:bytes), do: <<>>
   def type_default(:string), do: ""
   def type_default(_), do: nil
 end

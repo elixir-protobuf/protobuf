@@ -96,6 +96,11 @@ defmodule Protobuf.DSLTest do
     assert msg_props.repeated_fields == [:g, :h, :i]
   end
 
+  test "supports embedded_fields" do
+    msg_props = TestMsg.Foo.__message_props__()
+    assert msg_props.embedded_fields == [:e, :h]
+  end
+
   test "packed? is true by default for proto3" do
     msg_props = TestMsg.Foo.__message_props__()
     field_props = msg_props.field_props
