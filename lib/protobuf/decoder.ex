@@ -183,6 +183,7 @@ defmodule Protobuf.Decoder do
 
   def decode_type({:enum, type}, wire_varint(), bin) do
     {n, rest} = decode_type(:int32, wire_varint(), bin)
+
     val =
       try do
         type.key(n)
@@ -191,6 +192,7 @@ defmodule Protobuf.Decoder do
           Logger.warn("unknown enum value #{n} when decoding for #{inspect(type)}")
           n
       end
+
     {val, rest}
   end
 

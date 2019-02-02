@@ -49,8 +49,18 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       Google.Protobuf.DescriptorProto.new(
         name: "Foo",
         field: [
-          Google.Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: :TYPE_INT32, label: :LABEL_OPTIONAL),
-          Google.Protobuf.FieldDescriptorProto.new(name: "b", number: 2, type: :TYPE_STRING, label: :LABEL_REQUIRED)
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "a",
+            number: 1,
+            type: :TYPE_INT32,
+            label: :LABEL_OPTIONAL
+          ),
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "b",
+            number: 2,
+            type: :TYPE_STRING,
+            label: :LABEL_REQUIRED
+          )
         ]
       )
 
@@ -69,9 +79,24 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       Google.Protobuf.DescriptorProto.new(
         name: "Foo",
         field: [
-          Google.Protobuf.FieldDescriptorProto.new(name: "a", number: 1, type: :TYPE_INT32, label: :LABEL_OPTIONAL),
-          Google.Protobuf.FieldDescriptorProto.new(name: "b", number: 2, type: :TYPE_STRING, label: :LABEL_REQUIRED),
-          Google.Protobuf.FieldDescriptorProto.new(name: "c", number: 3, type: :TYPE_INT32, label: :LABEL_REPEATED)
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "a",
+            number: 1,
+            type: :TYPE_INT32,
+            label: :LABEL_OPTIONAL
+          ),
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "b",
+            number: 2,
+            type: :TYPE_STRING,
+            label: :LABEL_REQUIRED
+          ),
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "c",
+            number: 3,
+            type: :TYPE_INT32,
+            label: :LABEL_REPEATED
+          )
         ]
       )
 
@@ -392,7 +417,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
             label: :LABEL_OPTIONAL,
             oneof_index: 1
           ),
-          Google.Protobuf.FieldDescriptorProto.new(name: "other", number: 4, type: :TYPE_INT32, label: :LABEL_OPTIONAL)
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "other",
+            number: 4,
+            type: :TYPE_INT32,
+            label: :LABEL_OPTIONAL
+          )
         ]
       )
 

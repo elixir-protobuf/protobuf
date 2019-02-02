@@ -128,8 +128,13 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp type_to_spec(enum, type, repeated \\ false)
-  defp type_to_spec(:TYPE_MESSAGE, type, true), do: TypeUtil.enum_to_spec(:TYPE_MESSAGE, type, true)
-  defp type_to_spec(:TYPE_MESSAGE, type, false), do: TypeUtil.enum_to_spec(:TYPE_MESSAGE, type, false)
+
+  defp type_to_spec(:TYPE_MESSAGE, type, true),
+    do: TypeUtil.enum_to_spec(:TYPE_MESSAGE, type, true)
+
+  defp type_to_spec(:TYPE_MESSAGE, type, false),
+    do: TypeUtil.enum_to_spec(:TYPE_MESSAGE, type, false)
+
   defp type_to_spec(enum, _, _), do: TypeUtil.enum_to_spec(enum)
 
   def get_fields(ctx, desc) do
@@ -201,6 +206,7 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   defp default_value(_, ""), do: nil
   defp default_value(_, nil), do: nil
+
   defp default_value(t, val) do
     v = do_default_value(t, val)
     if v == nil, do: v, else: inspect(v)

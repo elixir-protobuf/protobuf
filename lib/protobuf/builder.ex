@@ -15,9 +15,10 @@ defmodule Protobuf.Builder do
         Enum.reduce(props.embedded_fields, msg, fn k, acc ->
           case msg do
             %{^k => v} when not is_nil(v) ->
-                f_props = props.field_props[props.field_tags[k]]
+              f_props = props.field_props[props.field_tags[k]]
 
-                v = if f_props.embedded? do
+              v =
+                if f_props.embedded? do
                   if f_props.repeated? do
                     Enum.map(v, fn i -> f_props.type.new(i) end)
                   else
@@ -26,7 +27,9 @@ defmodule Protobuf.Builder do
                 else
                   v
                 end
-                Map.put(acc, k, v)
+
+              Map.put(acc, k, v)
+
             _ ->
               acc
           end
