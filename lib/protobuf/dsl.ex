@@ -180,7 +180,7 @@ defmodule Protobuf.DSL do
   defp cal_label(props, _), do: props
 
   defp cal_type(%{enum?: true, type: type} = props) do
-    Map.merge(props, %{type: :enum, enum_type: type, wire_type: Protobuf.Encoder.wire_type(:enum)})
+    Map.merge(props, %{type: {:enum, type}, wire_type: Protobuf.Encoder.wire_type(:enum)})
   end
 
   defp cal_type(%{type: type} = props) do
@@ -195,7 +195,7 @@ defmodule Protobuf.DSL do
 
   defp cal_default(props, _), do: props
 
-  defp cal_embedded(%{type: type} = props) do
+  defp cal_embedded(%{type: type} = props) when is_atom(type) do
     case to_string(type) do
       "Elixir." <> _ -> Map.put(props, :embedded?, !props[:enum?])
       _ -> props

@@ -108,7 +108,8 @@ defmodule Protobuf.Encoder do
   def encode_type(:sint64, n), do: n |> encode_zigzag |> encode_varint
   def encode_type(:bool, true), do: encode_varint(1)
   def encode_type(:bool, false), do: encode_varint(0)
-  def encode_type(:enum, n), do: encode_varint(n)
+  def encode_type({:enum, type}, n) when is_atom(n), do: n |> type.value() |> encode_varint()
+  def encode_type({:enum, _}, n), do: encode_varint(n)
   def encode_type(:fixed64, n), do: <<n::64-little>>
   def encode_type(:sfixed64, n), do: <<n::64-signed-little>>
   def encode_type(:double, n), do: <<n::64-float-little>>

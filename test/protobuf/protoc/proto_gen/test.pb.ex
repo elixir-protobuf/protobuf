@@ -4,8 +4,8 @@ defmodule My.Test.Request do
 
   @type t :: %__MODULE__{
           key: [integer],
-          hue: integer,
-          hat: integer,
+          hue: atom | integer,
+          hat: atom | integer,
           deadline: float,
           somegroup: any,
           name_mapping: %{integer => String.t()},
@@ -139,6 +139,7 @@ defmodule My.Test.ReplyExtensions do
   @moduledoc false
   use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{}
   defstruct []
 end
 
@@ -158,6 +159,7 @@ defmodule My.Test.OldReply do
   @moduledoc false
   use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{}
   defstruct []
 end
 
@@ -201,6 +203,7 @@ defmodule My.Test.Communique.Delta do
   @moduledoc false
   use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{}
   defstruct []
 end
 

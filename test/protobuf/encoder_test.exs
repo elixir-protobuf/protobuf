@@ -77,6 +77,10 @@ defmodule Protobuf.EncoderTest do
   test "encodes enum type" do
     bin = Encoder.encode(TestMsg.Foo.new(j: 2))
     assert bin == <<88, 2>>
+    bin = Encoder.encode(TestMsg.Foo.new(j: :A))
+    assert bin == <<88, 1>>
+    bin = Encoder.encode(TestMsg.Foo.new(j: :B))
+    assert bin == <<88, 2>>
   end
 
   test "encodes unknown enum type" do

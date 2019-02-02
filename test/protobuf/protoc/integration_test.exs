@@ -16,8 +16,8 @@ defmodule Protobuf.Protoc.IntegrationTest do
     input =
       My.Test.Request.new(
         key: [123],
-        hue: My.Test.Request.Color.value(:GREEN),
-        hat: My.Test.HatType.value(:FEZ),
+        hue: :GREEN,
+        hat: :FEZ,
         deadline: 123.0,
         name_mapping: %{321 => "name"},
         msg_mapping: %{1234 => reply}
@@ -37,7 +37,7 @@ defmodule Protobuf.Protoc.IntegrationTest do
       name: "abc",
       temp_c: 1.2,
       height: 2.5,
-      today: 1,
+      today: :MONDAY,
       maybe: true,
       delta: 123,
       msg: My.Test.Reply.new()

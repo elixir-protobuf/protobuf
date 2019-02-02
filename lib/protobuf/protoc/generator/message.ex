@@ -110,8 +110,8 @@ defmodule Protobuf.Protoc.Generator.Message do
     String.pad_trailing("#{name}:", len + 1)
   end
 
-  defp fmt_type(%{opts: %{enum: true}, label: "repeated"}), do: "[integer]"
-  defp fmt_type(%{opts: %{enum: true}}), do: "integer"
+  defp fmt_type(%{opts: %{enum: true}, label: "repeated"}), do: "[atom | integer]"
+  defp fmt_type(%{opts: %{enum: true}}), do: "atom | integer"
 
   defp fmt_type(%{opts: %{map: true}, map: {{k_type, k_name}, {v_type, v_name}}}) do
     k_type = type_to_spec(k_type, k_name)
@@ -119,18 +119,18 @@ defmodule Protobuf.Protoc.Generator.Message do
     "%{#{k_type} => #{v_type}}"
   end
 
-  defp fmt_type(%{label: "repeated", type_num: type_num, type: type}) do
-    "[#{type_to_spec(type_num, type, true)}]"
+  defp fmt_type(%{label: "repeated", type_enum: type_enum, type: type}) do
+    "[#{type_to_spec(type_enum, type, true)}]"
   end
 
-  defp fmt_type(%{type_num: type_num, type: type}) do
-    "#{type_to_spec(type_num, type)}"
+  defp fmt_type(%{type_enum: type_enum, type: type}) do
+    "#{type_to_spec(type_enum, type)}"
   end
 
-  defp type_to_spec(num, type, repeated \\ false)
-  defp type_to_spec(11, type, true), do: TypeUtil.str_to_spec(11, type, true)
-  defp type_to_spec(11, type, false), do: TypeUtil.str_to_spec(11, type, false)
-  defp type_to_spec(num, _, _), do: TypeUtil.str_to_spec(num)
+  defp type_to_spec(enum, type, repeated \\ false)
+  defp type_to_spec(:TYPE_MESSAGE, type, true), do: TypeUtil.enum_to_spec(:TYPE_MESSAGE, type, true)
+  defp type_to_spec(:TYPE_MESSAGE, type, false), do: TypeUtil.enum_to_spec(:TYPE_MESSAGE, type, false)
+  defp type_to_spec(enum, _, _), do: TypeUtil.enum_to_spec(enum)
 
   def get_fields(ctx, desc) do
     oneofs = Enum.map(desc.oneof_decl, & &1.name)
@@ -153,7 +153,7 @@ defmodule Protobuf.Protoc.Generator.Message do
       number: f.number,
       label: label_name(f.label),
       type: type,
-      type_num: f.type,
+      type_enum: f.type,
       opts: opts,
       map: map,
       oneof: f.oneof_index
@@ -161,7 +161,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp field_type_name(ctx, f) do
-    type = TypeUtil.number_to_atom(f.type)
+    type = TypeUtil.from_enum(f.type)
 
     if f.type_name && (type == :enum || type == :message) do
       Util.type_from_type_name(ctx, f.type_name)
@@ -191,46 +191,51 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp field_options(f) do
-    opts = %{enum: f.type == 14, default: default_value(f.type, f.default_value)}
+    opts = %{enum: f.type == :TYPE_ENUM, default: default_value(f.type, f.default_value)}
     if f.options, do: merge_field_options(opts, f), else: opts
   end
 
-  defp label_name(1), do: "optional"
-  defp label_name(2), do: "required"
-  defp label_name(3), do: "repeated"
+  defp label_name(:LABEL_OPTIONAL), do: "optional"
+  defp label_name(:LABEL_REQUIRED), do: "required"
+  defp label_name(:LABEL_REPEATED), do: "repeated"
 
   defp default_value(_, ""), do: nil
   defp default_value(_, nil), do: nil
+  defp default_value(t, val) do
+    v = do_default_value(t, val)
+    if v == nil, do: v, else: inspect(v)
+  end
 
-  defp default_value(type, value) do
-    val =
-      cond do
-        type <= 2 ->
-          case Float.parse(value) do
-            {v, _} -> v
-            :error -> value
-          end
+  defp do_default_value(:TYPE_DOUBLE, v), do: float_default(v)
+  defp do_default_value(:TYPE_FLOAT, v), do: float_default(v)
+  defp do_default_value(:TYPE_INT64, v), do: int_default(v)
+  defp do_default_value(:TYPE_UINT64, v), do: int_default(v)
+  defp do_default_value(:TYPE_INT32, v), do: int_default(v)
+  defp do_default_value(:TYPE_FIXED64, v), do: int_default(v)
+  defp do_default_value(:TYPE_FIXED32, v), do: int_default(v)
+  defp do_default_value(:TYPE_BOOL, v), do: String.to_atom(v)
+  defp do_default_value(:TYPE_STRING, v), do: v
+  defp do_default_value(:TYPE_BYTES, v), do: v
+  defp do_default_value(:TYPE_UINT32, v), do: int_default(v)
+  defp do_default_value(:TYPE_ENUM, v), do: String.to_atom(v)
+  defp do_default_value(:TYPE_SFIXED32, v), do: int_default(v)
+  defp do_default_value(:TYPE_SFIXED64, v), do: int_default(v)
+  defp do_default_value(:TYPE_SINT32, v), do: int_default(v)
+  defp do_default_value(:TYPE_SINT64, v), do: int_default(v)
+  defp do_default_value(_, _), do: nil
 
-        type <= 7 || type == 13 || (type >= 15 && type <= 18) ->
-          case Integer.parse(value) do
-            {v, _} -> v
-            :error -> value
-          end
+  defp float_default(value) do
+    case Float.parse(value) do
+      {v, _} -> v
+      :error -> value
+    end
+  end
 
-        type == 8 ->
-          String.to_atom(value)
-
-        type == 9 || type == 12 ->
-          value
-
-        type == 14 ->
-          String.to_atom(value)
-
-        true ->
-          nil
-      end
-
-    if val == nil, do: val, else: inspect(val)
+  defp int_default(value) do
+    case Integer.parse(value) do
+      {v, _} -> v
+      :error -> value
+    end
   end
 
   defp merge_field_options(opts, f) do

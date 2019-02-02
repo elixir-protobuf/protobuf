@@ -1,6 +1,7 @@
 defmodule Protobuf.Decoder do
   import Protobuf.WireTypes
   import Bitwise, only: [bsl: 2, bsr: 2, band: 2]
+  require Logger
 
   @max_bits 64
   @mask64 bsl(1, @max_bits) - 1
@@ -127,7 +128,7 @@ defmodule Protobuf.Decoder do
     {:error, "wrong wire_type for #{prop_display(prop)}: got #{wire}, want #{wire_type}"}
   end
 
-  # decode_type/2 can only be used to parse unknown fields With no type detail
+  # decode_type/2 can only be used to parse unknown fields with no type detail
   @spec decode_type(integer, binary) :: {binary, binary}
   def decode_type(wire_varint(), bin) do
     decode_varint(bin)
@@ -180,8 +181,17 @@ defmodule Protobuf.Decoder do
     {n != 0, rest}
   end
 
-  def decode_type(:enum, wire_varint(), bin) do
-    decode_type(:int32, wire_varint(), bin)
+  def decode_type({:enum, type}, wire_varint(), bin) do
+    {n, rest} = decode_type(:int32, wire_varint(), bin)
+    val =
+      try do
+        type.key(n)
+      rescue
+        FunctionClauseError ->
+          Logger.warn("unknown enum value #{n} when decoding for #{inspect(type)}")
+          n
+      end
+    {val, rest}
   end
 
   def decode_type(:fixed64, wire_64bits(), bin) do
