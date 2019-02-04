@@ -16,7 +16,7 @@ defmodule Protobuf.Protoc.Generator.Enum do
     ":#{f.name}, #{f.number}"
   end
 
-  defp msg_opts(%{syntax: syntax}, desc) do
+  defp msg_opts(%{syntax: syntax}, _desc) do
     opts = %{syntax: syntax, enum: true}
     str = Util.options_to_str(opts)
     ", " <> str

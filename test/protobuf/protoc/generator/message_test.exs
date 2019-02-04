@@ -143,7 +143,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
             number: 1,
             type: :TYPE_INT32,
             label: :LABEL_OPTIONAL,
-            options: %Google.Protobuf.FieldOptions{packed: true}
+            options: Google.Protobuf.FieldOptions.new(packed: true)
           )
         ]
       )
@@ -164,7 +164,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
             number: 1,
             type: :TYPE_INT32,
             label: :LABEL_OPTIONAL,
-            options: %Google.Protobuf.FieldOptions{deprecated: true}
+            options: Google.Protobuf.FieldOptions.new(deprecated: true)
           )
         ]
       )
@@ -362,8 +362,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
               Google.Protobuf.EnumDescriptorProto.new(
                 name: "EnumFoo",
                 value: [
-                  %Google.Protobuf.EnumValueDescriptorProto{name: "a", number: 0},
-                  %Google.Protobuf.EnumValueDescriptorProto{name: "b", number: 1}
+                  Google.Protobuf.EnumValueDescriptorProto.new(name: "a", number: 0),
+                  Google.Protobuf.EnumValueDescriptorProto.new(name: "b", number: 1)
                 ]
               )
             ],
