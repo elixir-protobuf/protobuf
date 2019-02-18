@@ -4,6 +4,16 @@ defmodule Protobuf.Encoder do
 
   alias Protobuf.{MessageProps, FieldProps}
 
+  @spec encode(atom, struct, keyword) :: iodata
+  def encode(mod, struct, opts) do
+    case struct do
+      %{__struct__: _} ->
+        encode(struct, opts)
+      _ ->
+        encode(mod.new(struct), opts)
+    end
+  end
+
   @spec encode(struct, keyword) :: iodata
   def encode(%mod{} = struct, opts \\ []) do
     res = encode!(struct, mod.__message_props__())
@@ -60,13 +70,14 @@ defmodule Protobuf.Encoder do
   def encode_field(
         :embedded,
         val,
-        %{encoded_fnum: fnum, repeated?: is_repeated, map?: is_map} = prop
+        %{encoded_fnum: fnum, repeated?: is_repeated, map?: is_map, type: type} = prop
       ) do
     repeated = is_repeated || is_map
 
     repeated_or_not(val, repeated, fn v ->
       v = if is_map, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
-      encoded = encode(v, iolist: true)
+      # so that oneof {:atom, v} can be encoded
+      encoded = encode(type, v, iolist: true)
       byte_size = IO.iodata_length(encoded)
       [fnum, [encode_varint(byte_size), encoded]]
     end)

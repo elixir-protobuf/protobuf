@@ -143,12 +143,11 @@ defmodule Protobuf.EncoderTest.Validation do
     end
   end
 
-  test "embedded field is not right" do
+  test "build embedded field map when encode" do
     msg = TestMsg.Foo.new()
     msg = %{msg | e: %{a: 1}}
+    msg1 = TestMsg.Foo.new(e: %{a: 1})
 
-    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#e: %FunctionClauseError/, fn ->
-      Protobuf.Encoder.encode(msg)
-    end
+    assert Protobuf.Encoder.encode(msg) == Protobuf.Encoder.encode(msg1)
   end
 end

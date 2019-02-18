@@ -217,7 +217,7 @@ defmodule Protobuf.DSL do
   end
 
   defp cal_packed(%{repeated: repeated, type: type} = props, :proto3) do
-    packed = !props[:embedded?] && type_numeric?(type)
+    packed = (props[:enum?] || !props[:embedded?]) && type_numeric?(type)
 
     if packed && !repeated do
       raise ":packed must be used with :repeated"
@@ -226,7 +226,7 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp cal_packed(props, _), do: props
+  defp cal_packed(props, _), do: Map.put(props, :packed?, false)
 
   defp cal_repeated(%{map?: true} = props, _), do: Map.put(props, :repeated?, false)
   defp cal_repeated(props, %{repeated: true}), do: Map.put(props, :repeated?, true)
@@ -284,7 +284,7 @@ defmodule Protobuf.DSL do
   def type_numeric?(:sint32), do: true
   def type_numeric?(:sint64), do: true
   def type_numeric?(:bool), do: true
-  def type_numeric?(:enum), do: true
+  def type_numeric?({:enum, _}), do: true
   def type_numeric?(:fixed32), do: true
   def type_numeric?(:sfixed32), do: true
   def type_numeric?(:fixed64), do: true

@@ -23,7 +23,7 @@ defmodule Protobuf.DSLTest do
     msg_props = Foo.__message_props__()
 
     tags_map =
-      Enum.reduce([1, 2, 3] ++ Enum.to_list(5..15), %{}, fn i, acc -> Map.put(acc, i, i) end)
+      Enum.reduce([1, 2, 3] ++ Enum.to_list(5..16), %{}, fn i, acc -> Map.put(acc, i, i) end)
 
     assert tags_map == msg_props.tags_map
     field_props = msg_props.field_props
@@ -64,7 +64,7 @@ defmodule Protobuf.DSLTest do
 
   test "saves ordered tags" do
     msg_props = Foo.__message_props__()
-    assert [1, 2, 3] ++ Enum.to_list(5..15) == msg_props.ordered_tags
+    assert [1, 2, 3] ++ Enum.to_list(5..16) == msg_props.ordered_tags
   end
 
   test "supports embedded fields" do
@@ -94,7 +94,7 @@ defmodule Protobuf.DSLTest do
 
   test "supports repeated_fields" do
     msg_props = Foo.__message_props__()
-    assert msg_props.repeated_fields == [:g, :h, :i]
+    assert msg_props.repeated_fields == [:g, :h, :i, :o]
   end
 
   test "supports embedded_fields" do
@@ -106,6 +106,7 @@ defmodule Protobuf.DSLTest do
     msg_props = Foo.__message_props__()
     field_props = msg_props.field_props
     assert %FieldProps{fnum: 10, name: "i", repeated?: true, packed?: true} = field_props[10]
+    assert %FieldProps{name: "o", repeated?: true, packed?: true} = field_props[16]
   end
 
   test "packed? can be set to false for proto3" do
@@ -161,7 +162,8 @@ defmodule Protobuf.DSLTest do
              k: false,
              l: %{},
              m: 0,
-             n: 0.0
+             n: 0.0,
+             o: []
            } == Foo.__default_struct__()
   end
 

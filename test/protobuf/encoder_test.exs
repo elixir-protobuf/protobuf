@@ -83,6 +83,11 @@ defmodule Protobuf.EncoderTest do
     assert bin == <<88, 2>>
   end
 
+  test "encodes repeated enum fields using packed by default" do
+    bin = Encoder.encode(TestMsg.Foo.new(o: [:A, :B]))
+    assert bin == <<130, 1, 2, 1, 2>>
+  end
+
   test "encodes unknown enum type" do
     bin = Encoder.encode(TestMsg.Foo.new(j: 3))
     assert bin == <<88, 3>>

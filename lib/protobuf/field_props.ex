@@ -30,7 +30,7 @@ defmodule Protobuf.FieldProps do
             repeated?: false,
             enum?: false,
             embedded?: false,
-            packed?: false,
+            packed?: nil,
             map?: false,
             encoded_fnum: nil
 end
