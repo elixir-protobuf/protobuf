@@ -159,6 +159,7 @@ defmodule Protobuf.Encoder do
   def wire_type(:sint32), do: wire_varint()
   def wire_type(:sint64), do: wire_varint()
   def wire_type(:bool), do: wire_varint()
+  def wire_type({:enum, _}), do: wire_varint()
   def wire_type(:enum), do: wire_varint()
   def wire_type(:fixed64), do: wire_64bits()
   def wire_type(:sfixed64), do: wire_64bits()

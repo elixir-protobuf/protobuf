@@ -230,6 +230,8 @@ defmodule Protobuf.DSL do
 
   defp cal_repeated(%{map?: true} = props, _), do: Map.put(props, :repeated?, false)
   defp cal_repeated(props, %{repeated: true}), do: Map.put(props, :repeated?, true)
+  defp cal_repeated(_props, %{repeated: true, oneof: true}), do:
+    raise ":oneof can't be used with repeated"
   defp cal_repeated(props, _), do: props
 
   defp cal_encoded_fnum(%{fnum: fnum, packed?: true} = props) do
