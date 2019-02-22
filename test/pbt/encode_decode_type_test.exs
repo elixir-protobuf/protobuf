@@ -4,12 +4,12 @@ defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
   defmacro make_property(gen_func, field_type, wire_type) do
     quote do
       property unquote(Atom.to_string(field_type)) <> " roundtrip" do
-        forall {n, tail} <- {unquote(gen_func), binary()} do
+        forall n <- unquote(gen_func) do
           bin = Encoder.encode_type(unquote(field_type), n)
 
           ensure(
             {n, tail} ==
-              Decoder.decode_type(
+              Decoder.decode_type2(
                 unquote(field_type),
                 unquote(wire_type),
                 bin <> tail

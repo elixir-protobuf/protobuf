@@ -25,6 +25,54 @@ defmodule Protobuf.Decoder do
     raw_decode_key(data, [])
   end
 
+  defmacro decode_type_m(type, key, val) do
+    quote do
+      case unquote(type) do
+        :int32 ->
+          <<n::signed-integer-32>> = <<unquote(val)::32>>
+          n
+        :string -> unquote(val)
+        :bytes -> unquote(val)
+        :int64 ->
+          <<n::signed-integer-64>> = <<unquote(val)::64>>
+          n
+        :uint32 -> unquote(val)
+        :uint64 -> unquote(val)
+        :bool -> unquote(val) != 0
+        :sint32 -> decode_zigzag(unquote(val))
+        :sint64 -> decode_zigzag(unquote(val))
+        :fixed64 ->
+          <<n::little-64>> = unquote(val)
+          n
+        :sfixed64 ->
+          <<n::little-signed-64>> =unquote(val)
+          n
+        :double ->
+          <<n::little-float-64>> = unquote(val)
+          n
+        :fixed32 ->
+          <<n::little-32>> = unquote(val)
+          n
+        :sfixed32 ->
+          <<n::little-signed-32>> = unquote(val)
+          n
+        :float ->
+          <<n::little-float-32>> = unquote(val)
+          n
+        {:enum, enum_type} ->
+          try do
+            enum_type.key(unquote(val))
+          rescue
+            FunctionClauseError ->
+              Logger.warn("unknown enum value #{unquote(val)} when decoding for #{inspect(unquote(type))}")
+              unquote(val)
+          end
+        _ ->
+          raise DecodeError, message: "can't decode type #{unquote(type)} for field #{unquote(key)}"
+      end
+    end
+  end
+
   def build_struct([tag, wire, val | rest], %{field_props: f_props} = msg_props, struct) do
     case f_props do
       %{^tag => %{wire_type: ^wire, repeated?: is_repeated, map?: is_map, type: type, oneof: oneof, name_atom: name_atom, embedded?: embedded} = prop} ->
@@ -48,48 +96,7 @@ defmodule Protobuf.Decoder do
               Map.put(struct, key, val)
           end
         else
-          val = case type do
-            :int32 ->
-              <<n::signed-integer-32>> = <<val::32>>
-              n
-            :string -> val
-            :bytes -> val
-            :int64 ->
-              <<n::signed-integer-64>> = <<val::64>>
-            :uint32 -> val
-            :uint64 -> val
-            :bool -> val != 0
-            :sint32 -> decode_zigzag(val)
-            :sint64 -> decode_zigzag(val)
-            :fixed64 ->
-              <<n::little-64>> = val
-              n
-            :sfixed64 ->
-              <<n::little-signed-64>> =val
-              n
-            :double ->
-              <<n::little-float-64>> = val
-              n
-            :fixed32 ->
-              <<n::little-32>> = val
-              n
-            :sfixed32 ->
-              <<n::little-signed-32>> = val
-              n
-            :float ->
-              <<n::little-float-32>> = val
-              n
-            {:enum, enum_type} ->
-              try do
-                enum_type.key(val)
-              rescue
-                FunctionClauseError ->
-                  Logger.warn("unknown enum value #{val} when decoding for #{inspect(type)}")
-                  val
-              end
-            _ ->
-              raise DecodeError, message: "can't decode type #{type} for field #{key}"
-          end
+          val = decode_type_m(type, key, val)
           val = if oneof, do: {name_atom, val}, else: val
           case struct do
             %{^key => nil} ->
@@ -120,6 +127,9 @@ defmodule Protobuf.Decoder do
     struct
   end
 
+  def decode_varint(bin, type \\ :key) do
+    raw_decode_varint2(bin, [], type)
+  end
 
   defp raw_decode_key(<<>>, result), do: Enum.reverse(result)
   # defp raw_decode_key(<<bin::bits>>, result), do: raw_decode_varint(bin, result, :key, {0, 0})
@@ -642,16 +652,16 @@ defmodule Protobuf.Decoder do
   def decode_zigzag(n) when band(n, 1) == 1, do: -bsr(n + 1, 1)
 
   @spec decode_varint(binary) :: {number, binary}
-  def decode_varint(<<>>), do: {0, <<>>}
-  def decode_varint(bin), do: decode_varint(bin, 0, 0)
+  def decode_varint2(<<>>), do: {0, <<>>}
+  def decode_varint2(bin), do: decode_varint2(bin, 0, 0)
 
-  defp decode_varint(<<>>, 0, 0), do: {0, <<>>}
+  defp decode_varint2(<<>>, 0, 0), do: {0, <<>>}
 
-  defp decode_varint(<<1::1, x::7, rest::binary>>, n, acc) when n < @max_bits - 7 do
-    decode_varint(rest, n + 7, bsl(x, n) + acc)
+  defp decode_varint2(<<1::1, x::7, rest::binary>>, n, acc) when n < @max_bits - 7 do
+    decode_varint2(rest, n + 7, bsl(x, n) + acc)
   end
 
-  defp decode_varint(<<0::1, x::7, rest::binary>>, n, acc) do
+  defp decode_varint2(<<0::1, x::7, rest::binary>>, n, acc) do
     key = x |> bsl(n) |> Kernel.+(acc)
     {key, rest}
   end

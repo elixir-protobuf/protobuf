@@ -5,11 +5,9 @@ defmodule Protobuf.EncodeDecodeVarintTest do
   alias Protobuf.{Encoder, Decoder}
 
   property "varint roundtrip" do
-    forall {n, tail} <- {largeint(), binary()} do
+    forall n <- largeint() do
       bin = Encoder.encode_varint(n)
-      {n, ^tail} = Decoder.decode_varint(bin <> tail)
-      # how n is interpreted depends on field type
-      # so re-encode them as bytes and test?
+      [n] = Decoder.decode_varint(bin, :value)
       ensure(<<n::signed-64>> == <<n::64>>)
     end
   end
