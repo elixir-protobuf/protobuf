@@ -38,8 +38,8 @@ defmodule Protobuf.DSL do
         def __default_struct__ do
           struct = unquote(Macro.escape(default_struct))
 
-          Enum.reduce(unquote(Macro.escape(enum_fields)), struct, fn {name, type, default}, acc ->
-            Map.put(struct, name, type.value(default))
+          Enum.reduce(unquote(Macro.escape(enum_fields)), struct, fn {name, type}, acc ->
+            Map.put(acc, name, type.key(0))
           end)
         end
       else
@@ -50,10 +50,20 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp def_enum_functions(%{enum?: true, field_props: props}) do
+  defp def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}) do
+    if syntax == :proto3 do
+      found = Enum.find(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
+        fnum == 0
+      end)
+      if !found, do: raise "The first enum value must be zero in proto3"
+    end
     Enum.map(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
       quote do
         def value(unquote(name_atom)), do: unquote(fnum)
+      end
+    end) ++
+    Enum.map(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
+      quote do
         def key(unquote(fnum)), do: unquote(name_atom)
       end
     end)
@@ -272,12 +282,15 @@ defmodule Protobuf.DSL do
     |> Enum.map(fn props -> {props.name_atom, props.type} end)
   end
 
-  def enum_fields(msg_props) do
+  def enum_fields(%{syntax: :proto3} = msg_props) do
     msg_props.field_props
     |> Map.values()
-    |> Enum.filter(fn props -> props.enum? && props.default end)
-    |> Enum.map(fn props -> {props.name_atom, props.enum_type, props.default} end)
+    |> Enum.filter(fn props -> props.enum? && !props.default && !props.repeated? end)
+    |> Enum.map(fn props ->
+        {props.name_atom, elem(props.type, 1)}
+    end)
   end
+  def enum_fields(%{syntax: _} = msg_props), do: %{}
 
   def type_numeric?(:int32), do: true
   def type_numeric?(:int64), do: true

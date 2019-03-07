@@ -16,6 +16,7 @@ defmodule TestMsg do
   defmodule EnumFoo do
     use Protobuf, enum: true, syntax: :proto3
 
+    field :UNKNOWN, 0
     field :A, 1
     field :B, 2
     field :C, 4

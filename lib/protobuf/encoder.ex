@@ -32,7 +32,7 @@ defmodule Protobuf.Encoder do
 
     Enum.reduce(Map.values(field_props), [], fn prop, acc ->
       try do
-        %{name_atom: name, oneof: oneof} = prop
+        %{name_atom: name, oneof: oneof, enum?: is_enum, type: type} = prop
 
         val = if oneof, do: oneofs[name], else: Map.get(struct, name, nil)
 
@@ -40,7 +40,8 @@ defmodule Protobuf.Encoder do
           syntax == :proto2 && ((val == nil && prop.optional?) || val == [] || val == %{}) ->
             acc
 
-          syntax == :proto3 && ((empty_val?(val) && !oneof) || (oneof && is_nil(val))) ->
+          syntax == :proto3 && ((empty_val?(val) && !oneof) || (is_enum && is_enum_default(type, val)) ||
+                                (oneof && is_nil(val))) ->
             acc
 
           true ->
@@ -182,6 +183,10 @@ defmodule Protobuf.Encoder do
   defp empty_val?(v) do
     !v || v == 0 || v == "" || v == [] || v == %{}
   end
+
+  defp is_enum_default({_, type}, v) when is_atom(v), do: type.value(v) == 0
+  defp is_enum_default({_, type}, v) when is_integer(v), do: v == 0
+  defp is_enum_default({_, type}, v), do: false
 
   defp oneof_actual_vals(
          %{field_tags: field_tags, field_props: field_props, oneof: oneof},

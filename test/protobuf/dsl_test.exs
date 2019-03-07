@@ -158,10 +158,10 @@ defmodule Protobuf.DSLTest do
              g: [],
              h: [],
              i: [],
-             j: 0,
+             j: :UNKNOWN,
              k: false,
              l: %{},
-             m: 0,
+             m: :UNKNOWN,
              n: 0.0,
              o: []
            } == Foo.__default_struct__()
@@ -177,7 +177,7 @@ defmodule Protobuf.DSLTest do
              g: [],
              h: [],
              i: [],
-             j: 0,
+             j: :UNKNOWN,
              k: false,
              l: %{}
            } = Foo.new()
@@ -192,7 +192,7 @@ defmodule Protobuf.DSLTest do
              g: [],
              h: [],
              i: [],
-             j: 0,
+             j: :UNKNOWN,
              k: false,
              l: %{}
            } = Foo.new(%{a: 1, b: 42, c: "abc", e: Foo.Bar.new(a: 2, b: "asd")})
