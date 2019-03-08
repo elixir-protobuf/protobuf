@@ -1,11 +1,12 @@
 defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
-  alias Protobuf.{Encoder, Decoder}
+  alias Protobuf.{Encoder}
 
   require Logger
   import Protobuf.Decoder
 
-  def decode_type(type, val) do
-    decode_type_m(type, :fake_key, val)
+  def decode_type(wire, type, bin) do
+    [n] = raw_decode_value(wire, bin, [])
+    decode_type_m(type, :fake_key, n)
   end
 
   defmacro make_property(gen_func, field_type, wire_type) do
@@ -17,6 +18,7 @@ defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
           ensure(
             n ==
               decode_type(
+                unquote(wire_type),
                 unquote(field_type),
                 bin
               )
@@ -35,6 +37,7 @@ defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
         forall n <- unquote(gen_func) do
           canonical_val =
             decode_type(
+              unquote(wire_type),
               unquote(field_type),
               Encoder.encode_type(unquote(field_type), n)
             )
@@ -44,6 +47,7 @@ defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
           ensure(
             canonical_val ==
               decode_type(
+                unquote(wire_type),
                 unquote(field_type),
                 bin
               )
@@ -61,11 +65,11 @@ defmodule Protobuf.EncodeDecodeTypeTest do
   import Protobuf.EncodeDecodeTypeTest.PropertyGenerator
 
   defp uint32_gen do
-    let(<<x::unsigned-integer-size(32)>> = v <- binary(4), do: return(v))
+    let(<<x::unsigned-integer-size(32)>> <- binary(4), do: return(x))
   end
 
   defp uint64_gen do
-    let(<<x::unsigned-integer-size(64)>> = v <- binary(8), do: return(v))
+    let(<<x::unsigned-integer-size(64)>> <- binary(8), do: return(x))
   end
 
   make_property(int(), :int32, 0)

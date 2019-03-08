@@ -6,7 +6,7 @@ defmodule Protobuf.Decoder do
   @max_bits 64
   @mask64 bsl(1, @max_bits) - 1
 
-  alias Protobuf.{DecodeError, MessageProps, FieldProps}
+  alias Protobuf.DecodeError
 
   @spec decode(binary, atom) :: any
   def decode(data, module) do
@@ -21,6 +21,8 @@ defmodule Protobuf.Decoder do
     raw_decode_key(data, [])
   end
 
+  @doc false
+  # For performance
   defmacro decode_type_m(type, key, val) do
     quote do
       case unquote(type) do
@@ -78,36 +80,35 @@ defmodule Protobuf.Decoder do
           embedded_msg = decode(val, type)
           val = if is_map, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
           val = if oneof, do: {name_atom, val}, else: val
-
-          case struct do
+          val = case struct do
             %{^key => nil} ->
-              val = if is_repeated, do: [val], else: val
-              Map.put(struct, key, val)
+              if is_repeated, do: [val], else: val
 
             %{^key => value} ->
-              val = if is_repeated, do: [val|value], else: Map.merge(value, val)
-              Map.put(struct, key, val)
+              if is_repeated, do: [val|value], else: Map.merge(value, val)
 
-            %{} ->
-              val = if is_repeated, do: [val], else: val
-              Map.put(struct, key, val)
+            _ ->
+              if is_repeated, do: [val], else: val
           end
+          Map.put(struct, key, val)
         else
           val = decode_type_m(type, key, val)
           val = if oneof, do: {name_atom, val}, else: val
-          case struct do
-            %{^key => nil} ->
-              val = if is_repeated, do: [val], else: val
-              Map.put(struct, key, val)
+          val = if is_repeated do
+            case struct do
+              %{^key => nil} ->
+                [val]
 
-            %{^key => value} ->
-              val = if is_repeated, do: [val|value], else: val
-              Map.put(struct, key, val)
+              %{^key => value} ->
+                [val|value]
 
-            %{} ->
-              val = if is_repeated, do: [val], else: val
-              Map.put(struct, key, val)
+              _ ->
+                [val]
+            end
+          else
+            val
           end
+          Map.put(struct, key, val)
         end
         build_struct(rest, msg_props, struct)
       %{^tag => %{packed?: true} = f_prop} ->
@@ -124,6 +125,7 @@ defmodule Protobuf.Decoder do
     struct
   end
 
+  @doc false
   def decode_varint(bin, type \\ :key) do
     raw_decode_varint(bin, [], type)
   end
@@ -253,22 +255,20 @@ defmodule Protobuf.Decoder do
     raw_decode_varint(bin, [val|result], :packed)
   end
 
-  defp raw_decode_value(wire_varint(), <<bin::bits>>, result) do
-    # raw_decode_varint(bin, result, :value, {0, 0})
+  @doc false
+  def raw_decode_value(wire_varint(), <<bin::bits>>, result) do
     raw_decode_varint(bin, result, :value)
   end
 
-  defp raw_decode_value(wire_delimited(), <<bin::bits>>, result) do
-    # raw_decode_varint(bin, result, :bytes_len, {0, 0})
+  def raw_decode_value(wire_delimited(), <<bin::bits>>, result) do
     raw_decode_varint(bin, result, :bytes_len)
   end
 
-  defp raw_decode_value(wire_32bits(), <<n::32, rest::bits>>, result) do
+  def raw_decode_value(wire_32bits(), <<n::32, rest::bits>>, result) do
     raw_decode_key(rest, [<<n::32>>|result])
-    # raw_decode_key(rest, [n|result])
   end
 
-  defp raw_decode_value(wire_64bits(), <<n::64, rest::bits>>, result) do
+  def raw_decode_value(wire_64bits(), <<n::64, rest::bits>>, result) do
     raw_decode_key(rest, [<<n::64>>|result])
   end
 
@@ -304,40 +304,7 @@ defmodule Protobuf.Decoder do
     decode_packed(wire_64bits(), rest, [<<n::64>>|result])
   end
 
-  @spec find_field(MessageProps.t(), integer) :: {atom, FieldProps.t()} | {atom} | false
-  def find_field(_, tag) when tag < 0 do
-    raise DecodeError, message: "decoded tag is less than 0"
-  end
-
-  def find_field(props, tag) when is_integer(tag) do
-    case props do
-      %{tags_map: %{^tag => _field_num}, field_props: %{^tag => prop}} -> {:field_num, prop}
-      %{extendable?: true} -> {:extention}
-      _ -> {:field_num, %FieldProps{}}
-    end
-  end
-
-  @spec class_field(FieldProps.t(), integer) :: atom | {:error, String.t()}
-  def class_field(%{wire_type: wire_delimited(), embedded?: true}, wire_delimited()) do
-    :embedded
-  end
-
-  def class_field(%{wire_type: wire}, wire) do
-    :normal
-  end
-
-  def class_field(%{repeated?: true, packed?: true}, wire_delimited()) do
-    :packed
-  end
-
-  def class_field(%{wire_type: wire}, _) when is_nil(wire) do
-    :unknown_field
-  end
-
-  def class_field(%{wire_type: wire_type} = prop, wire) do
-    {:error, "wrong wire_type for #{prop_display(prop)}: got #{wire}, want #{wire_type}"}
-  end
-
+  @doc false
   @spec decode_zigzag(integer) :: integer
   def decode_zigzag(n) when band(n, 1) == 0, do: bsr(n, 1)
   def decode_zigzag(n) when band(n, 1) == 1, do: -bsr(n + 1, 1)
