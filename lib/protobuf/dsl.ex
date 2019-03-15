@@ -52,7 +52,7 @@ defmodule Protobuf.DSL do
 
   defp def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}) do
     if syntax == :proto3 do
-      found = Enum.find(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
+      found = Enum.find(props, fn {_, %{fnum: fnum}} ->
         fnum == 0
       end)
       if !found, do: raise "The first enum value must be zero in proto3"
@@ -290,7 +290,7 @@ defmodule Protobuf.DSL do
         {props.name_atom, elem(props.type, 1)}
     end)
   end
-  def enum_fields(%{syntax: _} = msg_props), do: %{}
+  def enum_fields(%{syntax: _}), do: %{}
 
   def type_numeric?(:int32), do: true
   def type_numeric?(:int64), do: true
