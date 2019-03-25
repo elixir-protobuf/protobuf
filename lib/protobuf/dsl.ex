@@ -61,7 +61,11 @@ defmodule Protobuf.DSL do
       quote do
         def value(unquote(name_atom)), do: unquote(fnum)
       end
-    end) ++
+    end) ++ [
+      quote do
+        def value(v) when is_integer(v), do: v
+      end
+    ] ++
     Enum.map(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
       quote do
         def key(unquote(fnum)), do: unquote(name_atom)
