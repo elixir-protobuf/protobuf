@@ -185,8 +185,8 @@ defmodule Protobuf.Encoder do
   end
 
   defp is_enum_default({_, type}, v) when is_atom(v), do: type.value(v) == 0
-  defp is_enum_default({_, type}, v) when is_integer(v), do: v == 0
-  defp is_enum_default({_, type}, v), do: false
+  defp is_enum_default({_, _}, v) when is_integer(v), do: v == 0
+  defp is_enum_default({_, _}, _), do: false
 
   defp oneof_actual_vals(
          %{field_tags: field_tags, field_props: field_props, oneof: oneof},
