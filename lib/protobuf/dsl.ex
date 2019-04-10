@@ -24,7 +24,7 @@ defmodule Protobuf.DSL do
     oneofs = Module.get_attribute(env.module, :oneofs)
     msg_props = generate_msg_props(fields, oneofs, options)
     default_fields = generate_default_fields(syntax, msg_props)
-    enum_fields = enum_fields(msg_props)
+    enum_fields = enum_fields(msg_props, false)
     default_struct = Map.put(default_fields, :__struct__, env.module)
 
     quote do
@@ -286,15 +286,16 @@ defmodule Protobuf.DSL do
     |> Enum.map(fn props -> {props.name_atom, props.type} end)
   end
 
-  def enum_fields(%{syntax: :proto3} = msg_props) do
+  def enum_fields(msg_props, include_oneof? \\ true)
+  def enum_fields(%{syntax: :proto3} = msg_props, include_oneof?) do
     msg_props.field_props
     |> Map.values()
-    |> Enum.filter(fn props -> props.enum? && !props.default && !props.repeated? end)
+    |> Enum.filter(fn props -> props.enum? && !props.default && !props.repeated? && (!props.oneof || include_oneof?) end)
     |> Enum.map(fn props ->
         {props.name_atom, elem(props.type, 1)}
     end)
   end
-  def enum_fields(%{syntax: _}), do: %{}
+  def enum_fields(%{syntax: _}, _include_oneof?), do: %{}
 
   def type_numeric?(:int32), do: true
   def type_numeric?(:int64), do: true
