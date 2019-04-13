@@ -142,7 +142,6 @@ defmodule Protobuf.EncoderTest do
     assert Encoder.encode(msg) == <<18, 0, 24, 0>>
 
     msg = TestMsg.OneofProto3.new(first: {:a, 0}, second: {:d, ""})
-    IO.inspect(msg)
     assert Encoder.encode(msg) == <<8, 0, 34, 0>>
     assert TestMsg.OneofProto3.encode(msg) == <<8, 0, 34, 0>>
     msg = TestMsg.OneofProto3.new(first: {:b, ""}, second: {:c, 0})
