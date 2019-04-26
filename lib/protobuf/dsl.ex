@@ -57,6 +57,9 @@ defmodule Protobuf.DSL do
       end)
       if !found, do: raise "The first enum value must be zero in proto3"
     end
+    mapping = Enum.reduce(props, %{}, fn {_, %{fnum: fnum, name_atom: name_atom}}, acc ->
+      Map.put(acc, name_atom, fnum)
+    end)
     Enum.map(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
       quote do
         def value(unquote(name_atom)), do: unquote(fnum)
@@ -70,7 +73,11 @@ defmodule Protobuf.DSL do
       quote do
         def key(unquote(fnum)), do: unquote(name_atom)
       end
-    end)
+    end) ++ [
+      quote do
+        def mapping(), do: unquote(Macro.escape(mapping))
+      end
+    ]
   end
 
   defp def_enum_functions(_), do: nil

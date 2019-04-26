@@ -137,6 +137,7 @@ defmodule Protobuf.DSLTest do
     assert TestMsg.EnumFoo.key(1) == :A
     assert TestMsg.EnumFoo.key(2) == :B
     assert TestMsg.EnumFoo.key(4) == :C
+    assert TestMsg.EnumFoo.mapping() == %{UNKNOWN: 0, A: 1, B: 2, C: 4}
 
     assert %FieldProps{fnum: 11, type: {:enum, TestMsg.EnumFoo}, wire_type: 0} =
              Foo.__message_props__().field_props[11]
