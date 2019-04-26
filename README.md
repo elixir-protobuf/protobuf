@@ -56,7 +56,7 @@ $ mix escript.install hex protobuf
 ```
 3. Generate Elixir code using protoc
 ```
-$ protoc --elixir_out=./lib helloword.proto
+$ protoc --elixir_out=./lib helloworld.proto
 ```
 4. Files `helloworld.pb.ex` will be generated, like:
 
