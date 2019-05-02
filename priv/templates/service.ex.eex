@@ -3,10 +3,9 @@ defmodule <%= mod_name %>.Service do
   use GRPC.Service, name: <%= inspect(name) %>
 
   def descriptor do
-    bin_desc
+    <%= desc.__struct__ %>.decode(
       <%= desc.__struct__.encode(desc |> Map.from_struct() |> Enum.filter(fn {_, x} -> x != nil end) |> desc.__struct__.new()) |> inspect(limit: :infinity) %>
-
-    <%= desc.__struct__ %>.decode(bin_desc)
+    )
   end
 
 <%= Enum.map methods, fn(method) -> %>
