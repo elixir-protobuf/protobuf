@@ -99,7 +99,7 @@ Note:
 
 ### gRPC Support
 
-If you write [services](https://developers.google.com/protocol-buffers/docs/proto#services) in protobuf, you can generate [gRPC](https://github.com/tony612/grpc-elixir) code by passing `plugins=grpc` in --go_out:
+If you write [services](https://developers.google.com/protocol-buffers/docs/proto#services) in protobuf, you can generate [gRPC](https://github.com/tony612/grpc-elixir) code by passing `plugins=grpc` in `--elixir_out`:
 ```
 $ protoc --elixir_out=plugins=grpc:./lib/ *.proto
 ```
