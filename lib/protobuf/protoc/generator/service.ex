@@ -18,9 +18,10 @@ defmodule Protobuf.Protoc.Generator.Service do
   end
 
   defp generate_service_method(ctx, m) do
+    name = Macro.underscore(m.name)
     input = service_arg(Util.type_from_type_name(ctx, m.input_type), m.client_streaming)
     output = service_arg(Util.type_from_type_name(ctx, m.output_type), m.server_streaming)
-    ":#{m.name}, #{input}, #{output}"
+    ":#{name}, #{input}, #{output}"
   end
 
   defp service_arg(type, true), do: "stream(#{type})"
