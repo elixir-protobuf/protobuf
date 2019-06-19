@@ -80,8 +80,8 @@ defmodule Protobuf.Encoder do
     repeated_or_not(val, repeated, fn v ->
       v = if is_map, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
       # so that oneof {:atom, v} can be encoded
-      encoded = encode(type, v, iolist: true)
-      byte_size = IO.iodata_length(encoded)
+      encoded = encode(type, v, [])
+      byte_size = byte_size(encoded)
       [fnum, [encode_varint(byte_size), encoded]]
     end)
   end
