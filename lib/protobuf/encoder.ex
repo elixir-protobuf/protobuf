@@ -182,8 +182,15 @@ defmodule Protobuf.Encoder do
     end
   end
 
-  defp empty_val?(v) do
-    !v || v == 0 || v == "" || v == [] || v == %{}
+  defp empty_val?(nil), do: true
+  defp empty_val?(false), do: true
+  defp empty_val?(0), do: true
+  defp empty_val?(0.0), do: true
+  defp empty_val?(""), do: true
+  defp empty_val?([]), do: true
+  defp empty_val?(v) when map_size(v) == 0, do: true
+  defp empty_val?(_) do
+    false
   end
 
   defp is_enum_default({_, type}, v) when is_atom(v), do: type.value(v) == 0
