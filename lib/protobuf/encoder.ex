@@ -17,7 +17,6 @@ defmodule Protobuf.Encoder do
   @spec encode(struct, keyword) :: iodata
   def encode(%mod{} = struct, opts \\ []) do
     res = encode!(struct, mod.__message_props__())
-    res = Enum.reverse(res)
 
     case Keyword.fetch(opts, :iolist) do
       {:ok, true} -> res
@@ -30,38 +29,57 @@ defmodule Protobuf.Encoder do
     syntax = props.syntax
     oneofs = oneof_actual_vals(props, struct)
 
-    Enum.reduce(Map.values(field_props), [], fn prop, acc ->
-      try do
-        %{name_atom: name, oneof: oneof, enum?: is_enum, type: type} = prop
-
-        val = if oneof, do: oneofs[name], else: Map.get(struct, name, nil)
-
-        cond do
-          syntax == :proto2 && ((val == nil && prop.optional?) || val == [] || val == %{}) ->
-            acc
-
-          syntax == :proto3 && ((empty_val?(val) && !oneof) ||
-                               (empty_val?(val) && oneof && is_enum) ||
-                               (is_enum && is_enum_default(type, val)) ||
-                               (oneof && is_nil(val))) ->
-            acc
-
-          true ->
-            [encode_field(class_field(prop), val, prop) | acc]
-        end
-      rescue
-        error ->
-          stacktrace = System.stacktrace()
-
-          msg =
-            "Got error when encoding #{inspect(struct.__struct__)}##{prop.name_atom}: #{
-              inspect(error)
-            }"
-
-          reraise Protobuf.EncodeError, [message: msg], stacktrace
-      end
-    end)
+    encode_fields(Map.values(field_props), syntax, struct, oneofs, [])
+    |> Enum.reverse()
   end
+
+  def encode_fields([], _, _, _, acc) do
+    acc
+  end
+  def encode_fields([prop|tail], syntax, struct, oneofs, acc) do
+    %{name_atom: name, oneof: oneof, enum?: is_enum, type: type} = prop
+
+    val =
+      if oneof do
+        oneofs[name]
+      else
+        case struct do
+          %{^name => v} ->
+            v
+          _ ->
+            nil
+        end
+      end
+
+    if skip_field?(syntax, val, prop) || (is_enum && is_enum_default(type, val)) do
+      encode_fields(tail, syntax, struct, oneofs, acc)
+    else
+      acc = [encode_field(class_field(prop), val, prop) | acc]
+      encode_fields(tail, syntax, struct, oneofs, acc)
+    end
+  rescue
+    error ->
+      stacktrace = System.stacktrace()
+
+      msg =
+        "Got error when encoding #{inspect(struct.__struct__)}##{prop.name_atom}: #{
+          inspect(error)
+        }"
+
+      reraise Protobuf.EncodeError, [message: msg], stacktrace
+  end
+
+  @doc false
+  def skip_field?(syntax, val, prop)
+  def skip_field?(_, [], _), do: true
+  def skip_field?(_, v, _) when map_size(v) == 0, do: true
+  def skip_field?(:proto2, nil, %{optional?: true}), do: true
+  def skip_field?(:proto3, nil, _), do: true
+  def skip_field?(:proto3, 0, %{oneof: nil}), do: true
+  def skip_field?(:proto3, 0.0, %{oneof: nil}), do: true
+  def skip_field?(:proto3, "", %{oneof: nil}), do: true
+  def skip_field?(:proto3, false, %{oneof: nil}), do: true
+  def skip_field?(_, _, _), do: false
 
   @spec encode_field(atom, any, FieldProps.t()) :: iodata
   def encode_field(:normal, val, %{encoded_fnum: fnum, type: type, repeated?: is_repeated}) do
@@ -82,14 +100,14 @@ defmodule Protobuf.Encoder do
       # so that oneof {:atom, v} can be encoded
       encoded = encode(type, v, [])
       byte_size = byte_size(encoded)
-      [fnum, [encode_varint(byte_size), encoded]]
+      [fnum, encode_varint(byte_size), encoded]
     end)
   end
 
   def encode_field(:packed, val, %{type: type, encoded_fnum: fnum}) do
     encoded = Enum.map(val, fn v -> encode_type(type, v) end)
     byte_size = IO.iodata_length(encoded)
-    [fnum, [encode_varint(byte_size), encoded]]
+    [fnum, encode_varint(byte_size), encoded]
   end
 
   @spec class_field(map) :: atom
@@ -180,17 +198,6 @@ defmodule Protobuf.Encoder do
     else
       func.(val)
     end
-  end
-
-  defp empty_val?(nil), do: true
-  defp empty_val?(false), do: true
-  defp empty_val?(0), do: true
-  defp empty_val?(0.0), do: true
-  defp empty_val?(""), do: true
-  defp empty_val?([]), do: true
-  defp empty_val?(v) when map_size(v) == 0, do: true
-  defp empty_val?(_) do
-    false
   end
 
   defp is_enum_default({_, type}, v) when is_atom(v), do: type.value(v) == 0
