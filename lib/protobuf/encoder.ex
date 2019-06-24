@@ -167,10 +167,13 @@ defmodule Protobuf.Encoder do
     encode_varint(n)
   end
 
-  def encode_varint(n) when n <= 127 and is_integer(n), do: <<n>>
+  def encode_varint(n) when n <= 127 do
+    <<n>>
+  end
 
-  def encode_varint(n) when n > 127,
-    do: <<1::1, band(n, 127)::7, encode_varint(bsr(n, 7))::binary>>
+  def encode_varint(n) do
+    [<<1::1, band(n, 127)::7>> | encode_varint(bsr(n, 7))] |> IO.iodata_to_binary
+  end
 
   @spec wire_type(atom) :: integer
   def wire_type(:int32), do: wire_varint()
