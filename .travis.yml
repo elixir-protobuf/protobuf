@@ -3,17 +3,18 @@ language: elixir
 git:
   depth: 3
 elixir:
-  - 1.5
   - 1.6
   - 1.7
+  - 1.8
+  - 1.9
 otp_release:
-  - 19.3
-  - 20.0
-  - 21.0
+  - 20.3
+  - 21.3
+  - 22.0
 matrix:
   exclude:
-  - elixir: 1.5
-    otp_release: 21.0
+  - elixir: 1.6
+    otp_release: 22.0
 env:
   - MIX_ENV=test VERBOSE_TESTS=true
 install:
