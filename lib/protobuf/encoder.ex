@@ -31,6 +31,9 @@ defmodule Protobuf.Encoder do
 
     encode_fields(Map.values(field_props), syntax, struct, oneofs, [])
     |> Enum.reverse()
+  catch
+    {e, msg, st} ->
+      reraise e, msg, st
   end
 
   def encode_fields([], _, _, _, acc) do
@@ -66,7 +69,7 @@ defmodule Protobuf.Encoder do
           inspect(error)
         }"
 
-      reraise Protobuf.EncodeError, [message: msg], stacktrace
+      throw {Protobuf.EncodeError, [message: msg], stacktrace}
   end
 
   @doc false
