@@ -46,8 +46,19 @@ defmodule Protobuf.Decoder do
           <<n::little-signed-64>> =unquote(val)
           n
         :double ->
-          <<n::little-float-64>> = unquote(val)
-          n
+          case unquote(val) do
+            <<n::little-float-64>> ->
+              n
+            # little endianness
+            # should be 0b0_11111111111_000000000...
+            # should be 0b1_11111111111_000000000...
+            <<0, 0, 0, 0, 0, 0, 0b1111::4, 0::4, 0b01111111::8>> ->
+              :infinity
+            <<0, 0, 0, 0, 0, 0, 0b1111::4, 0::4, 0b11111111::8>> ->
+              :negative_infinity
+            <<a::48, 0b1111::4, b::4, _::1, 0b1111111::7>> when a != 0 or b != 0 ->
+              :nan
+          end
         :fixed32 ->
           <<n::little-32>> = unquote(val)
           n
@@ -55,8 +66,21 @@ defmodule Protobuf.Decoder do
           <<n::little-signed-32>> = unquote(val)
           n
         :float ->
-          <<n::little-float-32>> = unquote(val)
-          n
+          case unquote(val) do
+            <<n::little-float-32>> ->
+              n
+            # little endianness
+            # should be 0b0_11111111_000000000...
+            <<0, 0, 0b1000_0000::8, 0b01111111::8>> ->
+              :infinity
+            # little endianness
+            # should be 0b1_11111111_000000000...
+            <<0, 0, 0b1000_0000::8, 0b11111111::8>> ->
+              :negative_infinity
+            # should be 0b*_11111111_not_zero...
+            <<a::16, 1::1, b::7, _::1, 0b1111111::7>> when a != 0 or b != 0 ->
+              :nan
+          end
         {:enum, enum_type} ->
           try do
             enum_type.key(unquote(val))

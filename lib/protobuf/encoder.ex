@@ -147,6 +147,9 @@ defmodule Protobuf.Encoder do
   def encode_type({:enum, _}, n), do: encode_varint(n)
   def encode_type(:fixed64, n), do: <<n::64-little>>
   def encode_type(:sfixed64, n), do: <<n::64-signed-little>>
+  def encode_type(:double, :infinity), do: <<0, 0, 0, 0, 0, 0, 240, 127>>
+  def encode_type(:double, :negative_infinity), do: <<0, 0, 0, 0, 0, 0, 240, 255>>
+  def encode_type(:double, :nan), do: <<1, 0, 0, 0, 0, 0, 248, 127>>
   def encode_type(:double, n), do: <<n::64-float-little>>
 
   def encode_type(:bytes, n) do
@@ -158,6 +161,9 @@ defmodule Protobuf.Encoder do
   def encode_type(:string, n), do: encode_type(:bytes, n)
   def encode_type(:fixed32, n), do: <<n::32-little>>
   def encode_type(:sfixed32, n), do: <<n::32-signed-little>>
+  def encode_type(:float, :infinity), do: <<0, 0, 128, 127>>
+  def encode_type(:float, :negative_infinity), do: <<0, 0, 128, 255>>
+  def encode_type(:float, :nan), do: <<0, 0, 192, 127>>
   def encode_type(:float, n), do: <<n::32-float-little>>
 
   @spec encode_zigzag(integer) :: integer

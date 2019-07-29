@@ -84,4 +84,16 @@ defmodule Protobuf.Decoder.DecodeTypeTest do
   test "decode_type/3 float" do
     assert 3.4028234663852886e38 == decode_type(:float, <<255, 255, 127, 127>>)
   end
+
+  test "decode_type/3 float infinity,-infinity,nan" do
+    assert :infinity == decode_type(:float, <<0, 0, 128, 127>>)
+    assert :negative_infinity == decode_type(:float, <<0, 0, 128, 255>>)
+    assert :nan == decode_type(:float, <<0, 0, 192, 127>>)
+  end
+
+  test "decode_type/3 double infinity,-infinity,nan" do
+    assert :infinity == decode_type(:double, <<0, 0, 0, 0, 0, 0, 240, 127>>)
+    assert :negative_infinity == decode_type(:double, <<0, 0, 0, 0, 0, 0, 240, 255>>)
+    assert :nan == decode_type(:double, <<1, 0, 0, 0, 0, 0, 248, 127>>)
+  end
 end
