@@ -6,7 +6,7 @@ defmodule My.Test.Request do
           key: [integer],
           hue: atom | integer,
           hat: atom | integer,
-          deadline: float,
+          deadline: float | :infinity | :negative_infinity | :nan,
           somegroup: any,
           name_mapping: %{integer => String.t()},
           msg_mapping: %{integer => My.Test.Reply.t() | nil},
