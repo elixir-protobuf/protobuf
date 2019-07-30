@@ -2,6 +2,9 @@ defmodule Protobuf.Encoder.DecodeTypeTest do
   use ExUnit.Case, async: true
 
   alias Protobuf.Encoder
+  alias Protobuf.Decoder
+  require Logger
+  import Protobuf.Decoder
 
   test "encode_type/2 varint" do
     assert Encoder.encode_type(:int32, 42) == <<42>>
@@ -99,5 +102,19 @@ defmodule Protobuf.Encoder.DecodeTypeTest do
 
   test "encode_type/3 int as float" do
     assert Encoder.encode_type(:float, 3) == <<0, 0, 64, 64>>
+  end
+
+  test "encode_type/3 float infinity/-infinity/nan" do
+    Enum.each([:infinity, :negative_infinity, :nan], fn f ->
+      bin = Encoder.encode_type(:float, f)
+      assert f == Decoder.decode_type_m(:float, :fake, bin)
+    end)
+  end
+
+  test "encode_type/3 double infinity/-infinity/nan" do
+    Enum.each([:infinity, :negative_infinity, :nan], fn f ->
+      bin = Encoder.encode_type(:double, f)
+      assert f == Decoder.decode_type_m(:double, :fake, bin)
+    end)
   end
 end

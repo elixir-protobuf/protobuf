@@ -18,8 +18,8 @@ defmodule Protobuf.TypeUtil do
   def from_enum(:TYPE_SINT32), do: :sint32
   def from_enum(:TYPE_SINT64), do: :sint64
 
-  def enum_to_spec(:TYPE_DOUBLE), do: "float"
-  def enum_to_spec(:TYPE_FLOAT), do: "float"
+  def enum_to_spec(:TYPE_DOUBLE), do: "float | :infinity | :negative_infinity | :nan"
+  def enum_to_spec(:TYPE_FLOAT), do: "float | :infinity | :negative_infinity | :nan"
   def enum_to_spec(:TYPE_INT64), do: "integer"
   def enum_to_spec(:TYPE_UINT64), do: "non_neg_integer"
   def enum_to_spec(:TYPE_INT32), do: "integer"
