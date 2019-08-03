@@ -33,7 +33,7 @@ defmodule TestMsg do
   defmodule Foo do
     use Protobuf, syntax: :proto3
 
-    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :n, :o]
+    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :n, :o, :p]
 
     field :a, 1, type: :int32
     field :b, 2, type: :fixed64
@@ -51,6 +51,7 @@ defmodule TestMsg do
     field :m, 14, type: EnumFoo, enum: true
     field :n, 15, type: :double
     field :o, 16, repeated: true, type: EnumFoo, enum: true
+    field :p, 17, type: :string, deprecated: true
   end
 
   defmodule Foo2 do

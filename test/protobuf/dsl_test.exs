@@ -23,7 +23,7 @@ defmodule Protobuf.DSLTest do
     msg_props = Foo.__message_props__()
 
     tags_map =
-      Enum.reduce([1, 2, 3] ++ Enum.to_list(5..16), %{}, fn i, acc -> Map.put(acc, i, i) end)
+      Enum.reduce([1, 2, 3] ++ Enum.to_list(5..17), %{}, fn i, acc -> Map.put(acc, i, i) end)
 
     assert tags_map == msg_props.tags_map
     field_props = msg_props.field_props
@@ -64,7 +64,7 @@ defmodule Protobuf.DSLTest do
 
   test "saves ordered tags" do
     msg_props = Foo.__message_props__()
-    assert [1, 2, 3] ++ Enum.to_list(5..16) == msg_props.ordered_tags
+    assert [1, 2, 3] ++ Enum.to_list(5..17) == msg_props.ordered_tags
   end
 
   test "supports embedded fields" do
@@ -127,6 +127,18 @@ defmodule Protobuf.DSLTest do
     assert %FieldProps{fnum: 10, name: "i", repeated?: true, packed?: true} = field_props[10]
   end
 
+  test "deprecated? is false by default" do
+    msg_props = Foo.__message_props__()
+    field_props = msg_props.field_props
+    assert %FieldProps{fnum: 10, name: "i", deprecated?: false} = field_props[10]
+  end
+
+  test "deprecated? can be set to true" do
+    msg_props = Foo.__message_props__()
+    field_props = msg_props.field_props
+    assert %FieldProps{fnum: 17, name: "p", deprecated?: true} = field_props[17]
+  end
+
   test "supports enum" do
     msg_props = TestMsg.EnumFoo.__message_props__()
     assert msg_props.enum? == true
@@ -165,7 +177,8 @@ defmodule Protobuf.DSLTest do
              l: %{},
              m: :UNKNOWN,
              n: 0.0,
-             o: []
+             o: [],
+             p: ""
            } == Foo.__default_struct__()
   end
 
