@@ -9,7 +9,9 @@ defmodule Protobuf.Protoc.Generator.Enum do
     name = Util.trans_name(desc.name)
     fields = Enum.map(desc.value, fn f -> generate_field(f) end)
     msg_name = Util.mod_name(ctx, ns ++ [name])
-    Protobuf.Protoc.Template.enum(msg_name, msg_opts(ctx, desc), fields, desc)
+    generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
+
+    Protobuf.Protoc.Template.enum(msg_name, msg_opts(ctx, desc), fields, generate_desc)
   end
 
   def generate_field(f) do

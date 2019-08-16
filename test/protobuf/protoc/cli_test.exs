@@ -10,8 +10,8 @@ defmodule Protobuf.Protoc.CLITest do
 
   test "parse_params/2 parse plugins" do
     ctx = %Context{}
-    ctx = parse_params(ctx, "plugins=grpc")
-    assert ctx == %Context{plugins: ["grpc"]}
+    ctx = parse_params(ctx, "plugins=grpc,gen_descriptors=true")
+    assert ctx == %Context{plugins: ["grpc"], gen_descriptors?: true}
   end
 
   test "find_types/2 returns multiple files" do

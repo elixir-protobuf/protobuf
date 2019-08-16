@@ -32,6 +32,11 @@ defmodule Protobuf.Protoc.CLI do
     parse_params(ctx, t)
   end
 
+  def parse_params(ctx, ["gen_descriptors=true" | t]) do
+    ctx = %{ctx | gen_descriptors?: true}
+    parse_params(ctx, t)
+  end
+
   def parse_params(ctx, _), do: ctx
 
   def find_types(ctx, descs) do

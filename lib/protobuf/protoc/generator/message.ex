@@ -16,6 +16,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   def parse_desc(%{namespace: ns} = ctx, desc) do
     new_ns = ns ++ [Util.trans_name(desc.name)]
     fields = get_fields(ctx, desc)
+    generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
 
     %{
       new_namespace: new_ns,
@@ -25,7 +26,7 @@ defmodule Protobuf.Protoc.Generator.Message do
       typespec: typespec_str(fields, desc.oneof_decl),
       fields: fields,
       oneofs: oneofs_str(desc.oneof_decl),
-      desc: desc,
+      desc: generate_desc
     }
   end
 
