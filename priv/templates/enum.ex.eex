@@ -4,6 +4,7 @@ defmodule <%= name %> do
 
   <%= if not is_nil(desc) do %>
   def descriptor do
+    # credo:disable-for-next-line
     <%= desc.__struct__ %>.decode(
       <%= desc.__struct__.encode(desc |> Map.from_struct() |> Enum.filter(fn {_, x} -> x != nil end) |> desc.__struct__.new()) |> inspect(limit: :infinity) %>
     )
