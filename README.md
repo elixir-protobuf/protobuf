@@ -97,6 +97,17 @@ Note:
 - Default values will be set by default in `decode`, which can be changed by `:use_default` option.
 - Validation is done in `encode`. An error will be raised if the struct is invalid(like type is not matched).
 
+### Descriptor support
+
+If you use any custom options in your protobufs then to gain access to them you'll need to include the raw descriptors in the generated modules. You can generate the descriptors by passing `gen_descriptors=true` in `--elixir_out`.
+
+The descriptors will be available on each module from the `descriptor/0` function.
+
+```
+$ protoc --elixir_out=gen_descriptors=true:./lib/ *.proto
+$ protoc --elixir_out=gen_descriptors=true,plugins=grpc:./lib/ *.proto
+```
+
 ### gRPC Support
 
 If you write [services](https://developers.google.com/protocol-buffers/docs/proto#services) in protobuf, you can generate [gRPC](https://github.com/tony612/grpc-elixir) code by passing `plugins=grpc` in `--elixir_out`:
