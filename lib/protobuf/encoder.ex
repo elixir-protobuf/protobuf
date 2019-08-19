@@ -54,7 +54,7 @@ defmodule Protobuf.Encoder do
         end
       end
 
-    if skip_field?(syntax, val, prop) || (is_enum && is_enum_default(type, val)) do
+    if skip_field?(syntax, val, prop) || (is_enum && !oneof && is_enum_default(type, val)) do
       encode_fields(tail, syntax, struct, oneofs, acc)
     else
       acc = [encode_field(class_field(prop), val, prop) | acc]

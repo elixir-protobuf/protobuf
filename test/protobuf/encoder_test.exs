@@ -136,16 +136,28 @@ defmodule Protobuf.EncoderTest do
   end
 
   test "encodes oneof fields zero values" do
+    # proto2
+    # int and string
     msg = TestMsg.Oneof.new(first: {:a, 0}, second: {:d, ""})
     assert Encoder.encode(msg) == <<8, 0, 34, 0>>
     msg = TestMsg.Oneof.new(first: {:b, ""}, second: {:c, 0})
     assert Encoder.encode(msg) == <<18, 0, 24, 0>>
+    # enum
+    msg = TestMsg.Oneof.new(first: {:e, :UNKNOWN})
+    assert Encoder.encode(msg) == <<48, 0>>
+    assert TestMsg.Oneof.decode(<<48, 0>>) == msg
 
+    # proto3
+    # int and string
     msg = TestMsg.OneofProto3.new(first: {:a, 0}, second: {:d, ""})
     assert Encoder.encode(msg) == <<8, 0, 34, 0>>
     assert TestMsg.OneofProto3.encode(msg) == <<8, 0, 34, 0>>
     msg = TestMsg.OneofProto3.new(first: {:b, ""}, second: {:c, 0})
     assert Encoder.encode(msg) == <<18, 0, 24, 0>>
     assert TestMsg.OneofProto3.encode(msg) == <<18, 0, 24, 0>>
+    # enum
+    msg = TestMsg.OneofProto3.new(first: {:e, :UNKNOWN})
+    assert Encoder.encode(msg) == <<48, 0>>
+    assert TestMsg.OneofProto3.decode(<<48, 0>>) == msg
   end
 end
