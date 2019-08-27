@@ -1,6 +1,6 @@
 defmodule Protobuf do
   defmacro __using__(opts) do
-    path = __CALLER__.module
+    type_path = __CALLER__.module
       |> Module.split()
       |> Enum.reverse()
       |> Enum.with_index()
@@ -10,7 +10,6 @@ defmodule Protobuf do
       end)
       |> Enum.reverse()
       |> Enum.join(".")
-    type_url = "type.googleapis.com/" <> path
 
     quote do
       import Protobuf.DSL, only: [field: 3, field: 2, oneof: 2]
@@ -30,8 +29,14 @@ defmodule Protobuf do
       end
 
       def type_url() do
-        unquote(type_url)
+        Path.join(type_fqdn(), unquote(type_path))
       end
+
+      def type_fqdn() do
+        "type.googleapis.com"
+      end
+
+      defoverridable(type_fqdn: 0)
     end
   end
 
