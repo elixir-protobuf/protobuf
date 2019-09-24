@@ -9,6 +9,7 @@ defmodule Protobuf.Encoder do
     case struct do
       %{__struct__: _} ->
         encode(struct, opts)
+
       _ ->
         encode(mod.new(struct), opts)
     end
@@ -39,7 +40,8 @@ defmodule Protobuf.Encoder do
   def encode_fields([], _, _, _, acc) do
     acc
   end
-  def encode_fields([prop|tail], syntax, struct, oneofs, acc) do
+
+  def encode_fields([prop | tail], syntax, struct, oneofs, acc) do
     %{name_atom: name, oneof: oneof, enum?: is_enum, type: type} = prop
 
     val =
@@ -49,6 +51,7 @@ defmodule Protobuf.Encoder do
         case struct do
           %{^name => v} ->
             v
+
           _ ->
             nil
         end
@@ -69,7 +72,7 @@ defmodule Protobuf.Encoder do
           inspect(error)
         }"
 
-      throw {Protobuf.EncodeError, [message: msg], stacktrace}
+      throw({Protobuf.EncodeError, [message: msg], stacktrace})
   end
 
   @doc false
@@ -181,7 +184,7 @@ defmodule Protobuf.Encoder do
   end
 
   def encode_varint(n) do
-    [<<1::1, band(n, 127)::7>> | encode_varint(bsr(n, 7))] |> IO.iodata_to_binary
+    [<<1::1, band(n, 127)::7>> | encode_varint(bsr(n, 7))] |> IO.iodata_to_binary()
   end
 
   @spec wire_type(atom) :: integer

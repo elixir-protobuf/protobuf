@@ -21,7 +21,9 @@ defmodule Protobuf.Decoder.DecodeVarintTest do
   end
 
   test "decode_varint+decode_type min int32" do
-    assert [1, 0, val = 18446744071562067968] == decode_varint(<<8, 128, 128, 128, 128, 248, 255, 255, 255, 255, 1>>)
+    assert [1, 0, val = 18_446_744_071_562_067_968] ==
+             decode_varint(<<8, 128, 128, 128, 128, 248, 255, 255, 255, 255, 1>>)
+
     assert -2_147_483_648 == decode_type(:int32, val)
   end
 

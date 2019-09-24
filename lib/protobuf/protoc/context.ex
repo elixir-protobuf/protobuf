@@ -25,5 +25,4 @@ defmodule Protobuf.Protoc.Context do
             # Include binary descriptors in the generated protobuf modules
             # And expose them via the `descriptor/0` function
             gen_descriptors?: false
-
 end

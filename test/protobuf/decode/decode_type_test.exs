@@ -21,19 +21,19 @@ defmodule Protobuf.Decoder.DecodeTypeTest do
   end
 
   test "decode_type/3 min sint32" do
-    assert -2_147_483_648 == decode_type(:sint32, 4294967295)
+    assert -2_147_483_648 == decode_type(:sint32, 4_294_967_295)
   end
 
   test "decode_type/3 max sint32" do
-    assert 2_147_483_647 == decode_type(:sint32, 4294967294)
+    assert 2_147_483_647 == decode_type(:sint32, 4_294_967_294)
   end
 
   test "decode_type/3 min sint64" do
-    assert -9_223_372_036_854_775_808 == decode_type(:sint64, 18446744073709551615)
+    assert -9_223_372_036_854_775_808 == decode_type(:sint64, 18_446_744_073_709_551_615)
   end
 
   test "decode_type/3 max sint64" do
-    assert 9_223_372_036_854_775_807 == decode_type(:sint64, 18446744073709551614)
+    assert 9_223_372_036_854_775_807 == decode_type(:sint64, 18_446_744_073_709_551_614)
   end
 
   test "decode_type/3 bool works" do
@@ -42,11 +42,13 @@ defmodule Protobuf.Decoder.DecodeTypeTest do
   end
 
   test "decode_type/3 a fixed64" do
-    assert 8_446_744_073_709_551_615 == decode_type(:fixed64, <<255, 255, 23, 118, 251, 220, 56, 117>>)
+    assert 8_446_744_073_709_551_615 ==
+             decode_type(:fixed64, <<255, 255, 23, 118, 251, 220, 56, 117>>)
   end
 
   test "decode_type/3 max fixed64" do
-    assert 18_446_744_073_709_551_615 == decode_type(:fixed64, <<255, 255, 255, 255, 255, 255, 255, 255>>)
+    assert 18_446_744_073_709_551_615 ==
+             decode_type(:fixed64, <<255, 255, 255, 255, 255, 255, 255, 255>>)
   end
 
   test "decode_type/3 min sfixed64" do
@@ -54,7 +56,8 @@ defmodule Protobuf.Decoder.DecodeTypeTest do
   end
 
   test "decode_type/3 max sfixed64" do
-    assert 9_223_372_036_854_775_807 == decode_type(:sfixed64, <<255, 255, 255, 255, 255, 255, 255, 127>>)
+    assert 9_223_372_036_854_775_807 ==
+             decode_type(:sfixed64, <<255, 255, 255, 255, 255, 255, 255, 127>>)
   end
 
   test "decode_type/3 min double" do
@@ -62,7 +65,8 @@ defmodule Protobuf.Decoder.DecodeTypeTest do
   end
 
   test "decode_type/3 max double" do
-    assert 1.7976931348623157e308 == decode_type(:double, <<255, 255, 255, 255, 255, 255, 239, 127>>)
+    assert 1.7976931348623157e308 ==
+             decode_type(:double, <<255, 255, 255, 255, 255, 255, 239, 127>>)
   end
 
   test "decode_type/3 string" do

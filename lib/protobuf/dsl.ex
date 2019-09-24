@@ -52,32 +52,39 @@ defmodule Protobuf.DSL do
 
   defp def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}) do
     if syntax == :proto3 do
-      found = Enum.find(props, fn {_, %{fnum: fnum}} ->
-        fnum == 0
-      end)
-      if !found, do: raise "The first enum value must be zero in proto3"
+      found =
+        Enum.find(props, fn {_, %{fnum: fnum}} ->
+          fnum == 0
+        end)
+
+      if !found, do: raise("The first enum value must be zero in proto3")
     end
-    mapping = Enum.reduce(props, %{}, fn {_, %{fnum: fnum, name_atom: name_atom}}, acc ->
-      Map.put(acc, name_atom, fnum)
-    end)
+
+    mapping =
+      Enum.reduce(props, %{}, fn {_, %{fnum: fnum, name_atom: name_atom}}, acc ->
+        Map.put(acc, name_atom, fnum)
+      end)
+
     Enum.map(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
       quote do
         def value(unquote(name_atom)), do: unquote(fnum)
       end
-    end) ++ [
-      quote do
-        def value(v) when is_integer(v), do: v
-      end
-    ] ++
-    Enum.map(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
-      quote do
-        def key(unquote(fnum)), do: unquote(name_atom)
-      end
-    end) ++ [
-      quote do
-        def mapping(), do: unquote(Macro.escape(mapping))
-      end
-    ]
+    end) ++
+      [
+        quote do
+          def value(v) when is_integer(v), do: v
+        end
+      ] ++
+      Enum.map(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
+        quote do
+          def key(unquote(fnum)), do: unquote(name_atom)
+        end
+      end) ++
+      [
+        quote do
+          def mapping(), do: unquote(Macro.escape(mapping))
+        end
+      ]
   end
 
   defp def_enum_functions(_), do: nil
@@ -251,8 +258,10 @@ defmodule Protobuf.DSL do
 
   defp cal_repeated(%{map?: true} = props, _), do: Map.put(props, :repeated?, false)
   defp cal_repeated(props, %{repeated: true}), do: Map.put(props, :repeated?, true)
-  defp cal_repeated(_props, %{repeated: true, oneof: true}), do:
-    raise ":oneof can't be used with repeated"
+
+  defp cal_repeated(_props, %{repeated: true, oneof: true}),
+    do: raise(":oneof can't be used with repeated")
+
   defp cal_repeated(props, _), do: props
 
   defp cal_encoded_fnum(%{fnum: fnum, packed?: true} = props) do
@@ -294,14 +303,18 @@ defmodule Protobuf.DSL do
   end
 
   def enum_fields(msg_props, include_oneof? \\ true)
+
   def enum_fields(%{syntax: :proto3} = msg_props, include_oneof?) do
     msg_props.field_props
     |> Map.values()
-    |> Enum.filter(fn props -> props.enum? && !props.default && !props.repeated? && (!props.oneof || include_oneof?) end)
+    |> Enum.filter(fn props ->
+      props.enum? && !props.default && !props.repeated? && (!props.oneof || include_oneof?)
+    end)
     |> Enum.map(fn props ->
-        {props.name_atom, elem(props.type, 1)}
+      {props.name_atom, elem(props.type, 1)}
     end)
   end
+
   def enum_fields(%{syntax: _}, _include_oneof?), do: %{}
 
   def type_numeric?(:int32), do: true

@@ -29,68 +29,101 @@ defmodule Protobuf.Decoder do
         :int32 ->
           <<n::signed-integer-32>> = <<unquote(val)::32>>
           n
-        :string -> unquote(val)
-        :bytes -> unquote(val)
+
+        :string ->
+          unquote(val)
+
+        :bytes ->
+          unquote(val)
+
         :int64 ->
           <<n::signed-integer-64>> = <<unquote(val)::64>>
           n
-        :uint32 -> unquote(val)
-        :uint64 -> unquote(val)
-        :bool -> unquote(val) != 0
-        :sint32 -> decode_zigzag(unquote(val))
-        :sint64 -> decode_zigzag(unquote(val))
+
+        :uint32 ->
+          unquote(val)
+
+        :uint64 ->
+          unquote(val)
+
+        :bool ->
+          unquote(val) != 0
+
+        :sint32 ->
+          decode_zigzag(unquote(val))
+
+        :sint64 ->
+          decode_zigzag(unquote(val))
+
         :fixed64 ->
           <<n::little-64>> = unquote(val)
           n
+
         :sfixed64 ->
-          <<n::little-signed-64>> =unquote(val)
+          <<n::little-signed-64>> = unquote(val)
           n
+
         :double ->
           case unquote(val) do
             <<n::little-float-64>> ->
               n
+
             # little endianness
             # should be 0b0_11111111111_000000000...
             # should be 0b1_11111111111_000000000...
             <<0, 0, 0, 0, 0, 0, 0b1111::4, 0::4, 0b01111111::8>> ->
               :infinity
+
             <<0, 0, 0, 0, 0, 0, 0b1111::4, 0::4, 0b11111111::8>> ->
               :negative_infinity
+
             <<a::48, 0b1111::4, b::4, _::1, 0b1111111::7>> when a != 0 or b != 0 ->
               :nan
           end
+
         :fixed32 ->
           <<n::little-32>> = unquote(val)
           n
+
         :sfixed32 ->
           <<n::little-signed-32>> = unquote(val)
           n
+
         :float ->
           case unquote(val) do
             <<n::little-float-32>> ->
               n
+
             # little endianness
             # should be 0b0_11111111_000000000...
             <<0, 0, 0b1000_0000::8, 0b01111111::8>> ->
               :infinity
+
             # little endianness
             # should be 0b1_11111111_000000000...
             <<0, 0, 0b1000_0000::8, 0b11111111::8>> ->
               :negative_infinity
+
             # should be 0b*_11111111_not_zero...
             <<a::16, 1::1, b::7, _::1, 0b1111111::7>> when a != 0 or b != 0 ->
               :nan
           end
+
         {:enum, enum_type} ->
           try do
             enum_type.key(unquote(val))
           rescue
             FunctionClauseError ->
-              Logger.warn("unknown enum value #{unquote(val)} when decoding for #{inspect(unquote(type))}")
+              Logger.warn(
+                "unknown enum value #{unquote(val)} when decoding for #{inspect(unquote(type))}"
+              )
+
               unquote(val)
           end
+
         _ ->
-          raise DecodeError, message: "can't decode type #{unquote(type)} for field #{unquote(key)}"
+          raise DecodeError,
+            message: "can't decode type #{unquote(type)} for field #{unquote(key)}"
       end
     end
   end
@@ -98,48 +131,72 @@ defmodule Protobuf.Decoder do
   # ugly for performance
   def build_struct([tag, wire, val | rest], %{field_props: f_props} = msg_props, struct) do
     case f_props do
-      %{^tag => %{wire_type: ^wire, repeated?: is_repeated, map?: is_map, type: type, oneof: oneof, name_atom: name_atom, embedded?: embedded} = prop} ->
+      %{
+        ^tag =>
+          %{
+            wire_type: ^wire,
+            repeated?: is_repeated,
+            map?: is_map,
+            type: type,
+            oneof: oneof,
+            name_atom: name_atom,
+            embedded?: embedded
+          } = prop
+      } ->
         key = if oneof, do: oneof_field(prop, msg_props), else: name_atom
-        struct = if embedded do
-          embedded_msg = decode(val, type)
-          val = if is_map, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
-          val = if oneof, do: {name_atom, val}, else: val
-          val = case struct do
-            %{^key => nil} ->
-              if is_repeated, do: [val], else: val
 
-            %{^key => value} ->
-              if is_repeated, do: [val|value], else: Map.merge(value, val)
+        struct =
+          if embedded do
+            embedded_msg = decode(val, type)
+            val = if is_map, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
+            val = if oneof, do: {name_atom, val}, else: val
 
-            _ ->
-              if is_repeated, do: [val], else: val
-          end
-          Map.put(struct, key, val)
-        else
-          val = decode_type_m(type, key, val)
-          val = if oneof, do: {name_atom, val}, else: val
-          val = if is_repeated do
-            case struct do
-              %{^key => nil} ->
-                [val]
+            val =
+              case struct do
+                %{^key => nil} ->
+                  if is_repeated, do: [val], else: val
 
-              %{^key => value} ->
-                [val|value]
+                %{^key => value} ->
+                  if is_repeated, do: [val | value], else: Map.merge(value, val)
 
-              _ ->
-                [val]
-            end
+                _ ->
+                  if is_repeated, do: [val], else: val
+              end
+
+            Map.put(struct, key, val)
           else
-            val
+            val = decode_type_m(type, key, val)
+            val = if oneof, do: {name_atom, val}, else: val
+
+            val =
+              if is_repeated do
+                case struct do
+                  %{^key => nil} ->
+                    [val]
+
+                  %{^key => value} ->
+                    [val | value]
+
+                  _ ->
+                    [val]
+                end
+              else
+                val
+              end
+
+            Map.put(struct, key, val)
           end
-          Map.put(struct, key, val)
-        end
+
         build_struct(rest, msg_props, struct)
+
       %{^tag => %{packed?: true} = f_prop} ->
         struct = put_packed_field(struct, f_prop, val)
         build_struct(rest, msg_props, struct)
+
       %{^tag => %{wire_type: wire2} = f_prop} ->
-        raise DecodeError, "wrong wire_type for #{prop_display(f_prop)}: got #{wire}, want #{wire2}"
+        raise DecodeError,
+              "wrong wire_type for #{prop_display(f_prop)}: got #{wire}, want #{wire2}"
+
       _ ->
         build_struct(rest, msg_props, struct)
     end
@@ -161,93 +218,90 @@ defmodule Protobuf.Decoder do
     raw_handle_varint(type, rest, result, x)
   end
 
-  defp raw_decode_varint(<<1::1, x0::7,
-                            0::1, x1::7, rest::bits>>, result, type) do
+  defp raw_decode_varint(<<1::1, x0::7, 0::1, x1::7, rest::bits>>, result, type) do
     val = bsl(x1, 7) + x0
     raw_handle_varint(type, rest, result, val)
   end
 
-  defp raw_decode_varint(<<1::1, x0::7,
-                            1::1, x1::7,
-                            0::1, x2::7, rest::bits>>, result, type) do
+  defp raw_decode_varint(<<1::1, x0::7, 1::1, x1::7, 0::1, x2::7, rest::bits>>, result, type) do
     val = bsl(x2, 14) + bsl(x1, 7) + x0
     raw_handle_varint(type, rest, result, val)
   end
 
-  defp raw_decode_varint(<<1::1, x0::7,
-                            1::1, x1::7,
-                            1::1, x2::7,
-                            0::1, x3::7, rest::bits>>, result, type) do
+  defp raw_decode_varint(
+         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 0::1, x3::7, rest::bits>>,
+         result,
+         type
+       ) do
     val = bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
     raw_handle_varint(type, rest, result, val)
   end
 
-  defp raw_decode_varint(<<1::1, x0::7,
-                            1::1, x1::7,
-                            1::1, x2::7,
-                            1::1, x3::7,
-                            0::1, x4::7, rest::bits>>, result, type) do
+  defp raw_decode_varint(
+         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 0::1, x4::7, rest::bits>>,
+         result,
+         type
+       ) do
     val = bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
     raw_handle_varint(type, rest, result, val)
   end
 
-  defp raw_decode_varint(<<1::1, x0::7,
-                            1::1, x1::7,
-                            1::1, x2::7,
-                            1::1, x3::7,
-                            1::1, x4::7,
-                            0::1, x5::7, rest::bits>>, result, type) do
+  defp raw_decode_varint(
+         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 0::1, x5::7,
+           rest::bits>>,
+         result,
+         type
+       ) do
     val = bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
     raw_handle_varint(type, rest, result, val)
   end
 
-  defp raw_decode_varint(<<1::1, x0::7,
-                            1::1, x1::7,
-                            1::1, x2::7,
-                            1::1, x3::7,
-                            1::1, x4::7,
-                            1::1, x5::7,
-                            0::1, x6::7, rest::bits>>, result, type) do
+  defp raw_decode_varint(
+         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 0::1,
+           x6::7, rest::bits>>,
+         result,
+         type
+       ) do
     val = bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
     raw_handle_varint(type, rest, result, val)
   end
 
-  defp raw_decode_varint(<<1::1, x0::7,
-                            1::1, x1::7,
-                            1::1, x2::7,
-                            1::1, x3::7,
-                            1::1, x4::7,
-                            1::1, x5::7,
-                            1::1, x6::7,
-                            0::1, x7::7, rest::bits>>, result, type) do
-    val = bsl(x7, 49) + bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
+  defp raw_decode_varint(
+         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 1::1,
+           x6::7, 0::1, x7::7, rest::bits>>,
+         result,
+         type
+       ) do
+    val =
+      bsl(x7, 49) + bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) +
+        bsl(x1, 7) + x0
+
     raw_handle_varint(type, rest, result, val)
   end
 
-  defp raw_decode_varint(<<1::1, x0::7,
-                            1::1, x1::7,
-                            1::1, x2::7,
-                            1::1, x3::7,
-                            1::1, x4::7,
-                            1::1, x5::7,
-                            1::1, x6::7,
-                            1::1, x7::7,
-                            0::1, x8::7, rest::bits>>, result, type) do
-    val = bsl(x8, 56) +bsl(x7, 49) + bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
+  defp raw_decode_varint(
+         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 1::1,
+           x6::7, 1::1, x7::7, 0::1, x8::7, rest::bits>>,
+         result,
+         type
+       ) do
+    val =
+      bsl(x8, 56) + bsl(x7, 49) + bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) +
+        bsl(x2, 14) + bsl(x1, 7) + x0
+
     raw_handle_varint(type, rest, result, val)
   end
 
-  defp raw_decode_varint(<<1::1, x0::7,
-                            1::1, x1::7,
-                            1::1, x2::7,
-                            1::1, x3::7,
-                            1::1, x4::7,
-                            1::1, x5::7,
-                            1::1, x6::7,
-                            1::1, x7::7,
-                            1::1, x8::7,
-                            0::1, x9::7, rest::bits>>, result, type) do
-    val = bsl(x9, 63) + bsl(x8, 56) +bsl(x7, 49) + bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
+  defp raw_decode_varint(
+         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 1::1,
+           x6::7, 1::1, x7::7, 1::1, x8::7, 0::1, x9::7, rest::bits>>,
+         result,
+         type
+       ) do
+    val =
+      bsl(x9, 63) + bsl(x8, 56) + bsl(x7, 49) + bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) +
+        bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
+
     val = band(val, @mask64)
     raw_handle_varint(type, rest, result, val)
   end
@@ -259,24 +313,24 @@ defmodule Protobuf.Decoder do
   end
 
   defp raw_handle_varint(:value, <<>>, result, val) do
-    Enum.reverse([val|result])
+    Enum.reverse([val | result])
   end
 
   defp raw_handle_varint(:value, <<bin::bits>>, result, val) do
-    raw_decode_varint(bin, [val|result], :key)
+    raw_decode_varint(bin, [val | result], :key)
   end
 
   defp raw_handle_varint(:bytes_len, <<bin::bits>>, result, len) do
     <<bytes::bytes-size(len), rest::bits>> = bin
-    raw_decode_key(rest, [bytes|result])
+    raw_decode_key(rest, [bytes | result])
   end
 
   defp raw_handle_varint(:packed, <<>>, result, val) do
-    [val|result]
+    [val | result]
   end
 
   defp raw_handle_varint(:packed, <<bin::bits>>, result, val) do
-    raw_decode_varint(bin, [val|result], :packed)
+    raw_decode_varint(bin, [val | result], :packed)
   end
 
   @doc false
@@ -289,19 +343,20 @@ defmodule Protobuf.Decoder do
   end
 
   def raw_decode_value(wire_32bits(), <<n::32, rest::bits>>, result) do
-    raw_decode_key(rest, [<<n::32>>|result])
+    raw_decode_key(rest, [<<n::32>> | result])
   end
 
   def raw_decode_value(wire_64bits(), <<n::64, rest::bits>>, result) do
-    raw_decode_key(rest, [<<n::64>>|result])
+    raw_decode_key(rest, [<<n::64>> | result])
   end
 
   # packed
   defp put_packed_field(msg, %{wire_type: wire_type, type: type, name_atom: key}, val) do
-    vals = decode_packed(wire_type, val, [])
-    |> Enum.map(fn v ->
-      decode_type_m(type, key, v)
-    end)
+    vals =
+      decode_packed(wire_type, val, [])
+      |> Enum.map(fn v ->
+        decode_type_m(type, key, v)
+      end)
 
     case msg do
       %{^key => nil} ->
@@ -316,16 +371,17 @@ defmodule Protobuf.Decoder do
   end
 
   defp decode_packed(_wire_type, <<>>, acc), do: acc
+
   defp decode_packed(wire_varint(), <<bin::bits>>, _) do
     raw_decode_varint(bin, [], :packed)
   end
 
   defp decode_packed(wire_32bits(), <<n::32, rest::bits>>, result) do
-    decode_packed(wire_32bits(), rest, [<<n::32>>|result])
+    decode_packed(wire_32bits(), rest, [<<n::32>> | result])
   end
 
   defp decode_packed(wire_64bits(), <<n::64, rest::bits>>, result) do
-    decode_packed(wire_64bits(), rest, [<<n::64>>|result])
+    decode_packed(wire_64bits(), rest, [<<n::64>> | result])
   end
 
   @doc false
@@ -338,6 +394,7 @@ defmodule Protobuf.Decoder do
   end
 
   defp reverse_repeated(msg, []), do: msg
+
   defp reverse_repeated(msg, [h | t]) do
     case msg do
       %{^h => val} when is_list(val) ->
