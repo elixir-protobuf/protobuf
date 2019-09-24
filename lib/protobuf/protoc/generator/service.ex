@@ -14,7 +14,8 @@ defmodule Protobuf.Protoc.Generator.Service do
     mod_name = Util.mod_name(ctx, [Util.trans_name(desc.name)])
     name = Util.attach_raw_pkg(desc.name, ctx.package)
     methods = Enum.map(desc.method, fn m -> generate_service_method(ctx, m) end)
-    Protobuf.Protoc.Template.service(mod_name, name, methods)
+    generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
+    Protobuf.Protoc.Template.service(mod_name, name, methods, generate_desc)
   end
 
   defp generate_service_method(ctx, m) do

@@ -381,7 +381,7 @@ defmodule Google.Protobuf.FileOptions do
   field :optimize_for, 9,
     optional: true,
     type: Google.Protobuf.FileOptions.OptimizeMode,
-    default: :SPEED,
+    default: 1,
     enum: true
 
   field :go_package, 11, optional: true, type: :string
@@ -455,7 +455,7 @@ defmodule Google.Protobuf.FieldOptions do
   field :ctype, 1,
     optional: true,
     type: Google.Protobuf.FieldOptions.CType,
-    default: :STRING,
+    default: 0,
     enum: true
 
   field :packed, 2, optional: true, type: :bool
@@ -463,7 +463,7 @@ defmodule Google.Protobuf.FieldOptions do
   field :jstype, 6,
     optional: true,
     type: Google.Protobuf.FieldOptions.JSType,
-    default: :JS_NORMAL,
+    default: 0,
     enum: true
 
   field :lazy, 5, optional: true, type: :bool, default: false
@@ -562,7 +562,7 @@ defmodule Google.Protobuf.MethodOptions do
   field :idempotency_level, 34,
     optional: true,
     type: Google.Protobuf.MethodOptions.IdempotencyLevel,
-    default: :IDEMPOTENCY_UNKNOWN,
+    default: 0,
     enum: true
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption

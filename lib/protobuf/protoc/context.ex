@@ -20,5 +20,10 @@ defmodule Protobuf.Protoc.Context do
 
             # For a message
             # Nested namespace when generating nested messages. It should be joined to get the full namespace
-            namespace: []
+            namespace: [],
+
+            # Include binary descriptors in the generated protobuf modules
+            # And expose them via the `descriptor/0` function
+            gen_descriptors?: false
+
 end

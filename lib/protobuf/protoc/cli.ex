@@ -5,7 +5,7 @@ defmodule Protobuf.Protoc.CLI do
     bin = IO.binread(:all)
     request = Protobuf.Decoder.decode(bin, Google.Protobuf.Compiler.CodeGeneratorRequest)
     # debug
-    # raise inspect(request, limit: :infinity)
+     # raise inspect(request, limit: :infinity)
 
     ctx =
       %Protobuf.Protoc.Context{}
@@ -29,6 +29,11 @@ defmodule Protobuf.Protoc.CLI do
   def parse_params(ctx, ["plugins=" <> plugins | t]) do
     plugins = String.split(plugins, "+")
     ctx = %{ctx | plugins: plugins}
+    parse_params(ctx, t)
+  end
+
+  def parse_params(ctx, ["gen_descriptors=true" | t]) do
+    ctx = %{ctx | gen_descriptors?: true}
     parse_params(ctx, t)
   end
 

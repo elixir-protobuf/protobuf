@@ -9,10 +9,10 @@ defmodule Protobuf.Protoc.Template do
     :def,
     :message,
     @msg_tmpl,
-    [:name, :options, :struct_fields, :typespec, :oneofs, :fields],
+    [:name, :options, :struct_fields, :typespec, :oneofs, :fields, :desc],
     trim: true
   )
 
-  EEx.function_from_file(:def, :enum, @enum_tmpl, [:name, :options, :fields], trim: true)
-  EEx.function_from_file(:def, :service, @svc_tmpl, [:mod_name, :name, :methods], trim: true)
+  EEx.function_from_file(:def, :enum, @enum_tmpl, [:name, :options, :fields, :desc], trim: true)
+  EEx.function_from_file(:def, :service, @svc_tmpl, [:mod_name, :name, :methods, :desc], trim: true)
 end
