@@ -1,6 +1,5 @@
 defmodule <%= name %> do
   @moduledoc false
-
   use Protobuf<%= options %>
 
   <%= typespec %>

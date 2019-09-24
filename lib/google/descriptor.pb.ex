@@ -147,8 +147,8 @@ defmodule Google.Protobuf.FieldDescriptorProto do
   @type t :: %__MODULE__{
           name: String.t(),
           number: integer,
-          label: integer,
-          type: integer,
+          label: atom | integer,
+          type: atom | integer,
           type_name: String.t(),
           extendee: String.t(),
           default_value: String.t(),
@@ -330,7 +330,7 @@ defmodule Google.Protobuf.FileOptions do
           java_multiple_files: boolean,
           java_generate_equals_and_hash: boolean,
           java_string_check_utf8: boolean,
-          optimize_for: integer,
+          optimize_for: atom | integer,
           go_package: String.t(),
           cc_generic_services: boolean,
           java_generic_services: boolean,
@@ -381,7 +381,7 @@ defmodule Google.Protobuf.FileOptions do
   field :optimize_for, 9,
     optional: true,
     type: Google.Protobuf.FileOptions.OptimizeMode,
-    default: 1,
+    default: :SPEED,
     enum: true
 
   field :go_package, 11, optional: true, type: :string
@@ -442,9 +442,9 @@ defmodule Google.Protobuf.FieldOptions do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          ctype: integer,
+          ctype: atom | integer,
           packed: boolean,
-          jstype: integer,
+          jstype: atom | integer,
           lazy: boolean,
           deprecated: boolean,
           weak: boolean,
@@ -455,7 +455,7 @@ defmodule Google.Protobuf.FieldOptions do
   field :ctype, 1,
     optional: true,
     type: Google.Protobuf.FieldOptions.CType,
-    default: 0,
+    default: :STRING,
     enum: true
 
   field :packed, 2, optional: true, type: :bool
@@ -463,7 +463,7 @@ defmodule Google.Protobuf.FieldOptions do
   field :jstype, 6,
     optional: true,
     type: Google.Protobuf.FieldOptions.JSType,
-    default: 0,
+    default: :JS_NORMAL,
     enum: true
 
   field :lazy, 5, optional: true, type: :bool, default: false
@@ -552,7 +552,7 @@ defmodule Google.Protobuf.MethodOptions do
 
   @type t :: %__MODULE__{
           deprecated: boolean,
-          idempotency_level: integer,
+          idempotency_level: atom | integer,
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()]
         }
   defstruct [:deprecated, :idempotency_level, :uninterpreted_option]
@@ -562,7 +562,7 @@ defmodule Google.Protobuf.MethodOptions do
   field :idempotency_level, 34,
     optional: true,
     type: Google.Protobuf.MethodOptions.IdempotencyLevel,
-    default: 0,
+    default: :IDEMPOTENCY_UNKNOWN,
     enum: true
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
@@ -586,8 +586,8 @@ defmodule Google.Protobuf.UninterpretedOption do
           identifier_value: String.t(),
           positive_int_value: non_neg_integer,
           negative_int_value: integer,
-          double_value: float,
-          string_value: String.t(),
+          double_value: float | :infinity | :negative_infinity | :nan,
+          string_value: binary,
           aggregate_value: String.t()
         }
   defstruct [
