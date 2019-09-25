@@ -122,3 +122,7 @@ message Communique {
 
   message Delta {}
 }
+
+message Options {
+  optional string opt1 = 1 [deprecated=true];
+}

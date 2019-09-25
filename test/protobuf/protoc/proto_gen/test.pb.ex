@@ -6,7 +6,7 @@ defmodule My.Test.Request do
           key: [integer],
           hue: atom | integer,
           hat: atom | integer,
-          deadline: float,
+          deadline: float | :infinity | :negative_infinity | :nan,
           somegroup: any,
           name_mapping: %{integer => String.t()},
           msg_mapping: %{integer => My.Test.Reply.t() | nil},
@@ -205,6 +205,18 @@ defmodule My.Test.Communique.Delta do
 
   @type t :: %__MODULE__{}
   defstruct []
+end
+
+defmodule My.Test.Options do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{
+          opt1: String.t()
+        }
+  defstruct [:opt1]
+
+  field :opt1, 1, optional: true, type: :string, deprecated: true
 end
 
 defmodule My.Test.HatType do

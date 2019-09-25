@@ -49,4 +49,8 @@ defmodule Protobuf.Protoc.IntegrationTest do
       assert My.Test.Communique.decode(output) == input
     end)
   end
+
+  test "options" do
+    assert %{deprecated?: true} = My.Test.Options.__message_props__().field_props[1]
+  end
 end
