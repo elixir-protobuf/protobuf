@@ -30,3 +30,4 @@ script:
   - mix test
   - mix test.integration
   - mix hex.build
+  - mix format --check-formatted
