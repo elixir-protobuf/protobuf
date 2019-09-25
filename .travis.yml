@@ -30,4 +30,5 @@ script:
   - mix test
   - mix test.integration
   - mix hex.build
-  - mix format --check-formatted
+  # Only run for latest version
+  - '[[ "$TRAVIS_ELIXIR_VERSION" =~ 1.[6-8] ]] || mix format --check-formatted'

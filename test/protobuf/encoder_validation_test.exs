@@ -85,7 +85,7 @@ defmodule Protobuf.EncoderTest.Validation do
   test "field is invalid" do
     msg = TestMsg.Foo.new(a: "abc")
 
-    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#a: %ArithmeticError/, fn ->
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#a: %FunctionClauseError/, fn ->
       Protobuf.Encoder.encode(msg)
     end
   end
@@ -93,7 +93,7 @@ defmodule Protobuf.EncoderTest.Validation do
   test "proto2 invalid when required field is nil" do
     msg = TestMsg.Foo2.new(a: nil)
 
-    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo2#a: %ArithmeticError/, fn ->
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo2#a: %FunctionClauseError/, fn ->
       Protobuf.Encoder.encode(msg)
     end
   end
@@ -123,7 +123,7 @@ defmodule Protobuf.EncoderTest.Validation do
   test "oneof field is invalid" do
     msg = TestMsg.Oneof.new(first: {:a, "abc"})
 
-    assert_raise Protobuf.EncodeError, ~r/TestMsg.Oneof#a: %ArithmeticError/, fn ->
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Oneof#a: %FunctionClauseError/, fn ->
       Protobuf.Encoder.encode(msg)
     end
   end
