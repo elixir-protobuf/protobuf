@@ -126,6 +126,14 @@ $ protoc --elixir_out=./lib --plugin=./protoc-gen-elixir *.proto
 $ protoc -I protos --elixir_out=./lib protos/hello.proto
 ```
 
+## Tests
+
+Before you can run the test suite, you must install `eqc_gen`:
+
+```
+$ mix eqc.install --mini
+```
+
 ## Sponsors
 
 This project is being sponsored by [Tubi](https://tubitv.com/). Thank you!
