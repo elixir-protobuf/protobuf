@@ -161,6 +161,7 @@ defmodule Protobuf.DSL do
       |> cal_embedded()
       |> cal_packed(syntax)
       |> cal_repeated(opts_map)
+      |> cal_deprecated()
 
     struct(props, parts)
     |> cal_encoded_fnum()
@@ -263,6 +264,9 @@ defmodule Protobuf.DSL do
     do: raise(":oneof can't be used with repeated")
 
   defp cal_repeated(props, _), do: props
+
+  defp cal_deprecated(%{deprecated: true} = props), do: Map.put(props, :deprecated?, true)
+  defp cal_deprecated(props), do: props
 
   defp cal_encoded_fnum(%{fnum: fnum, packed?: true} = props) do
     encoded_fnum = Protobuf.Encoder.encode_fnum(fnum, Protobuf.Encoder.wire_type(:bytes))
