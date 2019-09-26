@@ -41,10 +41,12 @@ defmodule Protobuf.Decoder do
           n
 
         :uint32 ->
-          unquote(val)
+          <<n::unsigned-integer-32>> = <<unquote(val)::32>>
+          n
 
         :uint64 ->
-          unquote(val)
+          <<n::unsigned-integer-64>> = <<unquote(val)::64>>
+          n
 
         :bool ->
           unquote(val) != 0
