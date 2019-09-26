@@ -119,101 +119,101 @@ defmodule Protobuf.Encoder.DecodeTypeTest do
   end
 
   test "encode_type/2 wrong uint32" do
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:uint32, 12_345_678_901_234_567_890)
     end
 
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:uint32, -1)
     end
   end
 
   test "encode_type/2 wrong uint64" do
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:uint64, 184_467_440_737_095_516_150)
     end
 
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:uint64, -1)
     end
   end
 
   test "encode_type/2 wrong fixed32" do
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:fixed32, 12_345_678_901_234_567_890)
     end
 
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:fixed32, -1)
     end
   end
 
   test "encode_type/2 wrong fixed64" do
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:fixed64, 184_467_440_737_095_516_150)
     end
 
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:fixed64, -1)
     end
   end
 
   test "encode_type/2 wrong int32" do
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:int32, 2_147_483_648)
     end
 
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:int32, -2_147_483_649)
     end
   end
 
   test "encode_type/2 wrong int64" do
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:int64, 184_467_440_737_095_516_150)
     end
 
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:int64, -184_467_440_737_095_516_150)
     end
   end
 
   test "encode_type/2 wrong sint32" do
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:sint32, 2_147_483_648)
     end
 
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:sint32, -2_147_483_649)
     end
   end
 
   test "encode_type/2 wrong sint64" do
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:sint64, 184_467_440_737_095_516_150)
     end
 
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:sint64, -184_467_440_737_095_516_150)
     end
   end
 
   test "encode_type/2 wrong sfixed32" do
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:sfixed32, 2_147_483_648)
     end
 
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:sfixed32, -2_147_483_649)
     end
   end
 
   test "encode_type/2 wrong sfixed64" do
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:sfixed64, 184_467_440_737_095_516_150)
     end
 
-    assert_raise FunctionClauseError, fn ->
+    assert_raise Protobuf.TypeEncodeError, fn ->
       Encoder.encode_type(:sfixed64, -184_467_440_737_095_516_150)
     end
   end

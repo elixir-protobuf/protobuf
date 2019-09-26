@@ -69,7 +69,7 @@ defmodule Protobuf.Encoder do
 
       msg =
         "Got error when encoding #{inspect(struct.__struct__)}##{prop.name_atom}: #{
-          inspect(error)
+          Exception.format(:error, error)
         }"
 
       throw({Protobuf.EncodeError, [message: msg], stacktrace})
@@ -180,6 +180,10 @@ defmodule Protobuf.Encoder do
 
   def encode_type(:sfixed32, n) when n >= -0x80000000 and n <= 0x7FFFFFFF,
     do: <<n::32-signed-little>>
+
+  def encode_type(type, n) do
+    raise Protobuf.TypeEncodeError, message: "#{inspect(n)} is invalid for type #{type}"
+  end
 
   @spec encode_zigzag(integer) :: integer
   def encode_zigzag(val) when val >= 0, do: val * 2

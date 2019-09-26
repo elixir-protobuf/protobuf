@@ -85,7 +85,7 @@ defmodule Protobuf.EncoderTest.Validation do
   test "field is invalid" do
     msg = TestMsg.Foo.new(a: "abc")
 
-    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#a: %FunctionClauseError/, fn ->
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#a.*Protobuf.TypeEncodeError/, fn ->
       Protobuf.Encoder.encode(msg)
     end
   end
@@ -93,7 +93,7 @@ defmodule Protobuf.EncoderTest.Validation do
   test "proto2 invalid when required field is nil" do
     msg = TestMsg.Foo2.new(a: nil)
 
-    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo2#a: %FunctionClauseError/, fn ->
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo2#a.*Protobuf.TypeEncodeError/, fn ->
       Protobuf.Encoder.encode(msg)
     end
   end
@@ -123,7 +123,7 @@ defmodule Protobuf.EncoderTest.Validation do
   test "oneof field is invalid" do
     msg = TestMsg.Oneof.new(first: {:a, "abc"})
 
-    assert_raise Protobuf.EncodeError, ~r/TestMsg.Oneof#a: %FunctionClauseError/, fn ->
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Oneof#a.*Protobuf.TypeEncodeError/, fn ->
       Protobuf.Encoder.encode(msg)
     end
   end
@@ -131,14 +131,14 @@ defmodule Protobuf.EncoderTest.Validation do
   test "repeated field is not list" do
     msg = TestMsg.Foo.new(g: 1)
 
-    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#g: %Protocol.UndefinedError/, fn ->
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#g.*Protocol.UndefinedError/, fn ->
       Protobuf.Encoder.encode(msg)
     end
 
     msg = TestMsg.Foo.new()
     msg = %{msg | h: TestMsg.Foo.Bar.new()}
 
-    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#h: %Protocol.UndefinedError/, fn ->
+    assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#h.*Protocol.UndefinedError/, fn ->
       Protobuf.Encoder.encode(msg)
     end
   end
