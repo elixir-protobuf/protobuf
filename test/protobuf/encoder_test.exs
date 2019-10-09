@@ -1,4 +1,5 @@
 Code.require_file("../support/test_msg.ex", __DIR__)
+Code.require_file("../support/google.ex", __DIR__)
 
 defmodule Protobuf.EncoderTest do
   use ExUnit.Case, async: true
@@ -159,5 +160,15 @@ defmodule Protobuf.EncoderTest do
     msg = TestMsg.OneofProto3.new(first: {:e, :UNKNOWN})
     assert Encoder.encode(msg) == <<48, 0>>
     assert TestMsg.OneofProto3.decode(<<48, 0>>) == msg
+  end
+
+  test "encodes map with oneof" do
+    msg = Google.Protobuf.Struct.new(fields: %{"valid" => %{kind: {:bool_value, true}}})
+    bin = Google.Protobuf.Struct.encode(msg)
+
+    assert Google.Protobuf.Struct.decode(bin) ==
+             Google.Protobuf.Struct.new(
+               fields: %{"valid" => %Google.Protobuf.Value{kind: {:bool_value, true}}}
+             )
   end
 end
