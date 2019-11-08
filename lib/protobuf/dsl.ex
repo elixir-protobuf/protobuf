@@ -27,6 +27,11 @@ defmodule Protobuf.DSL do
     enum_fields = enum_fields(msg_props, false)
     default_struct = Map.put(default_fields, :__struct__, env.module)
 
+    default_struct_proto3 =
+      Enum.reduce(enum_fields, default_struct, fn {name, type}, acc ->
+        Map.put(acc, name, type.key(0))
+      end)
+
     quote do
       def __message_props__ do
         unquote(Macro.escape(msg_props))
@@ -36,11 +41,7 @@ defmodule Protobuf.DSL do
 
       if unquote(syntax == :proto3) do
         def __default_struct__ do
-          struct = unquote(Macro.escape(default_struct))
-
-          Enum.reduce(unquote(Macro.escape(enum_fields)), struct, fn {name, type}, acc ->
-            Map.put(acc, name, type.key(0))
-          end)
+          unquote(Macro.escape(default_struct_proto3))
         end
       else
         def __default_struct__ do
