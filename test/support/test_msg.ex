@@ -123,4 +123,19 @@ defmodule TestMsg do
     field :child, 1, type: Link
     field :value, 2, type: :int32
   end
+
+  defmodule Bar2.Enum do
+    @moduledoc false
+    use Protobuf, enum: true, syntax: :proto2
+
+    field :a, 0
+    field :b, 1
+  end
+
+  defmodule Bar2 do
+    use Protobuf, syntax: :proto2
+
+    field :a, 1, required: true, type: Bar2.Enum, enum: true
+    field :b, 2, optional: true, type: Bar2.Enum, enum: true
+  end
 end
