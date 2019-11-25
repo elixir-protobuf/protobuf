@@ -26,14 +26,16 @@ defmodule Protobuf.Protoc.Generator do
 
     ctx = %{ctx | dep_type_mapping: get_dep_type_mapping(ctx, desc.dependency, desc.name)}
 
+    {enums, msgs} = MessageGenerator.generate_list(ctx, desc.message_type)
+
     list =
       EnumGenerator.generate_list(ctx, desc.enum_type) ++
-      MessageGenerator.generate_list(ctx, desc.message_type) ++
-        ServiceGenerator.generate_list(ctx, desc.service)
+        enums ++ msgs ++ ServiceGenerator.generate_list(ctx, desc.service)
 
     list
     |> List.flatten()
     |> Enum.join("\n")
+
     # |> format_code()
   end
 

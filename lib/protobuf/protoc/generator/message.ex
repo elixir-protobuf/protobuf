@@ -4,13 +4,18 @@ defmodule Protobuf.Protoc.Generator.Message do
   alias Protobuf.Protoc.Generator.Enum, as: EnumGenerator
 
   def generate_list(ctx, descs) do
-    Enum.map(descs, fn desc -> generate(ctx, desc) end)
+    descs
+    |> Enum.map(fn desc -> generate(ctx, desc) end)
+    |> Enum.unzip()
   end
 
   def generate(ctx, desc) do
     msg_struct = parse_desc(ctx, desc)
     ctx = %{ctx | namespace: msg_struct[:new_namespace]}
-    [gen_nested_enums(ctx, desc), gen_nested_msgs(ctx, desc), gen_msg(ctx.syntax, msg_struct)]
+    {nested_enums, nested_msgs} = Enum.unzip(gen_nested_msgs(ctx, desc))
+
+    {gen_nested_enums(ctx, desc) ++ nested_enums,
+     nested_msgs ++ [gen_msg(ctx.syntax, msg_struct)]}
   end
 
   def parse_desc(%{namespace: ns} = ctx, desc) do
