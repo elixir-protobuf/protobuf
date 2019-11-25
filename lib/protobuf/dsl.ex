@@ -29,6 +29,7 @@ defmodule Protobuf.DSL do
 
     default_struct_proto3 =
       Enum.reduce(enum_fields, default_struct, fn {name, type}, acc ->
+        Code.ensure_loaded(type)
         Map.put(acc, name, type.key(0))
       end)
 
