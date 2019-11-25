@@ -35,8 +35,7 @@ defmodule Protobuf.Protoc.Generator do
     list
     |> List.flatten()
     |> Enum.join("\n")
-
-    # |> format_code()
+    |> format_code()
   end
 
   @doc false
