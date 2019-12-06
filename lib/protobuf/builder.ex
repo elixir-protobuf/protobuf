@@ -9,7 +9,7 @@ defmodule Protobuf.Builder do
         attrs
 
       _ ->
-        msg = struct(mod.__default_struct__(), attrs)
+        msg = struct!(mod.__default_struct__(), attrs)
         props = mod.__message_props__()
 
         Enum.reduce(props.embedded_fields, msg, fn k, acc ->
