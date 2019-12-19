@@ -118,9 +118,6 @@ defmodule Protobuf.Protoc.Generator.Message do
     String.pad_trailing("#{name}:", len + 1)
   end
 
-  # defp fmt_type(%{opts: %{enum: true}, label: "repeated"} = l ), do: IO.inspect l; "[atom | integer]"
-  # defp fmt_type(%{opts: %{enum: true}}=l), do: IO.inspect l;  "atom | integer"
-
   defp fmt_type(%{opts: %{map: true}, map: {{k_type, k_name}, {v_type, v_name}}}) do
     k_type = type_to_spec(k_type, k_name)
     v_type = type_to_spec(v_type, v_name)
