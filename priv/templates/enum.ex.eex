@@ -1,6 +1,8 @@
 defmodule <%= name %> do
   @moduledoc false
   use Protobuf<%= options %>
+  
+  <%= type %>
 
   <%= if not is_nil(desc) do %>
   def descriptor do

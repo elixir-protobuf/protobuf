@@ -118,8 +118,8 @@ defmodule Protobuf.Protoc.Generator.Message do
     String.pad_trailing("#{name}:", len + 1)
   end
 
-  defp fmt_type(%{opts: %{enum: true}, label: "repeated"}), do: "[atom | integer]"
-  defp fmt_type(%{opts: %{enum: true}}), do: "atom | integer"
+  # defp fmt_type(%{opts: %{enum: true}, label: "repeated"} = l ), do: IO.inspect l; "[atom | integer]"
+  # defp fmt_type(%{opts: %{enum: true}}=l), do: IO.inspect l;  "atom | integer"
 
   defp fmt_type(%{opts: %{map: true}, map: {{k_type, k_name}, {v_type, v_name}}}) do
     k_type = type_to_spec(k_type, k_name)
@@ -137,11 +137,11 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   defp type_to_spec(enum, type, repeated \\ false)
 
-  defp type_to_spec(:TYPE_MESSAGE, type, true),
-    do: TypeUtil.enum_to_spec(:TYPE_MESSAGE, type, true)
+  defp type_to_spec(:TYPE_MESSAGE, type, repeated),
+    do: TypeUtil.enum_to_spec(:TYPE_MESSAGE, type, repeated)
 
-  defp type_to_spec(:TYPE_MESSAGE, type, false),
-    do: TypeUtil.enum_to_spec(:TYPE_MESSAGE, type, false)
+  defp type_to_spec(:TYPE_ENUM, type, repeated),
+    do: TypeUtil.enum_to_spec(:TYPE_ENUM, type, repeated)
 
   defp type_to_spec(enum, _, _), do: TypeUtil.enum_to_spec(enum)
 

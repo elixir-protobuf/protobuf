@@ -281,7 +281,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [msg]} = Generator.generate(ctx, desc)
-    assert msg =~ "a: atom | integer"
+    assert msg =~ "a: FooBar.AbCd.EnumFoo.t"
     assert msg =~ "field :a, 1, optional: true, type: FooBar.AbCd.EnumFoo, enum: true\n"
   end
 
