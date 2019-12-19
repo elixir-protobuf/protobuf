@@ -42,7 +42,7 @@ defmodule Protobuf.Encoder do
   end
 
   def encode_fields([prop | tail], syntax, struct, oneofs, acc) do
-    %{name_atom: name, oneof: oneof, enum?: is_enum, type: type} = prop
+    %{name_atom: name, oneof: oneof} = prop
 
     val =
       if oneof do
@@ -57,7 +57,7 @@ defmodule Protobuf.Encoder do
         end
       end
 
-    if skip_field?(syntax, val, prop) || (is_enum && !oneof && is_enum_default(type, val)) do
+    if skip_field?(syntax, val, prop) || skip_enum?(prop, val) do
       encode_fields(tail, syntax, struct, oneofs, acc)
     else
       acc = [encode_field(class_field(prop), val, prop) | acc]
@@ -231,9 +231,15 @@ defmodule Protobuf.Encoder do
     end
   end
 
-  defp is_enum_default({_, type}, v) when is_atom(v), do: type.value(v) == 0
-  defp is_enum_default({_, _}, v) when is_integer(v), do: v == 0
-  defp is_enum_default({_, _}, _), do: false
+  defp skip_enum?(prop, value)
+  defp skip_enum?(%{enum?: false}, _), do: false
+  defp skip_enum?(%{enum?: true, oneof: oneof}, _) when not is_nil(oneof), do: false
+  defp skip_enum?(%{required?: true}, _), do: false
+  defp skip_enum?(%{type: type}, value), do: is_enum_default?(type, value)
+
+  defp is_enum_default?({_, type}, v) when is_atom(v), do: type.value(v) == 0
+  defp is_enum_default?({_, _}, v) when is_integer(v), do: v == 0
+  defp is_enum_default?({_, _}, _), do: false
 
   defp oneof_actual_vals(
          %{field_tags: field_tags, field_props: field_props, oneof: oneof},

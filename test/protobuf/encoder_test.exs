@@ -171,4 +171,17 @@ defmodule Protobuf.EncoderTest do
                fields: %{"valid" => %Google.Protobuf.Value{kind: {:bool_value, true}}}
              )
   end
+
+  test "encodes default value for proto2" do
+    # Includes required
+    msg = TestMsg.Bar2.new(a: 0)
+    assert Encoder.encode(msg) == <<8, 0>>
+
+    # Excludes optionals at default value
+    msg = TestMsg.Bar2.new(a: 0, b: 0)
+    assert Encoder.encode(msg) == <<8, 0>>
+
+    msg = TestMsg.Bar2.new(a: 0, b: 1)
+    assert Encoder.encode(msg) == <<8, 0, 16, 1>>
+  end
 end
