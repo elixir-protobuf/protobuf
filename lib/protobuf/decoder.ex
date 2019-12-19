@@ -14,6 +14,9 @@ defmodule Protobuf.Decoder do
     %{repeated_fields: repeated_fields} = msg_props = module.__message_props__()
     struct = build_struct(kvs, msg_props, module.new())
     reverse_repeated(struct, repeated_fields)
+  catch
+    :error, :function_clause ->
+      raise Protobuf.DecodeError, message: "cannot decode binary data as #{module}"
   end
 
   @doc false

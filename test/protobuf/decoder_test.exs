@@ -28,6 +28,12 @@ defmodule Protobuf.DecoderTest do
     end)
   end
 
+  test "raises for bad binaries" do
+    assert_raise(Protobuf.DecodeError, ~r{cannot decode binary data as}, fn ->
+      Decoder.decode(<<0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo)
+    end)
+  end
+
   test "skips unknown varint fields" do
     struct = Decoder.decode(<<8, 42, 32, 100, 45, 0, 0, 247, 66>>, TestMsg.Foo)
     assert struct == TestMsg.Foo.new(a: 42, d: 123.5)
