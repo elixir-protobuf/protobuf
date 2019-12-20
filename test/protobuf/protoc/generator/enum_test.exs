@@ -19,7 +19,7 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
     msg = Generator.generate(ctx, desc)
     assert msg =~ "defmodule EnumFoo do\n"
     assert msg =~ "use Protobuf, enum: true\n"
-    assert msg =~ "@type t :: :A | 0 | :B | 1\n"
+    assert msg =~ "@type t :: integer | :A | :B\n"
     refute msg =~ "defstruct "
     assert msg =~ "field :A, 0\n  field :B, 1\n"
   end

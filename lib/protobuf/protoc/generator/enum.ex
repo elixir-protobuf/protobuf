@@ -18,10 +18,10 @@ defmodule Protobuf.Protoc.Generator.Enum do
   def generate_type(fields) do
     field_values =
       fields
-      |> Enum.map(fn f -> ":#{f.name} | #{f.number}" end)
+      |> Enum.map(fn f -> ":#{f.name}" end)
       |> Enum.join(" | ")
 
-    "@type t :: " <> field_values
+    "@type t :: integer | " <> field_values
   end
 
   def generate_field(f) do
