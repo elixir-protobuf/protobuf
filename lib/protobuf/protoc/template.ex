@@ -13,7 +13,9 @@ defmodule Protobuf.Protoc.Template do
     trim: true
   )
 
-  EEx.function_from_file(:def, :enum, @enum_tmpl, [:name, :options, :fields, :desc], trim: true)
+  EEx.function_from_file(:def, :enum, @enum_tmpl, [:name, :options, :fields, :type, :desc],
+    trim: true
+  )
 
   EEx.function_from_file(:def, :service, @svc_tmpl, [:mod_name, :name, :methods, :desc],
     trim: true

@@ -10,8 +10,18 @@ defmodule Protobuf.Protoc.Generator.Enum do
     fields = Enum.map(desc.value, fn f -> generate_field(f) end)
     msg_name = Util.mod_name(ctx, ns ++ [name])
     generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
+    type = generate_type(desc.value)
 
-    Protobuf.Protoc.Template.enum(msg_name, msg_opts(ctx, desc), fields, generate_desc)
+    Protobuf.Protoc.Template.enum(msg_name, msg_opts(ctx, desc), fields, type, generate_desc)
+  end
+
+  def generate_type(fields) do
+    field_values =
+      fields
+      |> Enum.map(fn f -> ":#{f.name}" end)
+      |> Enum.join(" | ")
+
+    "@type t :: integer | " <> field_values
   end
 
   def generate_field(f) do

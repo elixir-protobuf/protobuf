@@ -37,4 +37,6 @@ defmodule Protobuf.TypeUtil do
   def enum_to_spec(_), do: "any"
   def enum_to_spec(:TYPE_MESSAGE, type, true = _repeated), do: "#{type}.t"
   def enum_to_spec(:TYPE_MESSAGE, type, false = _repeated), do: "#{type}.t | nil"
+  def enum_to_spec(:TYPE_ENUM, type, true = _repeated), do: "[#{type}.t]"
+  def enum_to_spec(:TYPE_ENUM, type, false = _repeated), do: "#{type}.t"
 end
