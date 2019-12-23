@@ -52,7 +52,7 @@ defmodule Protobuf.BuilderTest do
 
   test "new!/2 raises for fields that don't exist in the schema" do
     assert_raise KeyError, fn ->
-      Foo.new(nonexisting_field: "foo")
+      Foo.new!(nonexisting_field: "foo")
     end
   end
 end
