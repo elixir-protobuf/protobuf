@@ -16,6 +16,10 @@ defmodule Protobuf do
       def new(attrs) do
         Protobuf.Builder.new(__MODULE__, attrs)
       end
+
+      def new!(attrs) do
+        Protobuf.Builder.new!(__MODULE__, attrs)
+      end
     end
   end
 
