@@ -308,6 +308,10 @@ defmodule Protobuf.Decoder do
     raw_handle_varint(type, rest, result, val)
   end
 
+  defp raw_decode_varint(_, _, _) do
+    raise Protobuf.DecodeError, message: "cannot decode binary data"
+  end
+
   defp raw_handle_varint(:key, <<bin::bits>>, result, key) do
     tag = bsr(key, 3)
     wire_type = band(key, 7)
@@ -350,6 +354,10 @@ defmodule Protobuf.Decoder do
 
   def raw_decode_value(wire_64bits(), <<n::64, rest::bits>>, result) do
     raw_decode_key(rest, [<<n::64>> | result])
+  end
+
+  def raw_decode_value(_, _, _) do
+    raise Protobuf.DecodeError, message: "cannot decode binary data"
   end
 
   # packed
