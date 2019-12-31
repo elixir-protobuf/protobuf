@@ -138,4 +138,49 @@ defmodule TestMsg do
     field :a, 1, required: true, type: Bar2.Enum, enum: true
     field :b, 2, optional: true, type: Bar2.Enum, enum: true
   end
+
+  defmodule Ext.Foo1 do
+    @moduledoc false
+    use Protobuf, syntax: :proto2
+
+    @type t :: %__MODULE__{}
+    defstruct []
+
+    extensions [{100, 100}, {1000, 2000}]
+  end
+
+  defmodule Ext.Options do
+    @moduledoc false
+    use Protobuf, syntax: :proto2
+
+    @type t :: %__MODULE__{}
+    defstruct []
+
+    field :a, 1, optional: true, type: :string
+  end
+
+  defmodule Ext.Foo2 do
+    @moduledoc false
+    use Protobuf, syntax: :proto2
+
+    @type t :: %__MODULE__{}
+    defstruct []
+    extensions [{100, 100}, {1000, 2000}]
+  end
+
+  defmodule Ext.Parent do
+    @moduledoc false
+    use Protobuf, syntax: :proto2
+
+    @type t :: %__MODULE__{}
+    defstruct []
+  end
+
+  defmodule Ext.PbExtension do
+    use Protobuf, syntax: :proto2
+
+    extend Ext.Foo1, :foo, 1047, type: Ext.Options
+    extend Ext.Foo2, :bar, 1047, type: :string
+    extend Ext.Foo2, :"Parent.foo", 1048, type: EnumFoo, enum: true
+  end
 end

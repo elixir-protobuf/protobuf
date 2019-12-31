@@ -10,6 +10,7 @@ defmodule Protobuf.Mixfile do
       elixir: "~> 1.4",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       escript: escript(),
       description: description(),
@@ -17,7 +18,15 @@ defmodule Protobuf.Mixfile do
     ]
   end
 
-  def application, do: [extra_applications: [:logger]]
+  def application do
+    [
+      mod: {Protobuf.Application, []},
+      extra_applications: [:logger]
+    ]
+  end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp deps do
     [

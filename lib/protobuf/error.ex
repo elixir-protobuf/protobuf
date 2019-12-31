@@ -13,3 +13,7 @@ end
 defmodule Protobuf.InvalidError do
   defexception [:message]
 end
+
+defmodule Protobuf.ExtensionNotFound do
+  defexception message: "extension for the field is not found"
+end

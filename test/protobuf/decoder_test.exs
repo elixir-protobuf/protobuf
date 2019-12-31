@@ -1,5 +1,3 @@
-Code.require_file("../support/test_msg.ex", __DIR__)
-
 defmodule Protobuf.DecoderTest do
   use ExUnit.Case, async: true
 
