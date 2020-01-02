@@ -5,18 +5,15 @@ defmodule Protobuf.Extension.Props do
     @moduledoc false
     @type t :: %__MODULE__{
       extendee: module,
-      name_atom: atom,
-      fnum: non_neg_integer,
-      type: atom
+      field_props: FieldProps.T
     }
     defstruct extendee: nil,
-              name_atom: nil,
-              fnum: nil,
-              type: nil
+              field_props: nil
   end
 
   @type t :: %__MODULE__{
-    extensions: [Extension.t]
+    extensions: %{{module, integer} => Extension.t},
+    name_to_tag: %{{module, atom} => {module, integer}}
   }
-  defstruct extensions: []
+  defstruct extensions: %{}, name_to_tag: %{}
 end

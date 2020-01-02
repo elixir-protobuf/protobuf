@@ -143,8 +143,8 @@ defmodule TestMsg do
     @moduledoc false
     use Protobuf, syntax: :proto2
 
-    @type t :: %__MODULE__{}
-    defstruct []
+    @type t :: %__MODULE__{__pb_extensions__: map}
+    defstruct [__pb_extensions__: %{}]
 
     extensions [{100, 100}, {1000, 2000}]
   end
@@ -153,8 +153,8 @@ defmodule TestMsg do
     @moduledoc false
     use Protobuf, syntax: :proto2
 
-    @type t :: %__MODULE__{}
-    defstruct []
+    @type t :: %__MODULE__{a: String.t}
+    defstruct [:a]
 
     field :a, 1, optional: true, type: :string
   end
@@ -163,8 +163,8 @@ defmodule TestMsg do
     @moduledoc false
     use Protobuf, syntax: :proto2
 
-    @type t :: %__MODULE__{}
-    defstruct []
+    @type t :: %__MODULE__{__pb_extensions__: map}
+    defstruct [__pb_extensions__: %{}]
     extensions [{100, 100}, {1000, 2000}]
   end
 
@@ -181,6 +181,6 @@ defmodule TestMsg do
 
     extend Ext.Foo1, :foo, 1047, type: Ext.Options
     extend Ext.Foo2, :bar, 1047, type: :string
-    extend Ext.Foo2, :"Parent.foo", 1048, type: EnumFoo, enum: true
+    extend Ext.Foo1, :"Parent.foo", 1048, type: EnumFoo, enum: true
   end
 end

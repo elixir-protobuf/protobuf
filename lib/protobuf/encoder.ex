@@ -30,7 +30,16 @@ defmodule Protobuf.Encoder do
     syntax = props.syntax
     oneofs = oneof_actual_vals(props, struct)
 
-    encode_fields(Map.values(field_props), syntax, struct, oneofs, [])
+    encoded = encode_fields(Map.values(field_props), syntax, struct, oneofs, [])
+
+    encoded =
+      if syntax == :proto2 do
+        encode_extensions(struct, encoded)
+      else
+        encoded
+      end
+
+    encoded
     |> Enum.reverse()
   catch
     {e, msg, st} ->
@@ -265,5 +274,24 @@ defmodule Protobuf.Encoder do
             message: "#{inspect(struct.__struct__)}##{field} should be {key, val} or nil"
       end
     end)
+  end
+
+  defp encode_extensions(%mod{__pb_extensions__: pb_exts}, encoded) do
+    Enum.reduce(pb_exts, encoded, fn {key, val}, acc ->
+      case Protobuf.Extension.get_extension_props(mod, key) do
+        %{field_props: prop} ->
+          if skip_field?(:proto2, val, prop) || skip_enum?(prop, val) do
+            encoded
+          else
+            [encode_field(class_field(prop), val, prop) | acc]
+          end
+        _ ->
+          acc
+      end
+    end)
+  end
+
+  defp encode_extensions(_, encoded) do
+    encoded
   end
 end

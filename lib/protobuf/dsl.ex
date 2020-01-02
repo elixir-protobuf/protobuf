@@ -168,16 +168,21 @@ defmodule Protobuf.DSL do
   end
 
   defp gen_extension_props(extends = [_|_])  do
-    extensions = Enum.map(extends, fn {extendee, name_atom, fnum, opts} ->
-      %Protobuf.Extension.Props.Extension{
+    extensions = Map.new(extends, fn {extendee, name_atom, fnum, opts} ->
+      # Only proto2 has extensions
+      props = field_props(:proto2, name_atom, fnum, opts)
+      props = %Protobuf.Extension.Props.Extension{
         extendee: extendee,
-        name_atom: name_atom,
-        fnum: fnum,
-        type: opts[:type]
+        field_props: props
       }
+      {{extendee, fnum}, props}
     end)
-    %Protobuf.Extension.Props{extensions: extensions}
+    name_to_tag = Map.new(extends, fn {extendee, name_atom, fnum, _opts} ->
+      {{extendee, name_atom}, {extendee, fnum}}
+    end)
+    %Protobuf.Extension.Props{extensions: extensions, name_to_tag: name_to_tag}
   end
+
   defp gen_extension_props(_)  do
     nil
   end
