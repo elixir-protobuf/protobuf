@@ -2,6 +2,9 @@ defmodule Protobuf.Protoc.Generator do
   alias Protobuf.Protoc.Generator.Message, as: MessageGenerator
   alias Protobuf.Protoc.Generator.Enum, as: EnumGenerator
   alias Protobuf.Protoc.Generator.Service, as: ServiceGenerator
+  alias Protobuf.Protoc.Generator.Extension, as: ExtensionGenerator
+
+  @locals_without_parens [field: 2, field: 3, oneof: 2, rpc: 3, extend: 4]
 
   def generate(ctx, desc) do
     name = new_file_name(desc.name)
@@ -32,6 +35,10 @@ defmodule Protobuf.Protoc.Generator do
       EnumGenerator.generate_list(ctx, desc.enum_type) ++
         enums ++ msgs ++ ServiceGenerator.generate_list(ctx, desc.service)
 
+    nested_extensions = ExtensionGenerator.get_nested_extensions(ctx, desc.message_type)
+    |> Enum.reverse()
+    list = list ++ [ExtensionGenerator.generate(ctx, desc, nested_extensions)]
+
     list
     |> List.flatten()
     |> Enum.join("\n")
@@ -61,7 +68,7 @@ defmodule Protobuf.Protoc.Generator do
     formated =
       if Code.ensure_loaded?(Code) && function_exported?(Code, :format_string!, 2) do
         code
-        |> Code.format_string!(locals_without_parens: [field: 2, field: 3, oneof: 2, rpc: 3])
+        |> Code.format_string!(locals_without_parens: @locals_without_parens)
         |> IO.iodata_to_binary()
       else
         code

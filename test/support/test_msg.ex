@@ -139,33 +139,58 @@ defmodule TestMsg do
     field :b, 2, optional: true, type: Bar2.Enum, enum: true
   end
 
+  defmodule Ext.EnumFoo do
+    @moduledoc false
+    use Protobuf, enum: true, syntax: :proto2
+
+    @type t :: integer | :UNKNOWN | :A | :B | :C
+
+    field :UNKNOWN, 0
+    field :A, 1
+    field :B, 2
+    field :C, 4
+  end
+
   defmodule Ext.Foo1 do
     @moduledoc false
     use Protobuf, syntax: :proto2
 
-    @type t :: %__MODULE__{__pb_extensions__: map}
-    defstruct [__pb_extensions__: %{}]
+    @type t :: %__MODULE__{
+            fa: non_neg_integer,
+            __pb_extensions__: map
+          }
+    defstruct [:fa, :__pb_extensions__]
 
-    extensions [{100, 100}, {1000, 2000}]
-  end
+    field :fa, 1, optional: true, type: :uint32
 
-  defmodule Ext.Options do
-    @moduledoc false
-    use Protobuf, syntax: :proto2
-
-    @type t :: %__MODULE__{a: String.t}
-    defstruct [:a]
-
-    field :a, 1, optional: true, type: :string
+    extensions([{100, 101}, {1000, 536_870_912}])
   end
 
   defmodule Ext.Foo2 do
     @moduledoc false
     use Protobuf, syntax: :proto2
 
-    @type t :: %__MODULE__{__pb_extensions__: map}
-    defstruct [__pb_extensions__: %{}]
-    extensions [{100, 100}, {1000, 2000}]
+    @type t :: %__MODULE__{
+            fa: non_neg_integer,
+            __pb_extensions__: map
+          }
+    defstruct [:fa, :__pb_extensions__]
+
+    field :fa, 1, optional: true, type: :uint32
+
+    extensions([{100, 101}, {1000, 536_870_912}])
+  end
+
+  defmodule Ext.Options do
+    @moduledoc false
+    use Protobuf, syntax: :proto2
+
+    @type t :: %__MODULE__{
+            a: String.t()
+          }
+    defstruct [:a]
+
+    field :a, 1, optional: true, type: :string
   end
 
   defmodule Ext.Parent do
@@ -177,10 +202,12 @@ defmodule TestMsg do
   end
 
   defmodule Ext.PbExtension do
+    @moduledoc false
     use Protobuf, syntax: :proto2
 
-    extend Ext.Foo1, :foo, 1047, type: Ext.Options
-    extend Ext.Foo2, :bar, 1047, type: :string
-    extend Ext.Foo1, :"Parent.foo", 1048, type: EnumFoo, enum: true
+    extend Ext.Foo1, :foo, 1047, optional: true, type: Ext.Options
+    extend Ext.Foo1, :foo2, 1049, repeated: true, type: :uint32
+    extend Ext.Foo2, :bar, 1047, optional: true, type: :string
+    extend Ext.Foo1, :"Parent.foo", 1048, optional: true, type: Ext.EnumFoo, enum: true
   end
 end

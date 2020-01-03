@@ -15,6 +15,12 @@ defmodule <%= name %> do
   <% end %>
 
 <%= for v <- oneofs do %>  <%= v %>
-<% end %><%= for f <- fields do %>  field <%= f %>
 <% end %>
+
+<%= for f <- fields do %>  field <%= f %>
+<% end %>
+
+  <%= if not is_nil(extensions) do %>
+  extensions <%= extensions %>
+  <% end %>
 end
