@@ -429,30 +429,40 @@ defmodule Protobuf.Decoder do
 
   defp try_decode_extension(%mod{} = struct, tag, wire, val) do
     case Protobuf.Extension.get_extension_props_by_tag(mod, tag) do
-      %{field_props: %{
-        wire_type: ^wire,
-        repeated?: is_repeated,
-        type: type,
-        name_atom: name_atom,
-        embedded?: embedded
-      }} ->
-        val = if embedded do
-          embedded_msg = decode(val, type)
-          merge_embedded_value(struct, name_atom, embedded_msg, is_repeated)
-        else
-          val = decode_type_m(type, name_atom, val)
-          if is_repeated do
-            merge_simple_repeated_value(struct, name_atom, val)
+      {ext_mod,
+       %{
+         field_props: %{
+           wire_type: ^wire,
+           repeated?: is_repeated,
+           type: type,
+           name_atom: name_atom,
+           embedded?: embedded
+         }
+       }} ->
+        val =
+          if embedded do
+            embedded_msg = decode(val, type)
+            merge_embedded_value(struct, name_atom, embedded_msg, is_repeated)
           else
-            val
+            val = decode_type_m(type, name_atom, val)
+
+            if is_repeated do
+              merge_simple_repeated_value(struct, name_atom, val)
+            else
+              val
+            end
           end
-        end
+
+        key = {ext_mod, name_atom}
+
         case struct do
           %{__pb_extensions__: pb_ext} ->
-            Map.put(struct, :__pb_extensions__, Map.put(pb_ext, name_atom, val))
+            Map.put(struct, :__pb_extensions__, Map.put(pb_ext, key, val))
+
           _ ->
-            Map.put(struct, :__pb_extensions__, %{name_atom => val})
+            Map.put(struct, :__pb_extensions__, %{key => val})
         end
+
       _ ->
         struct
     end

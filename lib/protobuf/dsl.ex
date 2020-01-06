@@ -32,8 +32,11 @@ defmodule Protobuf.DSL do
   defmacro __before_compile__(env) do
     fields = Module.get_attribute(env.module, :fields)
     options = Module.get_attribute(env.module, :options)
-    extension_props = Module.get_attribute(env.module, :extends)
-    |> gen_extension_props()
+
+    extension_props =
+      Module.get_attribute(env.module, :extends)
+      |> gen_extension_props()
+
     extensions = Module.get_attribute(env.module, :extensions)
     syntax = Keyword.get(options, :syntax, :proto2)
     oneofs = Module.get_attribute(env.module, :oneofs)
@@ -42,11 +45,19 @@ defmodule Protobuf.DSL do
     enum_fields = enum_fields(msg_props, false)
     default_struct = Map.put(default_fields, :__struct__, env.module)
 
-    default_struct_proto3 =
-      Enum.reduce(enum_fields, default_struct, fn {name, type}, acc ->
-        Code.ensure_loaded(type)
-        Map.put(acc, name, type.key(0))
-      end)
+    default_struct =
+      if syntax == :proto3 do
+        Enum.reduce(enum_fields, default_struct, fn {name, type}, acc ->
+          Code.ensure_loaded(type)
+          Map.put(acc, name, type.key(0))
+        end)
+      else
+        if extensions do
+          Map.put(default_struct, :__pb_extensions__, %{})
+        else
+          default_struct
+        end
+      end
 
     quote do
       def __message_props__ do
@@ -71,7 +82,7 @@ defmodule Protobuf.DSL do
 
       if unquote(syntax == :proto3) do
         def __default_struct__ do
-          unquote(Macro.escape(default_struct_proto3))
+          unquote(Macro.escape(default_struct))
         end
       else
         def __default_struct__ do
@@ -122,16 +133,16 @@ defmodule Protobuf.DSL do
 
   defp def_extension_functions() do
     quote do
-      def put_extension(%__MODULE__{} = struct, field, value) do
-        Protobuf.Extension.put(__MODULE__, struct, field, value)
+      def put_extension(%__MODULE__{} = struct, extension_mod, field, value) do
+        Protobuf.Extension.put(__MODULE__, struct, extension_mod, field, value)
       end
 
-      def put_extension(map = %{}, field, value) do
-        Protobuf.Extension.put(__MODULE__, map, field, value)
+      def put_extension(map = %{}, extension_mod, field, value) do
+        Protobuf.Extension.put(__MODULE__, map, extension_mod, field, value)
       end
 
-      def get_extension(struct, field, default \\ nil) do
-        Protobuf.Extension.get(struct, field, default)
+      def get_extension(struct, extension_mod, field, default \\ nil) do
+        Protobuf.Extension.get(struct, extension_mod, field, default)
       end
     end
   end
@@ -167,23 +178,29 @@ defmodule Protobuf.DSL do
     }
   end
 
-  defp gen_extension_props(extends = [_|_])  do
-    extensions = Map.new(extends, fn {extendee, name_atom, fnum, opts} ->
-      # Only proto2 has extensions
-      props = field_props(:proto2, name_atom, fnum, opts)
-      props = %Protobuf.Extension.Props.Extension{
-        extendee: extendee,
-        field_props: props
-      }
-      {{extendee, fnum}, props}
-    end)
-    name_to_tag = Map.new(extends, fn {extendee, name_atom, fnum, _opts} ->
-      {{extendee, name_atom}, {extendee, fnum}}
-    end)
+  defp gen_extension_props(extends = [_ | _]) do
+    extensions =
+      Map.new(extends, fn {extendee, name_atom, fnum, opts} ->
+        # Only proto2 has extensions
+        props = field_props(:proto2, name_atom, fnum, opts)
+
+        props = %Protobuf.Extension.Props.Extension{
+          extendee: extendee,
+          field_props: props
+        }
+
+        {{extendee, fnum}, props}
+      end)
+
+    name_to_tag =
+      Map.new(extends, fn {extendee, name_atom, fnum, _opts} ->
+        {{extendee, name_atom}, {extendee, fnum}}
+      end)
+
     %Protobuf.Extension.Props{extensions: extensions, name_to_tag: name_to_tag}
   end
 
-  defp gen_extension_props(_)  do
+  defp gen_extension_props(_) do
     nil
   end
 

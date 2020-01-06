@@ -24,10 +24,10 @@ defmodule Protobuf.Protoc.Generator do
       ctx
       | package: desc.package || "",
         syntax: syntax(desc.syntax),
-        module_prefix: (desc.options && desc.options.elixir_module_prefix) || (desc.package || "")
+        dep_type_mapping: get_dep_type_mapping(ctx, desc.dependency, desc.name)
     }
 
-    ctx = %{ctx | dep_type_mapping: get_dep_type_mapping(ctx, desc.dependency, desc.name)}
+    ctx = Protobuf.Protoc.Context.cal_file_options(ctx, desc.options)
 
     {enums, msgs} = MessageGenerator.generate_list(ctx, desc.message_type)
 
@@ -35,8 +35,10 @@ defmodule Protobuf.Protoc.Generator do
       EnumGenerator.generate_list(ctx, desc.enum_type) ++
         enums ++ msgs ++ ServiceGenerator.generate_list(ctx, desc.service)
 
-    nested_extensions = ExtensionGenerator.get_nested_extensions(ctx, desc.message_type)
-    |> Enum.reverse()
+    nested_extensions =
+      ExtensionGenerator.get_nested_extensions(ctx, desc.message_type)
+      |> Enum.reverse()
+
     list = list ++ [ExtensionGenerator.generate(ctx, desc, nested_extensions)]
 
     list

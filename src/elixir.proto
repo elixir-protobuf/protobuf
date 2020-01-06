@@ -1,9 +1,0 @@
-syntax = "proto2";
-
-import "google/protobuf/descriptor.proto";
-
-extend google.protobuf.FileOptions {
-	// 1047 is allocated to this project by Google
-  // It's actually a little hack, so we now have to use the same value with that in lib/google/descriptor.pb.ex:401.
-  optional string elixir_module_prefix = 1047;
-}

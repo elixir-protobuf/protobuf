@@ -75,11 +75,12 @@ defmodule Protobuf.Protoc.CLI do
   end
 
   def find_types_in_proto(%Google.Protobuf.FileDescriptorProto{} = desc) do
-    ctx = %{
-      module_prefix: desc.options && desc.options.elixir_module_prefix,
-      package: desc.package,
-      namespace: []
-    }
+    ctx =
+      %Protobuf.Protoc.Context{
+        package: desc.package,
+        namespace: []
+      }
+      |> Protobuf.Protoc.Context.cal_file_options(desc.options)
 
     %{}
     |> find_types_in_proto(ctx, desc.message_type)

@@ -80,13 +80,19 @@ defmodule Protobuf.Protoc.CLITest do
   end
 
   test "find_types_in_proto/1 supports elixir_module_prefix" do
+    opts = Google.Protobuf.FileOptions.new()
+    custom_opts = Elixirpb.FileOptions.new(module_prefix: "FooBar.Prefix")
+
+    opts =
+      Google.Protobuf.FileOptions.put_extension(opts, Elixirpb.PbExtension, :file, custom_opts)
+
     desc =
       FileDescriptorProto.new(
         name: "file1",
         package: "pkg",
         message_type: [DescriptorProto.new(name: "Msg")],
         enum_type: [EnumDescriptorProto.new(name: "Enum")],
-        options: Google.Protobuf.FileOptions.new(elixir_module_prefix: "foo_bar.prefix")
+        options: opts
       )
 
     assert %{

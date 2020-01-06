@@ -90,16 +90,19 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   def structs_str(struct, extensions) do
     fields = Enum.filter(struct.field, fn f -> !f.oneof_index end)
-    fields = if Enum.empty?(extensions) do
-      fields
-    else
-      fields ++ [%{name: :__pb_extensions__}]
-    end
+
+    fields =
+      if Enum.empty?(extensions) do
+        fields
+      else
+        fields ++ [%{name: :__pb_extensions__}]
+      end
+
     Enum.map_join(struct.oneof_decl ++ fields, ", ", fn f -> ":#{f.name}" end)
   end
 
   def typespec_str([], [], []), do: "  @type t :: %__MODULE__{}\n"
-  def typespec_str([], [], [_|_]), do: "  @type t :: %__MODULE__{__pb_extensions__: map}\n"
+  def typespec_str([], [], [_ | _]), do: "  @type t :: %__MODULE__{__pb_extensions__: map}\n"
 
   def typespec_str(fields, oneofs, extensions) do
     longest_field = fields |> Enum.max_by(&String.length(&1[:name]))
@@ -110,15 +113,19 @@ defmodule Protobuf.Protoc.Generator.Message do
       Enum.map(oneofs, fn f ->
         {fmt_type_name(f.name, longest_width), "{atom, any}"}
       end)
-    types = types ++ Enum.map(fields, fn f ->
+
+    types =
+      types ++
+        Enum.map(fields, fn f ->
           {fmt_type_name(f[:name], longest_width), fmt_type(f)}
         end)
 
-    types = if Enum.empty?(extensions) do
-      types
-    else
-      types ++ [{fmt_type_name(:__pb_extensions__, longest_width), "map"}]
-    end
+    types =
+      if Enum.empty?(extensions) do
+        types
+      else
+        types ++ [{fmt_type_name(:__pb_extensions__, longest_width), "map"}]
+      end
 
     "  @type t :: %__MODULE__{\n" <>
       Enum.map_join(types, ",\n", fn {k, v} ->

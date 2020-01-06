@@ -22,7 +22,5 @@ defmodule Protobuf.Protoc.Template do
     trim: true
   )
 
-  EEx.function_from_file(:def, :extension, @ext_tmpl, [:name, :options, :extends],
-    trim: true
-  )
+  EEx.function_from_file(:def, :extension, @ext_tmpl, [:name, :options, :extends], trim: true)
 end

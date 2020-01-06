@@ -6,13 +6,15 @@ defmodule Protobuf.Protoc.Generator.Extension do
   def generate(%{namespace: ns} = ctx, desc, nested_extensions) do
     extends = Enum.map(desc.extension, fn ext -> generate_extend(ctx, ext) end)
 
-    nested_extends = Enum.map(nested_extensions, fn {ns, exts} ->
-      ns = Util.join_name(ns)
-      Enum.map(exts, fn ext ->
-        generate_extend(ctx, ext, ns)
+    nested_extends =
+      Enum.map(nested_extensions, fn {ns, exts} ->
+        ns = Util.join_name(ns)
+
+        Enum.map(exts, fn ext ->
+          generate_extend(ctx, ext, ns)
+        end)
       end)
-    end)
-    |> Enum.concat()
+      |> Enum.concat()
 
     extends = extends ++ nested_extends
 
@@ -29,11 +31,14 @@ defmodule Protobuf.Protoc.Generator.Extension do
     extendee = Util.type_from_type_name(ctx, f.extendee)
     f = Protobuf.Protoc.Generator.Message.get_field(ctx, f, %{}, [])
     label_str = "#{f.label}: true, "
-    name = if ns == "" do
-      f.name
-    else
-      inspect(Util.join_name([ns, f.name]))
-    end
+
+    name =
+      if ns == "" do
+        f.name
+      else
+        inspect(Util.join_name([ns, f.name]))
+      end
+
     "#{extendee}, :#{name}, #{f.number}, #{label_str}type: #{f.type}#{f.opts_str}"
   end
 
@@ -50,6 +55,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
       new_ns = ns ++ [Util.trans_name(m.name)]
       extension = {new_ns, m.extension}
       acc = [extension | acc]
+
       if m.nested_type == [] do
         acc
       else

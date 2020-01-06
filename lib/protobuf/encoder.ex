@@ -276,15 +276,16 @@ defmodule Protobuf.Encoder do
     end)
   end
 
-  defp encode_extensions(%mod{__pb_extensions__: pb_exts}, encoded) do
-    Enum.reduce(pb_exts, encoded, fn {key, val}, acc ->
-      case Protobuf.Extension.get_extension_props(mod, key) do
+  defp encode_extensions(%mod{__pb_extensions__: pb_exts}, encoded) when is_map(pb_exts) do
+    Enum.reduce(pb_exts, encoded, fn {{ext_mod, key}, val}, acc ->
+      case Protobuf.Extension.get_extension_props(mod, ext_mod, key) do
         %{field_props: prop} ->
           if skip_field?(:proto2, val, prop) || skip_enum?(prop, val) do
             encoded
           else
             [encode_field(class_field(prop), val, prop) | acc]
           end
+
         _ ->
           acc
       end

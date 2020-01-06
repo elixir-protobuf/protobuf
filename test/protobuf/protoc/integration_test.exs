@@ -1,5 +1,3 @@
-Code.require_file("proto_gen/test.pb.ex", __DIR__)
-
 defmodule Protobuf.Protoc.IntegrationTest do
   use ExUnit.Case, async: true
   @moduletag :integration
@@ -11,7 +9,7 @@ defmodule Protobuf.Protoc.IntegrationTest do
       _my_field_name_2: 21
     }
 
-    reply = %My.Test.Reply{found: [entry], compact_keys: [1, 2, 3]}
+    reply = My.Test.Reply.new(found: [entry], compact_keys: [1, 2, 3])
 
     input =
       My.Test.Request.new(
@@ -52,5 +50,9 @@ defmodule Protobuf.Protoc.IntegrationTest do
 
   test "options" do
     assert %{deprecated?: true} = My.Test.Options.__message_props__().field_props[1]
+  end
+
+  test "extensions" do
+    assert "hello" == Protobuf.Protoc.ExtTest.Foo.new(a: "hello").a
   end
 end

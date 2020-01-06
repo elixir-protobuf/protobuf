@@ -11,15 +11,9 @@ gen_google_proto: protoc-gen-elixir
 	$(call ndef,PROTO_LIB)
 	protoc -I $(PROTO_LIB) --elixir_out=lib/google --plugin=./protoc-gen-elixir $(PROTO_LIB)/descriptor.proto
 	protoc -I $(PROTO_LIB) --elixir_out=lib/google --plugin=./protoc-gen-elixir $(PROTO_LIB)/compiler/plugin.proto
+	protoc -I $(PROTO_LIB) -I src --elixir_out=lib/google --plugin=./protoc-gen-elixir src/elixir.proto
 
-	# it's a hack until extension is implemented
-	# 1047 is allocated to this project by Google
-	sed -i "" '/field :ruby_package, 45/a \
-	\ \ field :elixir_module_prefix, 1047, optional: true, type: :string\
-	' lib/google/descriptor.pb.ex
+gen_test_protos: protoc-gen-elixir
+	protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/*.proto
 
-	sed -i "" '/    :ruby_package,/a \
-	\ \ \ \ :elixir_module_prefix,\
-	' lib/google/descriptor.pb.ex
-
-.PHONY: clean gen_google_proto
+.PHONY: clean gen_google_proto gen_test_protos
