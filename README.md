@@ -44,6 +44,7 @@ end
 * [x] Validate values
 * [x] Generate typespecs
 * [x] oneof
+* [x] (proto2) Extension
 
 ## Usage
 

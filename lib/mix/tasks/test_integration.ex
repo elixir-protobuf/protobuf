@@ -6,7 +6,6 @@ defmodule Mix.Tasks.Test.Integration do
   def run(args) do
     IO.puts("==> make clean")
     {_, 0} = System.cmd("make", ["clean"], into: IO.binstream(:stdio, :line))
-    test_path = "test/protobuf/protoc"
 
     IO.puts("==> make gen_test_protos")
     {_, 0} = System.cmd("make", ["gen_test_protos"], into: IO.binstream(:stdio, :line))

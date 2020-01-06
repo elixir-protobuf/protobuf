@@ -4,7 +4,7 @@ protoc-gen-elixir:
 	mix escript.build .
 
 clean:
-	rm protoc-gen-elixir
+	rm -f protoc-gen-elixir
 
 # PROTO_LIB should be your local path to https://github.com/google/protobuf/tree/master/src/google/protobuf
 gen_google_proto: protoc-gen-elixir
