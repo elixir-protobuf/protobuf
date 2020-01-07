@@ -1,4 +1,5 @@
 defmodule Protobuf.Protoc.Generator.Extension do
+  @moduledoc false
   alias Protobuf.Protoc.Generator.Util
 
   @ext_postfix "PbExtension"

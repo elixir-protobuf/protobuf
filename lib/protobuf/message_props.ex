@@ -1,4 +1,6 @@
 defmodule Protobuf.MessageProps do
+  @moduledoc false
+
   alias Protobuf.FieldProps
 
   @type t :: %__MODULE__{

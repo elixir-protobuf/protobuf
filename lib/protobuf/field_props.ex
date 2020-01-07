@@ -1,4 +1,6 @@
 defmodule Protobuf.FieldProps do
+  @moduledoc false
+
   @type t :: %__MODULE__{
           fnum: integer,
           name: String.t(),

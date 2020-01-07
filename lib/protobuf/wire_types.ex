@@ -1,7 +1,5 @@
 defmodule Protobuf.WireTypes do
-  @moduledoc """
-  Protocol buffer wire types.
-  """
+  @moduledoc false
 
   defmacro wire_varint, do: 0
   defmacro wire_64bits, do: 1

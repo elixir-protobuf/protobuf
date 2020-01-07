@@ -1,4 +1,6 @@
 defmodule Protobuf.GlobalStore do
+  @moduledoc false
+
   if function_exported?(:persistent_term, :get, 2) &&
        function_exported?(:persistent_term, :put, 2) do
     def put(key, value) do

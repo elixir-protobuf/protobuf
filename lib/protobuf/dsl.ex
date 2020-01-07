@@ -1,28 +1,35 @@
 defmodule Protobuf.DSL do
-  defmacro field(name, fnum, options) do
+
+  @doc """
+  Define a field in the message module.
+  """
+  defmacro field(name, fnum, options \\ []) do
     quote do
       @fields {unquote(name), unquote(fnum), unquote(options)}
     end
   end
 
-  defmacro field(name, fnum) do
-    quote do
-      @fields {unquote(name), unquote(fnum), []}
-    end
-  end
-
+  @doc """
+  Define oneof in the message module.
+  """
   defmacro oneof(name, index) do
     quote do
       @oneofs {unquote(name), unquote(index)}
     end
   end
 
+  @doc """
+  Define "extend" for a message(the first argument module).
+  """
   defmacro extend(mod, name, fnum, options) do
     quote do
       @extends {unquote(mod), unquote(name), unquote(fnum), unquote(options)}
     end
   end
 
+  @doc """
+  Define extensions range in the message module to allow extensions for this module.
+  """
   defmacro extensions(ranges) do
     quote do
       @extensions unquote(ranges)
@@ -367,7 +374,7 @@ defmodule Protobuf.DSL do
     props
   end
 
-  def generate_default_fields(syntax, msg_props) do
+  defp generate_default_fields(syntax, msg_props) do
     fields =
       msg_props.field_props
       |> Map.values()
@@ -384,16 +391,7 @@ defmodule Protobuf.DSL do
     end)
   end
 
-  def embedded_fields(msg_props) do
-    msg_props.field_props
-    |> Map.values()
-    |> Enum.filter(fn props -> props.embedded? && !props.repeated? && !props.map? end)
-    |> Enum.map(fn props -> {props.name_atom, props.type} end)
-  end
-
-  def enum_fields(msg_props, include_oneof? \\ true)
-
-  def enum_fields(%{syntax: :proto3} = msg_props, include_oneof?) do
+  defp enum_fields(%{syntax: :proto3} = msg_props, include_oneof?) do
     msg_props.field_props
     |> Map.values()
     |> Enum.filter(fn props ->
@@ -404,21 +402,21 @@ defmodule Protobuf.DSL do
     end)
   end
 
-  def enum_fields(%{syntax: _}, _include_oneof?), do: %{}
+  defp enum_fields(%{syntax: _}, _include_oneof?), do: %{}
 
-  def type_numeric?(:int32), do: true
-  def type_numeric?(:int64), do: true
-  def type_numeric?(:uint32), do: true
-  def type_numeric?(:uint64), do: true
-  def type_numeric?(:sint32), do: true
-  def type_numeric?(:sint64), do: true
-  def type_numeric?(:bool), do: true
-  def type_numeric?({:enum, _}), do: true
-  def type_numeric?(:fixed32), do: true
-  def type_numeric?(:sfixed32), do: true
-  def type_numeric?(:fixed64), do: true
-  def type_numeric?(:sfixed64), do: true
-  def type_numeric?(:float), do: true
-  def type_numeric?(:double), do: true
-  def type_numeric?(_), do: false
+  defp type_numeric?(:int32), do: true
+  defp type_numeric?(:int64), do: true
+  defp type_numeric?(:uint32), do: true
+  defp type_numeric?(:uint64), do: true
+  defp type_numeric?(:sint32), do: true
+  defp type_numeric?(:sint64), do: true
+  defp type_numeric?(:bool), do: true
+  defp type_numeric?({:enum, _}), do: true
+  defp type_numeric?(:fixed32), do: true
+  defp type_numeric?(:sfixed32), do: true
+  defp type_numeric?(:fixed64), do: true
+  defp type_numeric?(:sfixed64), do: true
+  defp type_numeric?(:float), do: true
+  defp type_numeric?(:double), do: true
+  defp type_numeric?(_), do: false
 end

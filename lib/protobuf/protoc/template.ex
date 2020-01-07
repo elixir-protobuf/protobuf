@@ -1,4 +1,5 @@
 defmodule Protobuf.Protoc.Template do
+  @moduledoc false
   @msg_tmpl Path.expand("./templates/message.ex.eex", :code.priv_dir(:protobuf))
   @enum_tmpl Path.expand("./templates/enum.ex.eex", :code.priv_dir(:protobuf))
   @svc_tmpl Path.expand("./templates/service.ex.eex", :code.priv_dir(:protobuf))

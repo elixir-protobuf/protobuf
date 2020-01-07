@@ -1,4 +1,6 @@
 defmodule Protobuf.Protoc.Generator do
+  @moduledoc false
+
   alias Protobuf.Protoc.Generator.Message, as: MessageGenerator
   alias Protobuf.Protoc.Generator.Enum, as: EnumGenerator
   alias Protobuf.Protoc.Generator.Service, as: ServiceGenerator

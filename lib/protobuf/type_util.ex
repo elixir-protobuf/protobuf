@@ -1,4 +1,5 @@
 defmodule Protobuf.TypeUtil do
+  @moduledoc false
   def from_enum(:TYPE_DOUBLE), do: :double
   def from_enum(:TYPE_FLOAT), do: :float
   def from_enum(:TYPE_INT64), do: :int64

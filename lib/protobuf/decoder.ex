@@ -1,4 +1,5 @@
 defmodule Protobuf.Decoder do
+  @moduledoc false
   import Protobuf.WireTypes
   import Bitwise, only: [bsl: 2, bsr: 2, band: 2]
   require Logger
@@ -130,7 +131,7 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  def build_struct([tag, wire, val | rest], %{field_props: f_props} = msg_props, struct) do
+  defp build_struct([tag, wire, val | rest], %{field_props: f_props} = msg_props, struct) do
     case f_props do
       %{
         ^tag =>
@@ -185,7 +186,7 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  def build_struct([], _, struct) do
+  defp build_struct([], _, struct) do
     struct
   end
 
