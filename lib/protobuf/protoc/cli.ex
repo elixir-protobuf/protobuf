@@ -1,4 +1,28 @@
 defmodule Protobuf.Protoc.CLI do
+  @moduledoc false
+
+  def main(["--version"]) do
+    {:ok, version} = :application.get_key(:protobuf, :vsn)
+    IO.puts to_string(version)
+  end
+
+  def main([opt]) when opt in ["--help", "-h"] do
+    IO.puts """
+    protoc plugin for generating Elixir code
+
+    See `protoc -h` and protobuf-elixir for details.
+    NOTICE: protoc-gen-elixir(this name is important) must be in $PATH
+
+    Examples:
+      $ protoc --elixir_out=./lib your.proto
+      $ protoc --elixir_out=plugins=grpc:./lib/ *.proto
+      $ protoc -I protos --elixir_out=./lib protos/namespace/*.proto
+
+    Options:
+    --version       Print version of protobuf-elixir
+    """
+  end
+
   def main(_) do
     # https://groups.google.com/forum/#!topic/elixir-lang-talk/T5enez_BBTI
     :io.setopts(:standard_io, encoding: :latin1)

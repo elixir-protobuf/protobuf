@@ -1,7 +1,7 @@
 defmodule Protobuf.Mixfile do
   use Mix.Project
 
-  @version "0.7.0"
+  @version "0.7.1"
 
   def project do
     [
@@ -29,7 +29,7 @@ defmodule Protobuf.Mixfile do
   end
 
   defp escript do
-    [main_module: Protobuf.Protoc.CLI, name: "protoc-gen-elixir", app: nil]
+    [main_module: Protobuf.Protoc.CLI, name: "protoc-gen-elixir"]
   end
 
   defp description do
