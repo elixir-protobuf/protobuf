@@ -74,13 +74,13 @@ defmodule Protobuf do
   @callback new() :: struct
 
   @doc "Build and update the struct with passed fields."
-  @callback new(Enum.t) :: struct
+  @callback new(Enum.t()) :: struct
 
   @doc """
   Similar to `new/1`, but use `struct!/2` to build the struct, so
   errors will be raised if unknown keys are passed.
   """
-  @callback new!(Enum.t) :: struct
+  @callback new!(Enum.t()) :: struct
 
   @doc """
   Encode the struct to a protobuf binary.

@@ -105,10 +105,10 @@ defmodule Protobuf.Encoder do
   end
 
   defp encode_field(
-        :embedded,
-        val,
-        %{encoded_fnum: fnum, repeated?: is_repeated, map?: is_map, type: type} = prop
-      ) do
+         :embedded,
+         val,
+         %{encoded_fnum: fnum, repeated?: is_repeated, map?: is_map, type: type} = prop
+       ) do
     repeated = is_repeated || is_map
 
     repeated_or_not(val, repeated, fn v ->

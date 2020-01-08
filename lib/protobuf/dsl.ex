@@ -1,5 +1,4 @@
 defmodule Protobuf.DSL do
-
   @doc """
   Define a field in the message module.
   """
