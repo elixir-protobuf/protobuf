@@ -3,11 +3,11 @@ defmodule Protobuf.Protoc.CLI do
 
   def main(["--version"]) do
     {:ok, version} = :application.get_key(:protobuf, :vsn)
-    IO.puts to_string(version)
+    IO.puts(to_string(version))
   end
 
   def main([opt]) when opt in ["--help", "-h"] do
-    IO.puts """
+    IO.puts("""
     protoc plugin for generating Elixir code
 
     See `protoc -h` and protobuf-elixir for details.
@@ -20,7 +20,7 @@ defmodule Protobuf.Protoc.CLI do
 
     Options:
     --version       Print version of protobuf-elixir
-    """
+    """)
   end
 
   def main(_) do
