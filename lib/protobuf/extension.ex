@@ -118,7 +118,7 @@ defmodule Protobuf.Extension do
   def cal_extensions(mods) do
     mods
     |> Enum.filter(fn mod ->
-      if Code.ensure_loaded?(mod) do
+      if to_string(mod) =~ ~r/\.PbExtension$/ && Code.ensure_loaded?(mod) do
         function_exported?(mod, :__protobuf_info__, 1)
       end
     end)

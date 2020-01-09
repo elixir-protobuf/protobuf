@@ -13,6 +13,10 @@ defmodule Protobuf.Application do
     if Application.get_env(:protobuf, :extensions, :disabled) == :enabled do
       mods = get_all_modules()
       Protobuf.Extension.cal_extensions(mods)
+    else
+      # Extensions in Protobuf should always be calculated for generating code
+      {:ok, mods} = :application.get_key(:protobuf, :modules)
+      Protobuf.Extension.cal_extensions(mods)
     end
 
     children = []
