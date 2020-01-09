@@ -45,7 +45,7 @@ end
 * [x] Validate values
 * [x] Generate typespecs
 * [x] oneof
-* [x] (proto2) Extension
+* [x] (proto2) Extension (Experiment, see `Protobuf.Extension`)
 
 ## Usage
 
@@ -126,6 +126,26 @@ $ protoc --elixir_out=./lib --plugin=./protoc-gen-elixir *.proto
 ```
 $ protoc -I protos --elixir_out=./lib protos/hello.proto
 ```
+
+### Custom options
+
+Since extensions(`Protobuf.Extension`) is supported now, some options are defined, like custom module_prefix.
+
+1. Copy src/elixirpb.proto to your protos path
+2. Import elixirpb.proto and use the options
+
+```proto
+syntax = "proto2";
+
+package your.pkg;
+
+import "elixirpb.proto";
+
+option (elixirpb.file).module_prefix = "Foo.Bar";
+```
+3. Generate code as before
+
+More options will be added in the future, see elixirpb.proto comments for details.
 
 ## Tests
 
