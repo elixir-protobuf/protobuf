@@ -148,7 +148,7 @@ defmodule My.Test.Reply do
   field :found, 1, repeated: true, type: My.Test.Reply.Entry
   field :compact_keys, 2, repeated: true, type: :int32, packed: true
 
-  extensions([{100, 536_870_912}])
+  extensions [{100, 536_870_912}]
 end
 
 defmodule My.Test.OtherBase do
@@ -163,7 +163,7 @@ defmodule My.Test.OtherBase do
 
   field :name, 1, optional: true, type: :string
 
-  extensions([{100, 536_870_912}])
+  extensions [{100, 536_870_912}]
 end
 
 defmodule My.Test.ReplyExtensions do
@@ -193,7 +193,7 @@ defmodule My.Test.OldReply do
   @type t :: %__MODULE__{__pb_extensions__: map}
   defstruct [:__pb_extensions__]
 
-  extensions([{100, 2_147_483_647}])
+  extensions [{100, 2_147_483_647}]
 end
 
 defmodule My.Test.Communique.SomeGroup do
