@@ -1,4 +1,5 @@
 defmodule Protobuf.Protoc.Generator.Enum do
+  @moduledoc false
   alias Protobuf.Protoc.Generator.Util
 
   def generate_list(ctx, descs) do

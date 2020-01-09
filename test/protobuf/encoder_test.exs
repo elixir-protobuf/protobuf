@@ -1,6 +1,3 @@
-Code.require_file("../support/test_msg.ex", __DIR__)
-Code.require_file("../support/google.ex", __DIR__)
-
 defmodule Protobuf.EncoderTest do
   use ExUnit.Case, async: true
 

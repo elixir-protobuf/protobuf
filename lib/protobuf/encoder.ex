@@ -1,17 +1,18 @@
 defmodule Protobuf.Encoder do
+  @moduledoc false
   import Protobuf.WireTypes
   import Bitwise, only: [bsr: 2, band: 2, bsl: 2, bor: 2]
 
   alias Protobuf.{MessageProps, FieldProps}
 
-  @spec encode(atom, struct, keyword) :: iodata
-  def encode(mod, struct, opts) do
-    case struct do
-      %{__struct__: _} ->
-        encode(struct, opts)
+  @spec encode(atom, map | struct, keyword) :: iodata
+  def encode(mod, msg, opts) do
+    case msg do
+      %{__struct__: ^mod} ->
+        encode(msg, opts)
 
       _ ->
-        encode(mod.new(struct), opts)
+        encode(mod.new(msg), opts)
     end
   end
 
@@ -30,18 +31,27 @@ defmodule Protobuf.Encoder do
     syntax = props.syntax
     oneofs = oneof_actual_vals(props, struct)
 
-    encode_fields(Map.values(field_props), syntax, struct, oneofs, [])
+    encoded = encode_fields(Map.values(field_props), syntax, struct, oneofs, [])
+
+    encoded =
+      if syntax == :proto2 do
+        encode_extensions(struct, encoded)
+      else
+        encoded
+      end
+
+    encoded
     |> Enum.reverse()
   catch
     {e, msg, st} ->
       reraise e, msg, st
   end
 
-  def encode_fields([], _, _, _, acc) do
+  defp encode_fields([], _, _, _, acc) do
     acc
   end
 
-  def encode_fields([prop | tail], syntax, struct, oneofs, acc) do
+  defp encode_fields([prop | tail], syntax, struct, oneofs, acc) do
     %{name_atom: name, oneof: oneof} = prop
 
     val =
@@ -88,17 +98,17 @@ defmodule Protobuf.Encoder do
   def skip_field?(_, _, _), do: false
 
   @spec encode_field(atom, any, FieldProps.t()) :: iodata
-  def encode_field(:normal, val, %{encoded_fnum: fnum, type: type, repeated?: is_repeated}) do
+  defp encode_field(:normal, val, %{encoded_fnum: fnum, type: type, repeated?: is_repeated}) do
     repeated_or_not(val, is_repeated, fn v ->
       [fnum, encode_type(type, v)]
     end)
   end
 
-  def encode_field(
-        :embedded,
-        val,
-        %{encoded_fnum: fnum, repeated?: is_repeated, map?: is_map, type: type} = prop
-      ) do
+  defp encode_field(
+         :embedded,
+         val,
+         %{encoded_fnum: fnum, repeated?: is_repeated, map?: is_map, type: type} = prop
+       ) do
     repeated = is_repeated || is_map
 
     repeated_or_not(val, repeated, fn v ->
@@ -110,25 +120,26 @@ defmodule Protobuf.Encoder do
     end)
   end
 
-  def encode_field(:packed, val, %{type: type, encoded_fnum: fnum}) do
+  defp encode_field(:packed, val, %{type: type, encoded_fnum: fnum}) do
     encoded = Enum.map(val, fn v -> encode_type(type, v) end)
     byte_size = IO.iodata_length(encoded)
     [fnum, encode_varint(byte_size), encoded]
   end
 
   @spec class_field(map) :: atom
-  def class_field(%{wire_type: wire_delimited(), embedded?: true}) do
+  defp class_field(%{wire_type: wire_delimited(), embedded?: true}) do
     :embedded
   end
 
-  def class_field(%{repeated?: true, packed?: true}) do
+  defp class_field(%{repeated?: true, packed?: true}) do
     :packed
   end
 
-  def class_field(_) do
+  defp class_field(_) do
     :normal
   end
 
+  @doc false
   @spec encode_fnum(integer, integer) :: iodata
   def encode_fnum(fnum, wire_type) do
     fnum
@@ -137,6 +148,7 @@ defmodule Protobuf.Encoder do
     |> encode_varint
   end
 
+  @doc false
   @spec encode_type(atom, any) :: iodata
   def encode_type(:int32, n) when n >= -0x80000000 and n <= 0x7FFFFFFF, do: encode_varint(n)
 
@@ -186,9 +198,10 @@ defmodule Protobuf.Encoder do
   end
 
   @spec encode_zigzag(integer) :: integer
-  def encode_zigzag(val) when val >= 0, do: val * 2
-  def encode_zigzag(val) when val < 0, do: val * -2 - 1
+  defp encode_zigzag(val) when val >= 0, do: val * 2
+  defp encode_zigzag(val) when val < 0, do: val * -2 - 1
 
+  @doc false
   @spec encode_varint(integer) :: iodata
   def encode_varint(n) when n < 0 do
     <<n::64-unsigned-native>> = <<n::64-signed-native>>
@@ -203,6 +216,7 @@ defmodule Protobuf.Encoder do
     [<<1::1, band(n, 127)::7>> | encode_varint(bsr(n, 7))] |> IO.iodata_to_binary()
   end
 
+  @doc false
   @spec wire_type(atom) :: integer
   def wire_type(:int32), do: wire_varint()
   def wire_type(:int64), do: wire_varint()
@@ -265,5 +279,25 @@ defmodule Protobuf.Encoder do
             message: "#{inspect(struct.__struct__)}##{field} should be {key, val} or nil"
       end
     end)
+  end
+
+  defp encode_extensions(%mod{__pb_extensions__: pb_exts}, encoded) when is_map(pb_exts) do
+    Enum.reduce(pb_exts, encoded, fn {{ext_mod, key}, val}, acc ->
+      case Protobuf.Extension.get_extension_props(mod, ext_mod, key) do
+        %{field_props: prop} ->
+          if skip_field?(:proto2, val, prop) || skip_enum?(prop, val) do
+            encoded
+          else
+            [encode_field(class_field(prop), val, prop) | acc]
+          end
+
+        _ ->
+          acc
+      end
+    end)
+  end
+
+  defp encode_extensions(_, encoded) do
+    encoded
   end
 end

@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package ext;
+
+// -I src is needed, see Makefile
+import "elixirpb.proto";
+
+option (elixirpb.file).module_prefix = "Protobuf.Protoc.ExtTest";
+
+message Foo {
+  optional string a = 1;
+}

@@ -1,4 +1,6 @@
 defmodule Protobuf.MessageProps do
+  @moduledoc false
+
   alias Protobuf.FieldProps
 
   @type t :: %__MODULE__{
@@ -12,7 +14,8 @@ defmodule Protobuf.MessageProps do
           oneof: [{atom, non_neg_integer}],
           enum?: boolean,
           extendable?: boolean,
-          map?: boolean
+          map?: boolean,
+          extension_range: [{non_neg_integer, non_neg_integer}]
         }
   defstruct ordered_tags: [],
             tags_map: %{},
@@ -24,9 +27,6 @@ defmodule Protobuf.MessageProps do
             oneof: [],
             enum?: false,
             extendable?: false,
-            map?: false
-
-  def has_oneof?(props) do
-    length(props.oneof) > 0
-  end
+            map?: false,
+            extension_range: []
 end

@@ -1,26 +1,29 @@
 defmodule Protobuf.Protoc.CLI do
-  @moduledoc false
+  @moduledoc """
+  protoc plugin for generating Elixir code
 
+  See `protoc -h` and protobuf-elixir for details.
+  NOTICE: protoc-gen-elixir(this name is important) must be in $PATH
+
+  ## Examples
+
+      $ protoc --elixir_out=./lib your.proto
+      $ protoc --elixir_out=plugins=grpc:./lib/ *.proto
+      $ protoc -I protos --elixir_out=./lib protos/namespace/*.proto
+
+  Options:
+  * --version       Print version of protobuf-elixir
+  * --help          Print this help
+  """
+
+  @doc false
   def main(["--version"]) do
     {:ok, version} = :application.get_key(:protobuf, :vsn)
     IO.puts(to_string(version))
   end
 
   def main([opt]) when opt in ["--help", "-h"] do
-    IO.puts("""
-    protoc plugin for generating Elixir code
-
-    See `protoc -h` and protobuf-elixir for details.
-    NOTICE: protoc-gen-elixir(this name is important) must be in $PATH
-
-    Examples:
-      $ protoc --elixir_out=./lib your.proto
-      $ protoc --elixir_out=plugins=grpc:./lib/ *.proto
-      $ protoc -I protos --elixir_out=./lib protos/namespace/*.proto
-
-    Options:
-    --version       Print version of protobuf-elixir
-    """)
+    IO.puts(@moduledoc)
   end
 
   def main(_) do
@@ -45,6 +48,7 @@ defmodule Protobuf.Protoc.CLI do
     IO.binwrite(Protobuf.Encoder.encode(response))
   end
 
+  @doc false
   def parse_params(ctx, params_str) when is_binary(params_str) do
     params = String.split(params_str, ",")
     parse_params(ctx, params)
@@ -63,10 +67,12 @@ defmodule Protobuf.Protoc.CLI do
 
   def parse_params(ctx, _), do: ctx
 
+  @doc false
   def find_types(ctx, descs) do
     find_types(ctx, descs, %{})
   end
 
+  @doc false
   def find_types(ctx, [], acc), do: %{ctx | global_type_mapping: acc}
 
   def find_types(ctx, [desc | t], acc) do
@@ -74,12 +80,14 @@ defmodule Protobuf.Protoc.CLI do
     find_types(ctx, t, Map.put(acc, desc.name, types))
   end
 
+  @doc false
   def find_types_in_proto(%Google.Protobuf.FileDescriptorProto{} = desc) do
-    ctx = %{
-      module_prefix: desc.options && desc.options.elixir_module_prefix,
-      package: desc.package,
-      namespace: []
-    }
+    ctx =
+      %Protobuf.Protoc.Context{
+        package: desc.package,
+        namespace: []
+      }
+      |> Protobuf.Protoc.Context.cal_file_options(desc.options)
 
     %{}
     |> find_types_in_proto(ctx, desc.message_type)

@@ -1,4 +1,5 @@
 defmodule Protobuf.Protoc.Generator.Util do
+  @moduledoc false
   def trans_name(name) do
     Macro.camelize(name)
   end
@@ -7,8 +8,12 @@ defmodule Protobuf.Protoc.Generator.Util do
     Enum.join(list, ".")
   end
 
-  def mod_name(%{module_prefix: prefix}, ns) do
+  def mod_name(%{module_prefix: prefix}, ns) when is_list(ns) do
     ns |> join_name() |> attach_pkg(prefix)
+  end
+
+  def mod_name(%{module_prefix: prefix}, ns) do
+    attach_pkg(ns, prefix)
   end
 
   defp attach_pkg(name, ""), do: name

@@ -1,4 +1,5 @@
 defmodule Protobuf.Protoc.Generator.Message do
+  @moduledoc false
   alias Protobuf.Protoc.Generator.Util
   alias Protobuf.TypeUtil
   alias Protobuf.Protoc.Generator.Enum, as: EnumGenerator
@@ -21,17 +22,19 @@ defmodule Protobuf.Protoc.Generator.Message do
   def parse_desc(%{namespace: ns} = ctx, desc) do
     new_ns = ns ++ [Util.trans_name(desc.name)]
     fields = get_fields(ctx, desc)
+    extensions = get_extensions(desc)
     generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
 
     %{
       new_namespace: new_ns,
       name: Util.mod_name(ctx, new_ns),
       options: msg_opts_str(ctx, desc.options),
-      structs: structs_str(desc),
-      typespec: typespec_str(fields, desc.oneof_decl),
+      structs: structs_str(desc, extensions),
+      typespec: typespec_str(fields, desc.oneof_decl, extensions),
       fields: fields,
       oneofs: oneofs_str(desc.oneof_decl),
-      desc: generate_desc
+      desc: generate_desc,
+      extensions: extensions
     }
   end
 
@@ -43,7 +46,8 @@ defmodule Protobuf.Protoc.Generator.Message do
       msg_struct[:typespec],
       msg_struct[:oneofs],
       gen_fields(syntax, msg_struct[:fields]),
-      msg_struct[:desc]
+      msg_struct[:desc],
+      gen_extensions(msg_struct[:extensions])
     )
   end
 
@@ -56,15 +60,20 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp gen_fields(syntax, fields) do
-    Enum.map(fields, fn %{opts: opts} = f ->
-      opts_str = Util.options_to_str(opts)
-      opts_str = if opts_str == "", do: "", else: ", " <> opts_str
-
+    Enum.map(fields, fn %{opts_str: opts_str} = f ->
       label_str =
         if syntax == :proto3 && f[:label] != "repeated", do: "", else: "#{f[:label]}: true, "
 
       ":#{f[:name]}, #{f[:number]}, #{label_str}type: #{f[:type]}#{opts_str}"
     end)
+  end
+
+  defp gen_extensions([]) do
+    nil
+  end
+
+  defp gen_extensions(exts) do
+    inspect(exts)
   end
 
   def msg_opts_str(%{syntax: syntax}, opts) do
@@ -80,14 +89,23 @@ defmodule Protobuf.Protoc.Generator.Message do
     if String.length(str) > 0, do: ", " <> str, else: ""
   end
 
-  def structs_str(struct) do
+  def structs_str(struct, extensions) do
     fields = Enum.filter(struct.field, fn f -> !f.oneof_index end)
+
+    fields =
+      if Enum.empty?(extensions) do
+        fields
+      else
+        fields ++ [%{name: :__pb_extensions__}]
+      end
+
     Enum.map_join(struct.oneof_decl ++ fields, ", ", fn f -> ":#{f.name}" end)
   end
 
-  def typespec_str([], []), do: "  @type t :: %__MODULE__{}\n"
+  def typespec_str([], [], []), do: "  @type t :: %__MODULE__{}\n"
+  def typespec_str([], [], [_ | _]), do: "  @type t :: %__MODULE__{__pb_extensions__: map}\n"
 
-  def typespec_str(fields, oneofs) do
+  def typespec_str(fields, oneofs, extensions) do
     longest_field = fields |> Enum.max_by(&String.length(&1[:name]))
     longest_width = String.length(longest_field[:name])
     fields = Enum.filter(fields, fn f -> !f[:oneof] end)
@@ -95,10 +113,20 @@ defmodule Protobuf.Protoc.Generator.Message do
     types =
       Enum.map(oneofs, fn f ->
         {fmt_type_name(f.name, longest_width), "{atom, any}"}
-      end) ++
+      end)
+
+    types =
+      types ++
         Enum.map(fields, fn f ->
           {fmt_type_name(f[:name], longest_width), fmt_type(f)}
         end)
+
+    types =
+      if Enum.empty?(extensions) do
+        types
+      else
+        types ++ [{fmt_type_name(:__pb_extensions__, longest_width), "map"}]
+      end
 
     "  @type t :: %__MODULE__{\n" <>
       Enum.map_join(types, ",\n", fn {k, v} ->
@@ -156,6 +184,9 @@ defmodule Protobuf.Protoc.Generator.Message do
     opts =
       if length(oneofs) > 0 && f.oneof_index, do: Map.put(opts, :oneof, f.oneof_index), else: opts
 
+    opts_str = Util.options_to_str(opts)
+    opts_str = if opts_str == "", do: "", else: ", " <> opts_str
+
     type = field_type_name(ctx, f)
 
     %{
@@ -165,9 +196,16 @@ defmodule Protobuf.Protoc.Generator.Message do
       type: type,
       type_enum: f.type,
       opts: opts,
+      opts_str: opts_str,
       map: map,
       oneof: f.oneof_index
     }
+  end
+
+  defp get_extensions(desc) do
+    Enum.map(desc.extension_range, fn range ->
+      {range.start, range.end}
+    end)
   end
 
   defp field_type_name(ctx, f) do

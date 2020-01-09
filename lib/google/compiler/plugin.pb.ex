@@ -34,20 +34,6 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorRequest do
   field :compiler_version, 3, optional: true, type: Google.Protobuf.Compiler.Version
 end
 
-defmodule Google.Protobuf.Compiler.CodeGeneratorResponse do
-  @moduledoc false
-  use Protobuf, syntax: :proto2
-
-  @type t :: %__MODULE__{
-          error: String.t(),
-          file: [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()]
-        }
-  defstruct [:error, :file]
-
-  field :error, 1, optional: true, type: :string
-  field :file, 15, repeated: true, type: Google.Protobuf.Compiler.CodeGeneratorResponse.File
-end
-
 defmodule Google.Protobuf.Compiler.CodeGeneratorResponse.File do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -62,4 +48,18 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorResponse.File do
   field :name, 1, optional: true, type: :string
   field :insertion_point, 2, optional: true, type: :string
   field :content, 15, optional: true, type: :string
+end
+
+defmodule Google.Protobuf.Compiler.CodeGeneratorResponse do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{
+          error: String.t(),
+          file: [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()]
+        }
+  defstruct [:error, :file]
+
+  field :error, 1, optional: true, type: :string
+  field :file, 15, repeated: true, type: Google.Protobuf.Compiler.CodeGeneratorResponse.File
 end

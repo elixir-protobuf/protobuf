@@ -3,7 +3,6 @@ language: elixir
 git:
   depth: 3
 elixir:
-  - 1.6
   - 1.7
   - 1.8
   - 1.9
@@ -12,9 +11,8 @@ otp_release:
   - 21.3
   - 22.0
 matrix:
-  exclude:
-  - elixir: 1.6
-    otp_release: 22.0
+  allow_failures:
+  - otp_release: 20.3
 env:
   - MIX_ENV=test VERBOSE_TESTS=true
 install:
@@ -23,8 +21,8 @@ install:
   - mix deps.get
   - mix eqc.install --mini --force
 before_script:
-  - wget https://github.com/google/protobuf/releases/download/v3.3.0/protoc-3.3.0-linux-x86_64.zip
-  - unzip protoc-3.3.0-linux-x86_64.zip
+  - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protoc-3.11.2-linux-x86_64.zip
+  - unzip protoc-3.11.2-linux-x86_64.zip
   - export PATH=$PATH:$PWD/bin/
 script:
   - mix test

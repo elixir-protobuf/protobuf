@@ -1,0 +1,7 @@
+defmodule <%= name %> do
+  @moduledoc false
+  use Protobuf<%= options %>
+
+<%= for ext <- extends do %>  extend <%= ext %>
+<% end %>
+end

@@ -22,9 +22,10 @@ The package can be installed by adding `protobuf` to your list of dependencies i
 ```elixir
 def deps do
   [
-    {:protobuf, "~> 0.5.3"},
+    {:protobuf, "~> 0.7.1"},
     # Only for files generated from Google's protos.
     # Can be ignored if you don't use Google's protos.
+    # Or you can generate the code by yourself.
     {:google_protos, "~> 0.1"}
   ]
 end
@@ -44,6 +45,7 @@ end
 * [x] Validate values
 * [x] Generate typespecs
 * [x] oneof
+* [x] (proto2) Extension (Experiment, see `Protobuf.Extension`)
 
 ## Usage
 
@@ -94,7 +96,6 @@ struct = Foo.decode(encoded)
 
 Note:
 - You should use `YourModule.new` instead of using the struct directly because default values will be set for all fields.
-- Default values will be set by default in `decode`, which can be changed by `:use_default` option.
 - Validation is done in `encode`. An error will be raised if the struct is invalid(like type is not matched).
 
 ### Descriptor support
@@ -125,6 +126,26 @@ $ protoc --elixir_out=./lib --plugin=./protoc-gen-elixir *.proto
 ```
 $ protoc -I protos --elixir_out=./lib protos/hello.proto
 ```
+
+### Custom options
+
+Since extensions(`Protobuf.Extension`) is supported now, some options are defined, like custom module_prefix.
+
+1. Copy src/elixirpb.proto to your protos path
+2. Import elixirpb.proto and use the options
+
+```proto
+syntax = "proto2";
+
+package your.pkg;
+
+import "elixirpb.proto";
+
+option (elixirpb.file).module_prefix = "Foo.Bar";
+```
+3. Generate code as before
+
+More options will be added in the future, see elixirpb.proto comments for details.
 
 ## Tests
 

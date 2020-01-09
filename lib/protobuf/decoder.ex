@@ -1,4 +1,5 @@
 defmodule Protobuf.Decoder do
+  @moduledoc false
   import Protobuf.WireTypes
   import Bitwise, only: [bsl: 2, bsr: 2, band: 2]
   require Logger
@@ -130,8 +131,7 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  # ugly for performance
-  def build_struct([tag, wire, val | rest], %{field_props: f_props} = msg_props, struct) do
+  defp build_struct([tag, wire, val | rest], %{field_props: f_props} = msg_props, struct) do
     case f_props do
       %{
         ^tag =>
@@ -153,17 +153,7 @@ defmodule Protobuf.Decoder do
             val = if is_map, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
             val = if oneof, do: {name_atom, val}, else: val
 
-            val =
-              case struct do
-                %{^key => nil} ->
-                  if is_repeated, do: [val], else: val
-
-                %{^key => value} ->
-                  if is_repeated, do: [val | value], else: Map.merge(value, val)
-
-                _ ->
-                  if is_repeated, do: [val], else: val
-              end
+            val = merge_embedded_value(struct, key, val, is_repeated)
 
             Map.put(struct, key, val)
           else
@@ -172,16 +162,7 @@ defmodule Protobuf.Decoder do
 
             val =
               if is_repeated do
-                case struct do
-                  %{^key => nil} ->
-                    [val]
-
-                  %{^key => value} ->
-                    [val | value]
-
-                  _ ->
-                    [val]
-                end
+                merge_simple_repeated_value(struct, key, val)
               else
                 val
               end
@@ -200,12 +181,39 @@ defmodule Protobuf.Decoder do
               "wrong wire_type for #{prop_display(f_prop)}: got #{wire}, want #{wire2}"
 
       _ ->
+        struct = try_decode_extension(struct, tag, wire, val)
         build_struct(rest, msg_props, struct)
     end
   end
 
-  def build_struct([], _, struct) do
+  defp build_struct([], _, struct) do
     struct
+  end
+
+  defp merge_embedded_value(struct, key, val, is_repeated) do
+    case struct do
+      %{^key => nil} ->
+        if is_repeated, do: [val], else: val
+
+      %{^key => value} ->
+        if is_repeated, do: [val | value], else: Map.merge(value, val)
+
+      _ ->
+        if is_repeated, do: [val], else: val
+    end
+  end
+
+  defp merge_simple_repeated_value(struct, key, val) do
+    case struct do
+      %{^key => nil} ->
+        [val]
+
+      %{^key => value} ->
+        [val | value]
+
+      _ ->
+        [val]
+    end
   end
 
   @doc false
@@ -418,5 +426,46 @@ defmodule Protobuf.Decoder do
   defp oneof_field(%{oneof: oneof}, %{oneof: oneofs}) do
     {field, ^oneof} = Enum.at(oneofs, oneof)
     field
+  end
+
+  defp try_decode_extension(%mod{} = struct, tag, wire, val) do
+    case Protobuf.Extension.get_extension_props_by_tag(mod, tag) do
+      {ext_mod,
+       %{
+         field_props: %{
+           wire_type: ^wire,
+           repeated?: is_repeated,
+           type: type,
+           name_atom: name_atom,
+           embedded?: embedded
+         }
+       }} ->
+        val =
+          if embedded do
+            embedded_msg = decode(val, type)
+            merge_embedded_value(struct, name_atom, embedded_msg, is_repeated)
+          else
+            val = decode_type_m(type, name_atom, val)
+
+            if is_repeated do
+              merge_simple_repeated_value(struct, name_atom, val)
+            else
+              val
+            end
+          end
+
+        key = {ext_mod, name_atom}
+
+        case struct do
+          %{__pb_extensions__: pb_ext} ->
+            Map.put(struct, :__pb_extensions__, Map.put(pb_ext, key, val))
+
+          _ ->
+            Map.put(struct, :__pb_extensions__, %{key => val})
+        end
+
+      _ ->
+        struct
+    end
   end
 end

@@ -7,9 +7,10 @@ defmodule Protobuf.Mixfile do
     [
       app: :protobuf,
       version: @version,
-      elixir: "~> 1.4",
+      elixir: "~> 1.6",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       escript: escript(),
       description: description(),
@@ -17,7 +18,15 @@ defmodule Protobuf.Mixfile do
     ]
   end
 
-  def application, do: [extra_applications: [:logger]]
+  def application do
+    [
+      mod: {Protobuf.Application, []},
+      extra_applications: [:logger]
+    ]
+  end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support", "test/protobuf/protoc/proto_gen"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp deps do
     [
@@ -42,7 +51,7 @@ defmodule Protobuf.Mixfile do
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/tony612/protobuf-elixir"},
       files:
-        ~w(mix.exs README.md lib/google lib/protobuf lib/protobuf.ex src config LICENSE priv/templates .formatter.exs)
+        ~w(mix.exs README.md lib/google lib/protobuf lib/protobuf.ex src LICENSE priv/templates .formatter.exs)
     ]
   end
 end

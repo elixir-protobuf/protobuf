@@ -1,37 +1,69 @@
 defmodule Protobuf.DSL do
-  defmacro field(name, fnum, options) do
+  @doc """
+  Define a field in the message module.
+  """
+  defmacro field(name, fnum, options \\ []) do
     quote do
       @fields {unquote(name), unquote(fnum), unquote(options)}
     end
   end
 
-  defmacro field(name, fnum) do
-    quote do
-      @fields {unquote(name), unquote(fnum), []}
-    end
-  end
-
+  @doc """
+  Define oneof in the message module.
+  """
   defmacro oneof(name, index) do
     quote do
       @oneofs {unquote(name), unquote(index)}
     end
   end
 
+  @doc """
+  Define "extend" for a message(the first argument module).
+  """
+  defmacro extend(mod, name, fnum, options) do
+    quote do
+      @extends {unquote(mod), unquote(name), unquote(fnum), unquote(options)}
+    end
+  end
+
+  @doc """
+  Define extensions range in the message module to allow extensions for this module.
+  """
+  defmacro extensions(ranges) do
+    quote do
+      @extensions unquote(ranges)
+    end
+  end
+
   defmacro __before_compile__(env) do
     fields = Module.get_attribute(env.module, :fields)
     options = Module.get_attribute(env.module, :options)
+
+    extension_props =
+      Module.get_attribute(env.module, :extends)
+      |> gen_extension_props()
+
+    extensions = Module.get_attribute(env.module, :extensions)
     syntax = Keyword.get(options, :syntax, :proto2)
     oneofs = Module.get_attribute(env.module, :oneofs)
-    msg_props = generate_msg_props(fields, oneofs, options)
+    msg_props = generate_msg_props(fields, oneofs, extensions, options)
     default_fields = generate_default_fields(syntax, msg_props)
     enum_fields = enum_fields(msg_props, false)
     default_struct = Map.put(default_fields, :__struct__, env.module)
 
-    default_struct_proto3 =
-      Enum.reduce(enum_fields, default_struct, fn {name, type}, acc ->
-        Code.ensure_loaded(type)
-        Map.put(acc, name, type.key(0))
-      end)
+    default_struct =
+      if syntax == :proto3 do
+        Enum.reduce(enum_fields, default_struct, fn {name, type}, acc ->
+          Code.ensure_loaded(type)
+          Map.put(acc, name, type.key(0))
+        end)
+      else
+        if extensions do
+          Map.put(default_struct, :__pb_extensions__, %{})
+        else
+          default_struct
+        end
+      end
 
     quote do
       def __message_props__ do
@@ -40,9 +72,23 @@ defmodule Protobuf.DSL do
 
       unquote(def_enum_functions(msg_props))
 
+      if unquote(Macro.escape(extension_props)) != nil do
+        def __protobuf_info__(:extension_props) do
+          unquote(Macro.escape(extension_props))
+        end
+      end
+
+      def __protobuf_info__(_) do
+        nil
+      end
+
+      if unquote(Macro.escape(extensions)) do
+        unquote(def_extension_functions())
+      end
+
       if unquote(syntax == :proto3) do
         def __default_struct__ do
-          unquote(Macro.escape(default_struct_proto3))
+          unquote(Macro.escape(default_struct))
         end
       else
         def __default_struct__ do
@@ -91,7 +137,23 @@ defmodule Protobuf.DSL do
 
   defp def_enum_functions(_), do: nil
 
-  defp generate_msg_props(fields, oneofs, options) do
+  defp def_extension_functions() do
+    quote do
+      def put_extension(%__MODULE__{} = struct, extension_mod, field, value) do
+        Protobuf.Extension.put(__MODULE__, struct, extension_mod, field, value)
+      end
+
+      def put_extension(map = %{}, extension_mod, field, value) do
+        Protobuf.Extension.put(__MODULE__, map, extension_mod, field, value)
+      end
+
+      def get_extension(struct, extension_mod, field, default \\ nil) do
+        Protobuf.Extension.get(struct, extension_mod, field, default)
+      end
+    end
+  end
+
+  defp generate_msg_props(fields, oneofs, extensions, options) do
     syntax = Keyword.get(options, :syntax, :proto2)
     field_props = field_props_map(syntax, fields)
 
@@ -117,8 +179,35 @@ defmodule Protobuf.DSL do
       syntax: syntax,
       oneof: Enum.reverse(oneofs),
       enum?: Keyword.get(options, :enum) == true,
-      map?: Keyword.get(options, :map) == true
+      map?: Keyword.get(options, :map) == true,
+      extension_range: extensions
     }
+  end
+
+  defp gen_extension_props(extends = [_ | _]) do
+    extensions =
+      Map.new(extends, fn {extendee, name_atom, fnum, opts} ->
+        # Only proto2 has extensions
+        props = field_props(:proto2, name_atom, fnum, opts)
+
+        props = %Protobuf.Extension.Props.Extension{
+          extendee: extendee,
+          field_props: props
+        }
+
+        {{extendee, fnum}, props}
+      end)
+
+    name_to_tag =
+      Map.new(extends, fn {extendee, name_atom, fnum, _opts} ->
+        {{extendee, name_atom}, {extendee, fnum}}
+      end)
+
+    %Protobuf.Extension.Props{extensions: extensions, name_to_tag: name_to_tag}
+  end
+
+  defp gen_extension_props(_) do
+    nil
   end
 
   defp tags_map(fields) do
@@ -284,7 +373,7 @@ defmodule Protobuf.DSL do
     props
   end
 
-  def generate_default_fields(syntax, msg_props) do
+  defp generate_default_fields(syntax, msg_props) do
     fields =
       msg_props.field_props
       |> Map.values()
@@ -301,16 +390,7 @@ defmodule Protobuf.DSL do
     end)
   end
 
-  def embedded_fields(msg_props) do
-    msg_props.field_props
-    |> Map.values()
-    |> Enum.filter(fn props -> props.embedded? && !props.repeated? && !props.map? end)
-    |> Enum.map(fn props -> {props.name_atom, props.type} end)
-  end
-
-  def enum_fields(msg_props, include_oneof? \\ true)
-
-  def enum_fields(%{syntax: :proto3} = msg_props, include_oneof?) do
+  defp enum_fields(%{syntax: :proto3} = msg_props, include_oneof?) do
     msg_props.field_props
     |> Map.values()
     |> Enum.filter(fn props ->
@@ -321,21 +401,21 @@ defmodule Protobuf.DSL do
     end)
   end
 
-  def enum_fields(%{syntax: _}, _include_oneof?), do: %{}
+  defp enum_fields(%{syntax: _}, _include_oneof?), do: %{}
 
-  def type_numeric?(:int32), do: true
-  def type_numeric?(:int64), do: true
-  def type_numeric?(:uint32), do: true
-  def type_numeric?(:uint64), do: true
-  def type_numeric?(:sint32), do: true
-  def type_numeric?(:sint64), do: true
-  def type_numeric?(:bool), do: true
-  def type_numeric?({:enum, _}), do: true
-  def type_numeric?(:fixed32), do: true
-  def type_numeric?(:sfixed32), do: true
-  def type_numeric?(:fixed64), do: true
-  def type_numeric?(:sfixed64), do: true
-  def type_numeric?(:float), do: true
-  def type_numeric?(:double), do: true
-  def type_numeric?(_), do: false
+  defp type_numeric?(:int32), do: true
+  defp type_numeric?(:int64), do: true
+  defp type_numeric?(:uint32), do: true
+  defp type_numeric?(:uint64), do: true
+  defp type_numeric?(:sint32), do: true
+  defp type_numeric?(:sint64), do: true
+  defp type_numeric?(:bool), do: true
+  defp type_numeric?({:enum, _}), do: true
+  defp type_numeric?(:fixed32), do: true
+  defp type_numeric?(:sfixed32), do: true
+  defp type_numeric?(:fixed64), do: true
+  defp type_numeric?(:sfixed64), do: true
+  defp type_numeric?(:float), do: true
+  defp type_numeric?(:double), do: true
+  defp type_numeric?(_), do: false
 end
