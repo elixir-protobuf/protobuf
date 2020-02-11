@@ -39,36 +39,51 @@ defmodule Protobuf.Builder do
 
   defp new_maybe_strict(mod, attrs, strict?) do
     case attrs do
-      %{__struct__: _} ->
+      # If the attrs is the module, we just return it
+      %{__struct__: ^mod} ->
         attrs
 
+      # If the module in the attrs doesn't match with mod
+      # raise error in strict and try changing it to a map in non-strict
+      %{__struct__: _} ->
+        if strict? do
+          raise ArgumentError,
+            message: "The __struct__ in the struct doesn't with the message module"
+        else
+          do_new_maybe_strict(mod, Map.from_struct(attrs), strict?)
+        end
+
       _ ->
-        props = mod.__message_props__()
-        default_struct = mod.__default_struct__()
-        msg = if strict?, do: struct!(default_struct, attrs), else: struct(default_struct, attrs)
-
-        Enum.reduce(props.embedded_fields, msg, fn k, acc ->
-          case msg do
-            %{^k => v} when not is_nil(v) ->
-              f_props = props.field_props[props.field_tags[k]]
-
-              v =
-                if f_props.embedded? do
-                  if f_props.repeated? do
-                    Enum.map(v, fn i -> f_props.type.new(i) end)
-                  else
-                    f_props.type.new(v)
-                  end
-                else
-                  v
-                end
-
-              Map.put(acc, k, v)
-
-            _ ->
-              acc
-          end
-        end)
+        do_new_maybe_strict(mod, attrs, strict?)
     end
+  end
+
+  defp do_new_maybe_strict(mod, attrs, strict?) do
+    props = mod.__message_props__()
+    default_struct = mod.__default_struct__()
+    msg = if strict?, do: struct!(default_struct, attrs), else: struct(default_struct, attrs)
+
+    Enum.reduce(props.embedded_fields, msg, fn k, acc ->
+      case msg do
+        %{^k => v} when not is_nil(v) ->
+          f_props = props.field_props[props.field_tags[k]]
+
+          v =
+            if f_props.embedded? do
+              if f_props.repeated? do
+                Enum.map(v, fn i -> f_props.type.new(i) end)
+              else
+                f_props.type.new(v)
+              end
+            else
+              v
+            end
+
+          Map.put(acc, k, v)
+
+        _ ->
+          acc
+      end
+    end)
   end
 end

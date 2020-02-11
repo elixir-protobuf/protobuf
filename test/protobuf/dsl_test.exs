@@ -21,7 +21,7 @@ defmodule Protobuf.DSLTest do
     msg_props = Foo.__message_props__()
 
     tags_map =
-      Enum.reduce([1, 2, 3] ++ Enum.to_list(5..17), %{}, fn i, acc -> Map.put(acc, i, i) end)
+      Enum.reduce([1, 2, 3] ++ Enum.to_list(5..17) ++ [101], %{}, fn i, acc -> Map.put(acc, i, i) end)
 
     assert tags_map == msg_props.tags_map
     field_props = msg_props.field_props
@@ -62,7 +62,7 @@ defmodule Protobuf.DSLTest do
 
   test "saves ordered tags" do
     msg_props = Foo.__message_props__()
-    assert [1, 2, 3] ++ Enum.to_list(5..17) == msg_props.ordered_tags
+    assert [1, 2, 3] ++ Enum.to_list(5..17) ++ [101] == msg_props.ordered_tags
   end
 
   test "supports embedded fields" do
@@ -176,7 +176,8 @@ defmodule Protobuf.DSLTest do
              m: :UNKNOWN,
              n: 0.0,
              o: [],
-             p: ""
+             p: "",
+             non_matched: ""
            } == Foo.__default_struct__()
   end
 

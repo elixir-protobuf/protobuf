@@ -53,4 +53,18 @@ defmodule Protobuf.BuilderTest do
       Foo.new!(nonexisting_field: "foo")
     end
   end
+
+  test "new!/2 raises for non matched strct" do
+    assert_raise ArgumentError, fn ->
+      Foo.new!(Foo2.new())
+    end
+  end
+
+  test "new/2 build correct message for non matched strct" do
+    foo = Foo.new(Foo2.new(non_matched: 1))
+
+    assert_raise Protobuf.EncodeError, fn ->
+      Foo.encode(foo)
+    end
+  end
 end

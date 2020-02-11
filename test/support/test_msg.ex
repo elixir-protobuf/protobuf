@@ -33,7 +33,7 @@ defmodule TestMsg do
   defmodule Foo do
     use Protobuf, syntax: :proto3
 
-    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :n, :o, :p]
+    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :n, :o, :p, :non_matched]
 
     field :a, 1, type: :int32
     field :b, 2, type: :fixed64
@@ -52,12 +52,14 @@ defmodule TestMsg do
     field :n, 15, type: :double
     field :o, 16, repeated: true, type: EnumFoo, enum: true
     field :p, 17, type: :string, deprecated: true
+    # Used for testing against same field name with different types(in Foo2)
+    field :non_matched, 101, type: :string
   end
 
   defmodule Foo2 do
     use Protobuf, syntax: :proto2
 
-    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m]
+    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :non_matched]
 
     field :a, 1, required: true, type: :int32
     field :b, 2, optional: true, type: :fixed64, default: 5
@@ -72,7 +74,7 @@ defmodule TestMsg do
     # field :j, 11, optional: true, type: EnumFoo, enum: true
     # field :k, 12, optioanl: true, type: :bool
     field :l, 13, repeated: true, type: MapFoo, map: true
-    # field :m, 14, optional: true, type: EnumFoo, default: :B, enum: true
+    field :non_matched, 101, type: :int32, optional: true
   end
 
   defmodule Oneof do
