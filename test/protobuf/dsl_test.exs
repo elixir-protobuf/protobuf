@@ -21,7 +21,9 @@ defmodule Protobuf.DSLTest do
     msg_props = Foo.__message_props__()
 
     tags_map =
-      Enum.reduce([1, 2, 3] ++ Enum.to_list(5..17) ++ [101], %{}, fn i, acc -> Map.put(acc, i, i) end)
+      Enum.reduce([1, 2, 3] ++ Enum.to_list(5..17) ++ [101], %{}, fn i, acc ->
+        Map.put(acc, i, i)
+      end)
 
     assert tags_map == msg_props.tags_map
     field_props = msg_props.field_props

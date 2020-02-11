@@ -31,6 +31,7 @@ defmodule Protobuf.Protoc.CLI do
     :io.setopts(:standard_io, encoding: :latin1)
     bin = IO.binread(:all)
     request = Protobuf.Decoder.decode(bin, Google.Protobuf.Compiler.CodeGeneratorRequest)
+
     # debug
     # raise inspect(request, limit: :infinity)
 
