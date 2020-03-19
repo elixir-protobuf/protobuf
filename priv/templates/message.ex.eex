@@ -1,6 +1,6 @@
 defmodule <%= name %> do
   @moduledoc false
-  use <%= using_module %> <%= options %>
+  use <%= using_module %><%= options %>
 
   <%= typespec %>
   defstruct [<%= struct_fields %>]
