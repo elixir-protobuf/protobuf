@@ -66,6 +66,11 @@ defmodule Protobuf.Protoc.CLI do
     parse_params(ctx, t)
   end
 
+  def parse_params(ctx, ["using_module=" <> using_module | t]) do
+    ctx = %{ctx | using_module: using_module}
+    parse_params(ctx, t)
+  end
+
   def parse_params(ctx, _), do: ctx
 
   @doc false
