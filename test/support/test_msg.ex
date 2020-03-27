@@ -77,6 +77,22 @@ defmodule TestMsg do
     field :non_matched, 101, type: :int32, optional: true
   end
 
+  defmodule DateFoo do
+    use Protobuf, syntax: :proto3
+
+    defstruct [:iso_days]
+
+    field :iso_days, 1, type: :int32
+  end
+
+  defmodule FooWithDate do
+    use Protobuf, syntax: :proto3
+
+    defstruct [:date]
+
+    field :date, 1, type: DateFoo
+  end
+
   defmodule Oneof do
     use Protobuf
 

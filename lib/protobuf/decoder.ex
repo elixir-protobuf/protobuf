@@ -2,6 +2,9 @@ defmodule Protobuf.Decoder do
   @moduledoc false
   import Protobuf.WireTypes
   import Bitwise, only: [bsl: 2, bsr: 2, band: 2]
+
+  alias Protobuf.Decodable
+
   require Logger
 
   @max_bits 64
@@ -14,7 +17,10 @@ defmodule Protobuf.Decoder do
     kvs = raw_decode_key(data, [])
     %{repeated_fields: repeated_fields} = msg_props = module.__message_props__()
     struct = build_struct(kvs, msg_props, module.new())
-    reverse_repeated(struct, repeated_fields)
+
+    struct
+    |> Decodable.to_elixir()
+    |> reverse_repeated(repeated_fields)
   end
 
   @doc false

@@ -140,4 +140,8 @@ defmodule Protobuf.DecoderTest do
     assert Decoder.decode(<<18, 0, 24, 0>>, TestMsg.Oneof) ==
              TestMsg.Oneof.new(first: {:b, ""}, second: {:c, 0})
   end
+
+  test "transforms to elixir representation after decode the message" do
+    assert Decoder.decode(<<8, 132, 171, 44>>, TestMsg.DateFoo) == ~D[1988-10-29]
+  end
 end

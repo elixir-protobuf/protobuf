@@ -25,6 +25,35 @@ message FileOptions {
   optional string module_prefix = 1;
 }
 
+// Message level options
+//
+// For example,
+// option (elixirpb.message).typespec = "Date.t";
+message MessageOptions {
+  // Specify a typespec that will used when a message reference this as field.
+  // For example, let's say you have in your message:
+  //
+  //     package MyApp.Protobuf;
+  //
+  //     message Date {
+  //       option (elixirpb.message).typespec = "Date.t";
+  //       int iso_days = 1;
+  //     }
+  //
+  //     message User {
+  //       Date birthday = 1;
+  //     }
+  //
+  // Then in `MyApp.Protobuf.User`, the type notation will for `birthday` will
+  // be `Date.t()` and not `MyApp.Protobuf.Date.t()`. This is useulf when
+  // combined with `Protobuf.Encodable` and `Protobuf.Decodable` mechanism.
+  optional string typespec = 1;
+}
+
 extend google.protobuf.FileOptions {
   optional FileOptions file = 1047;
+}
+
+extend google.protobuf.MessageOptions {
+  optional MessageOptions message = 1047;
 }

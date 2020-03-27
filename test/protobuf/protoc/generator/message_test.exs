@@ -212,8 +212,14 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     ctx = %Context{
       package: "foo_bar.ab_cd",
       dep_type_mapping: %{
-        ".foo_bar.ab_cd.Foo.ProjectsEntry" => %{type_name: "FooBar.AbCd.Foo.ProjectsEntry"},
-        ".foo_bar.ab_cd.Bar" => %{type_name: "FooBar.AbCd.Bar"}
+        ".foo_bar.ab_cd.Foo.ProjectsEntry" => %{
+          type_name: "FooBar.AbCd.Foo.ProjectsEntry",
+          typespec: "FooBar.AbCd.Foo.ProjectsEntry"
+        },
+        ".foo_bar.ab_cd.Bar" => %{
+          type_name: "FooBar.AbCd.Bar",
+          typespec: "FooBar.AbCd.Bar"
+        }
       },
       module_prefix: "FooBar.AbCd"
     }
@@ -262,7 +268,9 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     ctx = %Context{
       package: "foo_bar.ab_cd",
       dep_type_mapping: %{
-        ".foo_bar.ab_cd.EnumFoo" => %{type_name: "FooBar.AbCd.EnumFoo"}
+        ".foo_bar.ab_cd.EnumFoo" => %{
+          type_name: "FooBar.AbCd.EnumFoo"
+        }
       }
     }
 
@@ -288,7 +296,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 generate right enum type name with different package" do
     ctx = %Context{
       package: "foo_bar.ab_cd",
-      dep_type_mapping: %{".other_pkg.EnumFoo" => %{type_name: "OtherPkg.EnumFoo"}}
+      dep_type_mapping: %{
+        ".other_pkg.EnumFoo" => %{
+          type_name: "OtherPkg.EnumFoo",
+          typespec: "OtherPkg.EnumFoo"
+        }
+      }
     }
 
     desc =
@@ -312,7 +325,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 generate right message type name with different package" do
     ctx = %Context{
       package: "foo_bar.ab_cd",
-      dep_type_mapping: %{".other_pkg.MsgFoo" => %{type_name: "OtherPkg.MsgFoo"}}
+      dep_type_mapping: %{
+        ".other_pkg.MsgFoo" => %{
+          type_name: "OtherPkg.MsgFoo",
+          typespec: "CustomType.t"
+        }
+      }
     }
 
     desc =
@@ -330,7 +348,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [msg]} = Generator.generate(ctx, desc)
-    assert msg =~ "a: OtherPkg.MsgFoo.t"
+    assert msg =~ "a: CustomType.t"
     assert msg =~ "field :a, 1, optional: true, type: OtherPkg.MsgFoo\n"
   end
 

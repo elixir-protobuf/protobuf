@@ -10,9 +10,25 @@ defmodule Elixirpb.FileOptions do
   field :module_prefix, 1, optional: true, type: :string
 end
 
+defmodule Elixirpb.MessageOptions do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{
+          typespec: String.t()
+        }
+  defstruct [:typespec]
+
+  field :typespec, 1, optional: true, type: :string
+end
+
 defmodule Elixirpb.PbExtension do
   @moduledoc false
   use Protobuf, syntax: :proto2
 
   extend Google.Protobuf.FileOptions, :file, 1047, optional: true, type: Elixirpb.FileOptions
+
+  extend Google.Protobuf.MessageOptions, :message, 1047,
+    optional: true,
+    type: Elixirpb.MessageOptions
 end

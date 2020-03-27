@@ -181,4 +181,16 @@ defmodule Protobuf.EncoderTest do
     msg = TestMsg.Bar2.new(a: 0, b: 1)
     assert Encoder.encode(msg) == <<8, 0, 16, 1>>
   end
+
+  test "transforms from Elixir term to protobuf before encode a message" do
+    msg = %TestMsg.FooWithDate{date: ~D[1988-10-29]}
+
+    assert Encoder.encode(msg) == <<10, 4, 8, 132, 171, 44>>
+  end
+
+  test "transforms from Elixir term to protobuf before encode a message using new function" do
+    msg = TestMsg.FooWithDate.new(date: ~D[1988-10-29])
+
+    assert Encoder.encode(msg) == <<10, 4, 8, 132, 171, 44>>
+  end
 end

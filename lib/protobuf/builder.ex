@@ -71,9 +71,9 @@ defmodule Protobuf.Builder do
           v =
             if f_props.embedded? do
               if f_props.repeated? do
-                Enum.map(v, fn i -> f_props.type.new(i) end)
+                Enum.map(v, &protobuf_or_term(&1, f_props.type))
               else
-                f_props.type.new(v)
+                protobuf_or_term(v, f_props.type)
               end
             else
               v
@@ -86,4 +86,9 @@ defmodule Protobuf.Builder do
       end
     end)
   end
+
+  defp protobuf_or_term(value, type),
+    do: if(encodable?(value), do: value, else: type.new(value))
+
+  defp encodable?(v), do: Protobuf.Encodable.impl_for(v) != Protobuf.Encodable.Any
 end

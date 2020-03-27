@@ -105,13 +105,13 @@ defmodule Protobuf.Protoc.CLI do
     new_ctx = append_ns(ctx, name)
 
     types
-    |> update_types(ctx, name)
+    |> update_types(ctx, desc)
     |> find_types_in_proto(new_ctx, desc.enum_type)
     |> find_types_in_proto(new_ctx, desc.nested_type)
   end
 
-  defp find_types_in_proto(types, ctx, %Google.Protobuf.EnumDescriptorProto{name: name}) do
-    update_types(types, ctx, name)
+  defp find_types_in_proto(types, ctx, desc) do
+    update_types(types, ctx, desc)
   end
 
   defp append_ns(%{namespace: ns} = ctx, name) do
@@ -119,12 +119,25 @@ defmodule Protobuf.Protoc.CLI do
     Map.put(ctx, :namespace, new_ns)
   end
 
-  defp update_types(types, %{namespace: ns, package: pkg, module_prefix: prefix}, name) do
-    type_name =
-      join_names(prefix || pkg, ns, name)
-      |> Protobuf.Protoc.Generator.Util.normalize_type_name()
+  defp update_types(types, %{namespace: ns, package: pkg, module_prefix: prefix}, desc) do
+    name = desc.name
+    module_name = gen_module_name(prefix, pkg, ns, name)
 
-    Map.put(types, "." <> join_names(pkg, ns, name), %{type_name: type_name})
+    typespec =
+      desc.options
+      |> get_msg_options()
+      |> Map.get(:typespec)
+
+    Map.put(types, "." <> join_names(pkg, ns, name), %{
+      type_name: module_name,
+      typespec: typespec
+    })
+  end
+
+  defp gen_module_name(prefix, pkg, ns, name) do
+    (prefix || pkg)
+    |> join_names(ns, name)
+    |> Protobuf.Protoc.Generator.Util.normalize_type_name()
   end
 
   defp join_names(pkg, ns, name) do
@@ -133,5 +146,17 @@ defmodule Protobuf.Protoc.CLI do
     [pkg, ns_str, name]
     |> Enum.filter(&(&1 && &1 != ""))
     |> Enum.join(".")
+  end
+
+  defp get_msg_options(nil), do: %{}
+
+  defp get_msg_options(options) do
+    case Google.Protobuf.MessageOptions.get_extension(options, Elixirpb.PbExtension, :message) do
+      nil ->
+        %{}
+
+      opts ->
+        opts
+    end
   end
 end

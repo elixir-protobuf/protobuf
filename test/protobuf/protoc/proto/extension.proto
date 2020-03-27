@@ -10,3 +10,13 @@ option (elixirpb.file).module_prefix = "Protobuf.Protoc.ExtTest";
 message Foo {
   optional string a = 1;
 }
+
+message UnixDateTime {
+  option (elixirpb.message).typespec = "DateTime.t";
+
+  required int64 microseconds = 1;
+}
+
+message FooWithUnixDateTime {
+  optional UnixDateTime inserted_at = 1;
+}

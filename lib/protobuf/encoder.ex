@@ -3,7 +3,7 @@ defmodule Protobuf.Encoder do
   import Protobuf.WireTypes
   import Bitwise, only: [bsr: 2, band: 2, bsl: 2, bor: 2]
 
-  alias Protobuf.{MessageProps, FieldProps}
+  alias Protobuf.{Encodable, MessageProps, FieldProps}
 
   @spec encode(atom, map | struct, keyword) :: iodata
   def encode(mod, msg, opts) do
@@ -111,7 +111,9 @@ defmodule Protobuf.Encoder do
        ) do
     repeated = is_repeated || is_map
 
-    repeated_or_not(val, repeated, fn v ->
+    val
+    |> Encodable.to_protobuf(type)
+    |> repeated_or_not(repeated, fn v ->
       v = if is_map, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
       # so that oneof {:atom, v} can be encoded
       encoded = encode(type, v, [])

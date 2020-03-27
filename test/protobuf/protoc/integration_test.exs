@@ -55,4 +55,48 @@ defmodule Protobuf.Protoc.IntegrationTest do
   test "extensions" do
     assert "hello" == Protobuf.Protoc.ExtTest.Foo.new(a: "hello").a
   end
+
+  describe "message extensions" do
+    setup do
+      %{protobuf_file: File.read!("test/protobuf/protoc/proto_gen/extension.pb.ex")}
+    end
+
+    test "uses the option type_name", %{protobuf_file: protobuf_file} do
+      assert protobuf_file =~ "inserted_at: DateTime.t() | nil\n"
+    end
+
+    test "keeps the same module", %{protobuf_file: protobuf_file} do
+      assert protobuf_file =~ "type: Protobuf.Protoc.ExtTest.UnixDateTime\n"
+    end
+  end
+
+  describe "encodable protocol" do
+    test "transform to protobuf before" do
+      msg =
+        Protobuf.Protoc.ExtTest.FooWithUnixDateTime.new(
+          inserted_at: udatetime(~N[2020-04-03 11:28:21.929987])
+        )
+
+      assert Protobuf.encode(msg) ==
+               <<10, 9, 8, 131, 160, 134, 184, 147, 204, 232, 2>>
+    end
+  end
+
+  describe "decodable protocol" do
+    test "transforms to elixir after decoding" do
+      decoded =
+        Protobuf.Protoc.ExtTest.FooWithUnixDateTime.decode(
+          <<10, 9, 8, 131, 160, 134, 184, 147, 204, 232, 2>>
+        )
+
+      assert decoded ==
+               Protobuf.Protoc.ExtTest.FooWithUnixDateTime.new(
+                 inserted_at: udatetime(~N[2020-04-03 11:28:21.929987Z])
+               )
+    end
+  end
+
+  def udatetime(time) do
+    DateTime.from_naive!(time, "Etc/UTC")
+  end
 end
