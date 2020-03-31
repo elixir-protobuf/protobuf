@@ -22,7 +22,12 @@ defmodule Protobuf.Protoc.Generator.Enum do
       |> Enum.map(fn f -> ":#{f.name}" end)
       |> Enum.join(" | ")
 
-    "@type t :: integer | " <> field_values
+    lowercase_field_values =
+      fields
+      |> Enum.map(fn f -> ":#{f.name}" |> String.downcase() end)
+      |> Enum.join(" | ")
+
+    "@type t :: integer | " <> field_values <> " | " <> lowercase_field_values
   end
 
   def generate_field(f) do

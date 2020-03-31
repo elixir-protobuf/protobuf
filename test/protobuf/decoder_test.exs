@@ -80,8 +80,11 @@ defmodule Protobuf.DecoderTest do
   test "decodes enum type" do
     struct = Decoder.decode(<<88, 1>>, TestMsg.Foo)
     assert struct == TestMsg.Foo.new(j: :A)
+    # Always decodes to uppercase atom.
+    refute struct == TestMsg.Foo.new(j: :a)
     struct = Decoder.decode(<<88, 2>>, TestMsg.Foo)
     assert struct == TestMsg.Foo.new(j: :B)
+    refute struct == TestMsg.Foo.new(j: :b)
   end
 
   test "decodes unknown enum type" do

@@ -148,4 +148,11 @@ defmodule Protobuf.EncoderTest.Validation do
 
     assert Protobuf.Encoder.encode(msg) == Protobuf.Encoder.encode(msg1)
   end
+
+  test "enum encoding is case agnostic" do
+    msg = TestMsg.Foo.new(j: :A)
+    msg1 = TestMsg.Foo.new(j: :a)
+
+    assert Protobuf.Encoder.encode(msg) == Protobuf.Encoder.encode(msg1)
+  end
 end
