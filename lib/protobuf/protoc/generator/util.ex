@@ -50,4 +50,11 @@ defmodule Protobuf.Protoc.Generator.Util do
 
   def print(v) when is_atom(v), do: inspect(v)
   def print(v), do: v
+
+  def lowercase_atom(atom) when is_atom(atom) do
+    atom
+    |> Atom.to_string()
+    |> String.downcase()
+    |> String.to_atom()
+  end
 end

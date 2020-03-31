@@ -114,8 +114,11 @@ defmodule Protobuf.DSL do
       end)
 
     Enum.map(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
+      lowercase_name_atom = Protobuf.Protoc.Generator.Util.lowercase_atom(name_atom)
+
       quote do
         def value(unquote(name_atom)), do: unquote(fnum)
+        def value(unquote(lowercase_name_atom)), do: unquote(fnum)
       end
     end) ++
       [
@@ -123,6 +126,14 @@ defmodule Protobuf.DSL do
           def value(v) when is_integer(v), do: v
         end
       ] ++
+      Enum.map(props, fn {_, %{name_atom: name_atom}} ->
+        lowercase_name_atom = Protobuf.Protoc.Generator.Util.lowercase_atom(name_atom)
+
+        quote do
+          # Only generating alias functions for lowercase atoms as uppercase functions are not allowed in Elixir.
+          def unquote(lowercase_name_atom)(), do: unquote(lowercase_name_atom)
+        end
+      end) ++
       Enum.map(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
         quote do
           def key(unquote(fnum)), do: unquote(name_atom)

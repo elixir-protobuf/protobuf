@@ -145,7 +145,13 @@ defmodule Protobuf.DSLTest do
     assert TestMsg.EnumFoo.value(:A) == 1
     assert TestMsg.EnumFoo.value(:B) == 2
     assert TestMsg.EnumFoo.value(:C) == 4
+    assert TestMsg.EnumFoo.value(:a) == 1
+    assert TestMsg.EnumFoo.value(:b) == 2
+    assert TestMsg.EnumFoo.value(:c) == 4
     assert TestMsg.EnumFoo.value(1000) == 1000
+    assert TestMsg.EnumFoo.a() == :a
+    assert TestMsg.EnumFoo.b() == :b
+    assert TestMsg.EnumFoo.c() == :c
     assert TestMsg.EnumFoo.key(1) == :A
     assert TestMsg.EnumFoo.key(2) == :B
     assert TestMsg.EnumFoo.key(4) == :C
