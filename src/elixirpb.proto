@@ -28,3 +28,4 @@ message FileOptions {
 extend google.protobuf.FileOptions {
   optional FileOptions file = 1047;
 }
+

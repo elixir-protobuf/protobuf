@@ -223,4 +223,9 @@ defmodule Protobuf.DSLTest do
     assert msg_props.field_props[4].oneof == 1
     refute msg_props.field_props[5].oneof
   end
+
+  test "Extension use case" do
+    msg_props = TestMsg.Ext.UseCase.__message_props__()
+    assert %Protobuf.FieldProps{options: [extype: "String.t"]} = msg_props.field_props[1]
+  end
 end

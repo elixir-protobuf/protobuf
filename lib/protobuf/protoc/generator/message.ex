@@ -12,6 +12,7 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   def generate(ctx, desc) do
     msg_struct = parse_desc(ctx, desc)
+    IO.inspect(:stderr, msg_struct, label: :message_struct)
     ctx = %{ctx | namespace: msg_struct[:new_namespace]}
     {nested_enums, nested_msgs} = Enum.unzip(gen_nested_msgs(ctx, desc))
 
@@ -179,8 +180,10 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   def get_field(ctx, f, nested_maps, oneofs) do
+
     opts = field_options(f)
     map = nested_maps[f.type_name]
+
     opts = if map, do: Map.put(opts, :map, true), else: opts
 
     opts =
@@ -290,8 +293,13 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp merge_field_options(opts, f) do
+    extype_options = Google.Protobuf.FieldOptions.get_extension(f.options, Brex.Elixir.PbExtension, :field)
+
+    IO.inspect(:stderr, {opts, f.options, extype_options}, label: :together)
+
     opts
     |> Map.put(:packed, f.options.packed)
     |> Map.put(:deprecated, f.options.deprecated)
+    |> Map.put(:options, "#{inspect(extype_options)}")
   end
 end
