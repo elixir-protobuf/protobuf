@@ -176,11 +176,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 supports extensions on field options" do
     ctx = %Context{package: ""}
 
-    opts = Google.Protobuf.FieldOptions.new()
-    custom_opts = Brex.Elixir.FieldOptions.new(extype: "String.t")
+    field_opts = Google.Protobuf.FieldOptions.new()
+    elixir_opts = Elixirpb.FieldOptions.new()
+    custom_opts = Elixirpb.FieldOptions.put_extension(elixir_opts, Brex.Elixir.PbExtension, :extype, "String.t")
 
     opts =
-      Google.Protobuf.FieldOptions.put_extension(opts, Brex.Elixir.PbExtension, :field, custom_opts)
+      Google.Protobuf.FieldOptions.put_extension(field_opts, Elixirpb.PbExtension, :field, custom_opts)
 
     desc =
       Google.Protobuf.DescriptorProto.new(
@@ -190,7 +191,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
             name: "my_string",
             number: 1,
             type: :TYPE_MESSAGE,
-            # type_name: ".google.protobuf.StringValue",
+            # type_name: ".google.protodescbuf.StringValue",
             label: :LABEL_OPTIONAL,
             options: opts
           )
@@ -198,7 +199,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [msg]} = Generator.generate(ctx, desc)
-    assert msg =~ "field :my_string, 1, optional: true, type: :message, options: %Brex.Elixir.FieldOptions{extype: \"String.t\"}\n"
+    assert msg =~ "field :my_string, 1, optional: true, type: :message, options: [extype: \"String.t\"]\n"
   end
 
   test "generate/2 supports message type field" do

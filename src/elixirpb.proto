@@ -23,9 +23,20 @@ message FileOptions {
   // will be "Hello.Request". But with module_prefix "Foo", the message will be
   // "Foo.Request"
   optional string module_prefix = 1;
+  extensions 1000 to max;
 }
 
 extend google.protobuf.FileOptions {
   optional FileOptions file = 1047;
+}
+
+message FieldOptions {
+  // optional string extype = 1;
+  extensions 1000 to max;
+}
+
+extend google.protobuf.FieldOptions {
+  // TODO: determine appropriate number
+  optional FieldOptions field = 65007;
 }
 
