@@ -13,7 +13,14 @@ defmodule Protobuf.Protoc.Generator.Enum do
     generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
     type = generate_type(desc.value)
 
-    Protobuf.Protoc.Template.enum(msg_name, msg_opts(ctx, desc), fields, type, generate_desc)
+    Protobuf.Protoc.Template.enum(
+      msg_name,
+      msg_opts(ctx, desc),
+      fields,
+      type,
+      generate_desc,
+      ctx.using_module
+    )
   end
 
   def generate_type(fields) do

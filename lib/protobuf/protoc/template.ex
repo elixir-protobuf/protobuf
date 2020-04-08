@@ -11,11 +11,25 @@ defmodule Protobuf.Protoc.Template do
     :def,
     :message,
     @msg_tmpl,
-    [:name, :options, :struct_fields, :typespec, :oneofs, :fields, :desc, :extensions],
+    [
+      :name,
+      :options,
+      :struct_fields,
+      :typespec,
+      :oneofs,
+      :fields,
+      :desc,
+      :extensions,
+      :using_module
+    ],
     trim: true
   )
 
-  EEx.function_from_file(:def, :enum, @enum_tmpl, [:name, :options, :fields, :type, :desc],
+  EEx.function_from_file(
+    :def,
+    :enum,
+    @enum_tmpl,
+    [:name, :options, :fields, :type, :desc, :using_module],
     trim: true
   )
 
@@ -23,5 +37,7 @@ defmodule Protobuf.Protoc.Template do
     trim: true
   )
 
-  EEx.function_from_file(:def, :extension, @ext_tmpl, [:name, :options, :extends], trim: true)
+  EEx.function_from_file(:def, :extension, @ext_tmpl, [:name, :options, :extends, :using_module],
+    trim: true
+  )
 end

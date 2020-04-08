@@ -24,7 +24,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
     else
       name = Util.trans_name(@ext_postfix)
       msg_name = Util.mod_name(ctx, ns ++ [name])
-      Protobuf.Protoc.Template.extension(msg_name, msg_opts(ctx, desc), extends)
+      Protobuf.Protoc.Template.extension(msg_name, msg_opts(ctx, desc), extends, ctx.using_module)
     end
   end
 

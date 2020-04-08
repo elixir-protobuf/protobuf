@@ -29,7 +29,10 @@ defmodule Protobuf.Protoc.Context do
             gen_descriptors?: false,
 
             # Elixirpb.FileOptions
-            custom_file_options: %{}
+            custom_file_options: %{},
+
+            # Allow custom code injection
+            using_module: "Protobuf"
 
   def cal_file_options(ctx, nil) do
     %{ctx | custom_file_options: %{}, module_prefix: ctx.package || ""}
