@@ -11,10 +11,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   def generate(ctx, desc) do
-    IO.inspect(:stderr, desc, label: :desc)
-
     msg_struct = parse_desc(ctx, desc)
-    IO.inspect(:stderr, msg_struct, label: :message_struct)
     ctx = %{ctx | namespace: msg_struct[:new_namespace]}
     {nested_enums, nested_msgs} = Enum.unzip(gen_nested_msgs(ctx, desc))
 
@@ -182,7 +179,6 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   def get_field(ctx, f, nested_maps, oneofs) do
-
     opts = field_options(f)
     map = nested_maps[f.type_name]
 
@@ -295,32 +291,22 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp merge_field_options(opts, f) do
-    field_options =
+    custom_options =
       f.options
-      |> Google.Protobuf.FieldOptions.get_extension(Elixirpb.PbExtension, :field)
+      |> Google.Protobuf.FieldOptions.get_extension(Brex.Elixirpb.PbExtension, :field)
       |> case do
-        nil -> nil
+        nil ->
+          nil
+
         elixir_field_options ->
           elixir_field_options
-          # strips :__struct__
           |> Map.from_struct()
-          |> Enum.flat_map(&get_custom_field_options/1)
-          |> case do
-            [] -> nil
-            custom_opts -> custom_opts
-          end
+          |> Enum.into([])
       end
 
     opts
-      |> Map.put(:packed, f.options.packed)
-      |> Map.put(:deprecated, f.options.deprecated)
-      |> Map.put(:options, field_options)
+    |> Map.put(:packed, f.options.packed)
+    |> Map.put(:deprecated, f.options.deprecated)
+    |> Map.put(:options, custom_options)
   end
-
-  def get_custom_field_options({:__pb_extensions__, opts}) do
-    # For now if you want field options to show up in DSL you havee to extend Elixirpb.FieldOptions.
-    Enum.map(opts, fn {{_extending_message, field}, arg} -> {field, arg} end)
-  end
-  # Collect existing Elixirpb.FieldOptions (right now no fields though).
-  def get_custom_field_options({k, v}), do: [{k, v}]
 end
