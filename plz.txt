@@ -1,2 +1,0 @@
-deps/protobuf/src: warning: directory does not exist.
-Could not make proto path relative: test/support/wrapper_with_extension.proto: No such file or directory
