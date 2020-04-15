@@ -2,6 +2,7 @@ defmodule Protobuf.Protoc.CLITest do
   use ExUnit.Case, async: true
 
   import Protobuf.Protoc.CLI
+  import Protobuf.Protoc, only: [find_types: 2, find_types_in_proto: 1]
 
   alias Protobuf.Protoc.Context
   alias Google.Protobuf.FileDescriptorProto

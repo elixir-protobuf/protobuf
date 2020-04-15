@@ -40,7 +40,7 @@ defmodule Protobuf.Protoc do
     |> Enum.join(".")
   end
 
-  defp find_types_in_proto(%Google.Protobuf.FileDescriptorProto{} = desc) do
+  def find_types_in_proto(%Google.Protobuf.FileDescriptorProto{} = desc) do
     ctx =
       %Protobuf.Protoc.Context{
         package: desc.package,
@@ -53,13 +53,13 @@ defmodule Protobuf.Protoc do
     |> find_types_in_proto(ctx, desc.enum_type)
   end
 
-  defp find_types_in_proto(types, ctx, descs) when is_list(descs) do
+  def find_types_in_proto(types, ctx, descs) when is_list(descs) do
     Enum.reduce(descs, types, fn desc, acc ->
       find_types_in_proto(acc, ctx, desc)
     end)
   end
 
-  defp find_types_in_proto(types, ctx, %Google.Protobuf.DescriptorProto{name: name} = desc) do
+  def find_types_in_proto(types, ctx, %Google.Protobuf.DescriptorProto{name: name} = desc) do
     new_ctx = append_ns(ctx, name)
 
     types
@@ -68,7 +68,7 @@ defmodule Protobuf.Protoc do
     |> find_types_in_proto(new_ctx, desc.nested_type)
   end
 
-  defp find_types_in_proto(types, ctx, %Google.Protobuf.EnumDescriptorProto{name: name}) do
+  def find_types_in_proto(types, ctx, %Google.Protobuf.EnumDescriptorProto{name: name}) do
     update_types(types, ctx, name)
   end
 
