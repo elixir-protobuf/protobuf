@@ -18,7 +18,7 @@ defmodule Protobuf.Protoc.Generator.Util do
 
   defp attach_pkg(name, ""), do: name
   defp attach_pkg(name, nil), do: name
-  defp attach_pkg(name, pkg), do: normalize_type_name(pkg) <> "." <> name
+  defp attach_pkg(name, pkg), do: Protobuf.Protoc.normalize_type_name(pkg) <> "." <> name
 
   def attach_raw_pkg(name, ""), do: name
   def attach_raw_pkg(name, nil), do: name
@@ -39,13 +39,6 @@ defmodule Protobuf.Protoc.Generator.Util do
         raise "There's something wrong to get #{type_name}'s type, please contact with the lib author."
 
     metadata[:type_name]
-  end
-
-  def normalize_type_name(name) do
-    name
-    |> String.split(".")
-    |> Enum.map(&Macro.camelize(&1))
-    |> Enum.join(".")
   end
 
   def print(v) when is_atom(v), do: inspect(v)
