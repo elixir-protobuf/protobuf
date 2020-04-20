@@ -111,8 +111,7 @@ defmodule Protobuf.Protoc.Metadata do
             desc: map() | nil,
             fqn: String.t(),
             namespace: String.t(),
-            file: String.t(),
-            parent_msg: String.t(),
+            parent_fqn: String.t(),
             fields: [String.t()],
             nested_msgs: [String.t()]
           }
@@ -120,8 +119,7 @@ defmodule Protobuf.Protoc.Metadata do
     defstruct desc: nil,
               fqn: "",
               namespace: "",
-              file: "",
-              parent_msg: "",
+              parent_fqn: "",
               fields: [],
               nested_msgs: []
 

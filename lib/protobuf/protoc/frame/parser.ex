@@ -44,7 +44,7 @@ defmodule Protobuf.Protoc.Parser do
        ) do
     ctx = %{ctx | package: package, syntax: syntax(syntax)}
 
-    msgs = Enum.map(desc.message_type, &parse_msg(ctx, package, nil, &1))
+    msgs = Enum.map(desc.message_type, &parse_msg(ctx, package, &1))
     # result = Result.put_tree([package, name], file)
     msg_fqns = Enum.map(msgs, fn m -> m.fqn end)
 
@@ -65,11 +65,11 @@ defmodule Protobuf.Protoc.Parser do
     file
   end
 
-  @spec parse_msg(Context.t(), String.t(), String.t(), Google.Protobuf.DescriptorProto.t()) :: any
-  defp parse_msg(_ctx, _file_fqn, _parent_msg, []), do: []
+  @spec parse_msg(Context.t(), String.t(), Google.Protobuf.DescriptorProto.t()) :: any
+  defp parse_msg(_ctx, _parent_fqn, []), do: []
 
-  defp parse_msg(%{namespace: ns} = ctx, file_fqn, parent_msg_fqn, desc) do
-    fqn = Utils.join_name([parent_msg_fqn || file_fqn, desc.name])
+  defp parse_msg(%{namespace: ns} = ctx, parent_fqn, desc) do
+    fqn = Utils.join_name([parent_fqn, desc.name])
     fields = Enum.map(desc.field, &parse_field(ctx, fqn, &1))
     field_fqns = Enum.map(fields, fn f -> f.fqn end)
 
@@ -77,15 +77,14 @@ defmodule Protobuf.Protoc.Parser do
     # TODO: oneof
     # TODO: nested messages
     new_ctx = %{ctx | namespace: ns ++ [desc.name]}
-    nested_msgs = Enum.map(desc.nested_type, &parse_msg(new_ctx, file_fqn, fqn, &1))
+    nested_msgs = Enum.map(desc.nested_type, &parse_msg(new_ctx, fqn, &1))
     nested_msg_fqns = Enum.map(nested_msgs, fn nm -> nm.fqn end)
 
     msg = %Metadata.Message{
       namespace: Utils.join_name(ns),
       fqn: fqn,
       # desc: Map.put(desc, :source_code_info, nil),
-      file: file_fqn,
-      parent_msg: parent_msg_fqn,
+      parent_fqn: parent_fqn,
       fields: field_fqns,
       nested_msgs: nested_msg_fqns
     }
