@@ -54,5 +54,9 @@ defmodule Protobuf.Protoc.IntegrationTest do
 
   test "extensions" do
     assert "hello" == Protobuf.Protoc.ExtTest.Foo.new(a: "hello").a
+    dual = Protobuf.Protoc.ExtTest.Dual.new(a: Google.Protobuf.StringValue.new(value: "s1"), b: Google.Protobuf.StringValue.new(value: "s2"))
+
+    assert dual.a.value == "s1"
+    assert dual.b.value == "s2"
   end
 end
