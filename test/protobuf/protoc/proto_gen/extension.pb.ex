@@ -1,6 +1,6 @@
 defmodule Protobuf.Protoc.ExtTest.Foo do
   @moduledoc false
-  use Protobuf, syntax: :proto2
+  use Protobuf, custom_field_options?: true, syntax: :proto2
 
   @type t :: %__MODULE__{
           a: String.t()
@@ -12,7 +12,7 @@ end
 
 defmodule Protobuf.Protoc.ExtTest.Dual do
   @moduledoc false
-  use Protobuf, syntax: :proto2
+  use Protobuf, custom_field_options?: true, syntax: :proto2
 
   @type t :: %__MODULE__{
           a: Google.Protobuf.StringValue.t() | nil,

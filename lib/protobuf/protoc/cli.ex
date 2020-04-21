@@ -66,6 +66,11 @@ defmodule Protobuf.Protoc.CLI do
     parse_params(ctx, t)
   end
 
+  def parse_params(ctx, ["custom_field_options?=true" | t]) do
+    ctx = %{ctx | custom_field_options?: true}
+    parse_params(ctx, t)
+  end
+
   def parse_params(ctx, _), do: ctx
 
   @doc false

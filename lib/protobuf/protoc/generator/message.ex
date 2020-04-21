@@ -76,14 +76,21 @@ defmodule Protobuf.Protoc.Generator.Message do
     inspect(exts)
   end
 
-  def msg_opts_str(%{syntax: syntax}, opts) do
+  def msg_opts_str(%{syntax: syntax, custom_field_options?: custom_field_options}, opts) do
     msg_options = opts
 
     opts = %{
       syntax: syntax,
       map: msg_options && msg_options.map_entry,
-      deprecated: msg_options && msg_options.deprecated
+      deprecated: msg_options && msg_options.deprecated,
     }
+
+    opts =
+      if custom_field_options do
+        Map.put(opts, :custom_field_options?, true)
+      else
+        opts
+      end
 
     str = Util.options_to_str(opts)
     if String.length(str) > 0, do: ", " <> str, else: ""
@@ -177,7 +184,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   def get_field(ctx, f, nested_maps, oneofs) do
-    opts = field_options(f)
+    opts = field_options(ctx, f)
     map = nested_maps[f.type_name]
     opts = if map, do: Map.put(opts, :map, true), else: opts
 
@@ -238,9 +245,9 @@ defmodule Protobuf.Protoc.Generator.Message do
     end)
   end
 
-  defp field_options(f) do
+  defp field_options(ctx, f) do
     opts = %{enum: f.type == :TYPE_ENUM, default: default_value(f.type, f.default_value)}
-    if f.options, do: merge_field_options(opts, f), else: opts
+    if f.options, do: merge_field_options(ctx, opts, f), else: opts
   end
 
   defp label_name(:LABEL_OPTIONAL), do: "optional"
@@ -287,7 +294,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     end
   end
 
-  defp merge_field_options(opts, f) do
+  defp merge_field_options(%{custom_field_options?: true}, opts, f) do
     custom_options =
       f.options
       |> Google.Protobuf.FieldOptions.get_extension(Brex.Elixirpb.PbExtension, :field)
@@ -303,5 +310,11 @@ defmodule Protobuf.Protoc.Generator.Message do
     |> Map.put(:packed, f.options.packed)
     |> Map.put(:deprecated, f.options.deprecated)
     |> Map.put(:options, custom_options)
+  end
+
+  defp merge_field_options(_ctx, opts, f) do
+    opts
+    |> Map.put(:packed, f.options.packed)
+    |> Map.put(:deprecated, f.options.deprecated)
   end
 end
