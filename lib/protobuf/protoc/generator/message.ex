@@ -288,8 +288,20 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp merge_field_options(opts, f) do
+    custom_options =
+      f.options
+      |> Google.Protobuf.FieldOptions.get_extension(Brex.Elixirpb.PbExtension, :field)
+      |> case do
+        nil -> nil
+        elixir_field_options ->
+          elixir_field_options
+          |> Map.from_struct()
+          |> Enum.into([])
+      end
+
     opts
     |> Map.put(:packed, f.options.packed)
     |> Map.put(:deprecated, f.options.deprecated)
+    |> Map.put(:options, custom_options)
   end
 end

@@ -173,6 +173,55 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "field :a, 1, optional: true, type: :int32, deprecated: true\n"
   end
 
+  test "generate/2 supports custom field options" do
+    ctx = %Context{
+      dep_type_mapping: %{
+        ".brex.elixirpb.FieldOptions" => %{type_name: "Brex.Elixirpb.FieldOptions"},
+        ".google.protobuf.StringValue" => %{type_name: "Google.Protobuf.StringValue"}
+      },
+      package: ""
+    }
+
+    field_opts = Google.Protobuf.FieldOptions.new()
+    custom_opts = Brex.Elixirpb.FieldOptions.new(extype: "String.t")
+
+    opts =
+      Google.Protobuf.FieldOptions.put_extension(
+        field_opts,
+        Brex.Elixirpb.PbExtension,
+        :field,
+        custom_opts
+      )
+
+    desc =
+      Google.Protobuf.DescriptorProto.new(
+        name: "Foo",
+        field: [
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "a",
+            number: 1,
+            type: :TYPE_MESSAGE,
+            type_name: ".google.protobuf.StringValue",
+            label: :LABEL_OPTIONAL,
+            options: opts
+          ),
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "b",
+            number: 1,
+            type: :TYPE_MESSAGE,
+            type_name: ".google.protobuf.StringValue",
+            label: :LABEL_OPTIONAL
+          )
+        ]
+      )
+
+    {[], [msg]} = Generator.generate(ctx, desc)
+
+    assert msg =~
+             "field :a, 1, optional: true, type: Google.Protobuf.StringValue, options: [extype: \"String.t\"]\n"
+    assert msg =~ "field :b, 1, optional: true, type: Google.Protobuf.StringValue\n\nend"
+  end
+
   test "generete/2 supports message type field" do
     ctx = %Context{
       package: "",
