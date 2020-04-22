@@ -17,30 +17,67 @@ defmodule Protobuf.FieldOptionsProcessor do
   A value with type extype.
   """
   @type value :: struct | any
-
-
   @callback type_to_spec(type_enum :: atom, type :: String.t(), repeated :: boolean, options) :: String.t()
   @callback type_default(type, options) :: any
   @callback new(type, value, options) :: value
   @callback encode_type(type, value, options) :: binary
   @callback decode_type(val :: binary, type, options) :: value
 
-  def validate_options_str!(:TYPE_MESSAGE, "Google.Protobuf.StringValue", [extype: "String.t()" = extype]), do: extype
-  def validate_options_str!(:TYPE_MESSAGE, "Google.Protobuf.StringValue", [extype: "String.t" = extype]), do: extype
+  @wrappers [
+    Google.Protobuf.DoubleValue,
+    Google.Protobuf.FloatValue,
+    Google.Protobuf.Int64Value,
+    Google.Protobuf.UInt64Value,
+    Google.Protobuf.Int32Value,
+    Google.Protobuf.UInt32Value,
+    Google.Protobuf.BoolValue,
+    Google.Protobuf.StringValue,
+    Google.Protobuf.BytesValue
+  ]
+
+  @wrappers_str [
+    "Google.Protobuf.DoubleValue",
+    "Google.Protobuf.FloatValue",
+    "Google.Protobuf.Int64Value",
+    "Google.Protobuf.UInt64Value",
+    "Google.Protobuf.Int32Value",
+    "Google.Protobuf.UInt32Value",
+    "Google.Protobuf.BoolValue",
+    "Google.Protobuf.StringValue",
+    "Google.Protobuf.BytesValue"
+  ]
+
+  def get_extype_mod(type) do
+    cond do
+      type in @wrappers -> Protobuf.Extype.Wrappers
+      true -> raise "Sorry #{type} does not support the field option extype"
+    end
+  end
+
+  def get_extype_mod_string(:TYPE_MESSAGE, type) do
+    cond do
+      type in @wrappers_str -> Protobuf.Extype.Wrappers
+      true -> raise "Sorry #{type} does not support the field option extype"
+    end
+  end
+
+  def validate_options_str!(type_enum, type, extype: extype) do
+    {get_extype_mod_string(type_enum, type), extype}
+  end
   def validate_options_str!(_, type, options) do
     raise "The custom field option is invalid. Options: #{inspect(options)} incompatible with type: #{type}"
   end
 
-  def validate_options!(Google.Protobuf.StringValue, [extype: "String.t()"]), do: :string
-  def validate_options!(Google.Protobuf.StringValue, [extype: "String.t"]), do: :string
+  def validate_options!(type, extype: extype), do: {get_extype_mod(type), extype}
   def validate_options!(type, options) do
     raise "The custom field option is invalid. Options: #{inspect(options)} incompatible with type: #{type}"
   end
 
 
   def type_to_spec(type_enum, type, repeated, options) do
-    extype = validate_options_str!(type_enum, type, options)
-    type_str = extype <> " | nil"
+    {module, option_value} = validate_options_str!(type_enum, type, options)
+    type_str = module.do_type_to_spec(type, option_value)
+
     if repeated do
       "[#{type_str}]"
     else
@@ -49,39 +86,22 @@ defmodule Protobuf.FieldOptionsProcessor do
   end
 
   def type_default(type, options) do
-    validate_options!(type, options)
-    nil
+    {module, option_value} = validate_options!(type, options)
+    module.do_type_default(type, option_value)
   end
 
-  # Note: Could do type check here if we wanted to.
   def new(type, value, options) do
-    validate_options!(type, options)
-    value
+    {module, option_value} = validate_options!(type, options)
+    module.do_new(type, value, option_value)
   end
 
   def encode_type(type, v, options) do
-    extype = validate_options!(type, options)
-    encoded = do_encode_type(type, v, extype)
-    IO.iodata_to_binary(encoded)
-  end
-
-  defp do_encode_type(type, v, extype) do
-    fnum = type.__message_props__.field_props[1].encoded_fnum
-    encoded = Protobuf.Encoder.encode_type(extype, v)
-    [[fnum, encoded]]
+    {module, option_value} = validate_options!(type, options)
+    module.do_encode_type(type, v, option_value)
   end
 
   def decode_type(val, type, options) do
-    extype = validate_options!(type, options)
-    do_decode_type(type, val, extype)
-  end
-
-  defp do_decode_type(_type, val, extype) do
-    require Logger
-    require Protobuf.Decoder
-    import Protobuf.Decoder, only: [decode_zigzag: 1]
-
-    [_tag, _wire, val | _rest] = Protobuf.Decoder.decode_raw(val)
-    Protobuf.Decoder.decode_type_m(extype, :value, val)
+    {module, option_value} = validate_options!(type, options)
+    module.do_decode_type(type, val, option_value)
   end
 end

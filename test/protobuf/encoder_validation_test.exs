@@ -164,7 +164,8 @@ defmodule Protobuf.EncoderTest.Validation do
   end
 
   test "field with custom options, bad values" do
-    msg = TestMsg.Ext.DualUseCase.new(a: Google.Protobuf.StringValue.new(value: "s1"), b: Google.Protobuf.StringValue.new(value: "s2"))
+    # should be string
+    msg = TestMsg.Ext.DualUseCase.new(a: 11)
 
     assert_raise Protobuf.EncodeError, fn -> Protobuf.Encoder.encode(msg) end
   end

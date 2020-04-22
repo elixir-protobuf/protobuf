@@ -82,9 +82,14 @@ defmodule Protobuf.BuilderTest do
       fn -> DualUseCase.new(a: "s1", b: "s2") end
   end
 
-  test "new/2 build for custom_field_options, doesn't type check value" do
-    # Should be just string
-    assert %DualUseCase{a: %Google.Protobuf.StringValue{value: "s1"}} =
-      DualUseCase.new!(a: %Google.Protobuf.StringValue{value: "s1"})
+  test "new/2 build for custom_field_options shape checks" do
+    assert_raise RuntimeError,
+      "When extype option is present, new expects unwrapped value, not struct.",
+      fn -> DualUseCase.new!(a: %Google.Protobuf.StringValue{value: "s1"}) end
+  end
+
+  test "new/2 build for custom_field_options doesn't type check" do
+    # Should be string
+    assert %DualUseCase{a: 1} = DualUseCase.new!(a: 1)
   end
 end
