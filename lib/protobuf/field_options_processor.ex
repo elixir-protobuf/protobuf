@@ -50,6 +50,7 @@ defmodule Protobuf.FieldOptionsProcessor do
   def get_extype_mod(type) do
     cond do
       type in @wrappers -> Protobuf.Extype.Wrappers
+      type == Google.Protobuf.Timestamp -> Protobuf.Extype.Timestamp
       true -> raise "Sorry #{type} does not support the field option extype"
     end
   end
@@ -57,6 +58,7 @@ defmodule Protobuf.FieldOptionsProcessor do
   def get_extype_mod_string(:TYPE_MESSAGE, type) do
     cond do
       type in @wrappers_str -> Protobuf.Extype.Wrappers
+      type == "Google.Protobuf.Timestamp" -> Protobuf.Extype.Timestamp
       true -> raise "Sorry #{type} does not support the field option extype"
     end
   end
