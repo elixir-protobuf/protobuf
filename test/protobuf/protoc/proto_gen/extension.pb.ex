@@ -15,7 +15,7 @@ defmodule Protobuf.Protoc.ExtTest.Dual do
   use Protobuf, custom_field_options?: true, syntax: :proto2
 
   @type t :: %__MODULE__{
-          a: Google.Protobuf.StringValue.t() | nil,
+          a: String.t() | nil,
           b: Google.Protobuf.StringValue.t() | nil
         }
   defstruct [:a, :b]
