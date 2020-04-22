@@ -186,4 +186,9 @@ defmodule Protobuf.EncoderTest do
     msg = TestMsg.Ext.DualUseCase.new(a: "s1", b: Google.Protobuf.StringValue.new(value: "s2"))
     assert Encoder.encode(msg) == <<10, 4, 10, 2, 115, 49, 18, 4, 10, 2, 115, 50>>
   end
+
+  test "encoding with custom field options, empty" do
+    msg = TestMsg.Ext.DualUseCase.new(b: Google.Protobuf.StringValue.new(value: "s2"))
+    assert Encoder.encode(msg) == <<18, 4, 10, 2, 115, 50>>
+  end
 end

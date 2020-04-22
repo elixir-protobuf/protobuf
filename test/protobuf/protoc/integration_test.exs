@@ -60,5 +60,9 @@ defmodule Protobuf.Protoc.IntegrationTest do
     assert dual.b.value == "s2"
 
     assert %{options: [extype: "String.t"]} = Protobuf.Protoc.ExtTest.Dual.__message_props__().field_props[1]
+
+    output = Protobuf.Protoc.ExtTest.Dual.encode(dual)
+
+    assert Protobuf.Protoc.ExtTest.Dual.decode(output) == dual
   end
 end
