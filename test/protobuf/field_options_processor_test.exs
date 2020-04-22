@@ -26,7 +26,7 @@ defmodule Protobuf.FieldOptionsProcessorTest do
     assert_raise RuntimeError, "The custom field option is invalid. " <>
       "Options: [extype: \"integer\"] incompatible with type: Google.Protobuf.StringValue",
       fn ->
-        FieldOptionsProcessor.type_to_spec(:TYPE_MESSAGE, "Google.Protobuf.StringValue", false, [extype: "integer"])
+        FieldOptionsProcessor.type_to_spec(:TYPE_MESSAGE, "Google.Protobuf.StringValue", false, [extype: extype])
       end
   end
 
