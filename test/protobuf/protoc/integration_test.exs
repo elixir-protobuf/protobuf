@@ -65,4 +65,27 @@ defmodule Protobuf.Protoc.IntegrationTest do
 
     assert Protobuf.Protoc.ExtTest.Dual.decode(output) == dual
   end
+
+  test "extension use case 2" do
+    dt = DateTime.from_unix!(1_464_096_368, :microsecond)
+
+    msg = Ext.MyMessage.new(
+      f1: 1.0,
+      f2: 2.0,
+      f3: 3,
+      f4: 4,
+      f5: 5,
+      f6: 6,
+      f7: true,
+      f8: "8",
+      f9: "9",
+      nested: Ext.Nested.new(my_timestamp: {:dt, dt}),
+      no_extype: %Google.Protobuf.StringValue{value: "none"},
+      normal1: 1234,
+      normal2: "hello",
+      repeated_field: ["r1", "r2"]
+    )
+
+    assert msg |> Ext.MyMessage.encode() |> Ext.MyMessage.decode() == msg
+  end
 end

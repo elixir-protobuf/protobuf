@@ -26,9 +26,14 @@ defmodule Protobuf.Extype.Timestamp do
     nil
   end
 
-  def do_type_to_spec(type, extype) do
+  def do_type_to_spec(type, repeated, extype) do
     string_type = validate_extype_string!(type, extype)
-    string_type <> " | nil"
+
+    if repeated do
+      "[#{string_type}]"
+    else
+      string_type <> " | nil"
+    end
   end
 
   def do_new(type, value, extype) do

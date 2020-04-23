@@ -16,7 +16,7 @@ defmodule Protobuf.Protoc.CLITest do
 
   test "parse_params/2 parse custom_field_options" do
     ctx = %Context{}
-    ctx = parse_params(ctx, "plugins=grpc,custom_field_options?=true")
+    ctx = parse_params(ctx, "plugins=grpc,custom_field_options=true")
     assert ctx == %Context{plugins: ["grpc"], custom_field_options?: true}
   end
 

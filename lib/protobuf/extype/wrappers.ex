@@ -42,15 +42,20 @@ defmodule Protobuf.Extype.Wrappers do
     nil
   end
 
-  def do_type_to_spec(type, extype) do
+  def do_type_to_spec(type, repeated, extype) do
     string_type = validate_extype_string!(type, extype)
-    string_type <> " | nil"
+
+    if repeated do
+      "[#{string_type}]"
+    else
+      string_type <> " | nil"
+    end
   end
 
   def do_new(type, value, extype) do
     validate_extype!(type, extype)
     # No type check, just shape check.
-    if is_map(value) or is_list(value) do
+    if is_map(value) do
       raise "When extype option is present, new expects unwrapped value, not struct."
     else
       value

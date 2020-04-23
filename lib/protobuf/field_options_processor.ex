@@ -78,13 +78,7 @@ defmodule Protobuf.FieldOptionsProcessor do
 
   def type_to_spec(type_enum, type, repeated, options) do
     {module, option_value} = validate_options_str!(type_enum, type, options)
-    type_str = module.do_type_to_spec(type, option_value)
-
-    if repeated do
-      "[#{type_str}]"
-    else
-      type_str
-    end
+    module.do_type_to_spec(type, repeated, option_value)
   end
 
   def type_default(type, options) do
