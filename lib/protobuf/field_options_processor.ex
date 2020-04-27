@@ -23,81 +23,23 @@ defmodule Protobuf.FieldOptionsProcessor do
   @callback encode_type(type, value, options) :: binary
   @callback decode_type(val :: binary, type, options) :: value
 
-  @wrappers [
-    Google.Protobuf.DoubleValue,
-    Google.Protobuf.FloatValue,
-    Google.Protobuf.Int64Value,
-    Google.Protobuf.UInt64Value,
-    Google.Protobuf.Int32Value,
-    Google.Protobuf.UInt32Value,
-    Google.Protobuf.BoolValue,
-    Google.Protobuf.StringValue,
-    Google.Protobuf.BytesValue
-  ]
-
-  @wrappers_str [
-    "Google.Protobuf.DoubleValue",
-    "Google.Protobuf.FloatValue",
-    "Google.Protobuf.Int64Value",
-    "Google.Protobuf.UInt64Value",
-    "Google.Protobuf.Int32Value",
-    "Google.Protobuf.UInt32Value",
-    "Google.Protobuf.BoolValue",
-    "Google.Protobuf.StringValue",
-    "Google.Protobuf.BytesValue"
-  ]
-
-  def get_extype_mod(type) do
-    cond do
-      type in @wrappers -> Protobuf.Extype.Wrappers
-      type == Google.Protobuf.Timestamp -> Protobuf.Extype.Timestamp
-      true -> raise "Sorry #{type} does not support the field option extype"
-    end
+  def type_to_spec(_type_enum, type, repeated, [extype: extype]) do
+    Extype.type_to_spec(type, repeated, extype)
   end
 
-  def get_extype_mod_string(:TYPE_MESSAGE, type) do
-    cond do
-      type in @wrappers_str -> Protobuf.Extype.Wrappers
-      type == "Google.Protobuf.Timestamp" -> Protobuf.Extype.Timestamp
-      true -> raise "Sorry #{type} does not support the field option extype"
-    end
+  def type_default(type, [extype: extype]) do
+    Extype.type_default(type, extype)
   end
 
-  def validate_options_str!(type_enum, type, extype: extype) do
-    {get_extype_mod_string(type_enum, type), extype}
-  end
-  def validate_options_str!(_, type, options) do
-    raise "The custom field option is invalid. Options: #{inspect(options)} incompatible with type: #{type}"
+  def new(type, value, [extype: extype]) do
+    Extype.new(type, value, extype)
   end
 
-  def validate_options!(type, extype: extype), do: {get_extype_mod(type), extype}
-  def validate_options!(type, options) do
-    raise "The custom field option is invalid. Options: #{inspect(options)} incompatible with type: #{type}"
+  def encode_type(type, v, [extype: extype]) do
+    Extype.encode_type(type, v, extype)
   end
 
-
-  def type_to_spec(type_enum, type, repeated, options) do
-    {module, option_value} = validate_options_str!(type_enum, type, options)
-    module.do_type_to_spec(type, repeated, option_value)
-  end
-
-  def type_default(type, options) do
-    {module, option_value} = validate_options!(type, options)
-    module.do_type_default(type, option_value)
-  end
-
-  def new(type, value, options) do
-    {module, option_value} = validate_options!(type, options)
-    module.do_new(type, value, option_value)
-  end
-
-  def encode_type(type, v, options) do
-    {module, option_value} = validate_options!(type, options)
-    module.do_encode_type(type, v, option_value)
-  end
-
-  def decode_type(val, type, options) do
-    {module, option_value} = validate_options!(type, options)
-    module.do_decode_type(type, val, option_value)
+  def decode_type(val, type, [extype: extype]) do
+    Extype.decode_type(val, type, extype)
   end
 end
