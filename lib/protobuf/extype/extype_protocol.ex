@@ -1,7 +1,11 @@
 defprotocol Extype.Protocol do
-  # Imagine registering an extension by defining a protocol
-
-  @type extype :: atom
+  @moduledoc """
+  Protocol for defining an elixir type for a protobuf type.
+  """
+  @typedoc """
+  An elixir type.
+  """
+  @type extype :: String.t()
 
   @typedoc """
   The existing type of the field. Often the module name of the struct.
@@ -16,17 +20,17 @@ defprotocol Extype.Protocol do
   @spec validate_and_to_atom_extype!(type, option :: String.t) :: atom
   def validate_and_to_atom_extype!(type, option)
 
-  @spec do_type_default(type, extype) :: any
-  def do_type_default(type, extype)
+  @spec type_default(type, extype) :: any
+  def type_default(type, extype)
 
-  @spec do_new(type, value, extype) :: value
-  def do_new(type, value, extype)
+  @spec new(type, value, extype) :: value
+  def new(type, value, extype)
 
-  @spec do_encode_type(type, value, extype) :: binary
-  def do_encode_type(type, v, extype)
+  @spec encode_type(type, value, extype) :: binary
+  def encode_type(type, v, extype)
 
-  @spec do_decode_type(type, val :: binary, extype) :: value
-  def do_decode_type(val, type, extype)
+  @spec decode_type(type, val :: binary, extype) :: value
+  def decode_type(val, type, extype)
 end
 
 defmodule Extype do
@@ -48,6 +52,7 @@ defmodule Extype do
 
   @spec type_to_spec(type :: String.t(), repeated :: boolean, extype) :: String.t()
   def type_to_spec(_type, repeated, extype) do
+    extype = pad_parens(extype)
     if repeated do
       "[#{extype}]"
     else
@@ -58,28 +63,40 @@ defmodule Extype do
   @spec type_default(type, extype) :: any
   def type_default(type, extype) do
     mod = get_mod(type)
+    extype = pad_parens(extype)
     atom_extype = mod.validate_and_to_atom_extype!(type, extype)
-    mod.do_type_default(type, atom_extype)
+    mod.type_default(type, atom_extype)
   end
 
   @spec new(type, value, extype) :: value
   def new(type, value, extype) do
     mod = get_mod(type)
+    extype = pad_parens(extype)
     atom_extype = mod.validate_and_to_atom_extype!(type, extype)
-    mod.do_new(type, value, atom_extype)
+    mod.new(type, value, atom_extype)
   end
 
   @spec encode_type(type, value, extype) :: binary
   def encode_type(type, v, extype) do
     mod = get_mod(type)
+    extype = pad_parens(extype)
     atom_extype  = mod.validate_and_to_atom_extype!(type, extype)
-    mod.do_encode_type(type, v, atom_extype)
+    mod.encode_type(type, v, atom_extype)
   end
 
   @spec decode_type(val :: binary, type, extype) :: value
   def decode_type(val, type, extype) do
     mod = get_mod(type)
+    extype = pad_parens(extype)
     atom_extype = mod.validate_and_to_atom_extype!(type, extype)
-    mod.do_decode_type(type, val, atom_extype)
+    mod.decode_type(type, val, atom_extype)
+  end
+
+  defp pad_parens(extype) do
+    if String.ends_with?(extype, ".t") do
+      extype <> "()"
+    else
+      extype
+    end
   end
 end

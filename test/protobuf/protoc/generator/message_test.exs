@@ -273,7 +273,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     {[], [msg]} = Generator.generate(ctx, desc)
 
     assert msg =~ "use Protobuf, custom_field_options?: true"
-    assert msg =~ "a: String.t | nil"
+    assert msg =~ "a: String.t() | nil"
     assert msg =~ "b: Google.Protobuf.StringValue.t | nil"
     assert msg =~ "field :a, 1, optional: true, type: Google.Protobuf.StringValue, options: [extype: \"String.t\"]\n"
     assert msg =~ "field :b, 1, optional: true, type: Google.Protobuf.StringValue\n\nend"

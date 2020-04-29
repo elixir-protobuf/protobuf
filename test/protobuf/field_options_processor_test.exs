@@ -8,7 +8,7 @@ defmodule Protobuf.FieldOptionsProcessorTest do
   test "type_to_spec String.t and StringValue" do
     extype = "String.t"
     assert FieldOptionsProcessor.type_to_spec(:TYPE_MESSAGE, "Google.Protobuf.StringValue", false, [extype: extype]) ==
-      extype <> " | nil"
+      extype <> "() | nil"
   end
 
   test "type_to_spec String.t() and StringValue" do
@@ -22,7 +22,7 @@ defmodule Protobuf.FieldOptionsProcessorTest do
       "[String.t()]"
 
     # Note: Doesn't check against bad values
-    FieldOptionsProcessor.type_to_spec(:TYPE_MESSAGE, "Google.Protobuf.UnrealValue", false, [extype: "vfdkhnlim"]) ==
+    assert FieldOptionsProcessor.type_to_spec(:TYPE_MESSAGE, "Google.Protobuf.UnrealValue", false, [extype: "vfdkhnlim"]) ==
       "vfdkhnlim | nil"
   end
 
@@ -34,10 +34,14 @@ defmodule Protobuf.FieldOptionsProcessorTest do
     assert is_nil(FieldOptionsProcessor.type_default(Google.Protobuf.Timestamp, extype: "DateTime.t"))
     assert is_nil(FieldOptionsProcessor.type_default(Google.Protobuf.Timestamp, extype: "NaiveDateTime.t()"))
 
-    # Typo
-    assert_raise RuntimeError, "Invalid extype pairing, Datetime.t not compatible with " <>
+    # Typo in extype
+    assert_raise RuntimeError, "Invalid extype pairing, Datetime.t() not compatible with " <>
       "Elixir.Google.Protobuf.Timestamp. Supported types are DateTime.t() or NaiveDateTime.t()",
       fn -> FieldOptionsProcessor.type_default(Google.Protobuf.Timestamp, extype: "Datetime.t") end
+
+    # Unsupported struct and bad type
+    assert_raise RuntimeError, "Sorry Elixir.Google.Protobuf.UnrealValue does not support the field option extype",
+      fn -> FieldOptionsProcessor.type_default(Google.Protobuf.UnrealValue, [extype: "vfdkhnlim"]) end
   end
 
   test "encoding and decoding timestamp" do
@@ -106,5 +110,4 @@ defmodule Protobuf.FieldOptionsProcessorTest do
     # They are equal
     assert dt2 == result2
   end
-
 end

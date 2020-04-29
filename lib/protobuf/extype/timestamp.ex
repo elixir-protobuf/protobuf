@@ -1,22 +1,20 @@
-defimpl Extype.Protocol, for: [Google.Protobuf.Timestamp] do
+defimpl Extype.Protocol, for: Google.Protobuf.Timestamp do
   @moduledoc """
   Implement DateTime and NaiveDateTime casting for Google Timestamp.
   """
 
-  def validate_and_to_atom_extype!(Google.Protobuf.Timestamp, "NaiveDateTime.t"), do: :naivedatetime
   def validate_and_to_atom_extype!(Google.Protobuf.Timestamp, "NaiveDateTime.t()"), do: :naivedatetime
-  def validate_and_to_atom_extype!(Google.Protobuf.Timestamp, "DateTime.t"), do: :datetime
   def validate_and_to_atom_extype!(Google.Protobuf.Timestamp, "DateTime.t()"), do: :datetime
   def validate_and_to_atom_extype!(type, extype) do
     raise "Invalid extype pairing, #{extype} not compatible with #{type}. " <>
       "Supported types are DateTime.t() or NaiveDateTime.t()"
   end
 
-  def do_type_default(_type, _extype), do: nil
+  def type_default(_type, _extype), do: nil
 
-  def do_new(_type, value, _extype), do: value
+  def new(_type, value, _extype), do: value
 
-  def do_encode_type(_type, v, extype) do
+  def encode_type(_type, v, extype) do
     v = if extype == :naivedatetime, do: DateTime.from_naive!(v, "Etc/UTC"), else: v
 
     unix = DateTime.to_unix(v, :nanosecond)
@@ -29,7 +27,7 @@ defimpl Extype.Protocol, for: [Google.Protobuf.Timestamp] do
     Protobuf.encode(value)
   end
 
-  def do_decode_type(type, val, extype) do
+  def decode_type(type, val, extype) do
     protobuf_timestamp = Protobuf.decode(val, type)
 
     value =
