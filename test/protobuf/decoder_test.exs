@@ -205,4 +205,27 @@ defmodule Protobuf.DecoderTest do
       end
     end
   end
+
+  test "decode with and without custom field options" do
+    bin = <<10, 4, 10, 2, 115, 49, 18, 4, 10, 2, 115, 50>>
+
+    assert Decoder.decode(bin, TestMsg.Ext.DualUseCase) ==
+      TestMsg.Ext.DualUseCase.new(a: "s1", b: Google.Protobuf.StringValue.new(value: "s2"))
+
+    assert Decoder.decode(bin, TestMsg.Ext.DualNonUse) ==
+      TestMsg.Ext.DualNonUse.new(
+        a: Google.Protobuf.StringValue.new(value: "s1"),
+        b: Google.Protobuf.StringValue.new(value: "s2")
+      )
+  end
+
+  test "decode with and without custom field options, empty" do
+    bin = <<18, 4, 10, 2, 115, 50>>
+
+    assert Decoder.decode(bin, TestMsg.Ext.DualUseCase) ==
+      TestMsg.Ext.DualUseCase.new(a: nil, b: Google.Protobuf.StringValue.new(value: "s2"))
+
+    assert Decoder.decode(bin, TestMsg.Ext.DualNonUse) ==
+      TestMsg.Ext.DualNonUse.new(a: nil, b: Google.Protobuf.StringValue.new(value: "s2"))
+  end
 end
