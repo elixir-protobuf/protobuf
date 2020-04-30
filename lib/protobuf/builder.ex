@@ -53,7 +53,7 @@ defmodule Protobuf.Builder do
           raise ArgumentError,
             message: "The __struct__ in the struct doesn't with the message module"
         else
-          do_new_maybe_strict(mod, Map.from_struct(attrs), strict?)
+          attrs
         end
 
       _ ->
@@ -73,9 +73,9 @@ defmodule Protobuf.Builder do
 
           v =
             cond do
-              not is_nil(f_props.options) -> Protobuf.FieldOptionsProcessor.new(f_props.type, v, f_props.options)
               not is_nil(f_props.options) and f_props.repeated? ->
                 Enum.map(v, fn i -> Protobuf.FieldOptionsProcessor.new(f_props.type, i, f_props.options) end)
+              not is_nil(f_props.options) -> Protobuf.FieldOptionsProcessor.new(f_props.type, v, f_props.options)
               f_props.embedded? and f_props.repeated? -> Enum.map(v, fn i -> f_props.type.new(i) end)
               f_props.embedded? -> f_props.type.new(v)
               true -> v
