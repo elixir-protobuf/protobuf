@@ -92,4 +92,9 @@ defmodule Protobuf.BuilderTest do
     # Should be string
     assert %DualUseCase{a: 1} = DualUseCase.new!(a: 1)
   end
+
+  test "new/2 allows any struct in embedded fields" do
+    assert %TestMsg.Ext.DualNonUse{b: %{__struct__: "hello"}} ==
+      TestMsg.Ext.DualNonUse.new(b: %{__struct__: "hello"})
+  end
 end
