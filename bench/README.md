@@ -15,6 +15,7 @@ Erlang 21.2.4
 Benchmark suite executing with the following configuration:
 warmup: 2 s
 time: 10 s
+memory time: 2 s
 parallel: 1
 inputs: none specified
 Estimated total run time: 48 s
