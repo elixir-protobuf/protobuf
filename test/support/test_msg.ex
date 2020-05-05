@@ -141,6 +141,13 @@ defmodule TestMsg do
     field :b, 2, optional: true, type: Bar2.Enum, enum: true
   end
 
+  defmodule Atom.Bar2 do
+    use Protobuf, syntax: :proto3
+
+    field :a, 1, type: EnumFoo, enum: true, options: [extype: "atom"]
+    field :b, 2, type: EnumFoo, enum: true, options: [extype: "atom"]
+  end
+
   defmodule Ext.EnumFoo do
     @moduledoc false
     use Protobuf, enum: true, syntax: :proto2

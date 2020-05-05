@@ -20,6 +20,7 @@ defmodule Protobuf.FieldOptionsProcessor do
   @callback type_to_spec(type_enum :: atom, type :: String.t(), repeated :: boolean, options) :: String.t()
   @callback type_default(type, options) :: any
   @callback new(type, value, options) :: value
+  @callback skip?(type, value, options) :: boolean
   @callback encode_type(type, value, options) :: binary
   @callback decode_type(val :: binary, type, options) :: value
 
@@ -35,6 +36,9 @@ defmodule Protobuf.FieldOptionsProcessor do
 
   def new(type, value, []), do: type.new(value)
   def new(type, value, [extype: extype]), do: Extype.new(type, value, extype)
+
+  def skip?(type, value, []), do: Protobuf.Encoder.is_enum_default?(type, value)
+  def skip?(type, value, [extype: extype]), do: Extype.skip?(type, value, extype)
 
   def encode_type(type, v, []), do: Protobuf.Encoder.encode(type, v, [])
   def encode_type(type, v, [extype: extype]), do: Extype.encode_type(type, v, extype)

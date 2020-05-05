@@ -1,3 +1,32 @@
+defmodule Ext.MyEnum do
+  @moduledoc false
+  use Protobuf, enum: true, syntax: :proto3
+
+  @type t ::
+          integer
+          | :NO_REASON_PROVIDED
+          | :DEVICE_TOKEN_NOT_FOR_TOPIC
+          | :BAD_DEVICE_TOKEN
+          | :UNREGISTERED
+          | :INVALID_PHONE_NUMBER
+          | :DUPLICATE_CHANNEL
+          | :RECEIVED_STOP_FROM_USER
+          | :DISABLED_CHANNEL
+          | :LANDLINE_OR_UNREACHABLE_CARRIER
+          | :NOT_REGISTERED
+
+  field :NO_REASON_PROVIDED, 0
+  field :DEVICE_TOKEN_NOT_FOR_TOPIC, 1
+  field :BAD_DEVICE_TOKEN, 2
+  field :UNREGISTERED, 3
+  field :INVALID_PHONE_NUMBER, 4
+  field :DUPLICATE_CHANNEL, 5
+  field :RECEIVED_STOP_FROM_USER, 6
+  field :DISABLED_CHANNEL, 7
+  field :LANDLINE_OR_UNREACHABLE_CARRIER, 8
+  field :NOT_REGISTERED, 9
+end
+
 defmodule Ext.Nested do
   @moduledoc false
   use Protobuf, custom_field_options?: true, syntax: :proto3
@@ -31,7 +60,9 @@ defmodule Ext.MyMessage do
           repeated_field: [String.t()],
           normal1: non_neg_integer,
           normal2: String.t(),
-          nested: Ext.Nested.t() | nil
+          nested: Ext.Nested.t() | nil,
+          enum: Ext.MyEnum.t(),
+          no_enum: Ext.MyEnum.t()
         }
   defstruct [
     :f1,
@@ -47,7 +78,9 @@ defmodule Ext.MyMessage do
     :repeated_field,
     :normal1,
     :normal2,
-    :nested
+    :nested,
+    :enum,
+    :no_enum
   ]
 
   field :f1, 1, type: Google.Protobuf.DoubleValue, options: [extype: "float"]
@@ -69,4 +102,6 @@ defmodule Ext.MyMessage do
   field :normal1, 12, type: :uint64
   field :normal2, 13, type: :string
   field :nested, 14, type: Ext.Nested
+  field :enum, 15, type: Ext.MyEnum, enum: true, options: [extype: "atom"]
+  field :no_enum, 16, type: Ext.MyEnum, enum: true
 end

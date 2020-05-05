@@ -26,11 +26,14 @@ defprotocol Extype.Protocol do
   @spec new(type, value, extype) :: value
   def new(type, value, extype)
 
+  @spec skip?(type, value, extype) :: boolean
+  def skip?(type, value, extype)
+
   @spec encode_type(type, value, extype) :: binary
   def encode_type(type, v, extype)
 
   @spec decode_type(type, val :: binary, extype) :: value
-  def decode_type(val, type, extype)
+  def decode_type(type, val, sextype)
 end
 
 defmodule Extype do
@@ -49,8 +52,20 @@ defmodule Extype do
         reraise "Sorry #{type} does not support the field option extype", __STACKTRACE__
     end
   end
+  def get_mod(type) do
+    Extype.Protocol.impl_for!(type)
+  end
 
+  # TODO: figure out a better way to do this.
   @spec type_to_spec(type :: String.t(), repeated :: boolean, extype) :: String.t()
+  def type_to_spec(type, repeated, "atom") do
+    if repeated do
+      "[#{type}.t]"
+    else
+      type <> ".t"
+    end
+  end
+
   def type_to_spec(_type, repeated, extype) do
     extype = pad_parens(extype)
     if repeated do
@@ -74,6 +89,14 @@ defmodule Extype do
     extype = pad_parens(extype)
     atom_extype = mod.validate_and_to_atom_extype!(type, extype)
     mod.new(type, value, atom_extype)
+  end
+
+  @spec skip?(type, value, extype) :: boolean
+  def skip?(type, value, extype) do
+    mod = get_mod(type)
+    extype = pad_parens(extype)
+    atom_extype = mod.validate_and_to_atom_extype!(type, extype)
+    mod.skip?(type, value, atom_extype)
   end
 
   @spec encode_type(type, value, extype) :: binary

@@ -83,7 +83,10 @@ defmodule Protobuf.Protoc.IntegrationTest do
       no_extype: %Google.Protobuf.StringValue{value: "none"},
       normal1: 1234,
       normal2: "hello",
-      repeated_field: ["r1", "r2"]
+      repeated_field: ["r1", "r2"],
+      enum: :duplicate_channel,
+      no_enun: :DUPLICATE_CHANNEL
+
     )
 
     assert msg |> Ext.MyMessage.encode() |> Ext.MyMessage.decode() == msg

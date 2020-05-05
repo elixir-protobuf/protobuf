@@ -42,6 +42,8 @@ defimpl Extype.Protocol, for: [
     end
   end
 
+  def skip?(_type, _v, _extype), do: false
+
   def encode_type(type, v, extype) do
     fnum = type.__message_props__.field_props[1].encoded_fnum
     encoded = Protobuf.Encoder.encode_type(extype, v)

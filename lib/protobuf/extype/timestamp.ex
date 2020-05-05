@@ -14,6 +14,8 @@ defimpl Extype.Protocol, for: Google.Protobuf.Timestamp do
 
   def new(_type, value, _extype), do: value
 
+  def skip?(_type, _v, _extype), do: false
+
   def encode_type(_type, v, extype) do
     v = if extype == :naivedatetime, do: DateTime.from_naive!(v, "Etc/UTC"), else: v
 

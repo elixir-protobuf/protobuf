@@ -16,6 +16,20 @@ message Nested{
   }
 }
 
+
+enum MyEnum {
+  NO_REASON_PROVIDED = 0;
+  DEVICE_TOKEN_NOT_FOR_TOPIC = 1;
+  BAD_DEVICE_TOKEN = 2;
+  UNREGISTERED = 3;
+  INVALID_PHONE_NUMBER = 4;
+  DUPLICATE_CHANNEL = 5;
+  RECEIVED_STOP_FROM_USER = 6;
+  DISABLED_CHANNEL = 7;
+  LANDLINE_OR_UNREACHABLE_CARRIER = 8;
+  NOT_REGISTERED = 9;
+}
+
 message MyMessage {
   google.protobuf.DoubleValue f1 = 1 [(brex.elixirpb.field).extype="float"];
   google.protobuf.FloatValue f2 = 2 [(brex.elixirpb.field).extype="float"];
@@ -32,4 +46,7 @@ message MyMessage {
   uint64 normal1 = 12;
   string normal2 = 13;
   Nested nested = 14;
+  MyEnum enum = 15 [(brex.elixirpb.field).extype="atom"];
+  MyEnum no_enum = 16;
+
 }
