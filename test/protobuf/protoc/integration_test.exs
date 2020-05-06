@@ -83,7 +83,11 @@ defmodule Protobuf.Protoc.IntegrationTest do
       no_extype: %Google.Protobuf.StringValue{value: "none"},
       normal1: 1234,
       normal2: "hello",
-      repeated_field: ["r1", "r2"]
+      repeated_field: ["r1", "r2"],
+      color: :TRAFFIC_LIGHT_COLOR_UNSET,
+      color_lc: :traffic_light_color_invalid,
+      color_depr: :GREEN,
+      color_atom: :red
     )
 
     assert msg |> Ext.MyMessage.encode() |> Ext.MyMessage.decode() == msg

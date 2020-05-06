@@ -3,11 +3,13 @@ defmodule Brex.Elixirpb.FieldOptions do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          extype: String.t()
+          extype: String.t(),
+          enum: String.t()
         }
-  defstruct [:extype]
+  defstruct [:extype, :enum]
 
   field :extype, 1, optional: true, type: :string
+  field :enum, 2, optional: true, type: :string
 end
 
 defmodule Brex.Elixirpb.PbExtension do

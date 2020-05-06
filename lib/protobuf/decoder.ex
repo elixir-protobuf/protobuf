@@ -149,19 +149,7 @@ defmodule Protobuf.Decoder do
         key = if oneof, do: oneof_field(prop, msg_props), else: name_atom
 
         struct =
-          if is_nil(options) and not embedded do
-            val = decode_type_m(type, key, val)
-            val = if oneof, do: {name_atom, val}, else: val
-
-            val =
-              if is_repeated do
-                merge_simple_repeated_value(struct, key, val)
-              else
-                val
-              end
-
-            Map.put(struct, key, val)
-          else
+          if embedded do
             embedded_msg =
               if is_nil(options) do
                 decode(val, type)
@@ -173,6 +161,23 @@ defmodule Protobuf.Decoder do
             val = if oneof, do: {name_atom, val}, else: val
 
             val = merge_embedded_value(struct, key, val, is_repeated)
+
+            Map.put(struct, key, val)
+          else
+            val = if is_nil(options) do
+                decode_type_m(type, key, val)
+              else
+                Protobuf.FieldOptionsProcessor.decode_type(val, type, options)
+              end
+
+            val = if oneof, do: {name_atom, val}, else: val
+
+            val =
+              if is_repeated do
+                merge_simple_repeated_value(struct, key, val)
+              else
+                val
+              end
 
             Map.put(struct, key, val)
           end

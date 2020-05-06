@@ -29,7 +29,10 @@ defmodule Protobuf.Builder do
   def type_default(:sint32), do: 0
   def type_default(:sint64), do: 0
   def type_default(:bool), do: false
-  def type_default({:enum, _}), do: 0
+  def type_default({:enum, type}) do
+    Code.ensure_loaded(type)
+    type.key(0)
+  end
   def type_default(:fixed32), do: 0
   def type_default(:sfixed32), do: 0
   def type_default(:fixed64), do: 0

@@ -30,7 +30,7 @@ defprotocol Extype.Protocol do
   def encode_type(type, v, extype)
 
   @spec decode_type(type, val :: binary, extype) :: value
-  def decode_type(val, type, extype)
+  def decode_type(type, val, extype)
 end
 
 defmodule Extype do
@@ -59,6 +59,8 @@ defmodule Extype do
       extype <> " | nil"
     end
   end
+
+  def skip?(_type, _value, _extype), do: false
 
   @spec type_default(type, extype) :: any
   def type_default(type, extype) do

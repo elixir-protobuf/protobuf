@@ -3,7 +3,7 @@ defmodule Protobuf.Encoder do
   import Protobuf.WireTypes
   import Bitwise, only: [bsr: 2, band: 2, bsl: 2, bor: 2]
 
-  alias Protobuf.{MessageProps, FieldProps}
+  alias Protobuf.{MessageProps, FieldProps, FieldOptionsProcessor}
 
   @spec encode(atom, map | struct, keyword) :: iodata
   def encode(mod, msg, opts) do
@@ -98,25 +98,14 @@ defmodule Protobuf.Encoder do
   def skip_field?(_, _, _), do: false
 
   @spec encode_field(atom, any, FieldProps.t()) :: iodata
-   defp encode_field(
-         :custom,
-         val,
-         %{encoded_fnum: fnum, repeated?: is_repeated, map?: is_map, type: type, options: options} =
-           prop
-       ) do
-    repeated = is_repeated || is_map
-
-    repeated_or_not(val, repeated, fn v ->
-      v = if is_map, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
-      encoded = Protobuf.FieldOptionsProcessor.encode_type(type, v, options)
-      byte_size = byte_size(encoded)
-      [fnum, encode_varint(byte_size), encoded]
-    end)
-  end
-
-  defp encode_field(:normal, val, %{encoded_fnum: fnum, type: type, repeated?: is_repeated}) do
+  defp encode_field(:normal, val, %{encoded_fnum: fnum, type: type, repeated?: is_repeated} = prop) do
     repeated_or_not(val, is_repeated, fn v ->
-      [fnum, encode_type(type, v)]
+      encoded = if is_nil(prop.options) do
+          encode_type(type, v)
+        else
+          FieldOptionsProcessor.encode_type(type, v, prop.options)
+        end
+      [fnum, encoded]
     end)
   end
 
@@ -125,12 +114,17 @@ defmodule Protobuf.Encoder do
          val,
          %{encoded_fnum: fnum, repeated?: is_repeated, map?: is_map, type: type} = prop
        ) do
+
     repeated = is_repeated || is_map
 
     repeated_or_not(val, repeated, fn v ->
       v = if is_map, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
       # so that oneof {:atom, v} can be encoded
-      encoded = encode(type, v, [])
+      encoded = if is_nil(prop.options) do
+          encode(type, v, [])
+        else
+          FieldOptionsProcessor.encode_type(type, v, prop.options)
+        end
       byte_size = byte_size(encoded)
       [fnum, encode_varint(byte_size), encoded]
     end)
@@ -140,11 +134,6 @@ defmodule Protobuf.Encoder do
     encoded = Enum.map(val, fn v -> encode_type(type, v) end)
     byte_size = IO.iodata_length(encoded)
     [fnum, encode_varint(byte_size), encoded]
-  end
-
-  @spec class_field(map) :: atom
-  defp class_field(%{options: options}) when not is_nil(options) do
-    :custom
   end
 
   @spec class_field(map) :: atom
@@ -270,11 +259,14 @@ defmodule Protobuf.Encoder do
   defp skip_enum?(%{enum?: false}, _), do: false
   defp skip_enum?(%{enum?: true, oneof: oneof}, _) when not is_nil(oneof), do: false
   defp skip_enum?(%{required?: true}, _), do: false
+  defp skip_enum?(%{type: type, options: options}, value) when not is_nil(options) do
+    FieldOptionsProcessor.skip?(type, value, options)
+  end
   defp skip_enum?(%{type: type}, value), do: is_enum_default?(type, value)
 
-  defp is_enum_default?({_, type}, v) when is_atom(v), do: type.value(v) == 0
-  defp is_enum_default?({_, _}, v) when is_integer(v), do: v == 0
-  defp is_enum_default?({_, _}, _), do: false
+  def is_enum_default?({_, type}, v) when is_atom(v), do: type.value(v) == 0
+  def is_enum_default?({_, _}, v) when is_integer(v), do: v == 0
+  def is_enum_default?({_, _}, _), do: false
 
   defp oneof_actual_vals(
          %{field_tags: field_tags, field_props: field_props, oneof: oneof},
