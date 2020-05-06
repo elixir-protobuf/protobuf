@@ -20,25 +20,52 @@ defmodule Protobuf.FieldOptionsProcessor do
   @callback type_to_spec(type_enum :: atom, type :: String.t(), repeated :: boolean, options) :: String.t()
   @callback type_default(type, options) :: any
   @callback new(type, value, options) :: value
+  @callback skip?(type, value, options) :: boolean
   @callback encode_type(type, value, options) :: binary
   @callback decode_type(val :: binary, type, options) :: value
+
+  def get_mod(options) do
+    case Keyword.get(options, :extype) do
+      nil -> {EnumTransform, Keyword.fetch!(options, :enum)}
+      extype -> {Extype, extype}
+    end
+  end
 
   def type_to_spec(type_enum, type, repeated, []) do
     Protobuf.TypeUtil.enum_to_spec(type_enum, type, repeated)
   end
-  def type_to_spec(_type_enum, type, repeated, [extype: extype]) do
-    Extype.type_to_spec(type, repeated, extype)
+  def type_to_spec(_type_enum, type, repeated, options) do
+    {mod, option} = get_mod(options)
+    mod.type_to_spec(type, repeated, option)
   end
 
   def type_default(type, []), do: Protobuf.Builder.type_default(type)
-  def type_default(type, [extype: extype]), do: Extype.type_default(type, extype)
+  def type_default(type, options) do
+    {mod, option} = get_mod(options)
+    mod.type_default(type, option)
+  end
 
   def new(type, value, []), do: type.new(value)
-  def new(type, value, [extype: extype]), do: Extype.new(type, value, extype)
+  def new(type, value, options) do
+    {mod, option} = get_mod(options)
+    mod.new(type, value, option)
+  end
+
+  def skip?(type, value, []), do: Protobuf.Encoder.is_enum_default?(type, value)
+  def skip?(type, value, options) do
+    {mod, option} = get_mod(options)
+    mod.skip?(type, value, option)
+  end
 
   def encode_type(type, v, []), do: Protobuf.Encoder.encode(type, v, [])
-  def encode_type(type, v, [extype: extype]), do: Extype.encode_type(type, v, extype)
+  def encode_type(type, v, options) do
+    {mod, option} = get_mod(options)
+    mod.encode_type(type, v, option)
+  end
 
   def decode_type(val, type, []), do: Protobuf.Decoder.decode(val, type)
-  def decode_type(val, type, [extype: extype]), do: Extype.decode_type(val, type, extype)
+  def decode_type(val, type, options) do
+    {mod, option} = get_mod(options)
+    mod.decode_type(val, type, option)
+  end
 end

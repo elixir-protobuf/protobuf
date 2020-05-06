@@ -81,6 +81,19 @@ defmodule Protobuf.EncoderTest do
     assert bin == <<88, 2>>
   end
 
+  test "encodes enum with lowercase atoms" do
+    bin = Encoder.encode(TestMsg.Atom.Bar2.new(a: :unknown))
+    assert bin == <<>>
+    bin = Encoder.encode(TestMsg.Atom.Bar2.new(a: :a))
+    assert bin == <<8, 1>>
+    bin1 = Encoder.encode(TestMsg.Atom.Bar2.new(a: :A))
+    assert bin1 == bin
+    bin = Encoder.encode(TestMsg.Atom.Bar2.new(b: :b))
+    assert bin == <<16, 2>>
+    bin1 = Encoder.encode(TestMsg.Atom.Bar2.new(b: :B))
+    assert bin1 == bin
+  end
+
   test "encodes repeated enum fields using packed by default" do
     bin = Encoder.encode(TestMsg.Foo.new(o: [:A, :B]))
     assert bin == <<130, 1, 2, 1, 2>>

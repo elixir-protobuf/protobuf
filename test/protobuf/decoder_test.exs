@@ -84,6 +84,15 @@ defmodule Protobuf.DecoderTest do
     assert struct == TestMsg.Foo.new(j: :B)
   end
 
+  test "decodes enum with lowercase atoms" do
+    struct = Decoder.decode(<<8, 1>>, TestMsg.Atom.Bar2)
+    assert struct == TestMsg.Atom.Bar2.new(a: :a)
+    struct = Decoder.decode(<<16, 2>>, TestMsg.Atom.Bar2)
+    assert struct == TestMsg.Atom.Bar2.new(b: :b)
+    struct = Decoder.decode(<<>>, TestMsg.Atom.Bar2)
+    assert struct == TestMsg.Atom.Bar2.new(a: :unknown)
+  end
+
   test "decodes unknown enum type" do
     assert ExUnit.CaptureLog.capture_log(fn ->
              struct = Decoder.decode(<<88, 3>>, TestMsg.Foo)

@@ -16,6 +16,15 @@ message Nested{
   }
 }
 
+
+enum TrafficLightColor {
+    TRAFFIC_LIGHT_COLOR_INVALID = 0;
+    TRAFFIC_LIGHT_COLOR_UNSET = 1;
+    TRAFFIC_LIGHT_COLOR_GREEN = 2;
+    TRAFFIC_LIGHT_COLOR_YELLOW = 3;
+    TRAFFIC_LIGHT_COLOR_RED = 4;
+}
+
 message MyMessage {
   google.protobuf.DoubleValue f1 = 1 [(brex.elixirpb.field).extype="float"];
   google.protobuf.FloatValue f2 = 2 [(brex.elixirpb.field).extype="float"];
@@ -32,4 +41,8 @@ message MyMessage {
   uint64 normal1 = 12;
   string normal2 = 13;
   Nested nested = 14;
+  TrafficLightColor color = 15;
+  TrafficLightColor color_lc = 16 [(brex.elixirpb.field).enum="lowercase"];
+  TrafficLightColor color_depr = 17 [(brex.elixirpb.field).enum="deprefix"];
+  TrafficLightColor color_atom = 18 [(brex.elixirpb.field).enum="atomize"];
 }

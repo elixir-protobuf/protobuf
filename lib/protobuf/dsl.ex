@@ -48,21 +48,13 @@ defmodule Protobuf.DSL do
     oneofs = Module.get_attribute(env.module, :oneofs)
     msg_props = generate_msg_props(fields, oneofs, extensions, options)
     default_fields = generate_default_fields(syntax, msg_props)
-    enum_fields = enum_fields(msg_props, false)
     default_struct = Map.put(default_fields, :__struct__, env.module)
 
     default_struct =
-      if syntax == :proto3 do
-        Enum.reduce(enum_fields, default_struct, fn {name, type}, acc ->
-          Code.ensure_loaded(type)
-          Map.put(acc, name, type.key(0))
-        end)
-      else
-        if extensions do
+      if syntax == :proto2 and extensions do
           Map.put(default_struct, :__pb_extensions__, %{})
-        else
-          default_struct
-        end
+      else
+        default_struct
       end
 
     quote do
@@ -70,7 +62,7 @@ defmodule Protobuf.DSL do
         unquote(Macro.escape(msg_props))
       end
 
-      unquote(def_enum_functions(msg_props, fields))
+      unquote(def_enum_functions(msg_props, fields, env.module))
 
       if unquote(Macro.escape(extension_props)) != nil do
         def __protobuf_info__(:extension_props) do
@@ -98,7 +90,7 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}, fields) do
+  defp def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}, fields, module) do
     if syntax == :proto3 do
       unless props[0], do: raise("The first enum value must be zero in proto3")
     end
@@ -111,6 +103,14 @@ defmodule Protobuf.DSL do
           key <- [fnum, name],
           do: {key, name_atom},
           into: %{}
+
+    prefix =
+      module
+      |> Protobuf.Protoc.Generator.Util.mod_to_name()
+      |> Kernel.<>("_")
+      |> String.upcase()
+
+    is_prefixed? = Enum.all?(props, fn {_, %{name: name}} -> String.starts_with?(name, prefix) end)
 
     Enum.map(atom_to_num, fn {name_atom, fnum} ->
       quote do
@@ -133,8 +133,11 @@ defmodule Protobuf.DSL do
         end,
         quote do
           def __reverse_mapping__(), do: unquote(Macro.escape(string_or_num_to_atom))
+        end,
+        quote do
+          def prefix(), do: unquote(if is_prefixed?, do: prefix, else: "")
         end
-      ]
+     ]
   end
 
   defp def_enum_functions(_, _), do: nil
@@ -401,19 +404,6 @@ defmodule Protobuf.DSL do
       Map.put(acc, key, nil)
     end)
   end
-
-  defp enum_fields(%{syntax: :proto3} = msg_props, include_oneof?) do
-    msg_props.field_props
-    |> Map.values()
-    |> Enum.filter(fn props ->
-      props.enum? && !props.default && !props.repeated? && (!props.oneof || include_oneof?)
-    end)
-    |> Enum.map(fn props ->
-      {props.name_atom, elem(props.type, 1)}
-    end)
-  end
-
-  defp enum_fields(%{syntax: _}, _include_oneof?), do: %{}
 
   defp type_numeric?(:int32), do: true
   defp type_numeric?(:int64), do: true

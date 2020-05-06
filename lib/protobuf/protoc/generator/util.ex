@@ -48,6 +48,14 @@ defmodule Protobuf.Protoc.Generator.Util do
     |> Enum.join(".")
   end
 
+  def mod_to_name(mod) do
+    mod
+    |> Atom.to_string()
+    |> String.split(".")
+    |> List.last()
+    |> Macro.underscore()
+  end
+
   def print(v) when is_atom(v), do: inspect(v)
   def print(v) when is_list(v), do: inspect(v)
   def print(v), do: v

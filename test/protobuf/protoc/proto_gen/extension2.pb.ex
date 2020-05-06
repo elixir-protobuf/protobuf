@@ -1,3 +1,22 @@
+defmodule Ext.TrafficLightColor do
+  @moduledoc false
+  use Protobuf, enum: true, syntax: :proto3
+
+  @type t ::
+          integer
+          | :TRAFFIC_LIGHT_COLOR_INVALID
+          | :TRAFFIC_LIGHT_COLOR_UNSET
+          | :TRAFFIC_LIGHT_COLOR_GREEN
+          | :TRAFFIC_LIGHT_COLOR_YELLOW
+          | :TRAFFIC_LIGHT_COLOR_RED
+
+  field :TRAFFIC_LIGHT_COLOR_INVALID, 0
+  field :TRAFFIC_LIGHT_COLOR_UNSET, 1
+  field :TRAFFIC_LIGHT_COLOR_GREEN, 2
+  field :TRAFFIC_LIGHT_COLOR_YELLOW, 3
+  field :TRAFFIC_LIGHT_COLOR_RED, 4
+end
+
 defmodule Ext.Nested do
   @moduledoc false
   use Protobuf, custom_field_options?: true, syntax: :proto3
@@ -31,7 +50,11 @@ defmodule Ext.MyMessage do
           repeated_field: [String.t()],
           normal1: non_neg_integer,
           normal2: String.t(),
-          nested: Ext.Nested.t() | nil
+          nested: Ext.Nested.t() | nil,
+          color: Ext.TrafficLightColor.t(),
+          color_lc: Ext.TrafficLightColor.t(),
+          color_depr: Ext.TrafficLightColor.t(),
+          color_atom: Ext.TrafficLightColor.t()
         }
   defstruct [
     :f1,
@@ -47,7 +70,11 @@ defmodule Ext.MyMessage do
     :repeated_field,
     :normal1,
     :normal2,
-    :nested
+    :nested,
+    :color,
+    :color_lc,
+    :color_depr,
+    :color_atom
   ]
 
   field :f1, 1, type: Google.Protobuf.DoubleValue, options: [extype: "float"]
@@ -69,4 +96,8 @@ defmodule Ext.MyMessage do
   field :normal1, 12, type: :uint64
   field :normal2, 13, type: :string
   field :nested, 14, type: Ext.Nested
+  field :color, 15, type: Ext.TrafficLightColor, enum: true
+  field :color_lc, 16, type: Ext.TrafficLightColor, enum: true, options: [enum: "lowercase"]
+  field :color_depr, 17, type: Ext.TrafficLightColor, enum: true, options: [enum: "deprefix"]
+  field :color_atom, 18, type: Ext.TrafficLightColor, enum: true, options: [enum: "atomize"]
 end

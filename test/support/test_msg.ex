@@ -228,6 +228,13 @@ defmodule TestMsg do
     field :mapsi, 3, repeated: true, map: true, type: MapFoo
   end
 
+  defmodule Atom.Bar2 do
+    use Protobuf, syntax: :proto3
+
+    field :a, 1, type: EnumFoo, enum: true, options: [enum: "lowercase"]
+    field :b, 2, type: EnumFoo, enum: true, options: [enum: "atomize"]
+  end
+
   defmodule Ext.EnumFoo do
     @moduledoc false
     use Protobuf, enum: true, syntax: :proto2

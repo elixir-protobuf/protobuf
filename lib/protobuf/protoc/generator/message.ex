@@ -307,9 +307,11 @@ defmodule Protobuf.Protoc.Generator.Message do
       |> Google.Protobuf.FieldOptions.get_extension(Brex.Elixirpb.PbExtension, :field)
       |> case do
         nil -> nil
+        [] -> nil
         elixir_field_options ->
           elixir_field_options
           |> Map.from_struct()
+          |> Enum.filter(fn {_k, v} -> not is_nil(v) end)
           |> Enum.into([])
       end
 
