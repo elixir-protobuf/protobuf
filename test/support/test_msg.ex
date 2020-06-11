@@ -56,6 +56,30 @@ defmodule TestMsg do
     field :non_matched, 101, type: :string
   end
 
+  defmodule Scalars do
+    use Protobuf, syntax: :proto3
+
+    field :string, 1, type: :string
+    field :bool, 2, type: :bool
+
+    field :float, 3, type: :float
+    field :double, 4, type: :double
+
+    field :int32, 5, type: :int32
+    field :uint32, 6, type: :uint32
+    field :sint32, 7, type: :sint32
+    field :fixed32, 8, type: :fixed32
+    field :sfixed32, 9, type: :sfixed32
+
+    field :int64, 10, type: :int64
+    field :uint64, 11, type: :uint64
+    field :sint64, 12, type: :sint64
+    field :fixed64, 13, type: :fixed64
+    field :sfixed64, 14, type: :sfixed64
+
+    field :bytes, 15, type: :bytes
+  end
+
   defmodule Foo2 do
     use Protobuf, syntax: :proto2
 
