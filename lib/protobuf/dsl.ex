@@ -248,6 +248,7 @@ defmodule Protobuf.DSL do
       |> parse_field_opts(opts_map)
       |> cal_label(syntax)
       |> cal_type()
+      |> cal_json_name(props.name)
       |> cal_default(syntax)
       |> cal_embedded()
       |> cal_packed(syntax)
@@ -282,6 +283,10 @@ defmodule Protobuf.DSL do
     parse_field_opts(t, Map.put(acc, :oneof, oneof))
   end
 
+  defp parse_field_opts([{:json_name, json_name} | t], acc) do
+    parse_field_opts(t, Map.put(acc, :json_name, json_name))
+  end
+
   # skip unknown option
   defp parse_field_opts([{_, _} | t], acc) do
     parse_field_opts(t, acc)
@@ -308,6 +313,11 @@ defmodule Protobuf.DSL do
   end
 
   defp cal_type(props), do: props
+
+  # The compiler always emits a json name, but we omit it in the DSL when it
+  # matches the name, to keep it uncluttered. Now we infer it back from name.
+  defp cal_json_name(%{json_name: _} = props, _name), do: props
+  defp cal_json_name(props, name), do: Map.put(props, :json_name, name)
 
   defp cal_default(%{default: default}, :proto3) when not is_nil(default) do
     raise Protobuf.InvalidError, message: "default can't be used in proto3"
