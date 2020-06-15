@@ -1,14 +1,7 @@
 defmodule Protobuf.JSON.Encode do
-  @moduledoc """
-  Internal JSON encoding API.
-  """
+  @moduledoc false
 
   alias Protobuf.MessageProps
-
-  @type encode_opt ::
-          {:use_proto_names, boolean}
-          | {:use_enum_numbers, boolean}
-          | {:emit_unpopulated, boolean}
 
   @compile {:inline,
             encode_field: 3,
@@ -19,7 +12,7 @@ defmodule Protobuf.JSON.Encode do
             safe_enum_key: 2}
 
   @doc false
-  @spec encode(struct, MessageProps.t(), [encode_opt]) :: map
+  @spec encode(struct, MessageProps.t(), keyword) :: map
   def encode(%_{} = struct, %MessageProps{} = message_props, opts \\ []) do
     regular = encode_regular_fields(struct, message_props, opts)
     oneofs = encode_oneof_fields(struct, message_props, opts)

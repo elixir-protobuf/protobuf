@@ -4,7 +4,7 @@ defmodule Protobuf.JSON do
 
   It follows Google's [specs](https://developers.google.com/protocol-buffers/docs/proto3#json)
   and reference implementation. Only `proto3` syntax is supported at the moment. Some features
-  as [well-known](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf)
+  such as [well-known](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf)
   types are not fully supported yet.
 
   ## Types
@@ -53,9 +53,10 @@ defmodule Protobuf.JSON do
       iex> Protobuf.JSON.encode(message)
       {:ok, "{\\"color\\":\\"RED\\",\\"topSpeed\\":125.3}"}
 
-  JSON keys are encoded as camelCase strings, specified by the `json_name` field options. So
-  make sure to recompile the `.proto` files in your project before working with JSON encoding.
-  You can set your own `json_name` too:
+  JSON keys are encoded as camelCase strings by default, specified by the `json_name` field
+  option. So make sure to *recompile the `.proto` files in your project* before working with
+  JSON encoding, the compiler will generate all the required `json_name` options. You can set
+  your own `json_name` for a particular field too:
 
       message GeoCoordinate {
         double latitude = 1 [ json_name = "lat" ];
@@ -66,12 +67,15 @@ defmodule Protobuf.JSON do
 
   alias Protobuf.JSON.{Encode, EncodeError}
 
-  @type encode_opt :: {:json_library, module} | Encode.encode_opt()
+  @type encode_opt ::
+          {:use_proto_names, boolean}
+          | {:use_enum_numbers, boolean}
+          | {:emit_unpopulated, boolean}
 
   @doc """
   Generates a JSON representation of the given protobuf `struct`.
 
-  Similar to `encode/1` except it will unwrap the error tuple and raise in case of errors.
+  Similar to `encode/2` except it will unwrap the error tuple and raise in case of errors.
 
   ## Examples
 
@@ -105,17 +109,17 @@ defmodule Protobuf.JSON do
 
   Suppose these are you proto modules:
 
-      defmodule Color do
-        use Protobuf, syntax: :proto3, enum: true
-        field :GREEN, 0
-        field :RED, 1
-      end
+      syntax = "proto3";
 
-      defmodule Car do
-        use Protobuf, syntax: :proto3
-        field :color, 1, type: Color, enum: true
-        field :top_speed, 2, type: :float, json_name: "topSpeed"
-      end
+      message Car {
+        enum Color {
+          GREEN = 0;
+          RED = 1;
+        }
+
+        Color color = 1;
+        float top_speed = 2;
+      }
 
   Encoding should be as simple as:
 
@@ -132,7 +136,7 @@ defmodule Protobuf.JSON do
           {:ok, String.t()} | {:error, EncodeError.t() | Exception.t()}
   def encode(%module{} = struct, opts \\ []) do
     with {:ok, props} <- get_props(module),
-         {:ok, json_library} <- get_json_library(opts) do
+         {:ok, json_library} <- load_json_library() do
       struct
       |> Encode.encode(props, opts)
       |> json_library.encode()
@@ -141,19 +145,17 @@ defmodule Protobuf.JSON do
 
   defp get_props(module) do
     case module.__message_props__() do
-      %{syntax: :proto3} = props ->
+      %Protobuf.MessageProps{syntax: :proto3} = props ->
         {:ok, props}
 
-      %{syntax: syntax} ->
+      %Protobuf.MessageProps{syntax: syntax} ->
         {:error, EncodeError.new({:unsupported_syntax, syntax})}
     end
   end
 
-  defp get_json_library(opts) do
-    json_library = Keyword.get(opts, :json_library, Jason)
-
-    if Code.ensure_loaded?(json_library) do
-      {:ok, json_library}
+  defp load_json_library do
+    if Code.ensure_loaded?(Jason) do
+      {:ok, Jason}
     else
       {:error, EncodeError.new(:no_json_lib)}
     end

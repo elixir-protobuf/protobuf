@@ -239,10 +239,10 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp field_options(f, syntax) do
-    enum = f.type == :TYPE_ENUM
+    enum? = f.type == :TYPE_ENUM
     default = default_value(f.type, f.default_value)
 
-    %{enum: enum, default: default}
+    %{enum: enum?, default: default}
     |> put_json_name(syntax, f)
     |> merge_field_options(f)
   end
