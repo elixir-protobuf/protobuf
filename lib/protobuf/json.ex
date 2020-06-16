@@ -86,7 +86,7 @@ defmodule Protobuf.JSON do
       ** (Protobuf.JSON.EncodeError) JSON encoding of 'proto2' syntax is unsupported, try proto3
   """
   @spec encode!(struct, [encode_opt]) :: String.t() | no_return
-  def encode!(%_{} = struct, opts \\ []) do
+  def encode!(struct, opts \\ []) do
     case encode(struct, opts) do
       {:ok, json} -> json
       {:error, error} -> raise error
@@ -134,30 +134,13 @@ defmodule Protobuf.JSON do
   """
   @spec encode(struct, [encode_opt]) ::
           {:ok, String.t()} | {:error, EncodeError.t() | Exception.t()}
-  def encode(%module{} = struct, opts \\ []) do
-    with {:ok, props} <- get_props(module),
-         {:ok, json_library} <- load_json_library() do
-      struct
-      |> Encode.encode(props, opts)
-      |> json_library.encode()
-    end
-  end
+  def encode(struct, opts \\ []) do
+    Code.ensure_loaded?(Jason) or raise EncodeError.new(:no_json_lib)
 
-  defp get_props(module) do
-    case module.__message_props__() do
-      %Protobuf.MessageProps{syntax: :proto3} = props ->
-        {:ok, props}
-
-      %Protobuf.MessageProps{syntax: syntax} ->
-        {:error, EncodeError.new({:unsupported_syntax, syntax})}
-    end
-  end
-
-  defp load_json_library do
-    if Code.ensure_loaded?(Jason) do
-      {:ok, Jason}
-    else
-      {:error, EncodeError.new(:no_json_lib)}
-    end
+    struct
+    |> Encode.encode(opts)
+    |> Jason.encode()
+  catch
+    error -> {:error, EncodeError.new(error)}
   end
 end

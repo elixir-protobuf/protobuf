@@ -3,8 +3,8 @@ defmodule Protobuf.JSON.EncodeTest do
 
   alias TestMsg.{Foo, Foo.Bar, Scalars, OneofProto3, Parent, Parent.Child}
 
-  def encode(%module{} = struct, opts \\ []) do
-    Protobuf.JSON.Encode.encode(struct, module.__message_props__(), opts)
+  def encode(struct, opts \\ []) do
+    Protobuf.JSON.Encode.encode(struct, opts)
   end
 
   test "encodes strings and booleans as they are" do
