@@ -72,6 +72,8 @@ defmodule Protobuf.JSON do
           | {:use_enum_numbers, boolean}
           | {:emit_unpopulated, boolean}
 
+  @type json_data :: %{optional(binary) => any}
+
   @doc """
   Generates a JSON representation of the given protobuf `struct`.
 
@@ -135,11 +137,32 @@ defmodule Protobuf.JSON do
   @spec encode(struct, [encode_opt]) ::
           {:ok, String.t()} | {:error, EncodeError.t() | Exception.t()}
   def encode(struct, opts \\ []) do
-    Code.ensure_loaded?(Jason) or raise EncodeError.new(:no_json_lib)
+    if Code.ensure_loaded?(Jason) do
+      with {:ok, map} <- to_encodable(struct, opts), do: Jason.encode(map)
+    else
+      {:error, EncodeError.new(:no_json_lib)}
+    end
+  end
 
-    struct
-    |> Encode.encode(opts)
-    |> Jason.encode()
+  @doc """
+  Generates a JSON-encodable map for the given protobuf `struct`.
+
+  Similar to `encode/2` except it will return an intermediate `map` representation.
+
+  ## Examples
+
+      iex> Car.new(color: :RED, top_speed: 125.3) |> Protobuf.JSON.to_encodable()
+      {:ok, %{"color" => :RED, "topSpeed" => 125.3}}
+
+      iex> Car.new(color: :GREEN) |> Protobuf.JSON.to_encodable()
+      {:ok, %{}}
+
+      iex> Car.new() |> Protobuf.JSON.to_encodable(emit_unpopulated: true)
+      {:ok, %{"color" => :GREEN, "topSpeed" => 0.0}}
+  """
+  @spec to_encodable(struct, [encode_opt]) :: {:ok, json_data} | {:error, EncodeError.t()}
+  def to_encodable(struct, opts \\ []) do
+    {:ok, Encode.to_encodable(struct, opts)}
   catch
     error -> {:error, EncodeError.new(error)}
   end

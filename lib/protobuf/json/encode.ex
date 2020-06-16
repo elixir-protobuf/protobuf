@@ -12,8 +12,8 @@ defmodule Protobuf.JSON.Encode do
             safe_enum_key: 2}
 
   @doc false
-  @spec encode(struct, keyword) :: map | {:error, EncodeError.t()}
-  def encode(struct, opts) do
+  @spec to_encodable(struct, keyword) :: map | {:error, EncodeError.t()}
+  def to_encodable(struct, opts) do
     message_props = Utils.message_props(struct)
     regular = encode_regular_fields(struct, message_props, opts)
     oneofs = encode_oneof_fields(struct, message_props, opts)
@@ -96,7 +96,7 @@ defmodule Protobuf.JSON.Encode do
   end
 
   defp encode_value(value, %{embedded?: true} = prop, opts) do
-    maybe_repeat(prop, value, &encode(&1, opts))
+    maybe_repeat(prop, value, &to_encodable(&1, opts))
   end
 
   defp encode_float(value) when is_float(value), do: value
