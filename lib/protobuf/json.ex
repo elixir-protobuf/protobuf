@@ -53,6 +53,12 @@ defmodule Protobuf.JSON do
       iex> Protobuf.JSON.encode(message)
       {:ok, "{\\"color\\":\\"RED\\",\\"topSpeed\\":125.3}"}
 
+  And go the other way around with `decode/1`:
+
+      iex> json = ~S|{"color":"RED","topSpeed":125.3}|
+      iex> Protobuf.JSON.decode(json, Car)
+      {:ok, %Car{color: :RED, top_speed: 125.3}}
+
   JSON keys are encoded as camelCase strings by default, specified by the `json_name` field
   option. So make sure to *recompile the `.proto` files in your project* before working with
   JSON encoding, the compiler will generate all the required `json_name` options. You can set
@@ -63,9 +69,23 @@ defmodule Protobuf.JSON do
         double longitude = 2 [ json_name = "long" ];
       }
 
+  ## Known issues and limitations
+
+  Currently, the `protoc` compiler won't check for field name collisions, this library either.
+  So make sure your field names will be unique when serialized to JSON. For instance, this
+  message definition will not encode correctly, it will emit just one of the two fields, and
+  the problem might go unoticed:
+
+      message CollidingFields {
+        int32 f1 = 1 [json_name = "sameName"];
+        float f2 = 2 [json_name = "sameName"];
+      }
+
+  According to the specification, when duplicated JSON keys are found in maps, the library
+  should raise a decoding error. It currently ignores duplicates and keeps the last occurence.
   """
 
-  alias Protobuf.JSON.{Encode, EncodeError}
+  alias Protobuf.JSON.{Encode, EncodeError, Decode, DecodeError}
 
   @type encode_opt ::
           {:use_proto_names, boolean}
@@ -165,5 +185,94 @@ defmodule Protobuf.JSON do
     {:ok, Encode.to_encodable(struct, opts)}
   catch
     error -> {:error, EncodeError.new(error)}
+  end
+
+  @doc """
+  Decodes a JSON `iodata` into a `module` Protobuf struct.
+
+  Similar to `decode!/2` except it will unwrap the error tuple and raise in case of errors.
+
+  ## Examples
+
+      iex> Protobuf.JSON.decode!("{}", Car)
+      %Car{color: :GREEN, top_speed: 0.0}
+
+      iex> ~S|{"color":"RED"}| |> Protobuf.JSON.decode!(Car)
+      %Car{color: :RED, top_speed: 0.0}
+
+      iex> ~S|{"color":"GREEN","topSpeed":80.0}| |> Protobuf.JSON.decode!(Car)
+      %Car{color: :GREEN, top_speed: 80.0}
+
+  """
+  @spec decode!(iodata, module) :: struct | no_return
+  def decode!(iodata, module) do
+    case decode(iodata, module) do
+      {:ok, json} -> json
+      {:error, error} -> raise error
+    end
+  end
+
+  @doc """
+  Decodes a JSON `iodata` into a `module` Protobuf struct.
+
+  ## Examples
+
+  Given these proto modules:
+
+      syntax = "proto3";
+
+      message Car {
+        enum Color {
+          GREEN = 0;
+          RED = 1;
+        }
+
+        Color color = 1;
+        float top_speed = 2;
+      }
+
+  You can build their structs from JSON like so:
+
+      iex> Protobuf.JSON.decode("{}", Car)
+      {:ok, %Car{color: :GREEN, top_speed: 0.0}}
+
+      iex> ~S|{"color":"RED"}| |> Protobuf.JSON.decode(Car)
+      {:ok, %Car{color: :RED, top_speed: 0.0}}
+
+      iex> ~S|{"color":"GREEN","topSpeed":80.0}| |> Protobuf.JSON.decode(Car)
+      {:ok, %Car{color: :GREEN, top_speed: 80.0}}
+  """
+  @spec decode(iodata, module) :: {:ok, struct} | {:error, DecodeError.t() | Exception.t()}
+  def decode(iodata, module) do
+    if Code.ensure_loaded?(Jason) do
+      with {:ok, json_data} <- Jason.decode(iodata),
+           do: from_decoded(json_data, module)
+    else
+      {:error, DecodeError.new(:no_json_lib)}
+    end
+  end
+
+  @doc """
+  Decodes a `json_data` map into a `module` Protobuf struct.
+
+  Similar to `decode/2` except it takes a JSON `map` representation of the data.
+
+  ## Examples
+
+      iex> Protobuf.JSON.from_decoded(%{}, Car)
+      {:ok, %Car{color: :GREEN, top_speed: 0.0}}
+
+      iex> Protobuf.JSON.from_decoded(%{"color" => "RED"}, Car)
+      {:ok, %Car{color: :RED, top_speed: 0.0}}
+
+      iex> Protobuf.JSON.from_decoded(%{"color" => "GREEN","topSpeed" => 80.0}, Car)
+      {:ok, %Car{color: :GREEN, top_speed: 80.0}}
+
+  """
+  @spec from_decoded(json_data, module) :: {:ok, struct} | {:error, DecodeError.t()}
+  def from_decoded(json_data, module) do
+    {:ok, Decode.from_json_data(json_data, module)}
+  catch
+    error -> {:error, DecodeError.new(error)}
   end
 end
