@@ -65,31 +65,6 @@ defmodule TestMsg do
     field :non_matched, 101, type: :string
   end
 
-  defmodule Scalars do
-    @moduledoc false
-    use Protobuf, syntax: :proto3
-
-    field :string, 1, type: :string
-    field :bool, 2, type: :bool
-
-    field :float, 3, type: :float
-    field :double, 4, type: :double
-
-    field :int32, 5, type: :int32
-    field :uint32, 6, type: :uint32
-    field :sint32, 7, type: :sint32
-    field :fixed32, 8, type: :fixed32
-    field :sfixed32, 9, type: :sfixed32
-
-    field :int64, 10, type: :int64
-    field :uint64, 11, type: :uint64
-    field :sint64, 12, type: :sint64
-    field :fixed64, 13, type: :fixed64
-    field :sfixed64, 14, type: :sfixed64
-
-    field :bytes, 15, type: :bytes
-  end
-
   defmodule Foo2 do
     @moduledoc false
     use Protobuf, syntax: :proto2
@@ -180,6 +155,77 @@ defmodule TestMsg do
 
     field :a, 1, required: true, type: Bar2.Enum, enum: true
     field :b, 2, optional: true, type: Bar2.Enum, enum: true
+  end
+
+  defmodule Scalars do
+    @moduledoc false
+    use Protobuf, syntax: :proto3
+
+    defstruct [
+      :string,
+      :bool,
+      :float,
+      :double,
+      :int32,
+      :uint32,
+      :sint32,
+      :fixed32,
+      :sfixed32,
+      :int64,
+      :uint64,
+      :sint64,
+      :fixed64,
+      :sfixed64,
+      :bytes
+    ]
+
+    field :string, 1, type: :string
+    field :bool, 2, type: :bool
+
+    field :float, 3, type: :float
+    field :double, 4, type: :double
+
+    field :int32, 5, type: :int32
+    field :uint32, 6, type: :uint32
+    field :sint32, 7, type: :sint32
+    field :fixed32, 8, type: :fixed32
+    field :sfixed32, 9, type: :sfixed32
+
+    field :int64, 10, type: :int64
+    field :uint64, 11, type: :uint64
+    field :sint64, 12, type: :sint64
+    field :fixed64, 13, type: :fixed64
+    field :sfixed64, 14, type: :sfixed64
+
+    field :bytes, 15, type: :bytes
+  end
+
+  defmodule MapIntToInt do
+    use Protobuf, map: true, syntax: :proto3
+
+    defstruct [:key, :value]
+
+    field :key, 1, type: :int32
+    field :value, 2, type: :int32
+  end
+
+  defmodule MapBoolToInt do
+    use Protobuf, map: true, syntax: :proto3
+
+    defstruct [:key, :value]
+
+    field :key, 1, type: :bool
+    field :value, 2, type: :int32
+  end
+
+  defmodule Maps do
+    use Protobuf, syntax: :proto3
+
+    defstruct [:mapii, :mapbi, :mapsi]
+
+    field :mapii, 1, repeated: true, map: true, type: MapIntToInt
+    field :mapbi, 2, repeated: true, map: true, type: MapBoolToInt
+    field :mapsi, 3, repeated: true, map: true, type: MapFoo
   end
 
   defmodule Ext.EnumFoo do

@@ -1,7 +1,7 @@
 defmodule Protobuf.JSON.EncodeTest do
   use ExUnit.Case, async: true
 
-  alias TestMsg.{Foo, Foo.Bar, Scalars, OneofProto3, Parent, Parent.Child}
+  alias TestMsg.{Foo, Foo.Bar, Maps, OneofProto3, Parent, Parent.Child, Scalars}
 
   def encode(struct, opts \\ []) do
     Protobuf.JSON.Encode.to_encodable(struct, opts)
@@ -113,7 +113,7 @@ defmodule Protobuf.JSON.EncodeTest do
     assert encode(message) == %{"a" => 1, "d" => "d", "other" => "other"}
   end
 
-  test "skips unset onef fields" do
+  test "skips unset oneof fields" do
     message = OneofProto3.new!(first: {:a, 1}, other: "other")
     assert encode(message) == %{"a" => 1, "other" => "other"}
   end
@@ -164,33 +164,15 @@ defmodule Protobuf.JSON.EncodeTest do
   end
 
   test "map keys are encoded according to their type and then converted to string" do
-    defmodule MapIntToInt do
-      use Protobuf, map: true, syntax: :proto3
-
-      field :key, 1, type: :int32
-      field :value, 2, type: :int32
-    end
-
-    defmodule MapBoolToInt do
-      use Protobuf, map: true, syntax: :proto3
-
-      field :key, 1, type: :bool
-      field :value, 2, type: :int32
-    end
-
-    defmodule Maps do
-      use Protobuf, syntax: :proto3
-
-      field :mapii, 1, type: MapIntToInt, map: true
-      field :mapbi, 2, type: MapBoolToInt, map: true
-    end
-
     mapii = %{-1 => -1, 0 => 0, 1 => 1, 0b11 => 3, 0xFF => 255}
-    message = Maps.new!(mapii: mapii, mapbi: %{true => 1, false => 0})
+    mapbi = %{true => 1, false => 0}
+    mapsi = %{"" => 0, "ok" => 999_999_999}
+    message = Maps.new!(mapii: mapii, mapbi: mapbi, mapsi: mapsi)
 
     encoded = %{
       "mapii" => %{"-1" => -1, "0" => 0, "1" => 1, "3" => 3, "255" => 255},
-      "mapbi" => %{"true" => 1, "false" => 0}
+      "mapbi" => %{"true" => 1, "false" => 0},
+      "mapsi" => %{"" => 0, "ok" => 999_999_999}
     }
 
     assert encode(message) == encoded
