@@ -24,8 +24,8 @@ install:
   - mix deps.get
   - mix eqc.install --mini --force
 before_script:
-  - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protoc-3.11.2-linux-x86_64.zip
-  - unzip protoc-3.11.2-linux-x86_64.zip
+  - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protoc-3.12.3-linux-x86_64.zip
+  - unzip protoc-3.12.3-linux-x86_64.zip
   - export PATH=$PATH:$PWD/bin/
 script:
   - mix test
