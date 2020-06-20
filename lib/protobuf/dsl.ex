@@ -70,7 +70,7 @@ defmodule Protobuf.DSL do
         unquote(Macro.escape(msg_props))
       end
 
-      unquote(def_enum_functions(msg_props))
+      unquote(def_enum_functions(msg_props, fields))
 
       if unquote(Macro.escape(extension_props)) != nil do
         def __protobuf_info__(:extension_props) do
@@ -98,22 +98,15 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}) do
+  defp def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}, fields) do
     if syntax == :proto3 do
-      found =
-        Enum.find(props, fn {_, %{fnum: fnum}} ->
-          fnum == 0
-        end)
-
-      if !found, do: raise("The first enum value must be zero in proto3")
+      unless props[0], do: raise("The first enum value must be zero in proto3")
     end
 
-    mapping =
-      Enum.reduce(props, %{}, fn {_, %{fnum: fnum, name_atom: name_atom}}, acc ->
-        Map.put(acc, name_atom, fnum)
-      end)
+    num_to_atom = for {fnum, %{name_atom: name_atom}} <- props, do: {fnum, name_atom}
+    atom_to_num = for {name_atom, fnum, _opts} <- fields, do: {name_atom, fnum}, into: %{}
 
-    Enum.map(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
+    Enum.map(atom_to_num, fn {name_atom, fnum} ->
       quote do
         def value(unquote(name_atom)), do: unquote(fnum)
       end
@@ -123,19 +116,19 @@ defmodule Protobuf.DSL do
           def value(v) when is_integer(v), do: v
         end
       ] ++
-      Enum.map(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
+      Enum.map(num_to_atom, fn {fnum, name_atom} ->
         quote do
           def key(unquote(fnum)), do: unquote(name_atom)
         end
       end) ++
       [
         quote do
-          def mapping(), do: unquote(Macro.escape(mapping))
+          def mapping(), do: unquote(Macro.escape(atom_to_num))
         end
       ]
   end
 
-  defp def_enum_functions(_), do: nil
+  defp def_enum_functions(_, _), do: nil
 
   defp def_extension_functions() do
     quote do
