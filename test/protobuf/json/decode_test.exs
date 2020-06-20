@@ -475,6 +475,16 @@ defmodule Protobuf.JSON.DecodeTest do
       data = %{"a" => 0, "d" => ""}
       decoded = OneofProto3.new(first: {:a, 0}, second: {:d, ""})
       assert decode(data, OneofProto3) == {:ok, decoded}
+
+      defmodule BooleanOneof do
+        use Protobuf, syntax: :proto3
+        oneof :zero, 0
+        field :bool, 1, type: :bool, oneof: 0
+      end
+
+      data = %{"bool" => false}
+      decoded = BooleanOneof.new(zero: {:bool, false})
+      assert decode(data, BooleanOneof) == {:ok, decoded}
     end
 
     test "multiple non-null fields set in a single oneof is invalid" do

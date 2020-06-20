@@ -60,7 +60,7 @@ defmodule Protobuf.JSON.Decode do
   defp decode_oneof_fields(data, %{field_props: field_props, oneof: oneofs}) do
     for {oneof, index} <- oneofs,
         {_field_num, %{oneof: ^index} = prop} <- field_props,
-        value = field_value(prop, data),
+        not is_nil(value = field_value(prop, data)),
         reduce: %{} do
       %{^oneof => _duplicated} -> throw({:duplicated_oneof, oneof})
       acc -> Map.put(acc, oneof, {prop.name_atom, decode_value(prop, value)})
