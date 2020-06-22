@@ -224,16 +224,14 @@ defmodule Protobuf.Protoc.Generator.Message do
     prefix = "." <> full_name
 
     Enum.reduce(desc.nested_type, %{}, fn desc, acc ->
-      cond do
-        desc.options && desc.options.map_entry ->
-          [k, v] = Enum.sort(desc.field, &(&1.number < &2.number))
+      if desc.options && desc.options.map_entry do
+        [k, v] = Enum.sort(desc.field, &(&1.number < &2.number))
 
-          pair = {{k.type, field_type_name(ctx, k)}, {v.type, field_type_name(ctx, v)}}
+        pair = {{k.type, field_type_name(ctx, k)}, {v.type, field_type_name(ctx, v)}}
 
-          Map.put(acc, Util.join_name([prefix, desc.name]), pair)
-
-        true ->
-          acc
+        Map.put(acc, Util.join_name([prefix, desc.name]), pair)
+      else
+        acc
       end
     end)
   end
