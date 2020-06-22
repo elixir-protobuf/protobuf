@@ -60,11 +60,14 @@ defmodule Protobuf.JSON.Decode do
   defp decode_oneof_fields(data, %{field_props: field_props, oneof: oneofs}) do
     for {oneof, index} <- oneofs,
         {_field_num, %{oneof: ^index} = prop} <- field_props,
-        not is_nil(value = field_value(prop, data)),
-        reduce: %{} do
-      %{^oneof => _duplicated} -> throw({:duplicated_oneof, oneof})
-      acc -> Map.put(acc, oneof, {prop.name_atom, decode_value(prop, value)})
+        not is_nil(value = field_value(prop, data)) do
+      {oneof, prop, value}
     end
+    |> Enum.reduce(%{}, fn {oneof, prop, value}, acc ->
+      Map.update(acc, oneof, {prop.name_atom, decode_value(prop, value)}, fn _ ->
+        throw({:duplicated_oneof, oneof})
+      end)
+    end)
   end
 
   defp field_value(%{json_name: json_key, name: name_key}, data) do
