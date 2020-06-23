@@ -140,16 +140,19 @@ defmodule Protobuf.DSLTest do
   end
 
   test "supports enum" do
-    msg_props = TestMsg.EnumFoo.__message_props__()
-    assert msg_props.enum? == true
+    assert %{enum?: true} = TestMsg.EnumFoo.__message_props__()
     assert TestMsg.EnumFoo.value(:A) == 1
     assert TestMsg.EnumFoo.value(:B) == 2
     assert TestMsg.EnumFoo.value(:C) == 4
+    assert TestMsg.EnumFoo.value(:D) == 4
+    assert TestMsg.EnumFoo.value(:E) == 4
+    assert_raise FunctionClauseError, fn -> TestMsg.EnumFoo.value(:F) end
     assert TestMsg.EnumFoo.value(1000) == 1000
     assert TestMsg.EnumFoo.key(1) == :A
     assert TestMsg.EnumFoo.key(2) == :B
     assert TestMsg.EnumFoo.key(4) == :C
-    assert TestMsg.EnumFoo.mapping() == %{UNKNOWN: 0, A: 1, B: 2, C: 4}
+    assert_raise FunctionClauseError, fn -> TestMsg.EnumFoo.key(5) end
+    assert TestMsg.EnumFoo.mapping() == %{UNKNOWN: 0, A: 1, B: 2, C: 4, D: 4, E: 4}
 
     assert %FieldProps{fnum: 11, type: {:enum, TestMsg.EnumFoo}, wire_type: 0} =
              Foo.__message_props__().field_props[11]

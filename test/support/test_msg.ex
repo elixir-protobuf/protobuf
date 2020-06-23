@@ -25,6 +25,8 @@ defmodule TestMsg do
     field :A, 1
     field :B, 2
     field :C, 4
+    field :D, 4
+    field :E, 4
   end
 
   defmodule MapFoo do
