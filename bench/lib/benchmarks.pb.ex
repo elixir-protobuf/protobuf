@@ -5,7 +5,7 @@ defmodule Benchmarks.BenchmarkDataset do
   @type t :: %__MODULE__{
           name: String.t(),
           message_name: String.t(),
-          payload: [String.t()]
+          payload: [binary]
         }
   defstruct [:name, :message_name, :payload]
 
