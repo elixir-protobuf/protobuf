@@ -1,10 +1,14 @@
 defmodule TestMsg do
+  @moduledoc false
+
   defmodule SyntaxOption do
+    @moduledoc false
     use Protobuf, syntax: :proto3
     defstruct []
   end
 
   defmodule Foo.Bar do
+    @moduledoc false
     use Protobuf, syntax: :proto3
 
     defstruct [:a, :b]
@@ -14,6 +18,7 @@ defmodule TestMsg do
   end
 
   defmodule EnumFoo do
+    @moduledoc false
     use Protobuf, enum: true, syntax: :proto3
 
     field :UNKNOWN, 0
@@ -23,6 +28,7 @@ defmodule TestMsg do
   end
 
   defmodule MapFoo do
+    @moduledoc false
     use Protobuf, map: true, syntax: :proto3
 
     defstruct [:key, :value]
@@ -31,6 +37,7 @@ defmodule TestMsg do
   end
 
   defmodule Foo do
+    @moduledoc false
     use Protobuf, syntax: :proto3
 
     defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :n, :o, :p, :non_matched]
@@ -57,6 +64,7 @@ defmodule TestMsg do
   end
 
   defmodule Scalars do
+    @moduledoc false
     use Protobuf, syntax: :proto3
 
     field :string, 1, type: :string
@@ -81,6 +89,7 @@ defmodule TestMsg do
   end
 
   defmodule Foo2 do
+    @moduledoc false
     use Protobuf, syntax: :proto2
 
     defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :non_matched]
@@ -102,6 +111,7 @@ defmodule TestMsg do
   end
 
   defmodule Oneof do
+    @moduledoc false
     use Protobuf
 
     defstruct [:first, :second, :other]
@@ -117,6 +127,7 @@ defmodule TestMsg do
   end
 
   defmodule OneofProto3 do
+    @moduledoc false
     use Protobuf, syntax: :proto3
 
     defstruct [:first, :second, :other]
@@ -132,18 +143,21 @@ defmodule TestMsg do
   end
 
   defmodule Parent do
+    @moduledoc false
     use Protobuf, syntax: :proto3
     defstruct [:child]
     field :child, 1, type: Parent.Child
   end
 
   defmodule Parent.Child do
+    @moduledoc false
     use Protobuf, syntax: :proto3
     defstruct [:parent]
     field :parent, 1, type: Parent
   end
 
   defmodule Link do
+    @moduledoc false
     use Protobuf, syntax: :proto3
     defstruct [:child, :value]
     field :child, 1, type: Link
@@ -159,6 +173,7 @@ defmodule TestMsg do
   end
 
   defmodule Bar2 do
+    @moduledoc false
     use Protobuf, syntax: :proto2
 
     field :a, 1, required: true, type: Bar2.Enum, enum: true

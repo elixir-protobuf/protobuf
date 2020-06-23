@@ -1,6 +1,7 @@
 # Modules mentioned in doctests
 
 defmodule Color do
+  @moduledoc false
   use Protobuf, syntax: :proto3, enum: true
 
   field :GREEN, 0
@@ -8,6 +9,7 @@ defmodule Color do
 end
 
 defmodule Car do
+  @moduledoc false
   use Protobuf, syntax: :proto3
 
   field :color, 1, type: Color, enum: true

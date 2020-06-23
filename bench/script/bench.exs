@@ -14,6 +14,7 @@ sets =
 Benchee.run(
   sets,
   time: 10,
+  memory_time: 2,
   formatters: [
     Benchee.Formatters.HTML,
     Benchee.Formatters.Console

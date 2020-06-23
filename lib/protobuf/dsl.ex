@@ -143,7 +143,7 @@ defmodule Protobuf.DSL do
         Protobuf.Extension.put(__MODULE__, struct, extension_mod, field, value)
       end
 
-      def put_extension(map = %{}, extension_mod, field, value) do
+      def put_extension(%{} = map, extension_mod, field, value) do
         Protobuf.Extension.put(__MODULE__, map, extension_mod, field, value)
       end
 
@@ -184,7 +184,7 @@ defmodule Protobuf.DSL do
     }
   end
 
-  defp gen_extension_props(extends = [_ | _]) do
+  defp gen_extension_props([_ | _] = extends) do
     extensions =
       Map.new(extends, fn {extendee, name_atom, fnum, opts} ->
         # Only proto2 has extensions
