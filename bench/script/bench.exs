@@ -1,6 +1,6 @@
 # TODO: group of proto2 is not supported
 sets =
-  Path.wildcard("**/dataset.google_message1*.pb")
+  Path.wildcard("**/dataset.google_message*.pb")
   |> Enum.map(&ProtoBench.load(&1))
   |> Enum.reduce(%{}, fn %{payload: [payload]} = s, acc ->
     mod = ProtoBench.mod_name(s.message_name)

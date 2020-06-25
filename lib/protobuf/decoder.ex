@@ -342,7 +342,6 @@ defmodule Protobuf.Decoder do
   end
 
   defp raw_handle_varint(:value, <<>>, result, val, []), do: Enum.reverse([val | result])
-  defp raw_handle_varint(:value, <<>>, result, _val, _groups), do: Enum.reverse(result)
 
   defp raw_handle_varint(:value, <<bin::bits>>, result, val, []) do
     raw_decode_varint(bin, [val | result], :key, [])
@@ -412,13 +411,19 @@ defmodule Protobuf.Decoder do
     raw_decode_varint(bin, result, :bytes_len, groups)
   end
 
-  def raw_decode_value(wire_32bits(), <<n::32, rest::bits>>, result, groups) do
-    result = if groups != [], do: result, else: [<<n::32>> | result]
+  def raw_decode_value(wire_32bits(), <<n::32, rest::bits>>, result, []) do
+    raw_decode_key(rest, [<<n::32>> | result], [])
+  end
+
+  def raw_decode_value(wire_32bits(), <<_n::32, rest::bits>>, result, groups) do
     raw_decode_key(rest, result, groups)
   end
 
-  def raw_decode_value(wire_64bits(), <<n::64, rest::bits>>, result, groups) do
-    result = if groups != [], do: result, else: [<<n::64>> | result]
+  def raw_decode_value(wire_64bits(), <<n::64, rest::bits>>, result, []) do
+    raw_decode_key(rest, [<<n::64>> | result], [])
+  end
+
+  def raw_decode_value(wire_64bits(), <<_n::64, rest::bits>>, result, groups) do
     raw_decode_key(rest, result, groups)
   end
 
