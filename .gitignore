@@ -26,3 +26,8 @@ protoc-gen-elixir
 *.eqc
 
 .elixir_ls
+
+# Generated artifacts for conformance testing.
+failing_tests.txt
+conformance/report/*
+conformance_client
