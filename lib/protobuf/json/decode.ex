@@ -38,7 +38,7 @@ defmodule Protobuf.JSON.Decode do
 
   @float_types [:float, :double]
 
-  def from_json_data(data, module) when is_map(data) do
+  def from_json_data(data, module) when is_map(data) and is_atom(module) do
     message_props = Utils.message_props(module)
     regular = decode_regular_fields(data, message_props)
     oneofs = decode_oneof_fields(data, message_props)
@@ -48,7 +48,7 @@ defmodule Protobuf.JSON.Decode do
     |> struct(oneofs)
   end
 
-  def from_json_data(data, _module), do: throw({:bad_message, data})
+  def from_json_data(data, module) when is_atom(module), do: throw({:bad_message, data})
 
   defp decode_regular_fields(data, %{field_props: field_props}) do
     for {_field_num, %{oneof: nil} = prop} <- field_props,
