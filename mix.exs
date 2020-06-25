@@ -17,7 +17,7 @@ defmodule Protobuf.Mixfile do
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test, "coveralls.html": :test],
       deps: deps(),
-      escript: escript(),
+      escript: escript(Mix.env()),
       description: @description,
       package: package(),
       docs: docs(),
@@ -32,6 +32,7 @@ defmodule Protobuf.Mixfile do
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support", "test/protobuf/protoc/proto_gen"]
+  defp elixirc_paths(:conformance), do: ["lib", "conformance"]
   defp elixirc_paths(_), do: ["lib"]
 
   defp deps do
@@ -45,9 +46,10 @@ defmodule Protobuf.Mixfile do
     ]
   end
 
-  defp escript do
-    [main_module: Protobuf.Protoc.CLI, name: "protoc-gen-elixir"]
-  end
+  defp escript(:conformance),
+    do: [main_module: Conformance.Protobuf.Runner, name: "conformance_client"]
+
+  defp escript(_), do: [main_module: Protobuf.Protoc.CLI, name: "protoc-gen-elixir"]
 
   defp package do
     [

@@ -29,3 +29,8 @@ protoc-gen-elixir
 
 # ExUnit's :tmp_dir tag.
 /tmp
+
+# Generated artifacts for conformance testing.
+failing_tests.txt
+conformance/report/*
+conformance_client
