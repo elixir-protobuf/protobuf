@@ -157,8 +157,8 @@ defmodule Protobuf.JSON do
   @spec encode(struct, [encode_opt]) ::
           {:ok, String.t()} | {:error, EncodeError.t() | Exception.t()}
   def encode(struct, opts \\ []) do
-    if Code.ensure_loaded?(Jason) do
-      with {:ok, map} <- to_encodable(struct, opts), do: Jason.encode(map)
+    if jason = load_jason() do
+      with {:ok, map} <- to_encodable(struct, opts), do: jason.encode(map)
     else
       {:error, EncodeError.new(:no_json_lib)}
     end
@@ -244,8 +244,8 @@ defmodule Protobuf.JSON do
   """
   @spec decode(iodata, module) :: {:ok, struct} | {:error, DecodeError.t() | Exception.t()}
   def decode(iodata, module) do
-    if Code.ensure_loaded?(Jason) do
-      with {:ok, json_data} <- Jason.decode(iodata),
+    if jason = load_jason() do
+      with {:ok, json_data} <- jason.decode(iodata),
            do: from_decoded(json_data, module)
     else
       {:error, DecodeError.new(:no_json_lib)}
@@ -275,4 +275,6 @@ defmodule Protobuf.JSON do
   catch
     error -> {:error, DecodeError.new(error)}
   end
+
+  defp load_jason, do: Code.ensure_loaded?(Jason) and Jason
 end
