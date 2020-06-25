@@ -154,6 +154,17 @@ defmodule Protobuf.DSLTest do
     assert_raise FunctionClauseError, fn -> TestMsg.EnumFoo.key(5) end
     assert TestMsg.EnumFoo.mapping() == %{UNKNOWN: 0, A: 1, B: 2, C: 4, D: 4, E: 4}
 
+    assert TestMsg.EnumFoo.__reverse_mapping__() == %{
+             0 => :UNKNOWN,
+             1 => :A,
+             2 => :B,
+             4 => :C,
+             "A" => :A,
+             "B" => :B,
+             "C" => :C,
+             "UNKNOWN" => :UNKNOWN
+           }
+
     assert %FieldProps{fnum: 11, type: {:enum, TestMsg.EnumFoo}, wire_type: 0} =
              Foo.__message_props__().field_props[11]
   end
