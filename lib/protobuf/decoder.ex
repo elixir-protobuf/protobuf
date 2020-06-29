@@ -11,15 +11,15 @@ defmodule Protobuf.Decoder do
 
   @spec decode(binary, atom) :: any
   def decode(data, module) do
-    kvs = raw_decode_key(data, [])
-    %{repeated_fields: repeated_fields} = msg_props = module.__message_props__()
+    kvs = raw_decode_key(data, [], [])
+    msg_props = module.__message_props__()
     struct = build_struct(kvs, msg_props, module.new())
-    reverse_repeated(struct, repeated_fields)
+    reverse_repeated(struct, msg_props.repeated_fields)
   end
 
   @doc false
   def decode_raw(data) do
-    raw_decode_key(data, [])
+    raw_decode_key(data, [], [])
   end
 
   @doc false
@@ -218,153 +218,216 @@ defmodule Protobuf.Decoder do
 
   @doc false
   def decode_varint(bin, type \\ :key) do
-    raw_decode_varint(bin, [], type)
+    raw_decode_varint(bin, [], type, [])
   end
 
-  defp raw_decode_key(<<>>, result), do: Enum.reverse(result)
-  defp raw_decode_key(<<bin::bits>>, result), do: raw_decode_varint(bin, result, :key)
+  defp raw_decode_key(<<>>, result, []), do: Enum.reverse(result)
 
-  defp raw_decode_varint(<<0::1, x::7, rest::bits>>, result, type) do
-    raw_handle_varint(type, rest, result, x)
+  defp raw_decode_key(<<bin::bits>>, result, groups) do
+    raw_decode_varint(bin, result, :key, groups)
   end
 
-  defp raw_decode_varint(<<1::1, x0::7, 0::1, x1::7, rest::bits>>, result, type) do
+  defp raw_decode_varint(<<0::1, x::7, rest::bits>>, result, type, groups) do
+    raw_handle_varint(type, rest, result, x, groups)
+  end
+
+  defp raw_decode_varint(<<1::1, x0::7, 0::1, x1::7, rest::bits>>, result, type, groups) do
     val = bsl(x1, 7) + x0
-    raw_handle_varint(type, rest, result, val)
+    raw_handle_varint(type, rest, result, val, groups)
   end
 
-  defp raw_decode_varint(<<1::1, x0::7, 1::1, x1::7, 0::1, x2::7, rest::bits>>, result, type) do
+  defp raw_decode_varint(
+         <<1::1, x0::7, 1::1, x1::7, 0::1, x2::7, rest::bits>>,
+         result,
+         type,
+         groups
+       ) do
     val = bsl(x2, 14) + bsl(x1, 7) + x0
-    raw_handle_varint(type, rest, result, val)
+    raw_handle_varint(type, rest, result, val, groups)
   end
 
   defp raw_decode_varint(
          <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 0::1, x3::7, rest::bits>>,
          result,
-         type
+         type,
+         groups
        ) do
     val = bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
-    raw_handle_varint(type, rest, result, val)
+    raw_handle_varint(type, rest, result, val, groups)
   end
 
   defp raw_decode_varint(
          <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 0::1, x4::7, rest::bits>>,
          result,
-         type
+         type,
+         groups
        ) do
     val = bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
-    raw_handle_varint(type, rest, result, val)
+    raw_handle_varint(type, rest, result, val, groups)
   end
 
   defp raw_decode_varint(
          <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 0::1, x5::7,
            rest::bits>>,
          result,
-         type
+         type,
+         groups
        ) do
     val = bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
-    raw_handle_varint(type, rest, result, val)
+    raw_handle_varint(type, rest, result, val, groups)
   end
 
   defp raw_decode_varint(
          <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 0::1,
            x6::7, rest::bits>>,
          result,
-         type
+         type,
+         groups
        ) do
     val = bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
-    raw_handle_varint(type, rest, result, val)
+    raw_handle_varint(type, rest, result, val, groups)
   end
 
   defp raw_decode_varint(
          <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 1::1,
            x6::7, 0::1, x7::7, rest::bits>>,
          result,
-         type
+         type,
+         groups
        ) do
     val =
       bsl(x7, 49) + bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) +
         bsl(x1, 7) + x0
 
-    raw_handle_varint(type, rest, result, val)
+    raw_handle_varint(type, rest, result, val, groups)
   end
 
   defp raw_decode_varint(
          <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 1::1,
            x6::7, 1::1, x7::7, 0::1, x8::7, rest::bits>>,
          result,
-         type
+         type,
+         groups
        ) do
     val =
       bsl(x8, 56) + bsl(x7, 49) + bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) +
         bsl(x2, 14) + bsl(x1, 7) + x0
 
-    raw_handle_varint(type, rest, result, val)
+    raw_handle_varint(type, rest, result, val, groups)
   end
 
   defp raw_decode_varint(
          <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 1::1,
            x6::7, 1::1, x7::7, 1::1, x8::7, 0::1, x9::7, rest::bits>>,
          result,
-         type
+         type,
+         groups
        ) do
     val =
       bsl(x9, 63) + bsl(x8, 56) + bsl(x7, 49) + bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) +
         bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
 
     val = band(val, @mask64)
-    raw_handle_varint(type, rest, result, val)
+    raw_handle_varint(type, rest, result, val, groups)
   end
 
-  defp raw_decode_varint(_, _, _) do
+  defp raw_decode_varint(_, _, _, _) do
     raise Protobuf.DecodeError, message: "cannot decode binary data"
   end
 
-  defp raw_handle_varint(:key, <<bin::bits>>, result, key) do
+  defp raw_handle_varint(:key, <<bin::bits>>, result, key, groups) do
     tag = bsr(key, 3)
     wire_type = band(key, 7)
-    raw_decode_value(wire_type, bin, [wire_type, tag | result])
+    raw_handle_key(wire_type, tag, groups, bin, result)
   end
 
-  defp raw_handle_varint(:value, <<>>, result, val) do
-    Enum.reverse([val | result])
+  defp raw_handle_varint(:value, <<>>, result, val, []), do: Enum.reverse([val | result])
+
+  defp raw_handle_varint(:value, <<bin::bits>>, result, val, []) do
+    raw_decode_varint(bin, [val | result], :key, [])
   end
 
-  defp raw_handle_varint(:value, <<bin::bits>>, result, val) do
-    raw_decode_varint(bin, [val | result], :key)
+  defp raw_handle_varint(:value, <<bin::bits>>, result, _val, groups) do
+    raw_decode_varint(bin, result, :key, groups)
   end
 
-  defp raw_handle_varint(:bytes_len, <<bin::bits>>, result, len) do
+  defp raw_handle_varint(:bytes_len, <<bin::bits>>, result, len, []) do
     <<bytes::bytes-size(len), rest::bits>> = bin
-    raw_decode_key(rest, [bytes | result])
+    raw_decode_key(rest, [bytes | result], [])
   end
 
-  defp raw_handle_varint(:packed, <<>>, result, val) do
-    [val | result]
+  defp raw_handle_varint(:bytes_len, <<bin::bits>>, result, len, groups) do
+    <<_bytes::bytes-size(len), rest::bits>> = bin
+    raw_decode_key(rest, result, groups)
   end
 
-  defp raw_handle_varint(:packed, <<bin::bits>>, result, val) do
-    raw_decode_varint(bin, [val | result], :packed)
+  defp raw_handle_varint(:packed, <<>>, result, val, []), do: [val | result]
+  defp raw_handle_varint(:packed, <<>>, result, _val, _groups), do: result
+
+  defp raw_handle_varint(:packed, <<bin::bits>>, result, val, []) do
+    raw_decode_varint(bin, [val | result], :packed, [])
+  end
+
+  defp raw_handle_varint(:packed, <<bin::bits>>, result, _val, groups) do
+    raw_decode_varint(bin, result, :packed, groups)
+  end
+
+  defp raw_handle_key(wire_start_group(), opening, groups, bin, result) do
+    raw_decode_key(bin, result, [opening | groups])
+  end
+
+  defp raw_handle_key(wire_end_group(), closing, [closing | groups], bin, result) do
+    raw_decode_key(bin, result, groups)
+  end
+
+  defp raw_handle_key(wire_end_group(), closing, [], _bin, _result) do
+    raise(Protobuf.DecodeError,
+      message: "closing group #{inspect(closing)} but no groups are open"
+    )
+  end
+
+  defp raw_handle_key(wire_end_group(), closing, [open | _], _bin, _result) do
+    raise(Protobuf.DecodeError,
+      message: "closing group #{inspect(closing)} but group #{inspect(open)} is open"
+    )
+  end
+
+  defp raw_handle_key(wire_type, tag, [], bin, result) do
+    raw_decode_value(wire_type, bin, [wire_type, tag | result], [])
+  end
+
+  defp raw_handle_key(wire_type, _tag, groups, bin, result) do
+    raw_decode_value(wire_type, bin, result, groups)
   end
 
   @doc false
-  def raw_decode_value(wire_varint(), <<bin::bits>>, result) do
-    raw_decode_varint(bin, result, :value)
+  def raw_decode_value(wire, bin, result, groups \\ [])
+
+  def raw_decode_value(wire_varint(), <<bin::bits>>, result, groups) do
+    raw_decode_varint(bin, result, :value, groups)
   end
 
-  def raw_decode_value(wire_delimited(), <<bin::bits>>, result) do
-    raw_decode_varint(bin, result, :bytes_len)
+  def raw_decode_value(wire_delimited(), <<bin::bits>>, result, groups) do
+    raw_decode_varint(bin, result, :bytes_len, groups)
   end
 
-  def raw_decode_value(wire_32bits(), <<n::32, rest::bits>>, result) do
-    raw_decode_key(rest, [<<n::32>> | result])
+  def raw_decode_value(wire_32bits(), <<n::32, rest::bits>>, result, []) do
+    raw_decode_key(rest, [<<n::32>> | result], [])
   end
 
-  def raw_decode_value(wire_64bits(), <<n::64, rest::bits>>, result) do
-    raw_decode_key(rest, [<<n::64>> | result])
+  def raw_decode_value(wire_32bits(), <<_n::32, rest::bits>>, result, groups) do
+    raw_decode_key(rest, result, groups)
   end
 
-  def raw_decode_value(_, _, _) do
+  def raw_decode_value(wire_64bits(), <<n::64, rest::bits>>, result, []) do
+    raw_decode_key(rest, [<<n::64>> | result], [])
+  end
+
+  def raw_decode_value(wire_64bits(), <<_n::64, rest::bits>>, result, groups) do
+    raw_decode_key(rest, result, groups)
+  end
+
+  def raw_decode_value(_, _, _, _) do
     raise Protobuf.DecodeError, message: "cannot decode binary data"
   end
 
@@ -391,7 +454,7 @@ defmodule Protobuf.Decoder do
   defp decode_packed(_wire_type, <<>>, acc), do: acc
 
   defp decode_packed(wire_varint(), <<bin::bits>>, _) do
-    raw_decode_varint(bin, [], :packed)
+    raw_decode_varint(bin, [], :packed, [])
   end
 
   defp decode_packed(wire_32bits(), <<n::32, rest::bits>>, result) do
