@@ -1,10 +1,14 @@
 defmodule ProtoBench do
   def load(pb_path) do
-    bin = File.read!(pb_path)
-    Benchmarks.BenchmarkDataset.decode(bin)
+    pb_path
+    |> File.read!()
+    |> Benchmarks.BenchmarkDataset.decode()
   end
 
-  def mod_name("benchmarks.proto2.GoogleMessage1"), do: Benchmarks.Proto2.GoogleMessage1
-  def mod_name("benchmarks.proto3.GoogleMessage1"), do: Benchmarks.Proto3.GoogleMessage1
-  def mod_name("benchmarks.proto2.GoogleMessage2"), do: Benchmarks.Proto2.GoogleMessage2
+  def mod_name(name) do
+    name
+    |> String.split(".")
+    |> Enum.map(&Macro.camelize/1)
+    |> Module.safe_concat()
+  end
 end
