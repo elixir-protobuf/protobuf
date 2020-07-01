@@ -6,6 +6,8 @@ tag = "#{String.trim(head)}-#{String.trim(hash)}"
 opts = fn name, inputs ->
   [
     inputs: inputs,
+    time: 20,
+    memory_time: 5,
     save: [path: "benchmarks/#{tag}-#{name}.benchee", tag: "#{tag}-#{name}"],
     formatters: [Benchee.Formatters.Console]
   ]
@@ -13,11 +15,10 @@ end
 
 benches =
   for path <- Path.wildcard("data/*.pb"),
-      # Skipping this particular message for now because it takes too long.
-      path != "data/dataset.google_message3_1.pb",
-      %{payload: [payload | _], name: name, message_name: mod_name} = ProtoBench.load(path),
-      module = ProtoBench.mod_name(mod_name),
-      do: {name, module, payload}
+      bench = ProtoBench.load(path),
+      payload = Enum.max_by(bench.payload, &byte_size/1),
+      module = ProtoBench.mod_name(bench.message_name),
+      do: {bench.name, module, payload}
 
 decode =
   for {name, module, payload} <- benches,
