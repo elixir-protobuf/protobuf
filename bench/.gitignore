@@ -2,3 +2,6 @@
 /deps
 erl_crash.dump
 benchmarks
+/data/datasets.tar.gz
+/data/dataset.google_message3*.pb
+/data/dataset.google_message4.pb

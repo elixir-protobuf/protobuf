@@ -144,6 +144,54 @@ Generated benchmarks/output/encode.html
 Opened report using open
 ```
 
+## Protobuf standard benchmarks
+
+Protobuf includes benchmarks for its official language implementations, such as Python, C++
+and Golang. They measure average encode and decode throughput for each built-in dataset. This
+is useful to check how Elixir matches up with them. You can read more about these benchmarks
+[here](https://github.com/protocolbuffers/protobuf/blob/master/benchmarks/README.md).
+
+To run the standard benchmarks for Elixir, download the datasets then run `standard_bench.exs`.
+
+```console
+$ mix run script/standard_bench.exs
+Message benchmarks.proto2.GoogleMessage1 of dataset file data/dataset.google_message1_proto2.pb
+Average throughput for parse_from_benchmark: 18.48 MB/s
+Average throughput for serialize_to_benchmark: 6.19 MB/s
+
+Message benchmarks.proto3.GoogleMessage1 of dataset file data/dataset.google_message1_proto3.pb
+Average throughput for parse_from_benchmark: 18.4 MB/s
+Average throughput for serialize_to_benchmark: 11.1 MB/s
+
+Message benchmarks.proto2.GoogleMessage2 of dataset file data/dataset.google_message2.pb
+Average throughput for parse_from_benchmark: 47.82 MB/s
+Average throughput for serialize_to_benchmark: 5656.75 MB/s
+
+Message benchmarks.google_message3.GoogleMessage3 of dataset file data/dataset.google_message3_1.pb
+Average throughput for parse_from_benchmark: 19.94 MB/s
+Average throughput for serialize_to_benchmark: 45.5 MB/s
+
+Message benchmarks.google_message3.GoogleMessage3 of dataset file data/dataset.google_message3_2.pb
+Average throughput for parse_from_benchmark: 110.65 MB/s
+Average throughput for serialize_to_benchmark: 164.96 MB/s
+
+Message benchmarks.google_message3.GoogleMessage3 of dataset file data/dataset.google_message3_3.pb
+Average throughput for parse_from_benchmark: 9.8 MB/s
+Average throughput for serialize_to_benchmark: 6.84 MB/s
+
+Message benchmarks.google_message3.GoogleMessage3 of dataset file data/dataset.google_message3_4.pb
+Average throughput for parse_from_benchmark: 5254.14 MB/s
+Average throughput for serialize_to_benchmark: 737.71 MB/s
+
+Message benchmarks.google_message3.GoogleMessage3 of dataset file data/dataset.google_message3_5.pb
+Average throughput for parse_from_benchmark: 3.77 MB/s
+Average throughput for serialize_to_benchmark: 3.29 MB/s
+
+Message benchmarks.google_message4.GoogleMessage4 of dataset file data/dataset.google_message4.pb
+Average throughput for parse_from_benchmark: 20.06 MB/s
+Average throughput for serialize_to_benchmark: 32.46 MB/s
+```
+
 ## Contributing
 
 If you have trouble using the downloaded datasets, they might have been upgraded and their
