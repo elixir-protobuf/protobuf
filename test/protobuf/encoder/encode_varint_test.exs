@@ -43,7 +43,7 @@ defmodule Protobuf.Encoder.DecodeVarintTest do
              <<255, 255, 255, 255, 255, 255, 255, 255, 255, 1>>
   end
 
-  def encode(varint) do
+  defp encode(varint) do
     varint
     |> Encoder.encode_varint()
     |> IO.iodata_to_binary()

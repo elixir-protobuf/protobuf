@@ -218,7 +218,7 @@ defmodule Protobuf.Encoder.DecodeTypeTest do
     end
   end
 
-  def encode(type, value) do
+  defp encode(type, value) do
     type
     |> Encoder.encode_type(value)
     |> IO.iodata_to_binary()
