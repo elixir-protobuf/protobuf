@@ -100,7 +100,7 @@ defmodule Protobuf.Encoder do
   @spec encode_field(atom, any, FieldProps.t()) :: iodata
   defp encode_field(:normal, val, %{encoded_fnum: fnum, type: type, repeated?: is_repeated}) do
     repeated_or_not(val, is_repeated, fn v ->
-      [fnum, encode_type(type, v)]
+      [fnum | encode_type(type, v)]
     end)
   end
 
@@ -114,16 +114,16 @@ defmodule Protobuf.Encoder do
     repeated_or_not(val, repeated, fn v ->
       v = if is_map, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
       # so that oneof {:atom, v} can be encoded
-      encoded = encode(type, v, [])
-      byte_size = byte_size(encoded)
-      [fnum, encode_varint(byte_size), encoded]
+      encoded = encode(type, v, iolist: true)
+      byte_size = IO.iodata_length(encoded)
+      [fnum | encode_varint(byte_size)] ++ encoded
     end)
   end
 
   defp encode_field(:packed, val, %{type: type, encoded_fnum: fnum}) do
     encoded = Enum.map(val, fn v -> encode_type(type, v) end)
     byte_size = IO.iodata_length(encoded)
-    [fnum, encode_varint(byte_size), encoded]
+    [fnum | encode_varint(byte_size)] ++ encoded
   end
 
   @spec class_field(map) :: atom
@@ -140,12 +140,13 @@ defmodule Protobuf.Encoder do
   end
 
   @doc false
-  @spec encode_fnum(integer, integer) :: iodata
+  @spec encode_fnum(integer, integer) :: binary
   def encode_fnum(fnum, wire_type) do
     fnum
     |> bsl(3)
     |> bor(wire_type)
-    |> encode_varint
+    |> encode_varint()
+    |> IO.iodata_to_binary()
   end
 
   @doc false
@@ -162,19 +163,18 @@ defmodule Protobuf.Encoder do
   def encode_type(:bool, false), do: encode_varint(0)
   def encode_type({:enum, type}, n) when is_atom(n), do: n |> type.value() |> encode_varint()
   def encode_type({:enum, _}, n), do: encode_varint(n)
-  def encode_type(:float, :infinity), do: <<0, 0, 128, 127>>
-  def encode_type(:float, :negative_infinity), do: <<0, 0, 128, 255>>
-  def encode_type(:float, :nan), do: <<0, 0, 192, 127>>
+  def encode_type(:float, :infinity), do: [0, 0, 128, 127]
+  def encode_type(:float, :negative_infinity), do: [0, 0, 128, 255]
+  def encode_type(:float, :nan), do: [0, 0, 192, 127]
   def encode_type(:float, n), do: <<n::32-float-little>>
-  def encode_type(:double, :infinity), do: <<0, 0, 0, 0, 0, 0, 240, 127>>
-  def encode_type(:double, :negative_infinity), do: <<0, 0, 0, 0, 0, 0, 240, 255>>
-  def encode_type(:double, :nan), do: <<1, 0, 0, 0, 0, 0, 248, 127>>
+  def encode_type(:double, :infinity), do: [0, 0, 0, 0, 0, 0, 240, 127]
+  def encode_type(:double, :negative_infinity), do: [0, 0, 0, 0, 0, 0, 240, 255]
+  def encode_type(:double, :nan), do: [1, 0, 0, 0, 0, 0, 248, 127]
   def encode_type(:double, n), do: <<n::64-float-little>>
 
   def encode_type(:bytes, n) do
-    bin = IO.iodata_to_binary(n)
-    len = bin |> byte_size |> encode_varint
-    <<len::binary, bin::binary>>
+    len = n |> IO.iodata_length() |> encode_varint()
+    len ++ n
   end
 
   def encode_type(:sint32, n) when n >= -0x80000000 and n <= 0x7FFFFFFF,
@@ -202,18 +202,18 @@ defmodule Protobuf.Encoder do
   defp encode_zigzag(val) when val < 0, do: val * -2 - 1
 
   @doc false
-  @spec encode_varint(integer) :: iodata
+  @spec encode_varint(integer) :: iolist
   def encode_varint(n) when n < 0 do
     <<n::64-unsigned-native>> = <<n::64-signed-native>>
     encode_varint(n)
   end
 
   def encode_varint(n) when n <= 127 do
-    <<n>>
+    [n]
   end
 
   def encode_varint(n) do
-    [<<1::1, band(n, 127)::7>> | encode_varint(bsr(n, 7))] |> IO.iodata_to_binary()
+    [<<1::1, band(n, 127)::7>> | encode_varint(bsr(n, 7))]
   end
 
   @doc false
