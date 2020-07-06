@@ -1,6 +1,6 @@
 defmodule Protobuf.Encoder do
   @moduledoc false
-  import Protobuf.WireTypes
+  import Protobuf.Wire.Types
   import Bitwise, only: [bsl: 2, bor: 2]
 
   alias Protobuf.{FieldProps, MessageProps, Wire, Wire.Varint}
