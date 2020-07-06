@@ -140,7 +140,7 @@ defmodule Protobuf.DSL do
      ]
   end
 
-  defp def_enum_functions(_, _), do: nil
+  defp def_enum_functions(_, _, _), do: nil
 
   defp def_extension_functions() do
     quote do

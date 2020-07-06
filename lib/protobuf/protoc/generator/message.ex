@@ -299,7 +299,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     end
   end
 
-  defp merge_field_options(opts, _ctx, %{options: nil}), do: opts
+  defp merge_field_options(_ctx, opts, %{options: nil}), do: opts
 
   defp merge_field_options(%{custom_field_options?: true}, opts, f) do
     custom_options =
