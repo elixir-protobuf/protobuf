@@ -3,11 +3,14 @@ defimpl Extype.Protocol, for: Google.Protobuf.Timestamp do
   Implement DateTime and NaiveDateTime casting for Google Timestamp.
   """
 
-  def validate_and_to_atom_extype!(Google.Protobuf.Timestamp, "NaiveDateTime.t()"), do: :naivedatetime
+  def validate_and_to_atom_extype!(Google.Protobuf.Timestamp, "NaiveDateTime.t()"),
+    do: :naivedatetime
+
   def validate_and_to_atom_extype!(Google.Protobuf.Timestamp, "DateTime.t()"), do: :datetime
+
   def validate_and_to_atom_extype!(type, extype) do
     raise "Invalid extype pairing, #{extype} not compatible with #{type}. " <>
-      "Supported types are DateTime.t() or NaiveDateTime.t()"
+            "Supported types are DateTime.t() or NaiveDateTime.t()"
   end
 
   def type_default(_type, _extype), do: nil

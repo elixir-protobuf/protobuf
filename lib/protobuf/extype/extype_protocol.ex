@@ -17,7 +17,7 @@ defprotocol Extype.Protocol do
   """
   @type value :: struct | any
 
-  @spec validate_and_to_atom_extype!(type, option :: String.t) :: atom
+  @spec validate_and_to_atom_extype!(type, option :: String.t()) :: atom
   def validate_and_to_atom_extype!(type, option)
 
   @spec type_default(type, extype) :: any
@@ -36,9 +36,9 @@ end
 defmodule Extype do
   @moduledoc "Extype"
 
-  @type extype :: Extype.Protocol.extype
-  @type type :: Extype.Protocol.type
-  @type value :: Extype.Protocol.value
+  @type extype :: Extype.Protocol.extype()
+  @type type :: Extype.Protocol.type()
+  @type value :: Extype.Protocol.value()
 
   # A serious trick
   def get_mod(type) when is_atom(type) do
@@ -53,6 +53,7 @@ defmodule Extype do
   @spec type_to_spec(type :: String.t(), repeated :: boolean, extype) :: String.t()
   def type_to_spec(_type, repeated, extype) do
     extype = pad_parens(extype)
+
     if repeated do
       "[#{extype}]"
     else
@@ -60,6 +61,7 @@ defmodule Extype do
     end
   end
 
+  def skip?(_type, nil, _extype), do: true
   def skip?(_type, _value, _extype), do: false
 
   @spec type_default(type, extype) :: any
@@ -82,7 +84,7 @@ defmodule Extype do
   def encode_type(type, v, extype) do
     mod = get_mod(type)
     extype = pad_parens(extype)
-    atom_extype  = mod.validate_and_to_atom_extype!(type, extype)
+    atom_extype = mod.validate_and_to_atom_extype!(type, extype)
     mod.encode_type(type, v, atom_extype)
   end
 

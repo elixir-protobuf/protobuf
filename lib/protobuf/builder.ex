@@ -16,6 +16,7 @@ defmodule Protobuf.Builder do
   def field_default(_, %{options: options} = props) when not is_nil(options) do
     Protobuf.FieldOptionsProcessor.type_default(props.type, options)
   end
+
   def field_default(_, %{default: default}) when not is_nil(default), do: default
   def field_default(_, %{repeated?: true}), do: []
   def field_default(_, %{map?: true}), do: %{}
@@ -29,10 +30,12 @@ defmodule Protobuf.Builder do
   def type_default(:sint32), do: 0
   def type_default(:sint64), do: 0
   def type_default(:bool), do: false
+
   def type_default({:enum, type}) do
     Code.ensure_loaded(type)
     type.key(0)
   end
+
   def type_default(:fixed32), do: 0
   def type_default(:sfixed32), do: 0
   def type_default(:fixed64), do: 0
@@ -77,11 +80,21 @@ defmodule Protobuf.Builder do
           v =
             cond do
               not is_nil(f_props.options) and f_props.repeated? ->
-                Enum.map(v, fn i -> Protobuf.FieldOptionsProcessor.new(f_props.type, i, f_props.options) end)
-              not is_nil(f_props.options) -> Protobuf.FieldOptionsProcessor.new(f_props.type, v, f_props.options)
-              f_props.embedded? and f_props.repeated? -> Enum.map(v, fn i -> f_props.type.new(i) end)
-              f_props.embedded? -> f_props.type.new(v)
-              true -> v
+                Enum.map(v, fn i ->
+                  Protobuf.FieldOptionsProcessor.new(f_props.type, i, f_props.options)
+                end)
+
+              not is_nil(f_props.options) ->
+                Protobuf.FieldOptionsProcessor.new(f_props.type, v, f_props.options)
+
+              f_props.embedded? and f_props.repeated? ->
+                Enum.map(v, fn i -> f_props.type.new(i) end)
+
+              f_props.embedded? ->
+                f_props.type.new(v)
+
+              true ->
+                v
             end
 
           Map.put(acc, k, v)

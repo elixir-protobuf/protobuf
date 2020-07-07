@@ -164,7 +164,8 @@ defmodule Protobuf.Decoder do
 
             Map.put(struct, key, val)
           else
-            val = if is_nil(options) do
+            val =
+              if is_nil(options) do
                 decode_type_m(type, key, val)
               else
                 Protobuf.FieldOptionsProcessor.decode_type(val, type, options)

@@ -52,7 +52,7 @@ defmodule Protobuf.DSL do
 
     default_struct =
       if syntax == :proto2 and extensions do
-          Map.put(default_struct, :__pb_extensions__, %{})
+        Map.put(default_struct, :__pb_extensions__, %{})
       else
         default_struct
       end
@@ -110,7 +110,8 @@ defmodule Protobuf.DSL do
       |> Kernel.<>("_")
       |> String.upcase()
 
-    is_prefixed? = Enum.all?(props, fn {_, %{name: name}} -> String.starts_with?(name, prefix) end)
+    is_prefixed? =
+      Enum.all?(props, fn {_, %{name: name}} -> String.starts_with?(name, prefix) end)
 
     Enum.map(atom_to_num, fn {name_atom, fnum} ->
       quote do
@@ -137,7 +138,7 @@ defmodule Protobuf.DSL do
         quote do
           def prefix(), do: unquote(if is_prefixed?, do: prefix, else: "")
         end
-     ]
+      ]
   end
 
   defp def_enum_functions(_, _, _), do: nil

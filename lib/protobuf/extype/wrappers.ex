@@ -1,4 +1,5 @@
-defimpl Extype.Protocol, for: [
+defimpl Extype.Protocol,
+  for: [
     Google.Protobuf.DoubleValue,
     Google.Protobuf.FloatValue,
     Google.Protobuf.Int64Value,
@@ -9,7 +10,6 @@ defimpl Extype.Protocol, for: [
     Google.Protobuf.StringValue,
     Google.Protobuf.BytesValue
   ] do
-
   @moduledoc """
     Implement value unwrapping for Google Wrappers.
   """
@@ -27,6 +27,7 @@ defimpl Extype.Protocol, for: [
   def validate_and_to_atom_extype!(Google.Protobuf.BoolValue, "boolean"), do: :bool
   def validate_and_to_atom_extype!(Google.Protobuf.StringValue, "String.t()"), do: :string
   def validate_and_to_atom_extype!(Google.Protobuf.BytesValue, "String.t()"), do: :bytes
+
   def validate_and_to_atom_extype!(type, extype) do
     raise "Invalid extype pairing, #{extype} not compatible with #{type}"
   end
