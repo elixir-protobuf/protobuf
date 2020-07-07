@@ -86,18 +86,34 @@ defmodule Ext.MyMessage do
   field :f7, 7, type: Google.Protobuf.BoolValue, options: [extype: "boolean"]
   field :f8, 8, type: Google.Protobuf.StringValue, options: [extype: "String.t"]
   field :f9, 9, type: Google.Protobuf.BytesValue, options: [extype: "String.t()"]
-  field :no_extype, 10, type: Google.Protobuf.StringValue
+  field :no_extype, 10, type: Google.Protobuf.StringValue, json_name: "noExtype"
 
   field :repeated_field, 11,
     repeated: true,
     type: Google.Protobuf.StringValue,
+    json_name: "repeatedField",
     options: [extype: "String.t"]
 
   field :normal1, 12, type: :uint64
   field :normal2, 13, type: :string
   field :nested, 14, type: Ext.Nested
   field :color, 15, type: Ext.TrafficLightColor, enum: true
-  field :color_lc, 16, type: Ext.TrafficLightColor, enum: true, options: [enum: "lowercase"]
-  field :color_depr, 17, type: Ext.TrafficLightColor, enum: true, options: [enum: "deprefix"]
-  field :color_atom, 18, type: Ext.TrafficLightColor, enum: true, options: [enum: "atomize"]
+
+  field :color_lc, 16,
+    type: Ext.TrafficLightColor,
+    enum: true,
+    json_name: "colorLc",
+    options: [enum: "lowercase"]
+
+  field :color_depr, 17,
+    type: Ext.TrafficLightColor,
+    enum: true,
+    json_name: "colorDepr",
+    options: [enum: "deprefix"]
+
+  field :color_atom, 18,
+    type: Ext.TrafficLightColor,
+    enum: true,
+    json_name: "colorAtom",
+    options: [enum: "atomize"]
 end

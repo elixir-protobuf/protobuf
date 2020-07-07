@@ -54,12 +54,15 @@ defmodule Protobuf.Protoc.IntegrationTest do
 
   test "extensions" do
     assert "hello" == Protobuf.Protoc.ExtTest.Foo.new(a: "hello").a
-    dual = Protobuf.Protoc.ExtTest.Dual.new(a: "s1", b: Google.Protobuf.StringValue.new(value: "s2"))
+
+    dual =
+      Protobuf.Protoc.ExtTest.Dual.new(a: "s1", b: Google.Protobuf.StringValue.new(value: "s2"))
 
     assert dual.a == "s1"
     assert dual.b.value == "s2"
 
-    assert %{options: [extype: "String.t"]} = Protobuf.Protoc.ExtTest.Dual.__message_props__().field_props[1]
+    assert %{options: [extype: "String.t"]} =
+             Protobuf.Protoc.ExtTest.Dual.__message_props__().field_props[1]
 
     output = Protobuf.Protoc.ExtTest.Dual.encode(dual)
 
@@ -69,26 +72,44 @@ defmodule Protobuf.Protoc.IntegrationTest do
   test "extension use case 2" do
     dt = DateTime.from_unix!(1_464_096_368, :microsecond)
 
-    msg = Ext.MyMessage.new(
-      f1: 1.0,
-      f2: 2.0,
-      f3: 3,
-      f4: 4,
-      f5: 5,
-      f6: 6,
-      f7: true,
-      f8: "8",
-      f9: "9",
-      nested: Ext.Nested.new(my_timestamp: {:dt, dt}),
-      no_extype: %Google.Protobuf.StringValue{value: "none"},
-      normal1: 1234,
-      normal2: "hello",
-      repeated_field: ["r1", "r2"],
-      color: :TRAFFIC_LIGHT_COLOR_UNSET,
-      color_lc: :traffic_light_color_invalid,
-      color_depr: :GREEN,
-      color_atom: :red
-    )
+    msg =
+      Ext.MyMessage.new(
+        f1: 1.0,
+        f2: 2.0,
+        f3: 3,
+        f4: 4,
+        f5: 5,
+        f6: 6,
+        f7: true,
+        f8: "8",
+        f9: "9",
+        nested: Ext.Nested.new(my_timestamp: {:dt, dt}),
+        no_extype: %Google.Protobuf.StringValue{value: "none"},
+        normal1: 1234,
+        normal2: "hello",
+        repeated_field: ["r1", "r2"],
+        color: :TRAFFIC_LIGHT_COLOR_UNSET,
+        color_lc: :traffic_light_color_invalid,
+        color_depr: :GREEN,
+        color_atom: :red
+      )
+
+    assert msg |> Ext.MyMessage.encode() |> Ext.MyMessage.decode() == msg
+  end
+
+  test "extension use case empty values" do
+    msg =
+      Ext.MyMessage.new(
+        f1: 0.0,
+        f3: 0,
+        f7: false,
+        f8: "",
+        nested: Ext.Nested.new(),
+        no_extype: %Google.Protobuf.StringValue{value: ""},
+        normal1: 0,
+        normal2: "",
+        repeated_field: []
+      )
 
     assert msg |> Ext.MyMessage.encode() |> Ext.MyMessage.decode() == msg
   end
