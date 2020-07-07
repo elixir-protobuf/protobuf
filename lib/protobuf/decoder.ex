@@ -361,15 +361,10 @@ defmodule Protobuf.Decoder do
     raw_decode_key(rest, result, groups)
   end
 
-  defp raw_handle_varint(:packed, <<>>, result, val, []), do: [val | result]
-  defp raw_handle_varint(:packed, <<>>, result, _val, _groups), do: result
+  defp raw_handle_varint(:packed, <<>>, result, val, _groups), do: [val | result]
 
-  defp raw_handle_varint(:packed, <<bin::bits>>, result, val, []) do
-    raw_decode_varint(bin, [val | result], :packed, [])
-  end
-
-  defp raw_handle_varint(:packed, <<bin::bits>>, result, _val, groups) do
-    raw_decode_varint(bin, result, :packed, groups)
+  defp raw_handle_varint(:packed, <<bin::bits>>, result, val, groups) do
+    raw_decode_varint(bin, [val | result], :packed, groups)
   end
 
   defp raw_handle_key(wire_start_group(), opening, groups, <<bin::bits>>, result) do
