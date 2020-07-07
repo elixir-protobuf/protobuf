@@ -157,9 +157,14 @@ $ mix eqc.install --mini
 
 ## Sponsors
 
-This project is being sponsored by [Tubi](https://tubitv.com/). Thank you!
+* [Tubi](https://tubitv.com/)
 
 <img src="https://user-images.githubusercontent.com/1253659/37473536-4db44048-28a9-11e8-90d5-f8a2f5a8d53c.jpg" height="80">
+
+* [Community](https://www.community.com)
+
+<img src="https://user-images.githubusercontent.com/1253659/84641850-3f163d80-af2e-11ea-98a2-cfb854180222.png" height="80">
+
 
 ## Acknowledgements
 
