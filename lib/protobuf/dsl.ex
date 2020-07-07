@@ -62,7 +62,7 @@ defmodule Protobuf.DSL do
         unquote(Macro.escape(msg_props))
       end
 
-      unquote(def_enum_functions(msg_props, fields, env.module))
+      unquote(def_enum_functions(msg_props, env.module))
 
       if unquote(Macro.escape(extension_props)) != nil do
         def __protobuf_info__(:extension_props) do
@@ -90,19 +90,20 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}, fields, module) do
+  defp def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}, module) do
     if syntax == :proto3 do
-      unless props[0], do: raise("The first enum value must be zero in proto3")
+      found =
+        Enum.find(props, fn {_, %{fnum: fnum}} ->
+          fnum == 0
+        end)
+
+      if !found, do: raise("The first enum value must be zero in proto3")
     end
 
-    num_to_atom = for {fnum, %{name_atom: name_atom}} <- props, do: {fnum, name_atom}
-    atom_to_num = for {name_atom, fnum, _opts} <- fields, do: {name_atom, fnum}, into: %{}
-
-    string_or_num_to_atom =
-      for {fnum, %{name: name, name_atom: name_atom}} <- props,
-          key <- [fnum, name],
-          do: {key, name_atom},
-          into: %{}
+    mapping =
+      Enum.reduce(props, %{}, fn {_, %{fnum: fnum, name_atom: name_atom}}, acc ->
+        Map.put(acc, name_atom, fnum)
+      end)
 
     prefix =
       module
@@ -112,7 +113,7 @@ defmodule Protobuf.DSL do
 
     is_prefixed? = Enum.all?(props, fn {_, %{name: name}} -> String.starts_with?(name, prefix) end)
 
-    Enum.map(atom_to_num, fn {name_atom, fnum} ->
+    Enum.map(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
       quote do
         def value(unquote(name_atom)), do: unquote(fnum)
       end
@@ -122,17 +123,14 @@ defmodule Protobuf.DSL do
           def value(v) when is_integer(v), do: v
         end
       ] ++
-      Enum.map(num_to_atom, fn {fnum, name_atom} ->
+      Enum.map(props, fn {_, %{fnum: fnum, name_atom: name_atom}} ->
         quote do
           def key(unquote(fnum)), do: unquote(name_atom)
         end
       end) ++
       [
         quote do
-          def mapping(), do: unquote(Macro.escape(atom_to_num))
-        end,
-        quote do
-          def __reverse_mapping__(), do: unquote(Macro.escape(string_or_num_to_atom))
+          def mapping(), do: unquote(Macro.escape(mapping))
         end,
         quote do
           def prefix(), do: unquote(if is_prefixed?, do: prefix, else: "")
@@ -140,7 +138,7 @@ defmodule Protobuf.DSL do
      ]
   end
 
-  defp def_enum_functions(_, _, _), do: nil
+  defp def_enum_functions(_, _), do: nil
 
   defp def_extension_functions() do
     quote do
@@ -148,7 +146,7 @@ defmodule Protobuf.DSL do
         Protobuf.Extension.put(__MODULE__, struct, extension_mod, field, value)
       end
 
-      def put_extension(%{} = map, extension_mod, field, value) do
+      def put_extension(map = %{}, extension_mod, field, value) do
         Protobuf.Extension.put(__MODULE__, map, extension_mod, field, value)
       end
 
@@ -189,7 +187,7 @@ defmodule Protobuf.DSL do
     }
   end
 
-  defp gen_extension_props([_ | _] = extends) do
+  defp gen_extension_props(extends = [_ | _]) do
     extensions =
       Map.new(extends, fn {extendee, name_atom, fnum, opts} ->
         # Only proto2 has extensions
@@ -253,7 +251,6 @@ defmodule Protobuf.DSL do
       |> parse_field_opts(opts_map)
       |> cal_label(syntax)
       |> cal_type()
-      |> cal_json_name(props.name)
       |> cal_default(syntax)
       |> cal_embedded()
       |> cal_packed(syntax)
@@ -288,10 +285,6 @@ defmodule Protobuf.DSL do
     parse_field_opts(t, Map.put(acc, :oneof, oneof))
   end
 
-  defp parse_field_opts([{:json_name, json_name} | t], acc) do
-    parse_field_opts(t, Map.put(acc, :json_name, json_name))
-  end
-
   # skip unknown option
   defp parse_field_opts([{_, _} | t], acc) do
     parse_field_opts(t, acc)
@@ -318,11 +311,6 @@ defmodule Protobuf.DSL do
   end
 
   defp cal_type(props), do: props
-
-  # The compiler always emits a json name, but we omit it in the DSL when it
-  # matches the name, to keep it uncluttered. Now we infer it back from name.
-  defp cal_json_name(%{json_name: _} = props, _name), do: props
-  defp cal_json_name(props, name), do: Map.put(props, :json_name, name)
 
   defp cal_default(%{default: default}, :proto3) when not is_nil(default) do
     raise Protobuf.InvalidError, message: "default can't be used in proto3"

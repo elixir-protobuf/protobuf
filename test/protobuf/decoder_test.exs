@@ -94,10 +94,8 @@ defmodule Protobuf.DecoderTest do
   end
 
   test "decodes unknown enum type" do
-    assert ExUnit.CaptureLog.capture_log(fn ->
-             struct = Decoder.decode(<<88, 3>>, TestMsg.Foo)
-             assert struct == TestMsg.Foo.new(j: 3)
-           end) =~ ~r/unknown enum value 3 when decoding for {:enum, TestMsg.EnumFoo}/
+    struct = Decoder.decode(<<88, 3>>, TestMsg.Foo)
+    assert struct == TestMsg.Foo.new(j: 3)
   end
 
   test "decodes map type" do
@@ -173,68 +171,5 @@ defmodule Protobuf.DecoderTest do
 
     assert Decoder.decode(bin, TestMsg.Ext.DualNonUse) ==
       TestMsg.Ext.DualNonUse.new(a: nil, b: Google.Protobuf.StringValue.new(value: "s2"))
-  end
-
-  describe "groups" do
-    test "skips all groups and their fields" do
-      a = <<8, 42>>
-      b = <<17, 100, 0, 0, 0, 0, 0, 0, 0>>
-      c = <<26, 3, 115, 116, 114>>
-      d = <<45, 0, 0, 247, 66>>
-      # field number 2, wire type 3
-      group_start = <<19>>
-      # field number 2, wire type 4
-      group_end = <<20>>
-      # field number 5, wire type 0, value 42
-      skipped = <<40, 42>>
-      group = group_start <> skipped <> group_end
-
-      bin = a <> b <> group <> group <> c <> d
-      struct = Decoder.decode(bin, TestMsg.Foo)
-      assert struct == TestMsg.Foo.new(a: 42, b: 100, c: "str", d: 123.5)
-    end
-
-    test "skips repeated and nested groups" do
-      # field number 1, wire type 3
-      group1_start = <<11>>
-      # field number 1, wire type 4
-      group1_end = <<12>>
-
-      bin = group1_start <> group1_start <> group1_end <> group1_end
-      struct = Decoder.decode(bin, TestMsg.Foo)
-      assert struct == TestMsg.Foo.new()
-
-      a = <<8, 42>>
-      b = <<17, 100, 0, 0, 0, 0, 0, 0, 0>>
-      skipped = <<40, 42>>
-      # field number 2, wire type 3
-      group2_start = <<19>>
-      # field number 2, wire type 4
-      group2_end = <<20>>
-      group2 = group2_start <> skipped <> group2_end
-      group1 = group1_start <> skipped <> group2 <> group2 <> group1_end
-
-      bin = a <> group1 <> group1 <> b
-      struct = Decoder.decode(bin, TestMsg.Foo)
-      assert struct == TestMsg.Foo.new(a: 42, b: 100)
-    end
-
-    test "raises when closing a group before opening" do
-      assert_raise Protobuf.DecodeError, "closing group 2 but no groups are open", fn ->
-        Decoder.decode(<<20>>, TestMsg.Foo)
-      end
-    end
-
-    test "raises when opening one group and trying to close another" do
-      assert_raise Protobuf.DecodeError, "closing group 2 but group 3 is open", fn ->
-        Decoder.decode(<<27, 20>>, TestMsg.Foo)
-      end
-    end
-
-    test "raises when finishes with a group still open" do
-      assert_raise Protobuf.DecodeError, "cannot decode binary data", fn ->
-        Decoder.decode(<<19>>, TestMsg.Foo)
-      end
-    end
   end
 end

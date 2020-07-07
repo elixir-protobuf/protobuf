@@ -3,19 +3,16 @@ language: elixir
 git:
   depth: 3
 elixir:
+  - 1.7
   - 1.8
   - 1.9
-  - 1.10
 otp_release:
+  - 20.3
   - 21.3
-  - 22.3
-  - 23.0
+  - 22.0
 matrix:
-  exclude:
-    - elixir: 1.8
-      otp_release: 23.0
-    - elixir: 1.9
-      otp_release: 23.0
+  allow_failures:
+  - otp_release: 20.3
 env:
   - MIX_ENV=test VERBOSE_TESTS=true
 install:
@@ -24,12 +21,12 @@ install:
   - mix deps.get
   - mix eqc.install --mini --force
 before_script:
-  - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protoc-3.12.3-linux-x86_64.zip
-  - unzip protoc-3.12.3-linux-x86_64.zip
+  - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protoc-3.11.2-linux-x86_64.zip
+  - unzip protoc-3.11.2-linux-x86_64.zip
   - export PATH=$PATH:$PWD/bin/
 script:
   - mix test
   - mix test.integration
   - mix hex.build
   # Only run for latest version
-  - '[[ "$TRAVIS_ELIXIR_VERSION" =~ 1.[8-9] ]] || mix format --check-formatted'
+  - '[[ "$TRAVIS_ELIXIR_VERSION" =~ 1.[6-8] ]] || mix format --check-formatted'

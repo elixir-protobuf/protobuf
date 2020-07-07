@@ -1,14 +1,10 @@
 defmodule TestMsg do
-  @moduledoc false
-
   defmodule SyntaxOption do
-    @moduledoc false
     use Protobuf, syntax: :proto3
     defstruct []
   end
 
   defmodule Foo.Bar do
-    @moduledoc false
     use Protobuf, syntax: :proto3
 
     defstruct [:a, :b]
@@ -18,19 +14,15 @@ defmodule TestMsg do
   end
 
   defmodule EnumFoo do
-    @moduledoc false
     use Protobuf, enum: true, syntax: :proto3
 
     field :UNKNOWN, 0
     field :A, 1
     field :B, 2
     field :C, 4
-    field :D, 4
-    field :E, 4
   end
 
   defmodule MapFoo do
-    @moduledoc false
     use Protobuf, map: true, syntax: :proto3
 
     defstruct [:key, :value]
@@ -39,7 +31,6 @@ defmodule TestMsg do
   end
 
   defmodule Foo do
-    @moduledoc false
     use Protobuf, syntax: :proto3
 
     defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :n, :o, :p, :non_matched]
@@ -66,7 +57,6 @@ defmodule TestMsg do
   end
 
   defmodule Foo2 do
-    @moduledoc false
     use Protobuf, syntax: :proto2
 
     defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :non_matched]
@@ -88,7 +78,6 @@ defmodule TestMsg do
   end
 
   defmodule Oneof do
-    @moduledoc false
     use Protobuf
 
     defstruct [:first, :second, :other]
@@ -104,7 +93,6 @@ defmodule TestMsg do
   end
 
   defmodule OneofProto3 do
-    @moduledoc false
     use Protobuf, syntax: :proto3
 
     defstruct [:first, :second, :other]
@@ -120,21 +108,18 @@ defmodule TestMsg do
   end
 
   defmodule Parent do
-    @moduledoc false
     use Protobuf, syntax: :proto3
     defstruct [:child]
     field :child, 1, type: Parent.Child
   end
 
   defmodule Parent.Child do
-    @moduledoc false
     use Protobuf, syntax: :proto3
     defstruct [:parent]
     field :parent, 1, type: Parent
   end
 
   defmodule Link do
-    @moduledoc false
     use Protobuf, syntax: :proto3
     defstruct [:child, :value]
     field :child, 1, type: Link
@@ -150,91 +135,18 @@ defmodule TestMsg do
   end
 
   defmodule Bar2 do
-    @moduledoc false
     use Protobuf, syntax: :proto2
 
     field :a, 1, required: true, type: Bar2.Enum, enum: true
     field :b, 2, optional: true, type: Bar2.Enum, enum: true
   end
 
-
   defmodule Atom.Bar2 do
     use Protobuf, syntax: :proto3
 
     field :a, 1, type: EnumFoo, enum: true, options: [enum: "lowercase"]
     field :b, 2, type: EnumFoo, enum: true, options: [enum: "atomize"]
-  end
-
-  defmodule Scalars do
-    @moduledoc false
-    use Protobuf, syntax: :proto3
-
-    defstruct [
-      :string,
-      :bool,
-      :float,
-      :double,
-      :int32,
-      :uint32,
-      :sint32,
-      :fixed32,
-      :sfixed32,
-      :int64,
-      :uint64,
-      :sint64,
-      :fixed64,
-      :sfixed64,
-      :bytes
-    ]
-
-    field :string, 1, type: :string
-    field :bool, 2, type: :bool
-
-    field :float, 3, type: :float
-    field :double, 4, type: :double
-
-    field :int32, 5, type: :int32
-    field :uint32, 6, type: :uint32
-    field :sint32, 7, type: :sint32
-    field :fixed32, 8, type: :fixed32
-    field :sfixed32, 9, type: :sfixed32
-
-    field :int64, 10, type: :int64
-    field :uint64, 11, type: :uint64
-    field :sint64, 12, type: :sint64
-    field :fixed64, 13, type: :fixed64
-    field :sfixed64, 14, type: :sfixed64
-
-    field :bytes, 15, type: :bytes
-  end
-
-  defmodule MapIntToInt do
-    use Protobuf, map: true, syntax: :proto3
-
-    defstruct [:key, :value]
-
-    field :key, 1, type: :int32
-    field :value, 2, type: :int32
-  end
-
-  defmodule MapBoolToInt do
-    use Protobuf, map: true, syntax: :proto3
-
-    defstruct [:key, :value]
-
-    field :key, 1, type: :bool
-    field :value, 2, type: :int32
-  end
-
-  defmodule Maps do
-    use Protobuf, syntax: :proto3
-
-    defstruct [:mapii, :mapbi, :mapsi]
-
-    field :mapii, 1, repeated: true, map: true, type: MapIntToInt
-    field :mapbi, 2, repeated: true, map: true, type: MapBoolToInt
-    field :mapsi, 3, repeated: true, map: true, type: MapFoo
-  end
+end
 
   defmodule Ext.EnumFoo do
     @moduledoc false

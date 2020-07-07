@@ -30,7 +30,6 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
           %{
             extendee: ".ext.Foo1",
             name: "foo",
-            json_name: "foo",
             number: 1047,
             label: :LABEL_OPTIONAL,
             type: :TYPE_MESSAGE,
@@ -39,7 +38,6 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
           %{
             extendee: ".ext.Foo1",
             name: "foo2",
-            json_name: "foo2",
             number: 1049,
             label: :LABEL_REPEATED,
             type: :TYPE_UINT32
@@ -47,7 +45,6 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
           %{
             extendee: ".ext.Foo2",
             name: "bar",
-            json_name: "bar",
             number: 1047,
             label: :LABEL_OPTIONAL,
             type: :TYPE_STRING
@@ -81,7 +78,6 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
            extendee: ".ext.Foo1",
            label: :LABEL_OPTIONAL,
            name: "foo",
-           json_name: "foo",
            number: 1048,
            type: :TYPE_ENUM,
            type_name: ".ext.EnumFoo"

@@ -5,7 +5,7 @@ defmodule Protobuf.Protoc.IntegrationTest do
   test "encode and decode My.Test.Request" do
     entry = %My.Test.Reply.Entry{
       key_that_needs_1234camel_CasIng: 1,
-      value: -12_345,
+      value: -12345,
       _my_field_name_2: 21
     }
 

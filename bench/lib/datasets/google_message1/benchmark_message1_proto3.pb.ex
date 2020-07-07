@@ -37,7 +37,7 @@ defmodule Benchmarks.Proto3.GoogleMessage1 do
           field23: integer,
           field24: boolean,
           field25: integer,
-          field15: Benchmarks.Proto3.GoogleMessage1SubMessage.t() | nil,
+          field15: Benchmarks.Proto3.GoogleMessage1SubMessage.t(),
           field78: boolean,
           field67: integer,
           field68: integer,

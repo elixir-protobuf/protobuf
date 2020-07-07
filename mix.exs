@@ -10,7 +10,6 @@ defmodule Protobuf.Mixfile do
       elixir: "~> 1.6",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
-      dialyzer: [plt_add_apps: [:mix, :jason]],
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       escript: escript(),
@@ -31,9 +30,8 @@ defmodule Protobuf.Mixfile do
 
   defp deps do
     [
-      {:jason, "~> 1.2", optional: true},
-      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
+      {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.14", only: :dev, runtime: false},
       {:eqc_ex, github: "tony612/eqc_ex", branch: "fix-elixir-1-10", only: [:dev, :test]}
     ]

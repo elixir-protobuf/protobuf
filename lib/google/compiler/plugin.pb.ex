@@ -1,13 +1,3 @@
-defmodule Google.Protobuf.Compiler.CodeGeneratorResponse.Feature do
-  @moduledoc false
-  use Protobuf, enum: true, syntax: :proto2
-
-  @type t :: integer | :FEATURE_NONE | :FEATURE_PROTO3_OPTIONAL
-
-  field :FEATURE_NONE, 0
-  field :FEATURE_PROTO3_OPTIONAL, 1
-end
-
 defmodule Google.Protobuf.Compiler.Version do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -66,12 +56,10 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorResponse do
 
   @type t :: %__MODULE__{
           error: String.t(),
-          supported_features: non_neg_integer,
           file: [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()]
         }
-  defstruct [:error, :supported_features, :file]
+  defstruct [:error, :file]
 
   field :error, 1, optional: true, type: :string
-  field :supported_features, 2, optional: true, type: :uint64
   field :file, 15, repeated: true, type: Google.Protobuf.Compiler.CodeGeneratorResponse.File
 end

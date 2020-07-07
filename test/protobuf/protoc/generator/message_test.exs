@@ -51,14 +51,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         field: [
           Google.Protobuf.FieldDescriptorProto.new(
             name: "a",
-            json_name: "a",
             number: 1,
             type: :TYPE_INT32,
             label: :LABEL_OPTIONAL
           ),
           Google.Protobuf.FieldDescriptorProto.new(
             name: "b",
-            json_name: "b",
             number: 2,
             type: :TYPE_STRING,
             label: :LABEL_REQUIRED
@@ -83,21 +81,18 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         field: [
           Google.Protobuf.FieldDescriptorProto.new(
             name: "a",
-            json_name: "a",
             number: 1,
             type: :TYPE_INT32,
             label: :LABEL_OPTIONAL
           ),
           Google.Protobuf.FieldDescriptorProto.new(
             name: "b",
-            json_name: "b",
             number: 2,
             type: :TYPE_STRING,
             label: :LABEL_REQUIRED
           ),
           Google.Protobuf.FieldDescriptorProto.new(
             name: "c",
-            json_name: "c",
             number: 3,
             type: :TYPE_INT32,
             label: :LABEL_REPEATED
@@ -123,7 +118,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         field: [
           Google.Protobuf.FieldDescriptorProto.new(
             name: "a",
-            json_name: "a",
             number: 1,
             type: :TYPE_INT32,
             label: :LABEL_OPTIONAL,
@@ -146,7 +140,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         field: [
           Google.Protobuf.FieldDescriptorProto.new(
             name: "a",
-            json_name: "a",
             number: 1,
             type: :TYPE_INT32,
             label: :LABEL_OPTIONAL,
@@ -168,7 +161,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         field: [
           Google.Protobuf.FieldDescriptorProto.new(
             name: "a",
-            json_name: "a",
             number: 1,
             type: :TYPE_INT32,
             label: :LABEL_OPTIONAL,
@@ -302,7 +294,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         field: [
           Google.Protobuf.FieldDescriptorProto.new(
             name: "bar",
-            json_name: "bar",
             number: 1,
             type: :TYPE_MESSAGE,
             label: :LABEL_OPTIONAL,
@@ -310,7 +301,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
           ),
           Google.Protobuf.FieldDescriptorProto.new(
             name: "baz",
-            json_name: "baz",
             number: 1,
             type: :TYPE_MESSAGE,
             label: :LABEL_REPEATED,
@@ -340,7 +330,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         field: [
           Google.Protobuf.FieldDescriptorProto.new(
             name: "a",
-            json_name: "a",
             number: 1,
             type: :TYPE_MESSAGE,
             label: :LABEL_REPEATED,
@@ -354,14 +343,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
             field: [
               Google.Protobuf.FieldDescriptorProto.new(
                 name: "key",
-                json_name: "key",
                 number: 1,
                 label: :LABEL_OPTIONAL,
                 type: :TYPE_INT32
               ),
               Google.Protobuf.FieldDescriptorProto.new(
                 name: "value",
-                json_name: "value",
                 number: 2,
                 label: :LABEL_OPTIONAL,
                 type: :TYPE_MESSAGE,
@@ -391,7 +378,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         field: [
           Google.Protobuf.FieldDescriptorProto.new(
             name: "a",
-            json_name: "a",
             number: 1,
             type: :TYPE_ENUM,
             label: :LABEL_OPTIONAL,
@@ -417,7 +403,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         field: [
           Google.Protobuf.FieldDescriptorProto.new(
             name: "a",
-            json_name: "a",
             number: 1,
             type: :TYPE_ENUM,
             label: :LABEL_OPTIONAL,
@@ -442,7 +427,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         field: [
           Google.Protobuf.FieldDescriptorProto.new(
             name: "a",
-            json_name: "a",
             number: 1,
             type: :TYPE_MESSAGE,
             label: :LABEL_OPTIONAL,
@@ -513,7 +497,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         field: [
           Google.Protobuf.FieldDescriptorProto.new(
             name: "a",
-            json_name: "a",
             number: 1,
             type: :TYPE_INT32,
             label: :LABEL_OPTIONAL,
@@ -521,7 +504,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
           ),
           Google.Protobuf.FieldDescriptorProto.new(
             name: "b",
-            json_name: "b",
             number: 2,
             type: :TYPE_INT32,
             label: :LABEL_OPTIONAL,
@@ -529,7 +511,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
           ),
           Google.Protobuf.FieldDescriptorProto.new(
             name: "c",
-            json_name: "c",
             number: 3,
             type: :TYPE_INT32,
             label: :LABEL_OPTIONAL,
@@ -537,7 +518,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
           ),
           Google.Protobuf.FieldDescriptorProto.new(
             name: "d",
-            json_name: "d",
             number: 4,
             type: :TYPE_INT32,
             label: :LABEL_OPTIONAL,
@@ -545,7 +525,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
           ),
           Google.Protobuf.FieldDescriptorProto.new(
             name: "other",
-            json_name: "other",
             number: 4,
             type: :TYPE_INT32,
             label: :LABEL_OPTIONAL
@@ -566,59 +545,5 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "field :c, 3, optional: true, type: :int32, oneof: 1\n"
     assert msg =~ "field :d, 4, optional: true, type: :int32, oneof: 1\n"
     assert msg =~ "field :other, 4, optional: true, type: :int32\n"
-  end
-
-  describe "generate/2 json_name" do
-    test "is added when it differs from the original field name" do
-      ctx = %Context{package: "", syntax: :proto3}
-
-      desc =
-        Google.Protobuf.DescriptorProto.new(
-          name: "Foo",
-          field: [
-            Google.Protobuf.FieldDescriptorProto.new(
-              name: "simple",
-              json_name: "simple",
-              number: 1,
-              type: :TYPE_INT32,
-              label: :LABEL_OPTIONAL
-            ),
-            Google.Protobuf.FieldDescriptorProto.new(
-              name: "the_field_name",
-              json_name: "theFieldName",
-              number: 2,
-              type: :TYPE_STRING,
-              label: :LABEL_OPTIONAL
-            )
-          ]
-        )
-
-      {[], [msg]} = Generator.generate(ctx, desc)
-      assert msg =~ "defstruct [:simple, :the_field_name]\n"
-      assert msg =~ "field :simple, 1, type: :int32\n"
-      assert msg =~ "field :the_field_name, 2, type: :string, json_name: \"theFieldName\"\n"
-    end
-
-    test "is omitted when syntax is not proto3" do
-      ctx = %Context{package: ""}
-
-      desc =
-        Google.Protobuf.DescriptorProto.new(
-          name: "Foo",
-          field: [
-            Google.Protobuf.FieldDescriptorProto.new(
-              name: "the_field_name",
-              json_name: "theFieldName",
-              number: 1,
-              type: :TYPE_STRING,
-              label: :LABEL_REQUIRED
-            )
-          ]
-        )
-
-      {[], [msg]} = Generator.generate(ctx, desc)
-      assert msg =~ "defstruct [:the_field_name]\n"
-      assert msg =~ "field :the_field_name, 1, required: true, type: :string\n"
-    end
   end
 end

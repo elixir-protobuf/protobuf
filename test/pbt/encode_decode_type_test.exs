@@ -13,8 +13,7 @@ defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
     quote do
       property unquote(Atom.to_string(field_type)) <> " roundtrip" do
         forall n <- unquote(gen_func) do
-          iodata = Encoder.encode_type(unquote(field_type), n)
-          bin = IO.iodata_to_binary(iodata)
+          bin = Encoder.encode_type(unquote(field_type), n)
 
           ensure(
             n ==
@@ -36,22 +35,14 @@ defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
     quote do
       property unquote(Atom.to_string(field_type)) <> " canonical roundtrip" do
         forall n <- unquote(gen_func) do
-          encoded_val =
-            unquote(field_type)
-            |> Encoder.encode_type(n)
-            |> IO.iodata_to_binary()
-
           canonical_val =
             decode_type(
               unquote(wire_type),
               unquote(field_type),
-              encoded_val
+              Encoder.encode_type(unquote(field_type), n)
             )
 
-          bin =
-            unquote(field_type)
-            |> Encoder.encode_type(canonical_val)
-            |> IO.iodata_to_binary()
+          bin = Encoder.encode_type(unquote(field_type), canonical_val)
 
           ensure(
             canonical_val ==

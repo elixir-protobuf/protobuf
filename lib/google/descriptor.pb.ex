@@ -257,8 +257,7 @@ defmodule Google.Protobuf.FieldDescriptorProto do
           default_value: String.t(),
           oneof_index: integer,
           json_name: String.t(),
-          options: Google.Protobuf.FieldOptions.t() | nil,
-          proto3_optional: boolean
+          options: Google.Protobuf.FieldOptions.t() | nil
         }
   defstruct [
     :name,
@@ -270,8 +269,7 @@ defmodule Google.Protobuf.FieldDescriptorProto do
     :default_value,
     :oneof_index,
     :json_name,
-    :options,
-    :proto3_optional
+    :options
   ]
 
   field :name, 1, optional: true, type: :string
@@ -284,7 +282,6 @@ defmodule Google.Protobuf.FieldDescriptorProto do
   field :oneof_index, 9, optional: true, type: :int32
   field :json_name, 10, optional: true, type: :string
   field :options, 8, optional: true, type: Google.Protobuf.FieldOptions
-  field :proto3_optional, 17, optional: true, type: :bool
 end
 
 defmodule Google.Protobuf.OneofDescriptorProto do
@@ -464,7 +461,7 @@ defmodule Google.Protobuf.FileOptions do
   field :py_generic_services, 18, optional: true, type: :bool, default: false
   field :php_generic_services, 42, optional: true, type: :bool, default: false
   field :deprecated, 23, optional: true, type: :bool, default: false
-  field :cc_enable_arenas, 31, optional: true, type: :bool, default: true
+  field :cc_enable_arenas, 31, optional: true, type: :bool, default: false
   field :objc_class_prefix, 36, optional: true, type: :string
   field :csharp_namespace, 37, optional: true, type: :string
   field :swift_prefix, 39, optional: true, type: :string
