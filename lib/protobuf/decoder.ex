@@ -427,18 +427,16 @@ defmodule Protobuf.Decoder do
   end
 
   # packed
-  defp put_packed_field(msg, %{wire_type: wire_type, type: type, name_atom: key}, val) do
+  defp put_packed_field(msg, %{wire_type: wire_type, type: type, name_atom: key}, bin) do
     vals =
-      decode_packed(wire_type, val, [])
+      bin
+      |> decode_packed(wire_type)
       |> Enum.map(fn v ->
         decode_type_m(type, key, v)
       end)
 
     case msg do
-      %{^key => nil} ->
-        Map.put(msg, key, vals)
-
-      %{^key => value} ->
+      %{^key => value} when not is_nil(value) ->
         Map.put(msg, key, vals ++ value)
 
       %{} ->
@@ -446,19 +444,15 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  defp decode_packed(_wire_type, <<>>, acc), do: acc
+  defp decode_packed(bin, wire_varint()), do: raw_decode_varint(bin, [], :packed, [])
+  defp decode_packed(bin, wire_32bits()), do: raw_decode_32bits(bin, [])
+  defp decode_packed(bin, wire_64bits()), do: raw_decode_64bits(bin, [])
 
-  defp decode_packed(wire_varint(), <<bin::bits>>, _) do
-    raw_decode_varint(bin, [], :packed, [])
-  end
+  defp raw_decode_32bits(<<n::bits-32, bin::bits>>, acc), do: raw_decode_32bits(bin, [n | acc])
+  defp raw_decode_32bits(<<>>, acc), do: acc
 
-  defp decode_packed(wire_32bits(), <<n::32, rest::bits>>, result) do
-    decode_packed(wire_32bits(), rest, [<<n::32>> | result])
-  end
-
-  defp decode_packed(wire_64bits(), <<n::64, rest::bits>>, result) do
-    decode_packed(wire_64bits(), rest, [<<n::64>> | result])
-  end
+  defp raw_decode_64bits(<<n::bits-64, bin::bits>>, acc), do: raw_decode_64bits(bin, [n | acc])
+  defp raw_decode_64bits(<<>>, acc), do: acc
 
   @doc false
   @spec decode_zigzag(integer) :: integer
