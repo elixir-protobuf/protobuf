@@ -372,11 +372,11 @@ defmodule Protobuf.Decoder do
     raw_decode_varint(bin, result, :packed, groups)
   end
 
-  defp raw_handle_key(wire_start_group(), opening, groups, bin, result) do
+  defp raw_handle_key(wire_start_group(), opening, groups, <<bin::bits>>, result) do
     raw_decode_key(bin, result, [opening | groups])
   end
 
-  defp raw_handle_key(wire_end_group(), closing, [closing | groups], bin, result) do
+  defp raw_handle_key(wire_end_group(), closing, [closing | groups], <<bin::bits>>, result) do
     raw_decode_key(bin, result, groups)
   end
 
@@ -392,11 +392,11 @@ defmodule Protobuf.Decoder do
     )
   end
 
-  defp raw_handle_key(wire_type, tag, [], bin, result) do
+  defp raw_handle_key(wire_type, tag, [], <<bin::bits>>, result) do
     raw_decode_value(wire_type, bin, [wire_type, tag | result], [])
   end
 
-  defp raw_handle_key(wire_type, _tag, groups, bin, result) do
+  defp raw_handle_key(wire_type, _tag, groups, <<bin::bits>>, result) do
     raw_decode_value(wire_type, bin, result, groups)
   end
 
