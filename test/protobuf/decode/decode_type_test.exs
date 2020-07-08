@@ -8,16 +8,28 @@ defmodule Protobuf.Decoder.DecodeTypeTest do
     decode_type_m(type, :fake_key, val)
   end
 
-  test "decode_type/2 varint" do
+  test "decode_type/3 varint" do
     assert 42 == decode_type(:int32, 42)
   end
 
-  test "decode_type/2 int64" do
+  test "decode_type/3 int64" do
     assert -1 == decode_type(:int64, -1)
   end
 
-  test "decode_type/2 string" do
-    assert "a" = decode_type(:string, "a")
+  test "decode_type/3 min int32" do
+    assert -2_147_483_648 == decode_type(:int32, 18_446_744_071_562_067_968)
+  end
+
+  test "decode_type/3 max int32" do
+    assert -2_147_483_647 == decode_type(:int32, 18_446_744_071_562_067_969)
+  end
+
+  test "decode_type/3 min int64" do
+    assert -9_223_372_036_854_775_808 == decode_type(:int64, 9_223_372_036_854_775_808)
+  end
+
+  test "decode_type/3 max int64" do
+    assert 9_223_372_036_854_775_807 == decode_type(:int64, 9_223_372_036_854_775_807)
   end
 
   test "decode_type/3 min sint32" do
@@ -34,6 +46,14 @@ defmodule Protobuf.Decoder.DecodeTypeTest do
 
   test "decode_type/3 max sint64" do
     assert 9_223_372_036_854_775_807 == decode_type(:sint64, 18_446_744_073_709_551_614)
+  end
+
+  test "decode_type/3 max uint32" do
+    assert 4_294_967_295 == decode_type(:uint32, 4_294_967_295)
+  end
+
+  test "decode_type/3 max uint64" do
+    assert 9_223_372_036_854_775_807 == decode_type(:uint64, 9_223_372_036_854_775_807)
   end
 
   test "decode_type/3 bool works" do

@@ -1,13 +1,12 @@
 defmodule Protobuf.Decoder do
   @moduledoc false
-  import Protobuf.WireTypes
-  import Bitwise, only: [bsl: 2, bsr: 2, band: 2]
-  require Logger
 
-  @max_bits 64
-  @mask64 bsl(1, @max_bits) - 1
+  import Protobuf.{WireTypes, Wire.Varint}
+  import Bitwise, only: [bsr: 2, band: 2]
 
   alias Protobuf.DecodeError
+
+  require Logger
 
   @spec decode(binary, atom) :: any
   def decode(data, module) do
@@ -15,11 +14,6 @@ defmodule Protobuf.Decoder do
     msg_props = module.__message_props__()
     struct = build_struct(kvs, msg_props, module.new())
     reverse_repeated(struct, msg_props.repeated_fields)
-  end
-
-  @doc false
-  def decode_raw(data) do
-    raw_decode_key(data, [], [])
   end
 
   @doc false
@@ -216,155 +210,12 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  @doc false
-  def decode_varint(bin, type \\ :key) do
-    raw_decode_varint(bin, [], type, [])
-  end
-
   defp raw_decode_key(<<>>, result, []), do: Enum.reverse(result)
 
-  defp raw_decode_key(<<bin::bits>>, result, groups) do
-    raw_decode_varint(bin, result, :key, groups)
-  end
-
-  defp raw_decode_varint(<<0::1, x::7, rest::bits>>, result, type, groups) do
-    raw_handle_varint(type, rest, result, x, groups)
-  end
-
-  defp raw_decode_varint(<<1::1, x0::7, 0::1, x1::7, rest::bits>>, result, type, groups) do
-    val = bsl(x1, 7) + x0
-    raw_handle_varint(type, rest, result, val, groups)
-  end
-
-  defp raw_decode_varint(
-         <<1::1, x0::7, 1::1, x1::7, 0::1, x2::7, rest::bits>>,
-         result,
-         type,
-         groups
-       ) do
-    val = bsl(x2, 14) + bsl(x1, 7) + x0
-    raw_handle_varint(type, rest, result, val, groups)
-  end
-
-  defp raw_decode_varint(
-         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 0::1, x3::7, rest::bits>>,
-         result,
-         type,
-         groups
-       ) do
-    val = bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
-    raw_handle_varint(type, rest, result, val, groups)
-  end
-
-  defp raw_decode_varint(
-         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 0::1, x4::7, rest::bits>>,
-         result,
-         type,
-         groups
-       ) do
-    val = bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
-    raw_handle_varint(type, rest, result, val, groups)
-  end
-
-  defp raw_decode_varint(
-         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 0::1, x5::7,
-           rest::bits>>,
-         result,
-         type,
-         groups
-       ) do
-    val = bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
-    raw_handle_varint(type, rest, result, val, groups)
-  end
-
-  defp raw_decode_varint(
-         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 0::1,
-           x6::7, rest::bits>>,
-         result,
-         type,
-         groups
-       ) do
-    val = bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
-    raw_handle_varint(type, rest, result, val, groups)
-  end
-
-  defp raw_decode_varint(
-         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 1::1,
-           x6::7, 0::1, x7::7, rest::bits>>,
-         result,
-         type,
-         groups
-       ) do
-    val =
-      bsl(x7, 49) + bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) + bsl(x2, 14) +
-        bsl(x1, 7) + x0
-
-    raw_handle_varint(type, rest, result, val, groups)
-  end
-
-  defp raw_decode_varint(
-         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 1::1,
-           x6::7, 1::1, x7::7, 0::1, x8::7, rest::bits>>,
-         result,
-         type,
-         groups
-       ) do
-    val =
-      bsl(x8, 56) + bsl(x7, 49) + bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) + bsl(x3, 21) +
-        bsl(x2, 14) + bsl(x1, 7) + x0
-
-    raw_handle_varint(type, rest, result, val, groups)
-  end
-
-  defp raw_decode_varint(
-         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 1::1,
-           x6::7, 1::1, x7::7, 1::1, x8::7, 0::1, x9::7, rest::bits>>,
-         result,
-         type,
-         groups
-       ) do
-    val =
-      bsl(x9, 63) + bsl(x8, 56) + bsl(x7, 49) + bsl(x6, 42) + bsl(x5, 35) + bsl(x4, 28) +
-        bsl(x3, 21) + bsl(x2, 14) + bsl(x1, 7) + x0
-
-    val = band(val, @mask64)
-    raw_handle_varint(type, rest, result, val, groups)
-  end
-
-  defp raw_decode_varint(_, _, _, _) do
-    raise Protobuf.DecodeError, message: "cannot decode binary data"
-  end
-
-  defp raw_handle_varint(:key, <<bin::bits>>, result, key, groups) do
-    tag = bsr(key, 3)
-    wire_type = band(key, 7)
-    raw_handle_key(wire_type, tag, groups, bin, result)
-  end
-
-  defp raw_handle_varint(:value, <<>>, result, val, []), do: Enum.reverse([val | result])
-
-  defp raw_handle_varint(:value, <<bin::bits>>, result, val, []) do
-    raw_decode_varint(bin, [val | result], :key, [])
-  end
-
-  defp raw_handle_varint(:value, <<bin::bits>>, result, _val, groups) do
-    raw_decode_varint(bin, result, :key, groups)
-  end
-
-  defp raw_handle_varint(:bytes_len, <<bin::bits>>, result, len, []) do
-    <<bytes::bytes-size(len), rest::bits>> = bin
-    raw_decode_key(rest, [bytes | result], [])
-  end
-
-  defp raw_handle_varint(:bytes_len, <<bin::bits>>, result, len, groups) do
-    <<_bytes::bytes-size(len), rest::bits>> = bin
-    raw_decode_key(rest, result, groups)
-  end
-
-  defp raw_handle_varint(:packed, <<>>, result, val, _groups), do: [val | result]
-
-  defp raw_handle_varint(:packed, <<bin::bits>>, result, val, groups) do
-    raw_decode_varint(bin, [val | result], :packed, groups)
+  decoder :defp, :raw_decode_key, [:result, :groups] do
+    tag = bsr(value, 3)
+    wire_type = band(value, 7)
+    raw_handle_key(wire_type, tag, groups, rest, result)
   end
 
   defp raw_handle_key(wire_start_group(), opening, groups, <<bin::bits>>, result) do
@@ -393,6 +244,36 @@ defmodule Protobuf.Decoder do
 
   defp raw_handle_key(wire_type, _tag, groups, <<bin::bits>>, result) do
     raw_decode_value(wire_type, bin, result, groups)
+  end
+
+  decoder :defp, :raw_decode_varint, [:result, :type, :groups] do
+    raw_handle_varint(type, rest, result, value, groups)
+  end
+
+  defp raw_handle_varint(:value, <<>>, result, val, []), do: Enum.reverse([val | result])
+
+  defp raw_handle_varint(:value, <<bin::bits>>, result, val, []) do
+    raw_decode_key(bin, [val | result], [])
+  end
+
+  defp raw_handle_varint(:value, <<bin::bits>>, result, _val, groups) do
+    raw_decode_key(bin, result, groups)
+  end
+
+  defp raw_handle_varint(:bytes_len, <<bin::bits>>, result, len, []) do
+    <<bytes::bytes-size(len), rest::bits>> = bin
+    raw_decode_key(rest, [bytes | result], [])
+  end
+
+  defp raw_handle_varint(:bytes_len, <<bin::bits>>, result, len, groups) do
+    <<_bytes::bytes-size(len), rest::bits>> = bin
+    raw_decode_key(rest, result, groups)
+  end
+
+  defp raw_handle_varint(:packed, <<>>, result, val, _groups), do: [val | result]
+
+  defp raw_handle_varint(:packed, <<bin::bits>>, result, val, groups) do
+    raw_decode_varint(bin, [val | result], :packed, groups)
   end
 
   @doc false
