@@ -4,7 +4,7 @@ defmodule Protobuf.Decoder do
   import Protobuf.{WireTypes, Wire.Varint}
   import Bitwise, only: [bsr: 2, band: 2]
 
-  alias Protobuf.DecodeError
+  alias Protobuf.{DecodeError, Wire}
 
   require Logger
 
@@ -14,115 +14,6 @@ defmodule Protobuf.Decoder do
     msg_props = module.__message_props__()
     struct = build_struct(kvs, msg_props, module.new())
     reverse_repeated(struct, msg_props.repeated_fields)
-  end
-
-  @doc false
-  # For performance
-  defmacro decode_type_m(type, key, val) do
-    quote do
-      case unquote(type) do
-        :int32 ->
-          <<n::signed-integer-32>> = <<unquote(val)::32>>
-          n
-
-        :string ->
-          unquote(val)
-
-        :bytes ->
-          unquote(val)
-
-        :int64 ->
-          <<n::signed-integer-64>> = <<unquote(val)::64>>
-          n
-
-        :uint32 ->
-          <<n::unsigned-integer-32>> = <<unquote(val)::32>>
-          n
-
-        :uint64 ->
-          <<n::unsigned-integer-64>> = <<unquote(val)::64>>
-          n
-
-        :bool ->
-          unquote(val) != 0
-
-        :sint32 ->
-          decode_zigzag(unquote(val))
-
-        :sint64 ->
-          decode_zigzag(unquote(val))
-
-        :fixed64 ->
-          <<n::little-64>> = unquote(val)
-          n
-
-        :sfixed64 ->
-          <<n::little-signed-64>> = unquote(val)
-          n
-
-        :double ->
-          case unquote(val) do
-            <<n::little-float-64>> ->
-              n
-
-            # little endianness
-            # should be 0b0_11111111111_000000000...
-            # should be 0b1_11111111111_000000000...
-            <<0, 0, 0, 0, 0, 0, 0b1111::4, 0::4, 0b01111111::8>> ->
-              :infinity
-
-            <<0, 0, 0, 0, 0, 0, 0b1111::4, 0::4, 0b11111111::8>> ->
-              :negative_infinity
-
-            <<a::48, 0b1111::4, b::4, _::1, 0b1111111::7>> when a != 0 or b != 0 ->
-              :nan
-          end
-
-        :fixed32 ->
-          <<n::little-32>> = unquote(val)
-          n
-
-        :sfixed32 ->
-          <<n::little-signed-32>> = unquote(val)
-          n
-
-        :float ->
-          case unquote(val) do
-            <<n::little-float-32>> ->
-              n
-
-            # little endianness
-            # should be 0b0_11111111_000000000...
-            <<0, 0, 0b1000_0000::8, 0b01111111::8>> ->
-              :infinity
-
-            # little endianness
-            # should be 0b1_11111111_000000000...
-            <<0, 0, 0b1000_0000::8, 0b11111111::8>> ->
-              :negative_infinity
-
-            # should be 0b*_11111111_not_zero...
-            <<a::16, 1::1, b::7, _::1, 0b1111111::7>> when a != 0 or b != 0 ->
-              :nan
-          end
-
-        {:enum, enum_type} ->
-          try do
-            enum_type.key(unquote(val))
-          rescue
-            FunctionClauseError ->
-              Logger.warn(
-                "unknown enum value #{unquote(val)} when decoding for #{inspect(unquote(type))}"
-              )
-
-              unquote(val)
-          end
-
-        _ ->
-          raise DecodeError,
-            message: "can't decode type #{unquote(type)} for field #{unquote(key)}"
-      end
-    end
   end
 
   defp build_struct([tag, wire, val | rest], %{field_props: f_props} = msg_props, struct) do
@@ -151,7 +42,7 @@ defmodule Protobuf.Decoder do
 
             Map.put(struct, key, val)
           else
-            val = decode_type_m(type, key, val)
+            val = Wire.to_proto(type, val)
             val = if oneof, do: {name_atom, val}, else: val
 
             val =
@@ -272,19 +163,19 @@ defmodule Protobuf.Decoder do
     raw_decode_delimited(bin, result, groups)
   end
 
-  def raw_decode_value(wire_32bits(), <<n::32, rest::bits>>, result, []) do
-    raw_decode_key(rest, [<<n::32>> | result], [])
+  def raw_decode_value(wire_32bits(), <<n::bits-32, rest::bits>>, result, []) do
+    raw_decode_key(rest, [n | result], [])
   end
 
-  def raw_decode_value(wire_32bits(), <<_n::32, rest::bits>>, result, groups) do
+  def raw_decode_value(wire_32bits(), <<_n::bits-32, rest::bits>>, result, groups) do
     raw_decode_key(rest, result, groups)
   end
 
-  def raw_decode_value(wire_64bits(), <<n::64, rest::bits>>, result, []) do
-    raw_decode_key(rest, [<<n::64>> | result], [])
+  def raw_decode_value(wire_64bits(), <<n::bits-64, rest::bits>>, result, []) do
+    raw_decode_key(rest, [n | result], [])
   end
 
-  def raw_decode_value(wire_64bits(), <<_n::64, rest::bits>>, result, groups) do
+  def raw_decode_value(wire_64bits(), <<_n::bits-64, rest::bits>>, result, groups) do
     raw_decode_key(rest, result, groups)
   end
 
@@ -303,34 +194,30 @@ defmodule Protobuf.Decoder do
     value =
       case wire_type do
         wire_varint() -> decode_varints(bin, acc)
-        wire_32bits() -> decode_fixed32(bin, type, key, acc)
-        wire_64bits() -> decode_fixed64(bin, type, key, acc)
+        wire_32bits() -> decode_fixed32(bin, type, acc)
+        wire_64bits() -> decode_fixed64(bin, type, acc)
       end
 
     Map.put(msg, key, value)
   end
 
   defp decode_varints(<<>>, acc), do: acc
-  decoder :defp, :decode_varints, [:acc], do: decode_varints(rest, [value | acc])
 
-  @dialyzer {:nowarn_function, decode_fixed32: 4}
-  defp decode_fixed32(<<n::bits-32, bin::bits>>, type, key, acc) do
-    decode_fixed32(bin, type, key, [decode_type_m(type, key, n) | acc])
+  decoder :defp, :decode_varints, [:acc] do
+    decode_varints(rest, [value | acc])
   end
 
-  defp decode_fixed32(<<>>, _, _, acc), do: acc
-
-  @dialyzer {:nowarn_function, decode_fixed64: 4}
-  defp decode_fixed64(<<n::bits-64, bin::bits>>, type, key, acc) do
-    decode_fixed64(bin, type, key, [decode_type_m(type, key, n) | acc])
+  defp decode_fixed32(<<n::bits-32, bin::bits>>, type, acc) do
+    decode_fixed32(bin, type, [Wire.to_proto(type, n) | acc])
   end
 
-  defp decode_fixed64(<<>>, _, _, acc), do: acc
+  defp decode_fixed32(<<>>, _, acc), do: acc
 
-  @doc false
-  @spec decode_zigzag(integer) :: integer
-  def decode_zigzag(n) when band(n, 1) == 0, do: bsr(n, 1)
-  def decode_zigzag(n) when band(n, 1) == 1, do: -bsr(n + 1, 1)
+  defp decode_fixed64(<<n::bits-64, bin::bits>>, type, acc) do
+    decode_fixed64(bin, type, [Wire.to_proto(type, n) | acc])
+  end
+
+  defp decode_fixed64(<<>>, _, acc), do: acc
 
   defp prop_display(prop) do
     prop.name
@@ -370,7 +257,7 @@ defmodule Protobuf.Decoder do
             embedded_msg = decode(val, type)
             merge_embedded_value(struct, name_atom, embedded_msg, is_repeated)
           else
-            val = decode_type_m(type, name_atom, val)
+            val = Wire.to_proto(type, val)
 
             if is_repeated do
               merge_simple_repeated_value(struct, name_atom, val)

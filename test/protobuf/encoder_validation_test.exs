@@ -1,8 +1,6 @@
 defmodule Protobuf.EncoderTest.Validation do
   use ExUnit.Case, async: true
 
-  import Protobuf.Encoder
-
   @valid_vals %{
     int32: -32,
     int64: -64,
@@ -33,7 +31,7 @@ defmodule Protobuf.EncoderTest.Validation do
     assert_invalid = fn type, others ->
       Enum.each(other_types(others), fn {invalid, err_type} ->
         assert_raise err_type, fn ->
-          encode_type(type, invalid)
+          Protobuf.Wire.from_proto(type, invalid)
         end
       end)
     end
