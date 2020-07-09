@@ -6,7 +6,8 @@ defmodule Protobuf.EncodeDecodeVarintTest do
 
   property "varint roundtrip" do
     forall n <- largeint() do
-      bin = Encoder.encode_varint(n)
+      iodata = Encoder.encode_varint(n)
+      bin = IO.iodata_to_binary(iodata)
       [n] = Decoder.decode_varint(bin, :value)
       ensure(<<n::signed-64>> == <<n::64>>)
     end
@@ -18,7 +19,7 @@ defmodule Protobuf.EncodeDecodeVarintTest do
 
   property "encode_varint for negative integers should always be 10 bytes" do
     forall n <- neg_gen() do
-      ensure(byte_size(Encoder.encode_varint(n)) == 10)
+      ensure(IO.iodata_length(Encoder.encode_varint(n)) == 10)
     end
   end
 end
