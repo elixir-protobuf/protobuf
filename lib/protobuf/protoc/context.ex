@@ -33,7 +33,7 @@ defmodule Protobuf.Protoc.Context do
 
             # Encapsulates information about the original source file from which a
             # FileDescriptorProto was generated.
-            source_code_info: %{ location: [] },
+            source_code_info: %{location: []},
 
             # path to a Location as per documentation for protobufs `descriptor.proto/SourceCodeInfo/Location`
             # see: https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/descriptor.proto#L798

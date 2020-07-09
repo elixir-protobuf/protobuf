@@ -26,7 +26,13 @@ defmodule Protobuf.Protoc.Generator.Service do
     name = Util.attach_raw_pkg(desc.name, ctx.package)
     methods = get_methods(ctx, desc.method)
     generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
-    docs = Util.moduledoc_str(ctx, methods |> Enum.all?(fn m -> String.length(String.trim(m[:docs])) end))
+
+    docs =
+      Util.moduledoc_str(
+        ctx,
+        methods |> Enum.all?(fn m -> String.length(String.trim(m[:docs])) end)
+      )
+
     Protobuf.Protoc.Template.service(mod_name, name, methods, generate_desc, docs)
   end
 
