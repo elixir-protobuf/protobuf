@@ -95,10 +95,11 @@ defmodule Protobuf.Protoc.Generator.Util do
   @spec safe_type_name(binary()) :: binary()
   def safe_type_name(name) do
     prefix = "__"
-    reserved_names = ["and", "or", "not"]
+    reserved_names = ["and", "or", "not", "number"]
+    name = name |> to_string()
 
     if name in reserved_names do
-      prefix <> String.downcase(name)
+      String.downcase(prefix <> name)
     else
       String.downcase(name)
     end
