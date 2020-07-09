@@ -238,53 +238,38 @@ defmodule Protobuf.Decoder do
     )
   end
 
-  defp raw_handle_key(wire_type, tag, [], <<bin::bits>>, result) do
-    raw_decode_value(wire_type, bin, [wire_type, tag | result], [])
+  defp raw_handle_key(wire_type, tag, groups, <<bin::bits>>, result) do
+    case groups do
+      [] -> raw_decode_value(wire_type, bin, [wire_type, tag | result], groups)
+      _ -> raw_decode_value(wire_type, bin, result, groups)
+    end
   end
 
-  defp raw_handle_key(wire_type, _tag, groups, <<bin::bits>>, result) do
-    raw_decode_value(wire_type, bin, result, groups)
+  decoder :defp, :raw_decode_varint, [:result, :groups] do
+    case groups do
+      [] -> raw_decode_key(rest, [value | result], groups)
+      _ -> raw_decode_key(rest, result, groups)
+    end
   end
 
-  decoder :defp, :raw_decode_varint, [:result, :type, :groups] do
-    raw_handle_varint(type, rest, result, value, groups)
-  end
+  decoder :defp, :raw_decode_delimited, [:result, :groups] do
+    <<bytes::bytes-size(value), rest::bits>> = rest
 
-  defp raw_handle_varint(:value, <<>>, result, val, []), do: Enum.reverse([val | result])
-
-  defp raw_handle_varint(:value, <<bin::bits>>, result, val, []) do
-    raw_decode_key(bin, [val | result], [])
-  end
-
-  defp raw_handle_varint(:value, <<bin::bits>>, result, _val, groups) do
-    raw_decode_key(bin, result, groups)
-  end
-
-  defp raw_handle_varint(:bytes_len, <<bin::bits>>, result, len, []) do
-    <<bytes::bytes-size(len), rest::bits>> = bin
-    raw_decode_key(rest, [bytes | result], [])
-  end
-
-  defp raw_handle_varint(:bytes_len, <<bin::bits>>, result, len, groups) do
-    <<_bytes::bytes-size(len), rest::bits>> = bin
-    raw_decode_key(rest, result, groups)
-  end
-
-  defp raw_handle_varint(:packed, <<>>, result, val, _groups), do: [val | result]
-
-  defp raw_handle_varint(:packed, <<bin::bits>>, result, val, groups) do
-    raw_decode_varint(bin, [val | result], :packed, groups)
+    case groups do
+      [] -> raw_decode_key(rest, [bytes | result], groups)
+      _ -> raw_decode_key(rest, result, groups)
+    end
   end
 
   @doc false
   def raw_decode_value(wire, bin, result, groups \\ [])
 
   def raw_decode_value(wire_varint(), <<bin::bits>>, result, groups) do
-    raw_decode_varint(bin, result, :value, groups)
+    raw_decode_varint(bin, result, groups)
   end
 
   def raw_decode_value(wire_delimited(), <<bin::bits>>, result, groups) do
-    raw_decode_varint(bin, result, :bytes_len, groups)
+    raw_decode_delimited(bin, result, groups)
   end
 
   def raw_decode_value(wire_32bits(), <<n::32, rest::bits>>, result, []) do
@@ -317,13 +302,16 @@ defmodule Protobuf.Decoder do
 
     value =
       case wire_type do
-        wire_varint() -> raw_decode_varint(bin, acc, :packed, [])
+        wire_varint() -> decode_varints(bin, acc)
         wire_32bits() -> decode_fixed32(bin, type, key, acc)
         wire_64bits() -> decode_fixed64(bin, type, key, acc)
       end
 
     Map.put(msg, key, value)
   end
+
+  defp decode_varints(<<>>, acc), do: acc
+  decoder :defp, :decode_varints, [:acc], do: decode_varints(rest, [value | acc])
 
   @dialyzer {:nowarn_function, decode_fixed32: 4}
   defp decode_fixed32(<<n::bits-32, bin::bits>>, type, key, acc) do
