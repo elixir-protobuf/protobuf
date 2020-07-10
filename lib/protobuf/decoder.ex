@@ -8,197 +8,187 @@ defmodule Protobuf.Decoder do
 
   require Logger
 
+  @compile {:inline,
+            decode_field: 3, skip_varint: 4, skip_delimited: 4, reverse_repeated: 2, field_key: 2}
+
   @spec decode(binary, atom) :: any
-  def decode(data, module) do
-    kvs = raw_decode_key(data, [], [])
-    msg_props = module.__message_props__()
-    struct = build_struct(kvs, msg_props, module.new())
-    reverse_repeated(struct, msg_props.repeated_fields)
+  def decode(bin, module) do
+    props = module.__message_props__()
+
+    bin
+    |> build_message(module.new(), props)
+    |> reverse_repeated(props.repeated_fields)
   end
 
-  defp build_struct([tag, wire, val | rest], %{field_props: f_props} = msg_props, struct) do
-    case f_props do
-      %{
-        ^tag =>
-          %{
-            wire_type: ^wire,
-            repeated?: is_repeated,
-            map?: is_map,
-            type: type,
-            oneof: oneof,
-            name_atom: name_atom,
-            embedded?: embedded
-          } = prop
-      } ->
-        key = if oneof, do: oneof_field(prop, msg_props), else: name_atom
+  defp build_message(<<>>, message, _props), do: message
 
-        struct =
-          if embedded do
-            embedded_msg = decode(val, type)
-            val = if is_map, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
-            val = if oneof, do: {name_atom, val}, else: val
-
-            val = merge_embedded_value(struct, key, val, is_repeated)
-
-            Map.put(struct, key, val)
-          else
-            val = Wire.to_proto(type, val)
-            val = if oneof, do: {name_atom, val}, else: val
-
-            val =
-              if is_repeated do
-                merge_simple_repeated_value(struct, key, val)
-              else
-                val
-              end
-
-            Map.put(struct, key, val)
-          end
-
-        build_struct(rest, msg_props, struct)
-
-      %{^tag => %{packed?: true} = f_prop} ->
-        struct = put_packed_field(struct, f_prop, val)
-        build_struct(rest, msg_props, struct)
-
-      %{^tag => %{wire_type: wire2} = f_prop} ->
-        raise DecodeError,
-              "wrong wire_type for #{prop_display(f_prop)}: got #{wire}, want #{wire2}"
-
-      _ ->
-        struct = try_decode_extension(struct, tag, wire, val)
-        build_struct(rest, msg_props, struct)
-    end
+  defp build_message(<<bin::bits>>, message, props) do
+    decode_field(bin, message, props)
   end
 
-  defp build_struct([], _, struct) do
-    struct
-  end
-
-  defp merge_embedded_value(struct, key, val, is_repeated) do
-    case struct do
-      %{^key => nil} ->
-        if is_repeated, do: [val], else: val
-
-      %{^key => value} ->
-        if is_repeated, do: [val | value], else: Map.merge(value, val)
-
-      _ ->
-        if is_repeated, do: [val], else: val
-    end
-  end
-
-  defp merge_simple_repeated_value(struct, key, val) do
-    case struct do
-      %{^key => nil} ->
-        [val]
-
-      %{^key => value} ->
-        [val | value]
-
-      _ ->
-        [val]
-    end
-  end
-
-  defp raw_decode_key(<<>>, result, []), do: Enum.reverse(result)
-
-  decoder :defp, :raw_decode_key, [:result, :groups] do
-    tag = bsr(value, 3)
+  decoder :defp, :decode_field, [:message, :props] do
+    field_number = bsr(value, 3)
     wire_type = band(value, 7)
-    raw_handle_key(wire_type, tag, groups, rest, result)
+    handle_field(rest, field_number, wire_type, message, props)
   end
 
-  defp raw_handle_key(wire_start_group(), opening, groups, <<bin::bits>>, result) do
-    raw_decode_key(bin, result, [opening | groups])
+  defp handle_field(<<bin::bits>>, field_number, wire_start_group(), message, props) do
+    skip_field(bin, message, props, [field_number])
   end
 
-  defp raw_handle_key(wire_end_group(), closing, [closing | groups], <<bin::bits>>, result) do
-    raw_decode_key(bin, result, groups)
+  defp handle_field(<<_bin::bits>>, closing, wire_end_group(), _message, _props) do
+    msg = "closing group #{inspect(closing)} but no groups are open"
+    raise Protobuf.DecodeError, message: msg
   end
 
-  defp raw_handle_key(wire_end_group(), closing, [], _bin, _result) do
-    raise(Protobuf.DecodeError,
-      message: "closing group #{inspect(closing)} but no groups are open"
-    )
+  defp handle_field(<<bin::bits>>, field_number, wire_varint(), message, props) do
+    decode_varint(bin, field_number, message, props)
   end
 
-  defp raw_handle_key(wire_end_group(), closing, [open | _], _bin, _result) do
-    raise(Protobuf.DecodeError,
-      message: "closing group #{inspect(closing)} but group #{inspect(open)} is open"
-    )
+  defp handle_field(<<bin::bits>>, field_number, wire_delimited(), message, props) do
+    decode_delimited(bin, field_number, message, props)
   end
 
-  defp raw_handle_key(wire_type, tag, groups, <<bin::bits>>, result) do
-    case groups do
-      [] -> raw_decode_value(wire_type, bin, [wire_type, tag | result], groups)
-      _ -> raw_decode_value(wire_type, bin, result, groups)
-    end
+  defp handle_field(<<bin::bits>>, field_number, wire_32bits(), message, props) do
+    <<value::bits-32, rest::bits>> = bin
+    handle_value(rest, field_number, wire_32bits(), value, message, props)
   end
 
-  decoder :defp, :raw_decode_varint, [:result, :groups] do
-    case groups do
-      [] -> raw_decode_key(rest, [value | result], groups)
-      _ -> raw_decode_key(rest, result, groups)
-    end
+  defp handle_field(<<bin::bits>>, field_number, wire_64bits(), message, props) do
+    <<value::bits-64, rest::bits>> = bin
+    handle_value(rest, field_number, wire_64bits(), value, message, props)
   end
 
-  decoder :defp, :raw_decode_delimited, [:result, :groups] do
-    <<bytes::bytes-size(value), rest::bits>> = rest
-
-    case groups do
-      [] -> raw_decode_key(rest, [bytes | result], groups)
-      _ -> raw_decode_key(rest, result, groups)
-    end
-  end
-
-  @doc false
-  def raw_decode_value(wire, bin, result, groups \\ [])
-
-  def raw_decode_value(wire_varint(), <<bin::bits>>, result, groups) do
-    raw_decode_varint(bin, result, groups)
-  end
-
-  def raw_decode_value(wire_delimited(), <<bin::bits>>, result, groups) do
-    raw_decode_delimited(bin, result, groups)
-  end
-
-  def raw_decode_value(wire_32bits(), <<n::bits-32, rest::bits>>, result, []) do
-    raw_decode_key(rest, [n | result], [])
-  end
-
-  def raw_decode_value(wire_32bits(), <<_n::bits-32, rest::bits>>, result, groups) do
-    raw_decode_key(rest, result, groups)
-  end
-
-  def raw_decode_value(wire_64bits(), <<n::bits-64, rest::bits>>, result, []) do
-    raw_decode_key(rest, [n | result], [])
-  end
-
-  def raw_decode_value(wire_64bits(), <<_n::bits-64, rest::bits>>, result, groups) do
-    raw_decode_key(rest, result, groups)
-  end
-
-  def raw_decode_value(_, _, _, _) do
+  defp handle_field(_bin, _field_number, _wire_type, _message, _props) do
     raise Protobuf.DecodeError, message: "cannot decode binary data"
   end
 
-  # packed
-  defp put_packed_field(msg, %{wire_type: wire_type, type: type, name_atom: key}, bin) do
-    acc =
-      case msg do
-        %{^key => value} when is_list(value) -> value
-        %{} -> []
-      end
+  decoder :defp, :skip_field, [:message, :props, :groups] do
+    field_number = bsr(value, 3)
+    wire_type = band(value, 7)
 
-    value =
-      case wire_type do
-        wire_varint() -> decode_varints(bin, acc)
-        wire_32bits() -> decode_fixed32(bin, type, acc)
-        wire_64bits() -> decode_fixed64(bin, type, acc)
-      end
+    case wire_type do
+      wire_start_group() ->
+        skip_field(rest, message, props, [field_number | groups])
 
-    Map.put(msg, key, value)
+      wire_end_group() ->
+        case groups do
+          [^field_number] ->
+            build_message(rest, message, props)
+
+          [^field_number | groups] ->
+            skip_field(rest, message, props, groups)
+
+          [group | _] ->
+            msg = "closing group #{inspect(field_number)} but group #{inspect(group)} is open"
+            raise Protobuf.DecodeError, message: msg
+        end
+
+      wire_varint() ->
+        skip_varint(rest, message, props, groups)
+
+      wire_delimited() ->
+        skip_delimited(rest, message, props, groups)
+
+      wire_32bits() ->
+        <<_skip::bits-32, rest::bits>> = rest
+        skip_field(rest, message, props, groups)
+
+      wire_64bits() ->
+        <<_skip::bits-64, rest::bits>> = rest
+        skip_field(rest, message, props, groups)
+    end
+  end
+
+  decoder :defp, :skip_varint, [:message, :props, :groups] do
+    _ = var!(value)
+    skip_field(rest, message, props, groups)
+  end
+
+  decoder :defp, :skip_delimited, [:message, :props, :groups] do
+    <<_skip::bytes-size(value), rest::bits>> = rest
+    skip_field(rest, message, props, groups)
+  end
+
+  decoder :defp, :decode_varint, [:field_number, :message, :props] do
+    handle_value(rest, field_number, wire_varint(), value, message, props)
+  end
+
+  decoder :defp, :decode_delimited, [:field_number, :message, :props] do
+    <<bytes::bytes-size(value), rest::bits>> = rest
+    handle_value(rest, field_number, wire_delimited(), bytes, message, props)
+  end
+
+  defp handle_value(<<bin::bits>>, field_number, wire_type, value, message, props) do
+    case props.field_props do
+      %{^field_number => %{packed?: true} = prop} ->
+        key = prop.name_atom
+        current_value = Map.get(message, key)
+        new_value = value_for_packed(value, current_value, prop)
+        new_message = Map.put(message, key, new_value)
+        build_message(bin, new_message, props)
+
+      %{^field_number => %{wire_type: ^wire_type} = prop} ->
+        key = field_key(prop, props)
+        current_value = Map.get(message, key)
+        new_value = value_for_field(value, current_value, prop)
+        new_message = Map.put(message, key, new_value)
+        build_message(bin, new_message, props)
+
+      %{^field_number => %{wire_type: wanted, name: field}} ->
+        message = "wrong wire_type for #{field}: got #{wire_type}, want #{wanted}"
+        raise DecodeError, message: message
+
+      %{} ->
+        %mod{} = message
+
+        new_message =
+          case Protobuf.Extension.get_extension_props_by_tag(mod, field_number) do
+            {ext_mod, %{field_props: prop}} ->
+              current_value = Protobuf.Extension.get(message, ext_mod, prop.name_atom, nil)
+              new_value = value_for_field(value, current_value, prop)
+              Protobuf.Extension.put(mod, message, ext_mod, prop.name_atom, new_value)
+
+            _ ->
+              message
+          end
+
+        build_message(bin, new_message, props)
+    end
+  end
+
+  defp value_for_field(value, current, %{embedded?: false} = prop) do
+    val = Wire.to_proto(prop.type, value)
+    val = if prop.oneof, do: {prop.name_atom, val}, else: val
+
+    case {current, prop.repeated?} do
+      {nil, true} -> [val]
+      {current, true} -> [val | current]
+      _ -> val
+    end
+  end
+
+  defp value_for_field(bin, current, %{embedded?: true} = prop) do
+    embedded_msg = decode(bin, prop.type)
+    val = if prop.map?, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
+    val = if prop.oneof, do: {prop.name_atom, val}, else: val
+
+    case {current, prop.repeated?} do
+      {nil, true} -> [val]
+      {nil, false} -> val
+      {current, true} -> [val | current]
+      {current, false} -> Map.merge(current, val)
+    end
+  end
+
+  defp value_for_packed(bin, current, prop) do
+    acc = current || []
+
+    case prop.wire_type do
+      wire_varint() -> decode_varints(bin, acc)
+      wire_32bits() -> decode_fixed32(bin, prop.type, acc)
+      wire_64bits() -> decode_fixed64(bin, prop.type, acc)
+    end
   end
 
   defp decode_varints(<<>>, acc), do: acc
@@ -219,12 +209,6 @@ defmodule Protobuf.Decoder do
 
   defp decode_fixed64(<<>>, _, acc), do: acc
 
-  defp prop_display(prop) do
-    prop.name
-  end
-
-  defp reverse_repeated(msg, []), do: msg
-
   defp reverse_repeated(msg, [h | t]) do
     case msg do
       %{^h => val} when is_list(val) ->
@@ -235,49 +219,12 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  defp oneof_field(%{oneof: oneof}, %{oneof: oneofs}) do
-    {field, ^oneof} = Enum.at(oneofs, oneof)
-    field
-  end
+  defp reverse_repeated(msg, []), do: msg
 
-  defp try_decode_extension(%mod{} = struct, tag, wire, val) do
-    case Protobuf.Extension.get_extension_props_by_tag(mod, tag) do
-      {ext_mod,
-       %{
-         field_props: %{
-           wire_type: ^wire,
-           repeated?: is_repeated,
-           type: type,
-           name_atom: name_atom,
-           embedded?: embedded
-         }
-       }} ->
-        val =
-          if embedded do
-            embedded_msg = decode(val, type)
-            merge_embedded_value(struct, name_atom, embedded_msg, is_repeated)
-          else
-            val = Wire.to_proto(type, val)
+  defp field_key(%{oneof: nil, name_atom: field_key}, _message_props), do: field_key
 
-            if is_repeated do
-              merge_simple_repeated_value(struct, name_atom, val)
-            else
-              val
-            end
-          end
-
-        key = {ext_mod, name_atom}
-
-        case struct do
-          %{__pb_extensions__: pb_ext} ->
-            Map.put(struct, :__pb_extensions__, Map.put(pb_ext, key, val))
-
-          _ ->
-            Map.put(struct, :__pb_extensions__, %{key => val})
-        end
-
-      _ ->
-        struct
-    end
+  defp field_key(%{oneof: oneof_number}, %{oneof: oneofs}) do
+    {field_key, ^oneof_number} = Enum.at(oneofs, oneof_number)
+    field_key
   end
 end
