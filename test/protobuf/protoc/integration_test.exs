@@ -92,4 +92,22 @@ defmodule Protobuf.Protoc.IntegrationTest do
 
     assert msg |> Ext.MyMessage.encode() |> Ext.MyMessage.decode() == msg
   end
+
+  test "extension use case empty values" do
+    msg =
+      Ext.MyMessage.new(
+        f1: 0.0,
+        f3: 0,
+        f7: false,
+        f8: "",
+        nested: Ext.Nested.new(),
+        no_extype: %Google.Protobuf.StringValue{value: ""},
+        normal1: 0,
+        normal2: "",
+        # FIX: should be []
+        repeated_field: nil
+      )
+
+    assert msg |> Ext.MyMessage.encode() |> Ext.MyMessage.decode() == msg
+  end
 end
