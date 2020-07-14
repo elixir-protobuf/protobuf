@@ -1,4 +1,8 @@
 defmodule My.Test.HatType do
+  @moduledoc """
+  The Comment, yadda yadda yadda
+  More details
+  """
   use Protobuf, enum: true, syntax: :proto2
 
   @typedoc """
@@ -117,7 +121,7 @@ defmodule My.Test.Request do
   @type key :: [integer]
 
   @typedoc """
-   optional imp.ImportedMessage imported_message = 2;
+  optional imp.ImportedMessage imported_message = 2;
 
   no default
   """
@@ -126,7 +130,7 @@ defmodule My.Test.Request do
   @type hat :: My.Test.HatType.t()
 
   @typedoc """
-   optional imp.ImportedMessage.Owner owner = 6;
+  optional imp.ImportedMessage.Owner owner = 6;
   """
   @type deadline :: float | :infinity | :negative_infinity | :nan
 

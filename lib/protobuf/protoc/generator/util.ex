@@ -74,6 +74,7 @@ defmodule Protobuf.Protoc.Generator.Util do
     #    */
     |> Enum.map(&String.replace_prefix(&1, " ", ""))
     |> Enum.join("\n")
+    |> String.trim_leading()
     |> String.trim_trailing()
   end
 
