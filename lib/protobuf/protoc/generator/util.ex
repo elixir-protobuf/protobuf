@@ -97,10 +97,19 @@ defmodule Protobuf.Protoc.Generator.Util do
     name = name |> to_string() |> String.downcase()
 
     try do
+      original_compiler_options = Code.compiler_options()
+
+      # `Code.compile_string/2` will also load the compiled module into memory causing: `warning: redefining module SafeTypeNameWrapper (current version defined in memory)`
+      # to disable these temporarily we modify the compiler options
+      Code.compiler_options(ignore_module_conflict: true)
+
       # this will fail for names like
       # - `or` that are elixir operators and therefore are limited in how they can be used
       # - `number` and other predefined types which can not be redefined (see: https://hexdocs.pm/elixir/typespecs.html)
       Code.compile_string("defmodule SafeTypeNameWrapper do @type #{name} :: any() end")
+
+      # reset to the original/unmodified compiler options
+      Code.compiler_options(original_compiler_options)
 
       name
     rescue
