@@ -157,7 +157,6 @@ defmodule TestMsg do
     field :b, 2, optional: true, type: Bar2.Enum, enum: true
   end
 
-
   defmodule Atom.Bar2 do
     use Protobuf, syntax: :proto3
 

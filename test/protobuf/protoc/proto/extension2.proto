@@ -45,4 +45,7 @@ message MyMessage {
   TrafficLightColor color_lc = 16 [(brex.elixirpb.field).enum="lowercase"];
   TrafficLightColor color_depr = 17 [(brex.elixirpb.field).enum="deprefix"];
   TrafficLightColor color_atom = 18 [(brex.elixirpb.field).enum="atomize"];
+  repeated TrafficLightColor color_repeated = 19 [(brex.elixirpb.field).enum="atomize"];
+  repeated TrafficLightColor color_repeated_normal = 20;
+  repeated string normal3 = 21;
 }

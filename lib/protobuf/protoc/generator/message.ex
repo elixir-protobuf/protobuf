@@ -82,7 +82,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     opts = %{
       syntax: syntax,
       map: msg_options && msg_options.map_entry,
-      deprecated: msg_options && msg_options.deprecated,
+      deprecated: msg_options && msg_options.deprecated
     }
 
     opts =
@@ -110,7 +110,9 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   def typespec_str(_ctx, [], [], []), do: "  @type t :: %__MODULE__{}\n"
-  def typespec_str(_ctx, [], [], [_ | _]), do: "  @type t :: %__MODULE__{__pb_extensions__: map}\n"
+
+  def typespec_str(_ctx, [], [], [_ | _]),
+    do: "  @type t :: %__MODULE__{__pb_extensions__: map}\n"
 
   def typespec_str(ctx, fields, oneofs, extensions) do
     longest_field = fields |> Enum.max_by(&String.length(&1[:name]))
@@ -153,10 +155,17 @@ defmodule Protobuf.Protoc.Generator.Message do
     String.pad_trailing("#{name}:", len + 1)
   end
 
-  defp fmt_type(%{custom_field_options?: true}, %{label: label, type_enum: type_enum, type: type, opts: %{options: options}}) when not is_nil(options) do
+  defp fmt_type(%{custom_field_options?: true}, %{
+         label: label,
+         type_enum: type_enum,
+         type: type,
+         opts: %{options: options}
+       })
+       when not is_nil(options) do
     repeated = if label == "repeated", do: true, else: false
     "#{Protobuf.FieldOptionsProcessor.type_to_spec(type_enum, type, repeated, options)}"
   end
+
   defp fmt_type(_ctx, %{opts: %{map: true}, map: {{k_type, k_name}, {v_type, v_name}}}) do
     k_type = type_to_spec(k_type, k_name)
     v_type = type_to_spec(v_type, v_name)
@@ -306,8 +315,12 @@ defmodule Protobuf.Protoc.Generator.Message do
       f.options
       |> Google.Protobuf.FieldOptions.get_extension(Brex.Elixirpb.PbExtension, :field)
       |> case do
-        nil -> nil
-        [] -> nil
+        nil ->
+          nil
+
+        [] ->
+          nil
+
         elixir_field_options ->
           elixir_field_options
           |> Map.from_struct()

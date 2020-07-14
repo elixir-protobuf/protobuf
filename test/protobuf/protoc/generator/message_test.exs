@@ -187,7 +187,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ".brex.elixirpb.FieldOptions" => %{type_name: "Brex.Elixirpb.FieldOptions"},
         ".google.protobuf.StringValue" => %{type_name: "Google.Protobuf.StringValue"}
       },
-      package: "",
+      package: ""
     }
 
     refute ctx.custom_field_options?
@@ -230,8 +230,10 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "use Protobuf\n\n"
     assert msg =~ "a: Google.Protobuf.StringValue.t | nil"
     assert msg =~ "b: Google.Protobuf.StringValue.t | nil"
+
     assert msg =~
              "field :a, 1, optional: true, type: Google.Protobuf.StringValue\n"
+
     assert msg =~ "field :b, 1, optional: true, type: Google.Protobuf.StringValue\n\nend"
   end
 
@@ -283,7 +285,10 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "use Protobuf, custom_field_options?: true"
     assert msg =~ "a: String.t() | nil"
     assert msg =~ "b: Google.Protobuf.StringValue.t | nil"
-    assert msg =~ "field :a, 1, optional: true, type: Google.Protobuf.StringValue, options: [extype: \"String.t\"]\n"
+
+    assert msg =~
+             "field :a, 1, optional: true, type: Google.Protobuf.StringValue, options: [extype: \"String.t\"]\n"
+
     assert msg =~ "field :b, 1, optional: true, type: Google.Protobuf.StringValue\n\nend"
   end
 

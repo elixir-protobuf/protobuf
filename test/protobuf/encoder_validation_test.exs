@@ -151,7 +151,12 @@ defmodule Protobuf.EncoderTest.Validation do
 
   test "field with custom options is valid" do
     msg = TestMsg.Ext.DualUseCase.new(a: "s1", b: Google.Protobuf.StringValue.new(value: "s2"))
-    msg1 = TestMsg.Ext.DualNonUse.new(a: Google.Protobuf.StringValue.new(value: "s1"), b: Google.Protobuf.StringValue.new(value: "s2"))
+
+    msg1 =
+      TestMsg.Ext.DualNonUse.new(
+        a: Google.Protobuf.StringValue.new(value: "s1"),
+        b: Google.Protobuf.StringValue.new(value: "s2")
+      )
 
     assert Protobuf.Encoder.encode(msg) == Protobuf.Encoder.encode(msg1)
   end

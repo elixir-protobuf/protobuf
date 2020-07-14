@@ -54,7 +54,10 @@ defmodule Ext.MyMessage do
           color: Ext.TrafficLightColor.t(),
           color_lc: Ext.TrafficLightColor.t(),
           color_depr: Ext.TrafficLightColor.t(),
-          color_atom: Ext.TrafficLightColor.t()
+          color_atom: Ext.TrafficLightColor.t(),
+          color_repeated: [Ext.TrafficLightColor.t()],
+          color_repeated_normal: [[Ext.TrafficLightColor.t()]],
+          normal3: [String.t()]
         }
   defstruct [
     :f1,
@@ -74,7 +77,10 @@ defmodule Ext.MyMessage do
     :color,
     :color_lc,
     :color_depr,
-    :color_atom
+    :color_atom,
+    :color_repeated,
+    :color_repeated_normal,
+    :normal3
   ]
 
   field :f1, 1, type: Google.Protobuf.DoubleValue, options: [extype: "float"]
@@ -116,4 +122,19 @@ defmodule Ext.MyMessage do
     enum: true,
     json_name: "colorAtom",
     options: [enum: "atomize"]
+
+  field :color_repeated, 19,
+    repeated: true,
+    type: Ext.TrafficLightColor,
+    enum: true,
+    json_name: "colorRepeated",
+    options: [enum: "atomize"]
+
+  field :color_repeated_normal, 20,
+    repeated: true,
+    type: Ext.TrafficLightColor,
+    enum: true,
+    json_name: "colorRepeatedNormal"
+
+  field :normal3, 21, repeated: true, type: :string
 end

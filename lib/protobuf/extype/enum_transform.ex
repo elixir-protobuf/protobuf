@@ -14,27 +14,34 @@ defmodule EnumTransform do
 
   @type value :: atom
 
-
-
   def validate_and_get_transformers!({:enum, _type}, transform) when is_binary(transform) do
     transform
     |> String.split(",")
     |> Enum.map(&String.trim/1)
     |> Enum.sort()
     |> Enum.flat_map(fn
-      "lowercase"-> [EnumTransform.Lowercase]
-      "deprefix" ->[EnumTransform.Deprefix]
-      "atomize" -> [EnumTransform.Deprefix, EnumTransform.Lowercase]
-      _ -> raise "Invalid enum transformation: #{transform}. Accepted values are lowercase, deprefix, and atomize"
+      "lowercase" ->
+        [EnumTransform.Lowercase]
+
+      "deprefix" ->
+        [EnumTransform.Deprefix]
+
+      "atomize" ->
+        [EnumTransform.Deprefix, EnumTransform.Lowercase]
+
+      _ ->
+        raise "Invalid enum transformation: #{transform}. Accepted values are lowercase, deprefix, and atomize"
     end)
     |> Enum.uniq()
   end
+
   def validate_and_get_transformers!(type, _transform) do
     raise "Enum transformation applied to incorrect type: #{type}."
   end
 
   # TODO: add lowercase, deprefixed to spec?
-  @spec type_to_spec(type :: String.t(), repeated :: boolean, transform :: String.t()) :: String.t()
+  @spec type_to_spec(type :: String.t(), repeated :: boolean, transform :: String.t()) ::
+          String.t()
   def type_to_spec(type, repeated, _transform) do
     if repeated, do: "[#{type}.t]", else: type <> ".t"
   end
@@ -106,4 +113,3 @@ defmodule EnumTransform.Deprefix do
 
   def backward({:enum, type}), do: &String.replace_prefix(&1, type.prefix, "")
 end
-

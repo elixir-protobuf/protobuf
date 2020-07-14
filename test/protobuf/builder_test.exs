@@ -79,13 +79,13 @@ defmodule Protobuf.BuilderTest do
 
   test "new/2 build for custom_field_options, bad value" do
     assert_raise Protocol.UndefinedError,
-      fn -> DualUseCase.new(a: "s1", b: "s2") end
+                 fn -> DualUseCase.new(a: "s1", b: "s2") end
   end
 
   test "new/2 build for custom_field_options shape checks" do
     assert_raise RuntimeError,
-      "When extype option is present, new expects unwrapped value, not struct.",
-      fn -> DualUseCase.new!(a: %Google.Protobuf.StringValue{value: "s1"}) end
+                 "When extype option is present, new expects unwrapped value, not struct.",
+                 fn -> DualUseCase.new!(a: %Google.Protobuf.StringValue{value: "s1"}) end
   end
 
   test "new/2 build for custom_field_options doesn't type check" do
@@ -95,6 +95,6 @@ defmodule Protobuf.BuilderTest do
 
   test "new/2 allows any struct in embedded fields" do
     assert %TestMsg.Ext.DualNonUse{b: %{__struct__: "hello"}} ==
-      TestMsg.Ext.DualNonUse.new(b: %{__struct__: "hello"})
+             TestMsg.Ext.DualNonUse.new(b: %{__struct__: "hello"})
   end
 end
