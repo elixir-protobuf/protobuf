@@ -307,7 +307,7 @@ defmodule My.Test.Communique do
   use Protobuf, syntax: :proto2
 
   @type make_me_cry :: boolean
-  @type __number :: integer
+  @type number_ :: integer
   @type name :: String.t()
   @type data :: binary
   @type temp_c :: float | :infinity | :negative_infinity | :nan
@@ -327,7 +327,7 @@ defmodule My.Test.Communique do
   This is a oneof, called "union".
   """
   @type union ::
-          {:number, __number()}
+          {:number, number_()}
           | {:name, name()}
           | {:data, data()}
           | {:temp_c, temp_c()}

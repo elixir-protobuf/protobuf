@@ -94,14 +94,18 @@ defmodule Protobuf.Protoc.Generator.Util do
 
   @spec safe_type_name(binary()) :: binary()
   def safe_type_name(name) do
-    prefix = "__"
-    reserved_names = ["and", "or", "not", "number"]
-    name = name |> to_string()
+    name = name |> to_string() |> String.downcase()
 
-    if name in reserved_names do
-      String.downcase(prefix <> name)
-    else
-      String.downcase(name)
+    try do
+      # this will fail for names like
+      # - `or` that are elixir operators and therefore are limited in how they can be used
+      # - `number` and other predefined types which can not be redefined (see: https://hexdocs.pm/elixir/typespecs.html)
+      Code.compile_string("defmodule SafeTypeNameWrapper do @type #{name} :: any() end")
+
+      name
+    rescue
+      _ ->
+        name <> "_"
     end
   end
 
