@@ -118,4 +118,21 @@ defmodule Protobuf.Protoc.IntegrationTest do
 
     assert msg |> Ext.MyMessage.encode() |> Ext.MyMessage.decode() == msg
   end
+
+  test "extensions when enums are nil" do
+    msg =
+      Ext.MyMessage.new(
+        color: nil,
+        color_lc: nil,
+        color_depr: nil,
+        color_atom: nil
+      )
+
+    assert %Ext.MyMessage{
+             color: :TRAFFIC_LIGHT_COLOR_INVALID,
+             color_atom: :invalid,
+             color_depr: :INVALID,
+             color_lc: :traffic_light_color_invalid
+           } = msg |> Ext.MyMessage.encode() |> Ext.MyMessage.decode()
+  end
 end

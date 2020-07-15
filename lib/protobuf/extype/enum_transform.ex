@@ -59,6 +59,8 @@ defmodule EnumTransform do
     value
   end
 
+  def skip?(_type, nil, _transform), do: true
+
   def skip?(type, v, transform) do
     mods = validate_and_get_transformers!(type, transform)
     v = transform_atom(type, v, mods, :forward)
