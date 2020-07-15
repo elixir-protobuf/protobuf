@@ -48,4 +48,8 @@ message MyMessage {
   repeated TrafficLightColor color_repeated = 19 [(brex.elixirpb.field).enum="atomize"];
   repeated TrafficLightColor color_repeated_normal = 20;
   repeated string normal3 = 21;
+  oneof enums_oneof {
+    TrafficLightColor color_oneof = 22;
+    TrafficLightColor color_oneof_atom = 23 [(brex.elixirpb.field).enum="atomize"];
+  }
 }

@@ -125,14 +125,21 @@ defmodule Protobuf.Protoc.IntegrationTest do
         color: nil,
         color_lc: nil,
         color_depr: nil,
-        color_atom: nil
+        color_atom: nil,
+        enums_oneof: {:color_oneof_atom, :invalid}
       )
 
     assert %Ext.MyMessage{
              color: :TRAFFIC_LIGHT_COLOR_INVALID,
              color_atom: :invalid,
              color_depr: :INVALID,
-             color_lc: :traffic_light_color_invalid
+             color_lc: :traffic_light_color_invalid,
+             enums_oneof: {:color_oneof_atom, :invalid}
            } = msg |> Ext.MyMessage.encode() |> Ext.MyMessage.decode()
+  end
+
+  test "empty message" do
+    assert Ext.MyMessage.new() |> Ext.MyMessage.encode() |> Ext.MyMessage.decode() ==
+             Ext.MyMessage.new()
   end
 end

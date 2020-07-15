@@ -58,8 +58,9 @@ defmodule Protobuf.FieldOptionsProcessor do
   end
 
   def skip?(type, value, _prop, []), do: Protobuf.Encoder.is_enum_default?(type, value)
-
+  def skip?(_type, nil, _prop, _options), do: true
   def skip?(_type, _value, %{repeated?: true}, _options), do: false
+  def skip?(_type, _value, %{oneof: oneof}, _options) when not is_nil(oneof), do: false
 
   def skip?(type, value, _prop, options) do
     {mod, option} = get_mod(options)
