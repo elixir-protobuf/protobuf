@@ -361,22 +361,17 @@ defmodule Protobuf.Decoder do
     raw_decode_key(rest, result, groups)
   end
 
-  defp raw_handle_varint(:packed, <<>>, result, val, []), do: [val | result]
-  defp raw_handle_varint(:packed, <<>>, result, _val, _groups), do: result
+  defp raw_handle_varint(:packed, <<>>, result, val, _groups), do: [val | result]
 
-  defp raw_handle_varint(:packed, <<bin::bits>>, result, val, []) do
-    raw_decode_varint(bin, [val | result], :packed, [])
+  defp raw_handle_varint(:packed, <<bin::bits>>, result, val, groups) do
+    raw_decode_varint(bin, [val | result], :packed, groups)
   end
 
-  defp raw_handle_varint(:packed, <<bin::bits>>, result, _val, groups) do
-    raw_decode_varint(bin, result, :packed, groups)
-  end
-
-  defp raw_handle_key(wire_start_group(), opening, groups, bin, result) do
+  defp raw_handle_key(wire_start_group(), opening, groups, <<bin::bits>>, result) do
     raw_decode_key(bin, result, [opening | groups])
   end
 
-  defp raw_handle_key(wire_end_group(), closing, [closing | groups], bin, result) do
+  defp raw_handle_key(wire_end_group(), closing, [closing | groups], <<bin::bits>>, result) do
     raw_decode_key(bin, result, groups)
   end
 
@@ -392,11 +387,11 @@ defmodule Protobuf.Decoder do
     )
   end
 
-  defp raw_handle_key(wire_type, tag, [], bin, result) do
+  defp raw_handle_key(wire_type, tag, [], <<bin::bits>>, result) do
     raw_decode_value(wire_type, bin, [wire_type, tag | result], [])
   end
 
-  defp raw_handle_key(wire_type, _tag, groups, bin, result) do
+  defp raw_handle_key(wire_type, _tag, groups, <<bin::bits>>, result) do
     raw_decode_value(wire_type, bin, result, groups)
   end
 
@@ -432,38 +427,36 @@ defmodule Protobuf.Decoder do
   end
 
   # packed
-  defp put_packed_field(msg, %{wire_type: wire_type, type: type, name_atom: key}, val) do
-    vals =
-      decode_packed(wire_type, val, [])
-      |> Enum.map(fn v ->
-        decode_type_m(type, key, v)
-      end)
+  defp put_packed_field(msg, %{wire_type: wire_type, type: type, name_atom: key}, bin) do
+    acc =
+      case msg do
+        %{^key => value} when is_list(value) -> value
+        %{} -> []
+      end
 
-    case msg do
-      %{^key => nil} ->
-        Map.put(msg, key, vals)
+    value =
+      case wire_type do
+        wire_varint() -> raw_decode_varint(bin, acc, :packed, [])
+        wire_32bits() -> decode_fixed32(bin, type, key, acc)
+        wire_64bits() -> decode_fixed64(bin, type, key, acc)
+      end
 
-      %{^key => value} ->
-        Map.put(msg, key, vals ++ value)
-
-      %{} ->
-        Map.put(msg, key, vals)
-    end
+    Map.put(msg, key, value)
   end
 
-  defp decode_packed(_wire_type, <<>>, acc), do: acc
-
-  defp decode_packed(wire_varint(), <<bin::bits>>, _) do
-    raw_decode_varint(bin, [], :packed, [])
+  @dialyzer {:nowarn_function, decode_fixed32: 4}
+  defp decode_fixed32(<<n::bits-32, bin::bits>>, type, key, acc) do
+    decode_fixed32(bin, type, key, [decode_type_m(type, key, n) | acc])
   end
 
-  defp decode_packed(wire_32bits(), <<n::32, rest::bits>>, result) do
-    decode_packed(wire_32bits(), rest, [<<n::32>> | result])
+  defp decode_fixed32(<<>>, _, _, acc), do: acc
+
+  @dialyzer {:nowarn_function, decode_fixed64: 4}
+  defp decode_fixed64(<<n::bits-64, bin::bits>>, type, key, acc) do
+    decode_fixed64(bin, type, key, [decode_type_m(type, key, n) | acc])
   end
 
-  defp decode_packed(wire_64bits(), <<n::64, rest::bits>>, result) do
-    decode_packed(wire_64bits(), rest, [<<n::64>> | result])
-  end
+  defp decode_fixed64(<<>>, _, _, acc), do: acc
 
   @doc false
   @spec decode_zigzag(integer) :: integer
