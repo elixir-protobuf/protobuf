@@ -484,6 +484,27 @@ defmodule Protobuf.Decoder do
     field
   end
 
+  defp add_non_nil_values_to_struct(a, b) do
+    struct_type = a.__struct__
+    merged = Map.merge(Map.from_struct(a), Map.from_struct(b), fn _k, v1, v2 ->
+      if is_nil(v2) do
+        v1
+      else
+        v2
+      end
+    end)
+    struct(struct_type, merged)
+  end
+
+  defp add_and_merge_structs(pb_ext, key, val) do
+    # we have no Kernel.is_struct in elixir 1.8.2
+    if Map.has_key?(pb_ext, key) and Map.has_key?(val, :__struct__) do
+      %{pb_ext | key => add_non_nil_values_to_struct(pb_ext[key], val)}
+    else
+      Map.put(pb_ext, key, val)
+    end
+  end
+
   defp try_decode_extension(%mod{} = struct, tag, wire, val) do
     case Protobuf.Extension.get_extension_props_by_tag(mod, tag) do
       {ext_mod,
@@ -514,7 +535,7 @@ defmodule Protobuf.Decoder do
 
         case struct do
           %{__pb_extensions__: pb_ext} ->
-            Map.put(struct, :__pb_extensions__, Map.put(pb_ext, key, val))
+            Map.put(struct, :__pb_extensions__, add_and_merge_structs(pb_ext, key, val))
 
           _ ->
             Map.put(struct, :__pb_extensions__, %{key => val})
