@@ -176,6 +176,7 @@ defmodule Protobuf.EncoderTest do
 
     # Missing required field `:a` occurs a runtime error
     msg = TestMsg.EnumBar2.new()
+
     assert_raise Protobuf.EncodeError, ~r/Got error when encoding TestMsg.EnumBar2/, fn ->
       Encoder.encode(msg)
     end
@@ -208,5 +209,4 @@ defmodule Protobuf.EncoderTest do
     msg = TestMsg.EnumFoo2.new(a: 0, b: 1)
     assert Encoder.encode(msg) == <<8, 0, 16, 1>>
   end
-
 end
