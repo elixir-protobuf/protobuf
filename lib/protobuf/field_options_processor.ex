@@ -67,6 +67,16 @@ defmodule Protobuf.FieldOptionsProcessor do
     mod.skip?(type, value, option)
   end
 
+  def skip_verify?(_type, _value, _prop, []), do: false
+  def skip_verify?(_type, nil, _prop, _options), do: true
+  def skip_verify?(_type, _value, %{repeated?: true}, _options), do: false
+  def skip_verify?(_type, _value, %{oneof: oneof}, _options) when not is_nil(oneof), do: false
+
+  def skip_verify?(type, value, _prop, options) do
+    {mod, option} = get_mod(options)
+    mod.skip_verify?(type, value, option)
+  end
+
   def encode_type(type, v, []), do: Protobuf.Encoder.encode(type, v, [])
 
   def encode_type(type, v, options) do
@@ -79,5 +89,12 @@ defmodule Protobuf.FieldOptionsProcessor do
   def decode_type(val, type, options) do
     {mod, option} = get_mod(options)
     mod.decode_type(val, type, option)
+  end
+
+  def verify_type(type, v, []), do: Protobuf.Verifier.verify(type, v)
+
+  def verify_type(type, v, options) do
+    {mod, option} = get_mod(options)
+    mod.verify_type(type, v, option)
   end
 end

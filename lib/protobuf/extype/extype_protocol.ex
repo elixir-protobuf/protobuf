@@ -31,6 +31,9 @@ defprotocol Extype.Protocol do
 
   @spec decode_type(type, val :: binary, extype) :: value
   def decode_type(type, val, extype)
+
+  @spec verify_type(type, val :: binary, extype) :: :ok | {:error, String.t()}
+  def verify_type(type, val, extype)
 end
 
 defmodule Extype do
@@ -64,6 +67,9 @@ defmodule Extype do
   @spec skip?(type, value, extype) :: boolean
   def skip?(_type, _value, _extype), do: false
 
+  @spec skip_verify?(type, value, extype) :: boolean
+  def skip_verify?(_type, _value, _extype), do: false
+
   @spec type_default(type, extype) :: any
   def type_default(type, extype) do
     mod = get_mod(type)
@@ -94,6 +100,14 @@ defmodule Extype do
     extype = pad_parens(extype)
     atom_extype = mod.validate_and_to_atom_extype!(type, extype)
     mod.decode_type(type, val, atom_extype)
+  end
+
+  @spec verify_type(val :: binary, type, extype) :: :ok | {:error, String.t()}
+  def verify_type(type, v, extype) do
+    mod = get_mod(type)
+    extype = pad_parens(extype)
+    atom_extype = mod.validate_and_to_atom_extype!(type, extype)
+    mod.verify_type(type, v, atom_extype)
   end
 
   defp pad_parens(extype) do

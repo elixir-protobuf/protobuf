@@ -65,6 +65,8 @@ defmodule EnumTransform do
     Protobuf.Encoder.is_enum_default?(type, v)
   end
 
+  def skip_verify?(_type, _v, _transform), do: false
+
   @spec encode_type(type, value, transform) :: binary
   def encode_type(type, v, transform) do
     mods = validate_and_get_transformers!(type, transform)
@@ -78,6 +80,13 @@ defmodule EnumTransform do
     # Pass decode_type_m a false key. Should be field name
     val = Protobuf.Decoder.decode_type_m(type, :enum, val)
     transform_atom(type, val, mods, :backward)
+  end
+
+  @spec verify_type(type, value, transform) :: :ok | {:error, String.t()}
+  def verify_type(type, v, transform) do
+    mods = validate_and_get_transformers!(type, transform)
+    v = transform_atom(type, v, mods, :forward)
+    Protobuf.Verifier.verify_type(type, v)
   end
 
   defp transform_atom(type, atom, mods, direction) do

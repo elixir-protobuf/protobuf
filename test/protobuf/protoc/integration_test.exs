@@ -142,4 +142,34 @@ defmodule Protobuf.Protoc.IntegrationTest do
     assert Ext.MyMessage.new() |> Ext.MyMessage.encode() |> Ext.MyMessage.decode() ==
              Ext.MyMessage.new()
   end
+
+  test "new_and_verify!" do
+    dt = DateTime.from_unix!(1_464_096_368, :microsecond)
+
+    msg =
+      Ext.MyMessage.new_and_verify!(
+        f1: 1.0,
+        f2: 2.0,
+        f3: 3,
+        f4: 4,
+        f5: 5,
+        f6: 6,
+        f7: true,
+        f8: "8",
+        f9: "9",
+        nested: Ext.Nested.new(my_timestamp: {:dt, dt}),
+        no_extype: %Google.Protobuf.StringValue{value: "none"},
+        normal1: 1234,
+        normal2: "hello",
+        repeated_field: ["r1", "r2"],
+        color: :TRAFFIC_LIGHT_COLOR_UNSET,
+        color_lc: :traffic_light_color_invalid,
+        color_depr: :GREEN,
+        color_atom: :red,
+        color_repeated: [:red, :green],
+        color_repeated_normal: [:TRAFFIC_LIGHT_COLOR_RED, :TRAFFIC_LIGHT_COLOR_GREEN]
+      )
+
+    assert msg |> Ext.MyMessage.encode() |> Ext.MyMessage.decode() == msg
+  end
 end

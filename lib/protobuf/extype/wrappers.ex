@@ -53,4 +53,8 @@ defimpl Extype.Protocol,
     [_tag, _wire, val | _rest] = Protobuf.Decoder.decode_raw(val)
     Protobuf.Decoder.decode_type_m(extype, :value, val)
   end
+
+  def verify_type(_type, v, extype) do
+    Protobuf.Verifier.verify_type(extype, v)
+  end
 end

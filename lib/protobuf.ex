@@ -54,6 +54,27 @@ defmodule Protobuf do
         Protobuf.Builder.new!(__MODULE__, attrs)
       end
 
+      @doc """
+      `new_and_verify!` makes sure that the values used to instantiate a
+      protobuf struct have valid types. For example, if `a` is a string field
+      in `Foo`,
+
+          Foo.new_and_verify!(a: 123)
+
+      would raise an exception.
+      """
+      def new_and_verify!(attrs) do
+        struct = Protobuf.Builder.new!(__MODULE__, attrs)
+
+        case Protobuf.Verifier.verify(struct) do
+          {:error, messages} ->
+            raise Protobuf.VerificationError, message: Enum.join(messages, "\n\t")
+
+          :ok ->
+            struct
+        end
+      end
+
       unquote(def_encode_decode())
     end
   end

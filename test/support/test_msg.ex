@@ -334,4 +334,22 @@ defmodule TestMsg do
     field :a, 1, optional: true, type: Google.Protobuf.StringValue
     field :b, 2, optional: true, type: Google.Protobuf.StringValue
   end
+
+  defmodule Ext.Timestamps do
+    @moduledoc false
+    use Protobuf, syntax: :proto3
+
+    @type t :: %__MODULE__{
+            a: DateTime.t() | nil,
+            b: NaiveDateTime.t() | nil
+          }
+    defstruct [:a, :b]
+
+    field :a, 1, optional: true, type: Google.Protobuf.Timestamp, options: [extype: "DateTime.t"]
+
+    field :b, 2,
+      optional: true,
+      type: Google.Protobuf.Timestamp,
+      options: [extype: "NaiveDateTime.t"]
+  end
 end
