@@ -132,8 +132,13 @@ defmodule Protobuf.Verifier do
          prop.name_atom
        }"}
 
-  defp repeated_or_not(val, true = _repeated, func) when is_list(val) or is_tuple(val) or is_map(val), do: Enum.map(val, func)
-  defp repeated_or_not(_val, true = _repeated, _func), do: [{:error, "Got value for repeated or map field that wasn't a list, tuple, or map"}]
+  defp repeated_or_not(val, true = _repeated, func)
+       when is_list(val) or is_tuple(val) or is_map(val),
+       do: Enum.map(val, func)
+
+  defp repeated_or_not(_val, true = _repeated, _func),
+    do: [{:error, "Got value for repeated or map field that wasn't a list, tuple, or map"}]
+
   defp repeated_or_not(val, false = _repeated, func), do: [func.(val)]
 
   @spec ok_or_aggregate_errors([:ok | {:error, String.t()}]) :: :ok | {:error, [String.t()]}

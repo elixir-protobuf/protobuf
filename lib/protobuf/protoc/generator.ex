@@ -6,7 +6,15 @@ defmodule Protobuf.Protoc.Generator do
   alias Protobuf.Protoc.Generator.Service, as: ServiceGenerator
   alias Protobuf.Protoc.Generator.Extension, as: ExtensionGenerator
 
-  @locals_without_parens [field: 2, field: 3, oneof: 2, rpc: 3, extend: 4, extensions: 1]
+  @locals_without_parens [
+    field: 2,
+    field: 3,
+    oneof: 2,
+    rpc: 3,
+    extend: 4,
+    extensions: 1,
+    option: 1
+  ]
 
   def generate(ctx, desc) do
     name = new_file_name(desc.name)

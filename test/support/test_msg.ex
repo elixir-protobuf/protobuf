@@ -352,4 +352,19 @@ defmodule TestMsg do
       type: Google.Protobuf.Timestamp,
       options: [extype: "NaiveDateTime.t"]
   end
+
+  defmodule Ext.EnumFooCustom do
+    @moduledoc false
+    use Protobuf, enum: true, syntax: :proto2, custom_field_options?: true
+
+    option enum: :atomize
+
+    @type t :: integer | :letter_a | :letter_b | :letter_c | :letter_d | :letter_e
+
+    field :ENUM_FOO_CUSTOM_LETTER_A, 0
+    field :ENUM_FOO_CUSTOM_LETTER_B, 1
+    field :ENUM_FOO_CUSTOM_LETTER_C, 2
+    field :ENUM_FOO_CUSTOM_LETTER_D, 3
+    field :ENUM_FOO_CUSTOM_LETTER_E, 3
+  end
 end

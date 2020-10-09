@@ -172,13 +172,16 @@ defmodule Protobuf.VerifierTest do
     assert :ok == Verifier.verify(TestMsg.Foo.new(o: [:A]))
     assert :ok == Verifier.verify(TestMsg.Foo.new(o: [:B, :A, :UNKNOWN, :C]))
     assert {:error, errs} = Verifier.verify(TestMsg.Foo.new(o: [:B, :A, :banana, :C]))
+
     assert has_single_message_matching(
              errs,
              ~s(invalid value for enum Elixir.TestMsg.EnumFoo)
            )
+
     assert {:error, _errs} = Verifier.verify(TestMsg.Foo.new(o: [:B, :A, :D, "lalaland"]))
     assert {:error, _errs} = Verifier.verify(TestMsg.Foo.new(o: [:B, :A, :D, 555, :E]))
     assert {:error, errs} = Verifier.verify(TestMsg.Foo.new(o: :A))
+
     assert has_single_message_matching(
              errs,
              ~s(Got value for repeated or map field that wasn't a list, tuple, or map)

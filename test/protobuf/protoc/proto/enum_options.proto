@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package ext;
+
+import "brex_elixirpb.proto";
+import "extension2.proto";
+
+// To run
+// protoc -I src -I test/protobuf/protoc/proto --elixir_out=custom_field_options=true:test/protobuf/protoc/proto_gen --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/enum_options.proto
+
+enum MyPetIs {
+  option (brex.elixirpb.enum).deprefix = true;
+
+  MY_PET_IS_A_CAT = 0;
+  MY_PET_IS_A_BIRD = 1;
+  MY_PET_IS_A_DOG = 2;
+  MY_PET_IS_A_UNKNOWN = 3;
+}
+
+enum MySetIsA {
+  option (brex.elixirpb.enum).lowercase = true;
+
+  MY_SET_IS_A_CAT = 0;
+  MY_SET_IS_A_BIRD = 1;
+  MY_SET_IS_A_DOG = 2;
+  MY_SET_IS_A_UNKNOWN = 3;
+  SET_HORSE = 4;
+}
+
+enum TrafficFlight {
+  option (brex.elixirpb.enum).atomize = true;
+
+  TRAFFIC_FLIGHT_COLOR_INVALID = 0;
+  TRAFFIC_FLIGHT_COLOR_UNSET = 1;
+  TRAFFIC_FLIGHT_COLOR_GREEN = 2;
+  TRAFFIC_FLIGHT_COLOR_YELLOW = 3;
+  TRAFFIC_FLIGHT_COLOR_RED = 4;
+}
+
+message EnumTestMessage{
+  MyPetIs pet = 1;
+  MySetIsA set = 2;
+  TrafficFlight flight_color = 3;
+  TrafficLightColor color = 4;
+}

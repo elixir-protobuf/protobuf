@@ -31,11 +31,14 @@ defmodule Protobuf do
 
   defmacro __using__(opts) do
     quote location: :keep do
-      import Protobuf.DSL, only: [field: 3, field: 2, oneof: 2, extend: 4, extensions: 1]
+      import Protobuf.DSL,
+        only: [field: 3, field: 2, oneof: 2, extend: 4, extensions: 1, option: 1]
+
       Module.register_attribute(__MODULE__, :fields, accumulate: true)
       Module.register_attribute(__MODULE__, :oneofs, accumulate: true)
       Module.register_attribute(__MODULE__, :extends, accumulate: true)
       Module.register_attribute(__MODULE__, :extensions, [])
+      Module.register_attribute(__MODULE__, :msg_options, accumulate: true)
 
       @options unquote(opts)
       @before_compile Protobuf.DSL

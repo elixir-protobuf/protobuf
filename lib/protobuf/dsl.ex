@@ -35,18 +35,32 @@ defmodule Protobuf.DSL do
     end
   end
 
+  defmacro option([{option, value}]) do
+    # option (brex.elixirpb.enum).deprefix = true;
+    quote do
+      @msg_options {unquote(option), unquote(value)}
+    end
+  end
+
   defmacro __before_compile__(env) do
     fields = Module.get_attribute(env.module, :fields)
     options = Module.get_attribute(env.module, :options)
+
+    # When you compile .proto files into .pb.ex files, there's a
+    # Brex-specific flag called "custom_field_options" that turns on or off
+    # Brex's custom option handling. At first it was only being used for
+    # field options, but now it's used for field, enum, and file options.
+    custom_options = Keyword.get(options, :custom_field_options?)
 
     extension_props =
       Module.get_attribute(env.module, :extends)
       |> gen_extension_props()
 
     extensions = Module.get_attribute(env.module, :extensions)
+    msg_options = Module.get_attribute(env.module, :msg_options)
     syntax = Keyword.get(options, :syntax, :proto2)
     oneofs = Module.get_attribute(env.module, :oneofs)
-    msg_props = generate_msg_props(fields, oneofs, extensions, options)
+    msg_props = generate_msg_props(fields, oneofs, extensions, options, msg_options)
     default_fields = generate_default_fields(syntax, msg_props)
     default_struct = Map.put(default_fields, :__struct__, env.module)
 
@@ -62,7 +76,7 @@ defmodule Protobuf.DSL do
         unquote(Macro.escape(msg_props))
       end
 
-      unquote(def_enum_functions(msg_props, fields, env.module))
+      unquote(def_enum_functions(msg_props, fields, env.module, custom_options))
 
       if unquote(Macro.escape(extension_props)) != nil do
         def __protobuf_info__(:extension_props) do
@@ -90,28 +104,22 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}, fields, module) do
+  defp def_enum_functions(
+         %{syntax: syntax, enum?: true, field_props: props, options: enum_options},
+         fields,
+         module,
+         custom_options
+       ) do
     if syntax == :proto3 do
       unless props[0], do: raise("The first enum value must be zero in proto3")
     end
 
-    num_to_atom = for {fnum, %{name_atom: name_atom}} <- props, do: {fnum, name_atom}
-    atom_to_num = for {name_atom, fnum, _opts} <- fields, do: {name_atom, fnum}, into: %{}
-
-    string_or_num_to_atom =
-      for {fnum, %{name: name, name_atom: name_atom}} <- props,
-          key <- [fnum, name],
-          do: {key, name_atom},
-          into: %{}
-
-    prefix =
-      module
-      |> Protobuf.Protoc.Generator.Util.mod_to_name()
-      |> Kernel.<>("_")
-      |> String.upcase()
-
-    is_prefixed? =
-      Enum.all?(props, fn {_, %{name: name}} -> String.starts_with?(name, prefix) end)
+    {atom_to_num, num_to_atom, string_or_num_to_atom, extra_enum_defs} =
+      if is_nil(enum_options) or is_nil(custom_options) do
+        use_standard_mappings(props, fields, module)
+      else
+        Protobuf.EnumOptionsProcessor.generate_mappings(module, props, fields, enum_options)
+      end
 
     Enum.map(atom_to_num, fn {name_atom, fnum} ->
       quote do
@@ -134,14 +142,39 @@ defmodule Protobuf.DSL do
         end,
         quote do
           def __reverse_mapping__(), do: unquote(Macro.escape(string_or_num_to_atom))
-        end,
-        quote do
-          def prefix(), do: unquote(if is_prefixed?, do: prefix, else: "")
         end
-      ]
+      ] ++ extra_enum_defs
   end
 
-  defp def_enum_functions(_, _, _), do: nil
+  defp def_enum_functions(_, _, _, _), do: nil
+
+  defp use_standard_mappings(props, fields, module) do
+    atom_to_num = for {name_atom, fnum, _opts} <- fields, do: {name_atom, fnum}, into: %{}
+
+    num_to_atom = for {fnum, %{name_atom: name_atom}} <- props, do: {fnum, name_atom}
+
+    string_or_num_to_atom =
+      for {fnum, %{name: name, name_atom: name_atom}} <- props,
+          key <- [fnum, name],
+          do: {key, name_atom},
+          into: %{}
+
+    prefix =
+      module
+      |> Protobuf.Protoc.Generator.Util.mod_to_name()
+      |> Kernel.<>("_")
+      |> String.upcase()
+
+    is_prefixed? =
+      Enum.all?(props, fn {_, %{name: name}} -> String.starts_with?(name, prefix) end)
+
+    prefix_fun =
+      quote do
+        def prefix(), do: unquote(if is_prefixed?, do: prefix, else: "")
+      end
+
+    {atom_to_num, num_to_atom, string_or_num_to_atom, [prefix_fun]}
+  end
 
   defp def_extension_functions() do
     quote do
@@ -159,7 +192,7 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp generate_msg_props(fields, oneofs, extensions, options) do
+  defp generate_msg_props(fields, oneofs, extensions, options, msg_options) do
     syntax = Keyword.get(options, :syntax, :proto2)
     field_props = field_props_map(syntax, fields)
 
@@ -186,7 +219,8 @@ defmodule Protobuf.DSL do
       oneof: Enum.reverse(oneofs),
       enum?: Keyword.get(options, :enum) == true,
       map?: Keyword.get(options, :map) == true,
-      extension_range: extensions
+      extension_range: extensions,
+      options: if(msg_options == [], do: nil, else: msg_options)
     }
   end
 

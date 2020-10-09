@@ -16,10 +16,22 @@ message FieldOptions {
   // Specifies an elixir type to generate for this field. This will override usual type.
   optional string extype = 1;
   // Specifies options to lowercase or deprefix enums.
-  optional string enum = 2;
+  optional string enum = 2 [deprecated=true];
 }
 
 extend google.protobuf.FieldOptions {
   // Note: number to change
   optional FieldOptions field = 65007;
+}
+
+message EnumOptions {
+  // Specifies options to lowercase or deprefix enums.
+  // Alias for lowercase and deprefixing.
+  optional bool atomize = 1;
+  optional bool lowercase = 2;
+  optional bool deprefix = 3;
+}
+
+extend google.protobuf.EnumOptions {
+  optional EnumOptions enum = 65008;
 }

@@ -182,6 +182,60 @@ defmodule Protobuf.DSLTest do
              Foo.__message_props__().field_props[11]
   end
 
+  test "supports enum w/ custom option atomize" do
+    assert %{enum?: true} = TestMsg.Ext.EnumFooCustom.__message_props__()
+    assert TestMsg.Ext.EnumFooCustom.value(:letter_a) == 0
+    assert TestMsg.Ext.EnumFooCustom.value(:letter_b) == 1
+    assert TestMsg.Ext.EnumFooCustom.value(:letter_c) == 2
+    assert TestMsg.Ext.EnumFooCustom.value(:letter_d) == 3
+    assert TestMsg.Ext.EnumFooCustom.value(:letter_e) == 3
+
+    assert_raise FunctionClauseError, fn ->
+      TestMsg.Ext.EnumFooCustom.value(:ENUM_FOO_CUSTOM_LETTER_A)
+    end
+
+    assert TestMsg.Ext.EnumFooCustom.value(1000) == 1000
+    assert TestMsg.Ext.EnumFooCustom.key(1) == :letter_b
+    assert TestMsg.Ext.EnumFooCustom.key(2) == :letter_c
+    assert TestMsg.Ext.EnumFooCustom.key(3) == :letter_d
+    assert_raise FunctionClauseError, fn -> TestMsg.Ext.EnumFooCustom.key(5) end
+
+    assert TestMsg.Ext.EnumFooCustom.mapping() == %{
+             letter_a: 0,
+             letter_b: 1,
+             letter_c: 2,
+             letter_d: 3,
+             letter_e: 3
+           }
+
+    assert TestMsg.Ext.EnumFooCustom.__reverse_mapping__() == %{
+             0 => :letter_a,
+             1 => :letter_b,
+             2 => :letter_c,
+             3 => :letter_d,
+             "letter_a" => :letter_a,
+             "letter_b" => :letter_b,
+             "letter_c" => :letter_c,
+             "letter_d" => :letter_d
+           }
+
+    assert TestMsg.Ext.EnumFooCustom.__transformation_mapping__() == %{
+             ENUM_FOO_CUSTOM_LETTER_A: :letter_a,
+             ENUM_FOO_CUSTOM_LETTER_B: :letter_b,
+             ENUM_FOO_CUSTOM_LETTER_C: :letter_c,
+             ENUM_FOO_CUSTOM_LETTER_D: :letter_d,
+             ENUM_FOO_CUSTOM_LETTER_E: :letter_e
+           }
+
+    assert TestMsg.Ext.EnumFooCustom.prefix() == "ENUM_FOO_CUSTOM_"
+
+    assert TestMsg.Ext.EnumFooCustom.letter_a() == :letter_a
+    assert TestMsg.Ext.EnumFooCustom.letter_b() == :letter_b
+    assert TestMsg.Ext.EnumFooCustom.letter_c() == :letter_c
+    assert TestMsg.Ext.EnumFooCustom.letter_d() == :letter_d
+    assert TestMsg.Ext.EnumFooCustom.letter_e() == :letter_e
+  end
+
   test "ignores unknown options" do
     msg_props = Foo.__message_props__()
     assert msg_props.field_props[11].wire_type == 0

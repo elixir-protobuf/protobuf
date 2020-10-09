@@ -1,6 +1,6 @@
 defmodule Ext.TrafficLightColor do
   @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
+  use Protobuf, custom_field_options?: true, enum: true, syntax: :proto3
 
   @type t ::
           integer

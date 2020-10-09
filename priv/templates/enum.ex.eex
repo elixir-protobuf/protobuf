@@ -1,7 +1,11 @@
 defmodule <%= name %> do
   @moduledoc false
   use Protobuf<%= options %>
-  
+
+  <%= Enum.map enum_options, fn(option) -> %>
+    option <%= option %>
+  <% end %>
+
   <%= type %>
 
   <%= if not is_nil(desc) do %>
