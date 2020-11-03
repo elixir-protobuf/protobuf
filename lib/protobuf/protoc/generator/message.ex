@@ -21,6 +21,9 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   def parse_desc(%{namespace: ns} = ctx, desc) do
     new_ns = ns ++ [Util.trans_name(desc.name)]
+    full_name = Util.join_name([ctx.package | ctx.namespace] ++ [desc.name])
+    desc = Map.put(desc, :full_name, full_name)
+
     fields = get_fields(ctx, desc)
     extensions = get_extensions(desc)
     generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
@@ -28,6 +31,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     %{
       new_namespace: new_ns,
       name: Util.mod_name(ctx, new_ns),
+      full_name: full_name,
       options: msg_opts_str(ctx, desc.options),
       structs: structs_str(desc, extensions),
       typespec: typespec_str(ctx, fields, desc.oneof_decl, extensions),
@@ -41,6 +45,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   defp gen_msg(syntax, msg_struct) do
     Protobuf.Protoc.Template.message(
       msg_struct[:name],
+      msg_struct[:full_name],
       msg_struct[:options],
       msg_struct[:structs],
       msg_struct[:typespec],
