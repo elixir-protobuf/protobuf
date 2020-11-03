@@ -21,8 +21,7 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   def parse_desc(%{namespace: ns} = ctx, desc) do
     new_ns = ns ++ [Util.trans_name(desc.name)]
-    full_name = Util.join_name([ctx.package | ctx.namespace] ++ [desc.name])
-    desc = Map.put(desc, :full_name, full_name)
+    full_name = Util.join_name([ctx.package | ctx.namespace] ++ [desc.name]) |> String.downcase()
 
     fields = get_fields(ctx, desc)
     extensions = get_extensions(desc)

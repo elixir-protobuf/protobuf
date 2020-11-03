@@ -7,6 +7,10 @@ defmodule Elixirpb.FileOptions do
         }
   defstruct [:module_prefix]
 
+  def full_name do
+    "elixirpb.fileoptions"
+  end
+
   field :module_prefix, 1, optional: true, type: :string
 end
 

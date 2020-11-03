@@ -5,6 +5,10 @@ defmodule <%= name %> do
   <%= typespec %>
   defstruct [<%= struct_fields %>]
 
+  def full_name do
+    "<%= full_name %>"
+  end
+
   <%= if not is_nil(desc) do %>
   def descriptor do
     # credo:disable-for-next-line

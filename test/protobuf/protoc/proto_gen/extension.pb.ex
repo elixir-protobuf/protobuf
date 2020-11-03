@@ -7,6 +7,10 @@ defmodule Protobuf.Protoc.ExtTest.Foo do
         }
   defstruct [:a]
 
+  def full_name do
+    "ext.foo"
+  end
+
   field :a, 1, optional: true, type: :string
 end
 
@@ -19,6 +23,10 @@ defmodule Protobuf.Protoc.ExtTest.Dual do
           b: Google.Protobuf.StringValue.t() | nil
         }
   defstruct [:a, :b]
+
+  def full_name do
+    "ext.dual"
+  end
 
   field :a, 1, optional: true, type: Google.Protobuf.StringValue, options: [extype: "String.t"]
   field :b, 2, optional: true, type: Google.Protobuf.StringValue

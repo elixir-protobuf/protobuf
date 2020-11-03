@@ -193,7 +193,6 @@ defmodule Google.Protobuf.DescriptorProto do
 
   @type t :: %__MODULE__{
           name: String.t(),
-          full_name: String.t(),
           field: [Google.Protobuf.FieldDescriptorProto.t()],
           extension: [Google.Protobuf.FieldDescriptorProto.t()],
           nested_type: [Google.Protobuf.DescriptorProto.t()],
@@ -206,7 +205,6 @@ defmodule Google.Protobuf.DescriptorProto do
         }
   defstruct [
     :name,
-    :full_name,
     :field,
     :extension,
     :nested_type,
@@ -219,7 +217,6 @@ defmodule Google.Protobuf.DescriptorProto do
   ]
 
   field :name, 1, optional: true, type: :string
-  field :full_name, 11, optional: true, type: :string
   field :field, 2, repeated: true, type: Google.Protobuf.FieldDescriptorProto
   field :extension, 6, repeated: true, type: Google.Protobuf.FieldDescriptorProto
   field :nested_type, 3, repeated: true, type: Google.Protobuf.DescriptorProto
