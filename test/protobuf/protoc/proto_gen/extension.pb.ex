@@ -8,7 +8,7 @@ defmodule Protobuf.Protoc.ExtTest.Foo do
   defstruct [:a]
 
   def full_name do
-    "ext.foo"
+    "ext.Foo"
   end
 
   field :a, 1, optional: true, type: :string
@@ -25,7 +25,7 @@ defmodule Protobuf.Protoc.ExtTest.Dual do
   defstruct [:a, :b]
 
   def full_name do
-    "ext.dual"
+    "ext.Dual"
   end
 
   field :a, 1, optional: true, type: Google.Protobuf.StringValue, options: [extype: "String.t"]

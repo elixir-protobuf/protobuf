@@ -20,7 +20,8 @@ defmodule Protobuf.Protoc.Template do
       :oneofs,
       :fields,
       :desc,
-      :extensions
+      :extensions,
+      :custom_field_options_enabled
     ],
     trim: true
   )

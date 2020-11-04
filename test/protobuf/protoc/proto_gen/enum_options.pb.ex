@@ -61,7 +61,7 @@ defmodule Ext.EnumTestMessage do
   defstruct [:pet, :set, :flight_color, :color]
 
   def full_name do
-    "ext.enumtestmessage"
+    "ext.EnumTestMessage"
   end
 
   field :pet, 1, type: Ext.MyPetIs, enum: true

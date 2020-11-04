@@ -5,9 +5,11 @@ defmodule <%= name %> do
   <%= typespec %>
   defstruct [<%= struct_fields %>]
 
+  <%= if custom_field_options_enabled do %>
   def full_name do
     "<%= full_name %>"
   end
+  <% end %>
 
   <%= if not is_nil(desc) do %>
   def descriptor do

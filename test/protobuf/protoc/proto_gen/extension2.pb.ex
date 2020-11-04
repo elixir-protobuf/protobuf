@@ -27,7 +27,7 @@ defmodule Ext.Nested do
   defstruct [:my_timestamp]
 
   def full_name do
-    "ext.nested"
+    "ext.Nested"
   end
 
   oneof :my_timestamp, 0
@@ -90,7 +90,7 @@ defmodule Ext.MyMessage do
   ]
 
   def full_name do
-    "ext.mymessage"
+    "ext.MyMessage"
   end
 
   oneof :enums_oneof, 0

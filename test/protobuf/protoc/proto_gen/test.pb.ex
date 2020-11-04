@@ -49,10 +49,6 @@ defmodule My.Test.Request.SomeGroup do
         }
   defstruct [:group_field]
 
-  def full_name do
-    "my.test.request.somegroup"
-  end
-
   field :group_field, 9, optional: true, type: :int32
 end
 
@@ -65,10 +61,6 @@ defmodule My.Test.Request.NameMappingEntry do
           value: String.t()
         }
   defstruct [:key, :value]
-
-  def full_name do
-    "my.test.request.namemappingentry"
-  end
 
   field :key, 1, optional: true, type: :int32
   field :value, 2, optional: true, type: :string
@@ -83,10 +75,6 @@ defmodule My.Test.Request.MsgMappingEntry do
           value: My.Test.Reply.t() | nil
         }
   defstruct [:key, :value]
-
-  def full_name do
-    "my.test.request.msgmappingentry"
-  end
 
   field :key, 1, optional: true, type: :sint64
   field :value, 2, optional: true, type: My.Test.Reply
@@ -119,10 +107,6 @@ defmodule My.Test.Request do
     :get_key
   ]
 
-  def full_name do
-    "my.test.request"
-  end
-
   field :key, 1, repeated: true, type: :int64
   field :hue, 3, optional: true, type: My.Test.Request.Color, enum: true
   field :hat, 4, optional: true, type: My.Test.HatType, default: :FEDORA, enum: true
@@ -145,10 +129,6 @@ defmodule My.Test.Reply.Entry do
         }
   defstruct [:key_that_needs_1234camel_CasIng, :value, :_my_field_name_2]
 
-  def full_name do
-    "my.test.reply.entry"
-  end
-
   field :key_that_needs_1234camel_CasIng, 1, required: true, type: :int64
   field :value, 2, optional: true, type: :int64, default: 7
   field :_my_field_name_2, 3, optional: true, type: :int64
@@ -164,10 +144,6 @@ defmodule My.Test.Reply do
           __pb_extensions__: map
         }
   defstruct [:found, :compact_keys, :__pb_extensions__]
-
-  def full_name do
-    "my.test.reply"
-  end
 
   field :found, 1, repeated: true, type: My.Test.Reply.Entry
   field :compact_keys, 2, repeated: true, type: :int32, packed: true
@@ -185,10 +161,6 @@ defmodule My.Test.OtherBase do
         }
   defstruct [:name, :__pb_extensions__]
 
-  def full_name do
-    "my.test.otherbase"
-  end
-
   field :name, 1, optional: true, type: :string
 
   extensions [{100, 536_870_912}]
@@ -200,10 +172,6 @@ defmodule My.Test.ReplyExtensions do
 
   @type t :: %__MODULE__{}
   defstruct []
-
-  def full_name do
-    "my.test.replyextensions"
-  end
 end
 
 defmodule My.Test.OtherReplyExtensions do
@@ -215,10 +183,6 @@ defmodule My.Test.OtherReplyExtensions do
         }
   defstruct [:key]
 
-  def full_name do
-    "my.test.otherreplyextensions"
-  end
-
   field :key, 1, optional: true, type: :int32
 end
 
@@ -228,10 +192,6 @@ defmodule My.Test.OldReply do
 
   @type t :: %__MODULE__{__pb_extensions__: map}
   defstruct [:__pb_extensions__]
-
-  def full_name do
-    "my.test.oldreply"
-  end
 
   extensions [{100, 2_147_483_647}]
 end
@@ -245,10 +205,6 @@ defmodule My.Test.Communique.SomeGroup do
         }
   defstruct [:member]
 
-  def full_name do
-    "my.test.communique.somegroup"
-  end
-
   field :member, 15, optional: true, type: :string
 end
 
@@ -258,10 +214,6 @@ defmodule My.Test.Communique.Delta do
 
   @type t :: %__MODULE__{}
   defstruct []
-
-  def full_name do
-    "my.test.communique.delta"
-  end
 end
 
 defmodule My.Test.Communique do
@@ -273,10 +225,6 @@ defmodule My.Test.Communique do
           make_me_cry: boolean
         }
   defstruct [:union, :make_me_cry]
-
-  def full_name do
-    "my.test.communique"
-  end
 
   oneof :union, 0
 
@@ -301,10 +249,6 @@ defmodule My.Test.Options do
           opt1: String.t()
         }
   defstruct [:opt1]
-
-  def full_name do
-    "my.test.options"
-  end
 
   field :opt1, 1, optional: true, type: :string, deprecated: true
 end
