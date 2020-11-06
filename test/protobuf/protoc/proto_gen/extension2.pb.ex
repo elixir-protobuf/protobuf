@@ -26,6 +26,10 @@ defmodule Ext.Nested do
         }
   defstruct [:my_timestamp]
 
+  def full_name do
+    "ext.Nested"
+  end
+
   oneof :my_timestamp, 0
 
   field :dt, 1, type: Google.Protobuf.Timestamp, oneof: 0, options: [extype: "DateTime.t"]
@@ -84,6 +88,10 @@ defmodule Ext.MyMessage do
     :color_repeated_normal,
     :normal3
   ]
+
+  def full_name do
+    "ext.MyMessage"
+  end
 
   oneof :enums_oneof, 0
 

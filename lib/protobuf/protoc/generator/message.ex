@@ -21,33 +21,39 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   def parse_desc(%{namespace: ns} = ctx, desc) do
     new_ns = ns ++ [Util.trans_name(desc.name)]
+
     fields = get_fields(ctx, desc)
     extensions = get_extensions(desc)
     generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
+    full_name = Util.join_name([ctx.package | ctx.namespace] ++ [desc.name])
 
     %{
       new_namespace: new_ns,
       name: Util.mod_name(ctx, new_ns),
+      full_name: full_name,
       options: msg_opts_str(ctx, desc.options),
       structs: structs_str(desc, extensions),
       typespec: typespec_str(ctx, fields, desc.oneof_decl, extensions),
       fields: fields,
       oneofs: oneofs_str(desc.oneof_decl),
       desc: generate_desc,
-      extensions: extensions
+      extensions: extensions,
+      custom_field_options_enabled: ctx.custom_field_options?
     }
   end
 
   defp gen_msg(syntax, msg_struct) do
     Protobuf.Protoc.Template.message(
       msg_struct[:name],
+      msg_struct[:full_name],
       msg_struct[:options],
       msg_struct[:structs],
       msg_struct[:typespec],
       msg_struct[:oneofs],
       gen_fields(syntax, msg_struct[:fields]),
       msg_struct[:desc],
-      gen_extensions(msg_struct[:extensions])
+      gen_extensions(msg_struct[:extensions]),
+      msg_struct[:custom_field_options_enabled]
     )
   end
 
