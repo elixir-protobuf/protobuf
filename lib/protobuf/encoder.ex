@@ -75,14 +75,12 @@ defmodule Protobuf.Encoder do
     end
   rescue
     error ->
-      stacktrace = System.stacktrace()
-
       msg =
         "Got error when encoding #{inspect(struct.__struct__)}##{prop.name_atom}: #{
           Exception.format(:error, error)
         }"
 
-      throw({Protobuf.EncodeError, [message: msg], stacktrace})
+      throw({Protobuf.EncodeError, [message: msg], __STACKTRACE__})
   end
 
   @doc false
