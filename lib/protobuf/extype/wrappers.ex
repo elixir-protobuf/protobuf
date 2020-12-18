@@ -14,9 +14,7 @@ defimpl Extype.Protocol,
     Implement value unwrapping for Google Wrappers.
   """
 
-  require Protobuf.Decoder
   require Logger
-  import Protobuf.Decoder, only: [decode_zigzag: 1]
 
   def validate_and_to_atom_extype!(Google.Protobuf.DoubleValue, "float"), do: :double
   def validate_and_to_atom_extype!(Google.Protobuf.FloatValue, "float"), do: :float
@@ -43,15 +41,14 @@ defimpl Extype.Protocol,
     end
   end
 
-  def encode_type(type, v, extype) do
-    fnum = type.__message_props__.field_props[1].encoded_fnum
-    encoded = Protobuf.Encoder.encode_type(extype, v)
-    IO.iodata_to_binary([[fnum, encoded]])
+  def encode_type(type, v, _extype) do
+    val = type.new(value: v)
+    Protobuf.Encoder.encode(type, val, iolist: true)
   end
 
-  def decode_type(_type, val, extype) do
-    [_tag, _wire, val | _rest] = Protobuf.Decoder.decode_raw(val)
-    Protobuf.Decoder.decode_type_m(extype, :value, val)
+  def decode_type(type, val, _extype) do
+    %{value: value} = Protobuf.Decoder.decode(val, type)
+    value
   end
 
   def verify_type(_type, v, extype) do
