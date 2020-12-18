@@ -175,6 +175,16 @@ defmodule Protobuf.DecoderTest do
              TestMsg.Ext.DualNonUse.new(a: nil, b: Google.Protobuf.StringValue.new(value: "s2"))
   end
 
+  test "decode with and without custom field options, default" do
+    bin = <<10, 0>>
+
+    assert Decoder.decode(bin, TestMsg.Ext.DualUseCase) ==
+             TestMsg.Ext.DualUseCase.new(a: "")
+
+    assert Decoder.decode(bin, TestMsg.Ext.DualNonUse) ==
+             TestMsg.Ext.DualNonUse.new(a: Google.Protobuf.StringValue.new(value: ""))
+  end
+
   describe "groups" do
     test "skips all groups and their fields" do
       a = <<8, 42>>

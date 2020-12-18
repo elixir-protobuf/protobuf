@@ -204,4 +204,14 @@ defmodule Protobuf.EncoderTest do
     msg = TestMsg.Ext.DualUseCase.new(b: Google.Protobuf.StringValue.new(value: "s2"))
     assert Encoder.encode(msg) == <<18, 4, 10, 2, 115, 50>>
   end
+
+  test "encoding with custom field options, default" do
+    msg = TestMsg.Ext.DualUseCase.new(a: "")
+    assert Encoder.encode(msg) == <<10, 0>>
+  end
+
+  test "encoding with custom field options, default2" do
+    msg = TestMsg.Ext.DualNonUse.new(a: Google.Protobuf.StringValue.new(value: ""))
+    assert Encoder.encode(msg) == <<10, 0>>
+  end
 end
