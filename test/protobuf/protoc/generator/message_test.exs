@@ -515,4 +515,31 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       assert msg =~ "field :the_field_name, 1, required: true, type: :string\n"
     end
   end
+
+  test "generate/2 repeated enum field in typespec" do
+    ctx = %Context{
+      package: "foo_bar.ab_cd",
+      dep_type_mapping: %{
+        ".foo_bar.ab_cd.EnumFoo" => %{type_name: "FooBar.AbCd.EnumFoo"}
+      }
+    }
+
+    desc =
+      Google.Protobuf.DescriptorProto.new(
+        name: "Foo",
+        field: [
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "a",
+            json_name: "a",
+            number: 1,
+            type: :TYPE_ENUM,
+            label: :LABEL_REPEATED,
+            type_name: ".foo_bar.ab_cd.EnumFoo"
+          )
+        ]
+      )
+
+    {[], [msg]} = Generator.generate(ctx, desc)
+    assert msg =~ "a: [FooBar.AbCd.EnumFoo.t]"
+  end
 end
