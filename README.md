@@ -1,23 +1,22 @@
 # protobuf-elixir
 
-[![Hex.pm](https://img.shields.io/hexpm/v/protobuf.svg)](https://hex.pm/packages/protobuf)
-[![Build Status](https://travis-ci.org/tony612/protobuf-elixir.svg?branch=master)](https://travis-ci.org/tony612/protobuf-elixir)
+[![CI](https://github.com/elixir-protobuf/protobuf/actions/workflows/main.yml/badge.svg)](https://github.com/elixir-protobuf/protobuf/actions/workflows/main.yml)
 
-A pure Elixir implementation of [Google Protobuf](https://developers.google.com/protocol-buffers/)
+A pure Elixir implementation of [Google Protobuf](https://developers.google.com/protocol-buffers/).
 
 ## Why this instead of exprotobuf(gpb)?
 
 It has some must-have and other cool features like:
 
 1. A protoc [plugin](https://developers.google.com/protocol-buffers/docs/cpptutorial#compiling-your-protocol-buffers) to generate Elixir code just like what other official libs do, which is powerful and reliable.
-2. Generate **simple and explicit** code with the power of Macro. (see [test/support/test_msg.ex](https://github.com/tony612/protobuf-elixir/blob/master/test/support/test_msg.ex))
+2. Generate **simple and explicit** code with the power of Macro. See [test/support/test_msg.ex](https://github.com/tony612/protobuf-elixir/blob/master/test/support/test_msg.ex).
 3. Plugins support. Only [grpc](https://github.com/tony612/grpc-elixir) is supported now.
 4. Use **structs** for messages instead of Erlang records.
 5. Support Typespec in generated code.
 
 ## Installation
 
-The package can be installed by adding `protobuf` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `:protobuf` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -51,40 +50,47 @@ end
 
 ### Generate Elixir code
 
-1. Install `protoc`(cpp) [here](https://github.com/google/protobuf/blob/master/src/README.md) or `brew install protobuf` on MacOS.
-2. Install protoc plugin `protoc-gen-elixir` for Elixir . NOTE: You have to make sure `protoc-gen-elixir`(this name is important) is in your PATH.
-```
-$ mix escript.install hex protobuf
-```
-3. Generate Elixir code using protoc
-```
-$ protoc --elixir_out=./lib helloworld.proto
-```
-4. Files `helloworld.pb.ex` will be generated, like:
+1. Install `protoc`(cpp) [here](https://github.com/google/protobuf/blob/master/src/README.md) or
+   `brew install protobuf` on MacOS.
 
-```elixir
-defmodule Helloworld.HelloRequest do
-  use Protobuf, syntax: :proto3
+2.  Install protoc plugin `protoc-gen-elixir` for Elixir . NOTE: You have to
+    make sure `protoc-gen-elixir`(this name is important) is in your PATH.
 
-  @type t :: %__MODULE__{
-    name: String.t
-  }
-  defstruct [:name]
+    ```bash
+    $ mix escript.install hex protobuf
+    ```
 
-  field :name, 1, type: :string
-end
+3.  Generate Elixir code using protoc
 
-defmodule Helloworld.HelloReply do
-  use Protobuf, syntax: :proto3
+    ```bash
+    $ protoc --elixir_out=./lib helloworld.proto
+    ```
 
-  @type t :: %__MODULE__{
-    message: String.t
-  }
-  defstruct [:message]
+4.  Files `helloworld.pb.ex` will be generated, like:
 
-  field :message, 1, type: :string
-end
-```
+    ```elixir
+    defmodule Helloworld.HelloRequest do
+      use Protobuf, syntax: :proto3
+
+      @type t :: %__MODULE__{
+        name: String.t
+      }
+      defstruct [:name]
+
+      field :name, 1, type: :string
+    end
+
+    defmodule Helloworld.HelloReply do
+      use Protobuf, syntax: :proto3
+
+      @type t :: %__MODULE__{
+        message: String.t
+      }
+      defstruct [:message]
+
+      field :message, 1, type: :string
+    end
+    ```
 
 ### Encode and decode in your code
 
@@ -118,32 +124,38 @@ $ protoc --elixir_out=plugins=grpc:./lib/ *.proto
 
 ### Tips for protoc
 
-- Custom protoc-gen-elixir name or path using `--plugin`
-```
+Custom protoc-gen-elixir name or path using `--plugin`:
+
+```bash
 $ protoc --elixir_out=./lib --plugin=./protoc-gen-elixir *.proto
 ```
-- Pass `-I` argument if you import other protobuf files
-```
+
+Pass `-I` argument if you import other protobuf files:
+
+```bash
 $ protoc -I protos --elixir_out=./lib protos/hello.proto
 ```
 
 ### Custom options
 
-Since extensions(`Protobuf.Extension`) is supported now, some options are defined, like custom module_prefix.
+Since extensions(`Protobuf.Extension`) is supported now, some options are
+defined, like custom module_prefix.
 
-1. Copy src/elixirpb.proto to your protos path
-2. Import elixirpb.proto and use the options
+1.  Copy `src/elixirpb.proto` to your protos path.
 
-```proto
-syntax = "proto2";
+2.  Import `elixirpb.proto` and use the options.
 
-package your.pkg;
+    ```proto
+    syntax = "proto2";
 
-import "elixirpb.proto";
+    package your.pkg;
 
-option (elixirpb.file).module_prefix = "Foo.Bar";
-```
-3. Generate code as before
+    import "elixirpb.proto";
+
+    option (elixirpb.file).module_prefix = "Foo.Bar";
+    ```
+
+3.  Generate code as before
 
 More options will be added in the future, see elixirpb.proto comments for details.
 
@@ -162,7 +174,6 @@ mix test
 * [Community](https://www.community.com)
 
 <img src="https://user-images.githubusercontent.com/1253659/84641850-3f163d80-af2e-11ea-98a2-cfb854180222.png" height="80">
-
 
 ## Acknowledgements
 

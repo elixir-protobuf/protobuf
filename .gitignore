@@ -19,10 +19,10 @@ erl_crash.dump
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
 
-protoc-gen-elixir
+# Ignore package tarball (built via "mix hex.build").
+protobuf-*.tar
 
-# QuickCheck artifacts
+# Misc.
+protoc-gen-elixir
 .eqc-info
 *.eqc
-
-.elixir_ls

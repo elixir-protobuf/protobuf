@@ -1,6 +1,6 @@
 defmodule Protobuf do
   @moduledoc """
-  `protoc` should always be used to generate code instead of wrting the code by hand.
+  `protoc` should always be used to generate code instead of writing the code by hand.
 
   By `use` this module, macros defined in `Protobuf.DSL` will be injected. Most of thee macros
   are equal to definition in .proto files.
@@ -25,10 +25,10 @@ defmodule Protobuf do
   Except functions in "Callbacks", some other functions may be defined:
 
   * Extension functions when your Protobuf message use extensions. See `Protobuf.Extension` for details.
-    * put_extension(struct, extension_mod, field, value)
-    * get_extension(struct, extension_mod, field, default \\ nil)
-  """
+    * `put_extension(struct, extension_mod, field, value)`
+    * `get_extension(struct, extension_mod, field, default \\ nil)`
 
+  """
   defmacro __using__(opts) do
     quote location: :keep do
       import Protobuf.DSL, only: [field: 3, field: 2, oneof: 2, extend: 4, extensions: 1]
@@ -73,7 +73,9 @@ defmodule Protobuf do
   """
   @callback new() :: struct
 
-  @doc "Build and update the struct with passed fields."
+  @doc """
+  Build and update the struct with passed fields.
+  """
   @callback new(Enum.t()) :: struct
 
   @doc """
@@ -97,9 +99,10 @@ defmodule Protobuf do
   @callback decode(binary) :: struct
 
   @doc """
-  It's preferable to use message's `decode` function, like
+  It's preferable to use message's `decode` function, like:
 
       Foo.decode(bin)
+
   """
   @spec decode(binary, module) :: struct
   def decode(data, mod) do
@@ -107,9 +110,10 @@ defmodule Protobuf do
   end
 
   @doc """
-  It's preferable to use message's `encode` function, like
+  It's preferable to use message's `encode` function, like:
 
       Foo.encode(foo)
+
   """
   @spec encode(struct) :: binary
   def encode(struct) do

@@ -1,9 +1,10 @@
 defmodule Protobuf.Protoc.CLI do
   @moduledoc """
-  protoc plugin for generating Elixir code
+  protoc plugin for generating Elixir code.
 
   See `protoc -h` and protobuf-elixir for details.
-  NOTICE: protoc-gen-elixir(this name is important) must be in $PATH
+
+  **NOTICE:** protoc-gen-elixir(this name is important) must be in `$PATH`.
 
   ## Examples
 

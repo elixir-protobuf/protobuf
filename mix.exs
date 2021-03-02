@@ -1,6 +1,7 @@
 defmodule Protobuf.Mixfile do
   use Mix.Project
 
+  @source_url "https://github.com/elixir-protobuf/protobuf"
   @version "0.8.0-beta.1"
 
   def project do
@@ -17,7 +18,8 @@ defmodule Protobuf.Mixfile do
       description: description(),
       package: package(),
       aliases: aliases(),
-      preferred_cli_env: ["test.integration": :test]
+      preferred_cli_env: ["test.integration": :test],
+      docs: docs()
     ]
   end
 
@@ -36,7 +38,7 @@ defmodule Protobuf.Mixfile do
       {:jason, "~> 1.2", optional: true},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.23", only: :dev, runtime: false},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:stream_data, "~> 0.5.0", only: [:dev, :test]}
     ]
   end
@@ -53,9 +55,18 @@ defmodule Protobuf.Mixfile do
     [
       maintainers: ["Bing Han"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/tony612/protobuf-elixir"},
       files:
-        ~w(mix.exs README.md lib/google lib/protobuf lib/*.ex src LICENSE priv/templates .formatter.exs)
+        ~w(mix.exs README.md lib/google lib/protobuf lib/*.ex src LICENSE priv/templates .formatter.exs),
+      links: %{"GitHub" => @source_url}
+    ]
+  end
+
+  defp docs do
+    [
+      extras: ["README.md"],
+      main: "readme",
+      source_url: @source_url,
+      source_ref: "v#{@version}"
     ]
   end
 
