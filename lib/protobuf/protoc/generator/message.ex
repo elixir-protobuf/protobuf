@@ -34,7 +34,8 @@ defmodule Protobuf.Protoc.Generator.Message do
       fields: fields,
       oneofs: oneofs_str(desc.oneof_decl),
       desc: generate_desc,
-      extensions: extensions
+      extensions: extensions,
+      using_module: ctx.using_module
     }
   end
 
@@ -47,7 +48,8 @@ defmodule Protobuf.Protoc.Generator.Message do
       msg_struct[:oneofs],
       gen_fields(syntax, msg_struct[:fields]),
       msg_struct[:desc],
-      gen_extensions(msg_struct[:extensions])
+      gen_extensions(msg_struct[:extensions]),
+      msg_struct[:using_module]
     )
   end
 
@@ -179,6 +181,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   def get_field(ctx, f, nested_maps, oneofs) do
     opts = field_options(f, ctx.syntax)
     map = nested_maps[f.type_name]
+
     opts = if map, do: Map.put(opts, :map, true), else: opts
 
     opts =
@@ -292,9 +295,23 @@ defmodule Protobuf.Protoc.Generator.Message do
   defp merge_field_options(opts, %{options: nil}), do: opts
 
   defp merge_field_options(opts, f) do
+    custom_options =
+      f.options
+      |> Google.Protobuf.FieldOptions.get_extension(Brex.Elixirpb.PbExtension, :field)
+      |> case do
+        nil ->
+          nil
+
+        elixir_field_options ->
+          elixir_field_options
+          |> Map.from_struct()
+          |> Enum.into([])
+      end
+
     opts
     |> Map.put(:packed, f.options.packed)
     |> Map.put(:deprecated, f.options.deprecated)
+    |> Map.put(:options, custom_options)
   end
 
   # Omit `json_name` from the options list when it matches the original field

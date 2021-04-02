@@ -135,6 +135,8 @@ defmodule Protobuf.Extension do
           raise "Extension #{inspect(ext.extendee)}##{fnum} already exists"
         end
 
+        # IO.inspect(:stderr, {fnum_key, mod}, label: :extensions)
+
         GlobalStore.put(fnum_key, mod)
       end)
     end)

@@ -299,4 +299,16 @@ defmodule TestMsg do
     extend Ext.Foo2, :bar, 1047, optional: true, type: :string
     extend Ext.Foo1, :"Parent.foo", 1048, optional: true, type: Ext.EnumFoo, enum: true
   end
+
+  defmodule Ext.UseCase do
+    @moduledoc false
+    use Protobuf, syntax: :proto3
+
+    @type t :: %__MODULE__{
+            my_string: Google.Protobuf.StringValue.t() | nil
+          }
+    defstruct [:my_string]
+
+    field :my_string, 1, type: Google.Protobuf.StringValue, options: [extype: "String.t"]
+  end
 end

@@ -1,6 +1,6 @@
 defmodule <%= name %> do
   @moduledoc false
-  use Protobuf<%= options %>
+  use <%= using_module %><%= options %>
 
   <%= typespec %>
   defstruct [<%= struct_fields %>]
