@@ -391,7 +391,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     {[[msg]], _} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo.Nested.EnumFoo do\n"
     assert msg =~ "use Protobuf, enum: true\n"
-    assert msg =~ "field :a, 0\n  field :b, 1\n"
+    assert msg =~ "field :a, 0\n\n  field :b, 1\n"
   end
 
   test "generate/2 supports oneof" do
