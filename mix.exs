@@ -35,7 +35,7 @@ defmodule Protobuf.Mixfile do
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.23", only: :dev, runtime: false},
-      {:eqc_ex, github: "tony612/eqc_ex", branch: "fix-elixir-1-10", only: [:dev, :test]}
+      {:stream_data, "~> 0.4", only: [:dev, :test]}
     ]
   end
 
