@@ -1,0 +1,46 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test (Elixir ${{matrix.elixir}} | Erlang/OTP ${{matrix.otp}})
+    runs-on: ubuntu-16.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - otp: 23.0
+            elixir: 1.11.2
+            lint: true
+          - otp: 23.0
+            elixir: 1.10.3
+          - otp: 22.3
+            elixir: 1.10.3
+          - otp: 22.1
+            elixir: 1.9.4
+          - otp: 21.3
+            elixir: 1.8.2
+    env:
+      MIX_ENV: test
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install OTP and Elixir
+        uses: erlef/setup-elixir@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+
+      - name: Install dependencies
+        run: mix deps.get --only test
+
+      - name: Check no unused dependencies
+        run: mix deps.get && mix deps.unlock --check-unused
+        if: ${{matrix.lint}}
+
+      - name: Compile dependencies
+        run: mix deps.compile
+
+      - name: Run tests
+        run: mix test --trace
