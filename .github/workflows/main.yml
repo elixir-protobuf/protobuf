@@ -43,4 +43,4 @@ jobs:
         run: mix deps.compile
 
       - name: Run tests
-        run: mix test --trace
+        run: mix test.integration --trace

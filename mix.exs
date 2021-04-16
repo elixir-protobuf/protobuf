@@ -15,7 +15,9 @@ defmodule Protobuf.Mixfile do
       deps: deps(),
       escript: escript(),
       description: description(),
-      package: package()
+      package: package(),
+      aliases: aliases(),
+      preferred_cli_env: ["test.integration": :test]
     ]
   end
 
@@ -55,5 +57,23 @@ defmodule Protobuf.Mixfile do
       files:
         ~w(mix.exs README.md lib/google lib/protobuf lib/*.ex src LICENSE priv/templates .formatter.exs)
     ]
+  end
+
+  defp aliases do
+    ["test.integration": &run_integration_tests/1]
+  end
+
+  defp run_integration_tests(args) do
+    IO.puts("==> make clean")
+    Mix.shell().cmd("make clean")
+
+    IO.puts("==> make gen-protos")
+    Mix.shell().cmd("make gen-protos")
+
+    args = ["--only", "integration" | args]
+    args = if IO.ANSI.enabled?(), do: ["--color" | args], else: ["--no-color" | args]
+
+    IO.puts("==> mix test #{Enum.join(args, " ")}")
+    Mix.Task.run("test", args)
   end
 end
