@@ -1,5 +1,5 @@
 defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
-  alias Protobuf.Encoder
+  alias Protobuf.{Encoder}
 
   require Logger
   import Protobuf.Decoder
@@ -53,7 +53,7 @@ defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
 end
 
 defmodule Protobuf.EncodeDecodeTypeTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   use ExUnitProperties
 
   import Protobuf.EncodeDecodeTypeTest.PropertyGenerator
