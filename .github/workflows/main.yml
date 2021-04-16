@@ -42,9 +42,5 @@ jobs:
       - name: Compile dependencies
         run: mix deps.compile
 
-      - name: Compile with --warnings-as-errors
-        run: mix compile --warnings-as-errors
-        if: ${{matrix.lint}}
-
       - name: Run tests
         run: mix test --trace
