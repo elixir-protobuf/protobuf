@@ -149,10 +149,8 @@ More options will be added in the future, see elixirpb.proto comments for detail
 
 ## Tests
 
-Before you can run the test suite, you must install `eqc_gen`:
-
-```
-$ mix eqc.install --mini
+```bash
+mix test
 ```
 
 ## Sponsors
