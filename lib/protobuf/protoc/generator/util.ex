@@ -44,8 +44,7 @@ defmodule Protobuf.Protoc.Generator.Util do
   def normalize_type_name(name) do
     name
     |> String.split(".")
-    |> Enum.map(&Macro.camelize(&1))
-    |> Enum.join(".")
+    |> Enum.map_join(".", &trans_name/1)
   end
 
   def print(v) when is_atom(v), do: inspect(v)

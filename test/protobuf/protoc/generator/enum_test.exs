@@ -12,15 +12,28 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
       options: nil,
       value: [
         Google.Protobuf.EnumValueDescriptorProto.new(name: "A", number: 0),
-        Google.Protobuf.EnumValueDescriptorProto.new(name: "B", number: 1)
+        Google.Protobuf.EnumValueDescriptorProto.new(name: "B", number: 1),
+        Google.Protobuf.EnumValueDescriptorProto.new(name: "HAS_UNDERSCORES", number: 2),
+        Google.Protobuf.EnumValueDescriptorProto.new(name: "HAS_UNDERSCORES_X", number: 3),
+        Google.Protobuf.EnumValueDescriptorProto.new(name: "HAS_UNDERSCORES_", number: 4)
       ]
     }
 
     msg = Generator.generate(ctx, desc)
     assert msg =~ "defmodule EnumFoo do\n"
     assert msg =~ "use Protobuf, enum: true\n"
-    assert msg =~ "@type t :: integer | :A | :B\n"
+
+    assert msg =~
+             "@type t :: integer | :A | :B | :HAS_UNDERSCORES | :HAS_UNDERSCORES_X | :HAS_UNDERSCORES_\n"
+
     refute msg =~ "defstruct "
-    assert msg =~ "field :A, 0\n  field :B, 1\n"
+
+    assert msg =~ """
+             field :A, 0
+             field :B, 1
+             field :HAS_UNDERSCORES, 2
+             field :HAS_UNDERSCORES_X, 3
+             field :HAS_UNDERSCORES_, 4
+           """
   end
 end
