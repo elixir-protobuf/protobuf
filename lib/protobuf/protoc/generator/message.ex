@@ -154,7 +154,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp fmt_type(%{label: "repeated", type_enum: type_enum, type: type}) do
-    "#{type_to_spec(type_enum, type, true)}"
+    type_to_spec(type_enum, type, true)
   end
 
   defp fmt_type(%{type_enum: type_enum, type: type}) do
