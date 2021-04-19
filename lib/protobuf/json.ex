@@ -74,7 +74,7 @@ defmodule Protobuf.JSON do
   Currently, the `protoc` compiler won't check for field name collisions, this library either.
   So make sure your field names will be unique when serialized to JSON. For instance, this
   message definition will not encode correctly, it will emit just one of the two fields, and
-  the problem might go unoticed:
+  the problem might go unnoticed:
 
       message CollidingFields {
         int32 f1 = 1 [json_name = "sameName"];
@@ -82,7 +82,7 @@ defmodule Protobuf.JSON do
       }
 
   According to the specification, when duplicated JSON keys are found in maps, the library
-  should raise a decoding error. It currently ignores duplicates and keeps the last occurence.
+  should raise a decoding error. It currently ignores duplicates and keeps the last occurrence.
   """
 
   alias Protobuf.JSON.{Encode, EncodeError, Decode, DecodeError}
