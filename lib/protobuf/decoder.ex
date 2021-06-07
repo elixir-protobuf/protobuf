@@ -101,7 +101,7 @@ defmodule Protobuf.Decoder do
   end
 
   decoder :defp, :skip_varint, [:message, :props, :groups] do
-    _ = var!(value)
+    _ = value
     skip_field(rest, message, props, groups)
   end
 
