@@ -1,21 +1,24 @@
 defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
-  alias Protobuf.{Encoder}
-
-  require Logger
-  import Protobuf.Decoder
-
-  def decode_type(wire, type, bin) do
-    [n] = raw_decode_value(wire, bin, [])
-    decode_type_m(type, :fake_key, n)
+  def decode(type, bin) do
+    bin
+    |> TestMsg.Scalars.decode()
+    |> Map.fetch!(type)
   end
 
-  defmacro make_property(gen_func, field_type, wire_type) do
+  def encode(type, val) do
+    [{type, val}]
+    |> TestMsg.Scalars.new!()
+    |> Protobuf.Encoder.encode(iolist: false)
+  end
+
+  defmacro make_property(gen_func, field_type) do
     quote do
-      property unquote(Atom.to_string(field_type)) <> " roundtrip" do
+      property "#{unquote(field_type)} roundtrip" do
         check all n <- unquote(gen_func) do
-          iodata = Encoder.encode_type(unquote(field_type), n)
-          bin = IO.iodata_to_binary(iodata)
-          assert n == decode_type(unquote(wire_type), unquote(field_type), bin)
+          field_type = unquote(field_type)
+          bin = encode(field_type, n)
+
+          assert n == decode(field_type, bin)
         end
       end
     end
@@ -24,28 +27,16 @@ defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
   # Since float point is not precise, make canonical value before doing PBT
   # ref: http://hypothesis.works/articles/canonical-serialization/
   # and try 0.2 here: https://www.h-schmidt.net/FloatConverter/IEEE754.html
-  defmacro make_canonical_property(gen_func, field_type, wire_type) do
+  defmacro make_canonical_property(gen_func, field_type) do
     quote do
-      property unquote(Atom.to_string(field_type)) <> " canonical roundtrip" do
+      property "#{unquote(field_type)} canonical roundtrip" do
         check all n <- unquote(gen_func) do
-          encoded_val =
-            unquote(field_type)
-            |> Encoder.encode_type(n)
-            |> IO.iodata_to_binary()
+          field_type = unquote(field_type)
+          encoded_val = encode(field_type, n)
+          canonical_val = decode(field_type, encoded_val)
+          bin = encode(field_type, canonical_val)
 
-          canonical_val =
-            decode_type(
-              unquote(wire_type),
-              unquote(field_type),
-              encoded_val
-            )
-
-          bin =
-            unquote(field_type)
-            |> Encoder.encode_type(canonical_val)
-            |> IO.iodata_to_binary()
-
-          assert canonical_val == decode_type(unquote(wire_type), unquote(field_type), bin)
+          assert canonical_val == decode(field_type, bin)
         end
       end
     end
@@ -74,18 +65,18 @@ defmodule Protobuf.EncodeDecodeTypeTest do
     map(integer(), &abs/1)
   end
 
-  make_property(integer(), :int32, 0)
-  make_property(large_integer(), :int64, 0)
-  make_property(uint32_gen(), :uint32, 0)
-  make_property(uint64_gen(), :uint64, 0)
-  make_property(integer(), :sint32, 0)
-  make_property(large_integer(), :sint64, 0)
+  make_property(integer(), :int32)
+  make_property(large_integer(), :int64)
+  make_property(uint32_gen(), :uint32)
+  make_property(uint64_gen(), :uint64)
+  make_property(integer(), :sint32)
+  make_property(large_integer(), :sint64)
 
-  make_property(boolean(), :bool, 0)
+  make_property(boolean(), :bool)
 
-  make_property(natural_number(), :fixed64, 1)
-  make_property(large_integer(), :sfixed64, 1)
+  make_property(natural_number(), :fixed64)
+  make_property(large_integer(), :sfixed64)
 
-  make_canonical_property(float(), :double, 1)
-  make_canonical_property(float(), :float, 5)
+  make_canonical_property(float(), :double)
+  make_canonical_property(float(), :float)
 end

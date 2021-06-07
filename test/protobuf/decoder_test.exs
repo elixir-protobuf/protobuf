@@ -80,15 +80,16 @@ defmodule Protobuf.DecoderTest do
   test "decodes enum type" do
     struct = Decoder.decode(<<88, 1>>, TestMsg.Foo)
     assert struct == TestMsg.Foo.new(j: :A)
+
     struct = Decoder.decode(<<88, 2>>, TestMsg.Foo)
     assert struct == TestMsg.Foo.new(j: :B)
   end
 
-  test "decodes unknown enum type" do
+  test "decodes unknown enum value" do
     assert ExUnit.CaptureLog.capture_log(fn ->
              struct = Decoder.decode(<<88, 3>>, TestMsg.Foo)
              assert struct == TestMsg.Foo.new(j: 3)
-           end) =~ ~r/unknown enum value 3 when decoding for {:enum, TestMsg.EnumFoo}/
+           end) =~ ~r/unknown enum value 3 when decoding for TestMsg\.EnumFoo/
   end
 
   test "decodes map type" do

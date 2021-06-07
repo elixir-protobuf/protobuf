@@ -1,9 +1,9 @@
 defmodule Protobuf.Encoder do
   @moduledoc false
-  import Protobuf.WireTypes
-  import Bitwise, only: [bsr: 2, band: 2, bsl: 2, bor: 2]
+  import Protobuf.Wire.Types
+  import Bitwise, only: [bsl: 2, bor: 2]
 
-  alias Protobuf.{MessageProps, FieldProps}
+  alias Protobuf.{FieldProps, MessageProps, Wire, Wire.Varint}
 
   @spec encode(atom, map | struct, keyword) :: iodata
   def encode(mod, msg, opts) do
@@ -98,7 +98,7 @@ defmodule Protobuf.Encoder do
   @spec encode_field(atom, any, FieldProps.t()) :: iodata
   defp encode_field(:normal, val, %{encoded_fnum: fnum, type: type, repeated?: is_repeated}) do
     repeated_or_not(val, is_repeated, fn v ->
-      [fnum | encode_type(type, v)]
+      [fnum | Wire.from_proto(type, v)]
     end)
   end
 
@@ -114,14 +114,14 @@ defmodule Protobuf.Encoder do
       # so that oneof {:atom, v} can be encoded
       encoded = encode(type, v, iolist: true)
       byte_size = IO.iodata_length(encoded)
-      [fnum | encode_varint(byte_size)] ++ encoded
+      [fnum | Varint.encode(byte_size)] ++ encoded
     end)
   end
 
   defp encode_field(:packed, val, %{type: type, encoded_fnum: fnum}) do
-    encoded = Enum.map(val, fn v -> encode_type(type, v) end)
+    encoded = Enum.map(val, fn v -> Wire.from_proto(type, v) end)
     byte_size = IO.iodata_length(encoded)
-    [fnum | encode_varint(byte_size)] ++ encoded
+    [fnum | Varint.encode(byte_size)] ++ encoded
   end
 
   @spec class_field(map) :: atom
@@ -143,75 +143,8 @@ defmodule Protobuf.Encoder do
     fnum
     |> bsl(3)
     |> bor(wire_type)
-    |> encode_varint()
+    |> Varint.encode()
     |> IO.iodata_to_binary()
-  end
-
-  @doc false
-  @spec encode_type(atom, any) :: iodata
-  def encode_type(:int32, n) when n >= -0x80000000 and n <= 0x7FFFFFFF, do: encode_varint(n)
-
-  def encode_type(:int64, n) when n >= -0x8000000000000000 and n <= 0x7FFFFFFFFFFFFFFF,
-    do: encode_varint(n)
-
-  def encode_type(:string, n), do: encode_type(:bytes, n)
-  def encode_type(:uint32, n) when n >= 0 and n <= 0xFFFFFFFF, do: encode_varint(n)
-  def encode_type(:uint64, n) when n >= 0 and n <= 0xFFFFFFFFFFFFFFFF, do: encode_varint(n)
-  def encode_type(:bool, true), do: encode_varint(1)
-  def encode_type(:bool, false), do: encode_varint(0)
-  def encode_type({:enum, type}, n) when is_atom(n), do: n |> type.value() |> encode_varint()
-  def encode_type({:enum, _}, n), do: encode_varint(n)
-  def encode_type(:float, :infinity), do: [0, 0, 128, 127]
-  def encode_type(:float, :negative_infinity), do: [0, 0, 128, 255]
-  def encode_type(:float, :nan), do: [0, 0, 192, 127]
-  def encode_type(:float, n), do: <<n::32-float-little>>
-  def encode_type(:double, :infinity), do: [0, 0, 0, 0, 0, 0, 240, 127]
-  def encode_type(:double, :negative_infinity), do: [0, 0, 0, 0, 0, 0, 240, 255]
-  def encode_type(:double, :nan), do: [1, 0, 0, 0, 0, 0, 248, 127]
-  def encode_type(:double, n), do: <<n::64-float-little>>
-
-  def encode_type(:bytes, n) do
-    len = n |> IO.iodata_length() |> encode_varint()
-    len ++ n
-  end
-
-  def encode_type(:sint32, n) when n >= -0x80000000 and n <= 0x7FFFFFFF,
-    do: n |> encode_zigzag |> encode_varint
-
-  def encode_type(:sint64, n) when n >= -0x8000000000000000 and n <= 0x7FFFFFFFFFFFFFFF,
-    do: n |> encode_zigzag |> encode_varint
-
-  def encode_type(:fixed64, n) when n >= 0 and n <= 0xFFFFFFFFFFFFFFFF, do: <<n::64-little>>
-
-  def encode_type(:sfixed64, n) when n >= -0x8000000000000000 and n <= 0x7FFFFFFFFFFFFFFF,
-    do: <<n::64-signed-little>>
-
-  def encode_type(:fixed32, n) when n >= 0 and n <= 0xFFFFFFFF, do: <<n::32-little>>
-
-  def encode_type(:sfixed32, n) when n >= -0x80000000 and n <= 0x7FFFFFFF,
-    do: <<n::32-signed-little>>
-
-  def encode_type(type, n) do
-    raise Protobuf.TypeEncodeError, message: "#{inspect(n)} is invalid for type #{type}"
-  end
-
-  @spec encode_zigzag(integer) :: integer
-  defp encode_zigzag(val) when val >= 0, do: val * 2
-  defp encode_zigzag(val) when val < 0, do: val * -2 - 1
-
-  @doc false
-  @spec encode_varint(integer) :: iolist
-  def encode_varint(n) when n < 0 do
-    <<n::64-unsigned-native>> = <<n::64-signed-native>>
-    encode_varint(n)
-  end
-
-  def encode_varint(n) when n <= 127 do
-    [n]
-  end
-
-  def encode_varint(n) do
-    [<<1::1, band(n, 127)::7>> | encode_varint(bsr(n, 7))]
   end
 
   @doc false

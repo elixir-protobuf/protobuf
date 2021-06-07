@@ -1,4 +1,4 @@
-defmodule Protobuf.WireTypes do
+defmodule Protobuf.Wire.Types do
   @moduledoc false
 
   defmacro wire_varint, do: 0
