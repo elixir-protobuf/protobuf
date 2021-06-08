@@ -17,8 +17,6 @@ defmodule Protobuf.Mixfile do
       escript: escript(),
       description: description(),
       package: package(),
-      aliases: aliases(),
-      preferred_cli_env: ["test.integration": :test],
       docs: docs()
     ]
   end
@@ -68,23 +66,5 @@ defmodule Protobuf.Mixfile do
       source_url: @source_url,
       source_ref: "v#{@version}"
     ]
-  end
-
-  defp aliases do
-    ["test.integration": &run_integration_tests/1]
-  end
-
-  defp run_integration_tests(args) do
-    IO.puts("==> make clean")
-    Mix.shell().cmd("make clean")
-
-    IO.puts("==> make gen-protos")
-    Mix.shell().cmd("make gen-protos")
-
-    args = ["--only", "integration" | args]
-    args = if IO.ANSI.enabled?(), do: ["--color" | args], else: ["--no-color" | args]
-
-    IO.puts("==> mix test #{Enum.join(args, " ")}")
-    Mix.Task.run("test", args)
   end
 end
