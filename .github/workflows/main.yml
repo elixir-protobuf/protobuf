@@ -12,7 +12,6 @@ jobs:
         include:
           - otp: 24.0
             elixir: 1.12.1
-            lint: true
             integration: true
           - otp: 23.3
             elixir: 1.11.4
@@ -37,12 +36,17 @@ jobs:
       - name: Install dependencies
         run: mix deps.get --only test
 
-      - name: Check no unused dependencies
+      - name: Check for unused dependencies
         run: mix deps.get && mix deps.unlock --check-unused
         if: ${{matrix.lint}}
 
-      - name: Compile dependencies
-        run: mix deps.compile
+      - name: Compile with --warnings-as-errors
+        run: mix compile --warnings-as-errors
+        if: ${{matrix.lint}}
+
+      - name: Check mix format
+        run: mix format --check-formatted
+        if: ${{matrix.lint}}
 
       - name: Run tests
         run: mix test --trace
