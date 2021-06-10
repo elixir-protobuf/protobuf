@@ -115,7 +115,6 @@ defmodule Protobuf.Protoc.Generator.Message do
         {fmt_type_name(f.name, longest_width), "{atom, any}"}
       end)
 
-
     types =
       types ++
         Enum.map(fields, fn f ->
