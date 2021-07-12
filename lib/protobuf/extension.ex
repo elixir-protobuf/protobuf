@@ -137,4 +137,10 @@ defmodule Protobuf.Extension do
       end)
     end)
   end
+
+  def unload_extensions do
+    for {{Protobuf.Extension, _extendee, _tag} = key, _mod} <- :persistent_term.get() do
+      :persistent_term.erase(key)
+    end
+  end
 end
