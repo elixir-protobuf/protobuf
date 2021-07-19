@@ -13,11 +13,11 @@ defmodule Protobuf.Application do
   def start(_type, _args) do
     if Application.get_env(:protobuf, :extensions, :disabled) == :enabled do
       mods = get_all_modules()
-      Protobuf.Extension.cal_extensions(mods)
+      Protobuf.Extension.__cal_extensions__(mods)
     else
       # Extensions in Protobuf should always be calculated for generating code
       {:ok, mods} = :application.get_key(:protobuf, :modules)
-      Protobuf.Extension.cal_extensions(mods)
+      Protobuf.Extension.__cal_extensions__(mods)
     end
 
     children = []
@@ -26,7 +26,7 @@ defmodule Protobuf.Application do
 
   @impl true
   def stop(_state) do
-    Protobuf.Extension.unload_extensions()
+    Protobuf.Extension.__unload_extensions__()
     :ok
   end
 

@@ -113,7 +113,7 @@ defmodule Protobuf.Extension do
   end
 
   @doc false
-  def cal_extensions(mods) do
+  def __cal_extensions__(mods) do
     mods
     |> Enum.filter(fn mod ->
       if to_string(mod) =~ ~r/\.PbExtension$/ && Code.ensure_loaded?(mod) do
@@ -138,7 +138,8 @@ defmodule Protobuf.Extension do
     end)
   end
 
-  def unload_extensions do
+  @doc false
+  def __unload_extensions__ do
     for {{Protobuf.Extension, _extendee, _tag} = key, _mod} <- :persistent_term.get() do
       :persistent_term.erase(key)
     end
