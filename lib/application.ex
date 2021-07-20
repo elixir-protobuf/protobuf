@@ -9,18 +9,25 @@ defmodule Protobuf.Application do
   """
 
   @doc false
+  @impl true
   def start(_type, _args) do
     if Application.get_env(:protobuf, :extensions, :disabled) == :enabled do
       mods = get_all_modules()
-      Protobuf.Extension.cal_extensions(mods)
+      Protobuf.Extension.__cal_extensions__(mods)
     else
       # Extensions in Protobuf should always be calculated for generating code
       {:ok, mods} = :application.get_key(:protobuf, :modules)
-      Protobuf.Extension.cal_extensions(mods)
+      Protobuf.Extension.__cal_extensions__(mods)
     end
 
     children = []
     Supervisor.start_link(children, strategy: :one_for_one)
+  end
+
+  @impl true
+  def stop(_state) do
+    Protobuf.Extension.__unload_extensions__()
+    :ok
   end
 
   defp get_all_modules() do
