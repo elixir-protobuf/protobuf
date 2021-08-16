@@ -11,7 +11,7 @@ jobs:
       matrix:
         include:
           - otp: 24.0
-            elixir: 1.12.1
+            elixir: 1.12.2
             integration: true
           - otp: 23.3
             elixir: 1.11.4
