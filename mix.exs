@@ -2,7 +2,7 @@ defmodule Protobuf.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/elixir-protobuf/protobuf"
-  @version "0.8.1"
+  @version "0.8.0"
 
   def project do
     [
@@ -34,7 +34,7 @@ defmodule Protobuf.Mixfile do
   defp deps do
     [
       {:jason, "~> 1.2", optional: true},
-      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:stream_data, "~> 0.5.0", only: [:dev, :test]}
