@@ -237,4 +237,9 @@ defmodule Protobuf.DSLTest do
     assert msg_props.field_props[4].oneof == 1
     refute msg_props.field_props[5].oneof
   end
+
+  test "creates transform_module/1 function" do
+    assert TestMsg.Foo.transform_module() == nil
+    assert TestMsg.WithTransformModule.transform_module() == TestMsg.TransformModule
+  end
 end

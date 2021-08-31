@@ -228,6 +228,38 @@ defmodule TestMsg do
     field :mapsi, 3, repeated: true, map: true, type: MapFoo
   end
 
+  defmodule WithTransformModule do
+    use Protobuf, syntax: :proto3
+
+    defstruct [:field]
+
+    field :field, 1, type: :int32
+
+    def transform_module(), do: TestMsg.TransformModule
+  end
+
+  defmodule ContainsTransformModule do
+    use Protobuf, syntax: :proto3
+
+    defstruct [:field]
+
+    field :field, 1, type: WithTransformModule
+  end
+
+  defmodule TransformModule do
+    @behaviour Protobuf.TransformModule
+
+    @impl true
+    def encode(integer, WithTransformModule) when is_integer(integer) do
+      %WithTransformModule{field: integer}
+    end
+
+    @impl true
+    def decode(%WithTransformModule{field: integer}, WithTransformModule) do
+      integer
+    end
+  end
+
   defmodule Ext.EnumFoo do
     @moduledoc false
     use Protobuf, enum: true, syntax: :proto2

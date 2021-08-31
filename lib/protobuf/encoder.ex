@@ -76,9 +76,7 @@ defmodule Protobuf.Encoder do
   rescue
     error ->
       msg =
-        "Got error when encoding #{inspect(struct.__struct__)}##{prop.name_atom}: #{
-          Exception.format(:error, error)
-        }"
+        "Got error when encoding #{inspect(struct.__struct__)}##{prop.name_atom}: #{Exception.format(:error, error)}"
 
       throw({Protobuf.EncodeError, [message: msg], __STACKTRACE__})
   end
@@ -111,6 +109,7 @@ defmodule Protobuf.Encoder do
 
     repeated_or_not(val, repeated, fn v ->
       v = if is_map, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
+      v = transform_module(v, prop.type)
       # so that oneof {:atom, v} can be encoded
       encoded = encode(type, v, iolist: true)
       byte_size = IO.iodata_length(encoded)
@@ -122,6 +121,14 @@ defmodule Protobuf.Encoder do
     encoded = Enum.map(val, fn v -> Wire.from_proto(type, v) end)
     byte_size = IO.iodata_length(encoded)
     [fnum | Varint.encode(byte_size)] ++ encoded
+  end
+
+  defp transform_module(message, module) do
+    if transform_module = module.transform_module() do
+      transform_module.encode(message, module)
+    else
+      message
+    end
   end
 
   @spec class_field(map) :: atom

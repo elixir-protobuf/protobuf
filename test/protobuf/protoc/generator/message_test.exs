@@ -29,6 +29,18 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "defmodule Pkg.Name.Foo do\n"
   end
 
+  test "generate/2 adds transform_module/1" do
+    ctx = %Context{}
+    desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
+    {[], [msg]} = Generator.generate(ctx, desc)
+    assert msg =~ "def transform_module(), do: nil\n"
+
+    ctx = %Context{transform_module: My.Transform.Module}
+    desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
+    {[], [msg]} = Generator.generate(ctx, desc)
+    assert msg =~ "def transform_module(), do: My.Transform.Module\n"
+  end
+
   test "generate/2 has right options" do
     ctx = %Context{package: "pkg.name"}
 

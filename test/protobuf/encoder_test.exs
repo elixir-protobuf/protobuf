@@ -181,4 +181,10 @@ defmodule Protobuf.EncoderTest do
     msg = TestMsg.Bar2.new(a: 0, b: 1)
     assert Encoder.encode(msg) == <<8, 0, 16, 1>>
   end
+
+  test "encodes with transformer module" do
+    msg = %TestMsg.ContainsTransformModule{field: 42}
+    assert Encoder.encode(msg) == <<10, 2, 8, 42>>
+    assert TestMsg.ContainsTransformModule.decode(Encoder.encode(msg)) == msg
+  end
 end

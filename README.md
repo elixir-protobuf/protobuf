@@ -125,6 +125,19 @@ For example to prefix generated Elixir modules with `MyApp.Protos` use `my_app.p
 $ protoc --elixir_out=./lib --elixir_opt=package_prefix=my_app.protos *.proto
 ```
 
+### Transformer module
+
+By defining a callback `transform_module/0` function on your protobuf message module
+you can add custom encoding and decoding logic for your message. See the documentation
+for `Protobuf.TransformModule` for more details.
+
+If your protobufs are generated from a `.proto` files you can add the callback function
+by passing `transform_module=...` in `--elixir_out`.
+
+```
+$ protoc --elixir_out=transform_module=MyTransformModule:./lib/ *.proto
+```
+
 ### gRPC Support
 
 If you write [services](https://developers.google.com/protocol-buffers/docs/proto#services) in protobuf, you can generate [gRPC](https://github.com/tony612/grpc-elixir) code by passing `plugins=grpc` in `--elixir_out`:

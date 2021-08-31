@@ -18,6 +18,15 @@ defmodule Protobuf.Decoder do
     bin
     |> build_message(module.new(), props)
     |> reverse_repeated(props.repeated_fields)
+    |> transform_module(module)
+  end
+
+  defp transform_module(message, module) do
+    if transform_module = module.transform_module() do
+      transform_module.decode(message, module)
+    else
+      message
+    end
   end
 
   defp build_message(<<>>, message, _props), do: message
