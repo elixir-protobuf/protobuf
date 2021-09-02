@@ -185,16 +185,16 @@ defmodule Protobuf.Decoder do
     acc = current || []
 
     case prop.wire_type do
-      wire_varint() -> decode_varints(bin, acc)
+      wire_varint() -> decode_varints(bin, prop.type, acc)
       wire_32bits() -> decode_fixed32(bin, prop.type, acc)
       wire_64bits() -> decode_fixed64(bin, prop.type, acc)
     end
   end
 
-  defp decode_varints(<<>>, acc), do: acc
+  defp decode_varints(<<>>, _, acc), do: acc
 
-  decoder :defp, :decode_varints, [:acc] do
-    decode_varints(rest, [value | acc])
+  decoder :defp, :decode_varints, [:type, :acc] do
+    decode_varints(rest, type, [Wire.to_proto(type, value) | acc])
   end
 
   defp decode_fixed32(<<n::bits-32, bin::bits>>, type, acc) do
