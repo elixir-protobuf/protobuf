@@ -82,7 +82,7 @@ defmodule TestMsg do
     # field :h, 9, repeated: true, type: Foo.Bar
     field :i, 10, repeated: true, type: :int32, packed: true
     # field :j, 11, optional: true, type: EnumFoo, enum: true
-    # field :k, 12, optioanl: true, type: :bool
+    # field :k, 12, optional: true, type: :bool
     field :l, 13, repeated: true, type: MapFoo, map: true
     field :non_matched, 101, type: :int32, optional: true
   end
