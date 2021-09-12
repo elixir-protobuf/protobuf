@@ -115,6 +115,16 @@ $ protoc --elixir_out=gen_descriptors=true:./lib/ *.proto
 $ protoc --elixir_out=gen_descriptors=true,plugins=grpc:./lib/ *.proto
 ```
 
+### Package prefix
+
+You can use `package_prefix` option to prefix generated Elixir code.
+
+For example to prefix generated Elixir modules with `MyApp.Protos` use `my_app.protos` as package prefix:
+
+```
+$ protoc --elixir_out=./lib --elixir_opt=package_prefix=my_app.protos *.proto
+```
+
 ### gRPC Support
 
 If you write [services](https://developers.google.com/protocol-buffers/docs/proto#services) in protobuf, you can generate [gRPC](https://github.com/tony612/grpc-elixir) code by passing `plugins=grpc` in `--elixir_out`:
