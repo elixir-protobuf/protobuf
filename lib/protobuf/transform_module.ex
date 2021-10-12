@@ -26,7 +26,7 @@ defmodule Protobuf.TransformModule do
         def encode(string, StringMessage) when is_binary(string), do: %StringMessage{value: string}
 
         @impl true
-        def decode(%StringMessage{value: string}), do: string
+        def decode(%StringMessage{value: string}, StringMessage), do: string
       end
   """
 
