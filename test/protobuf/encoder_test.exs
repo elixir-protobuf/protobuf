@@ -187,4 +187,10 @@ defmodule Protobuf.EncoderTest do
     assert Encoder.encode(msg) == <<10, 2, 8, 42>>
     assert TestMsg.ContainsTransformModule.decode(Encoder.encode(msg)) == msg
   end
+
+  test "encoding skips transformer module when field is not set" do
+    msg = %TestMsg.ContainsTransformModule{field: nil}
+    assert Encoder.encode(msg) == <<>>
+    assert TestMsg.ContainsTransformModule.decode(Encoder.encode(msg)) == msg
+  end
 end
