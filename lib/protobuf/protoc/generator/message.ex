@@ -34,6 +34,7 @@ defmodule Protobuf.Protoc.Generator.Message do
       fields: fields,
       oneofs: oneofs_str(desc.oneof_decl),
       desc: generate_desc,
+      transform_module: ctx.transform_module,
       extensions: extensions
     }
   end
@@ -47,6 +48,7 @@ defmodule Protobuf.Protoc.Generator.Message do
       msg_struct[:oneofs],
       gen_fields(syntax, msg_struct[:fields]),
       msg_struct[:desc],
+      msg_struct[:transform_module],
       gen_extensions(msg_struct[:extensions])
     )
   end

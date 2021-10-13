@@ -11,7 +11,17 @@ defmodule Protobuf.Protoc.Template do
     :def,
     :message,
     @msg_tmpl,
-    [:name, :options, :struct_fields, :typespec, :oneofs, :fields, :desc, :extensions],
+    [
+      :name,
+      :options,
+      :struct_fields,
+      :typespec,
+      :oneofs,
+      :fields,
+      :desc,
+      :transform_module,
+      :extensions
+    ],
     trim: true
   )
 

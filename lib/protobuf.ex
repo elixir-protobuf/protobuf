@@ -54,6 +54,12 @@ defmodule Protobuf do
         Protobuf.Builder.new!(__MODULE__, attrs)
       end
 
+      def transform_module() do
+        nil
+      end
+
+      defoverridable transform_module: 0
+
       unquote(def_encode_decode())
     end
   end
@@ -97,6 +103,14 @@ defmodule Protobuf do
   Errors may be raised if there's something wrong in the binary.
   """
   @callback decode(binary) :: struct
+
+  @doc """
+  Returns `nil` or a transformer module that implements the `Protobuf.TransformModule`
+  behaviour.
+
+  This function is overridable in your module.
+  """
+  @callback transform_module() :: module | nil
 
   @doc """
   It's preferable to use message's `decode` function, like:

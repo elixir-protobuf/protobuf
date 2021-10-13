@@ -20,6 +20,8 @@ defmodule <%= name %> do
 <%= for f <- fields do %>  field <%= f %>
 <% end %>
 
+  def transform_module(), do: <%= inspect(transform_module) %>
+
   <%= if not is_nil(extensions) do %>
   extensions <%= extensions %>
   <% end %>

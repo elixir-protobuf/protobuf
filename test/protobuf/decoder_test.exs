@@ -144,6 +144,18 @@ defmodule Protobuf.DecoderTest do
              TestMsg.Oneof.new(first: {:b, ""}, second: {:c, 0})
   end
 
+  test "decodes with transformer module" do
+    assert TestMsg.WithTransformModule.decode(<<8, 42>>) == 42
+
+    assert TestMsg.WithTransformModule.decode(<<>>) == 0
+
+    assert TestMsg.ContainsTransformModule.decode(<<10, 2, 8, 42>>) ==
+             %TestMsg.ContainsTransformModule{field: 42}
+
+    assert TestMsg.ContainsTransformModule.decode(<<>>) ==
+             %TestMsg.ContainsTransformModule{field: nil}
+  end
+
   describe "groups" do
     test "skips all groups and their fields" do
       a = <<8, 42>>

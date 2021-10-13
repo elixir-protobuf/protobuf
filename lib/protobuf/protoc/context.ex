@@ -29,6 +29,9 @@ defmodule Protobuf.Protoc.Context do
             # And expose them via the `descriptor/0` function
             gen_descriptors?: false,
 
+            # Module to transform values before and after encode and decode
+            transform_module: nil,
+
             # Elixirpb.FileOptions
             custom_file_options: %{}
 

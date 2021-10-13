@@ -19,6 +19,12 @@ defmodule Protobuf.Protoc.CLITest do
            }
   end
 
+  test "parse_params/2 parse transform_module" do
+    ctx = %Context{}
+    ctx = parse_params(ctx, "transform_module=My.Transform.Module")
+    assert %Context{transform_module: My.Transform.Module} = ctx
+  end
+
   test "find_types/2 returns multiple files" do
     ctx = %Context{}
     descs = [FileDescriptorProto.new(name: "file1"), FileDescriptorProto.new(name: "file2")]

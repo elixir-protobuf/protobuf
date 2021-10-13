@@ -72,6 +72,11 @@ defmodule Protobuf.Protoc.CLI do
     parse_params(ctx, t)
   end
 
+  def parse_params(ctx, ["transform_module=" <> module | t]) do
+    ctx = %{ctx | transform_module: Module.concat([module])}
+    parse_params(ctx, t)
+  end
+
   def parse_params(ctx, _), do: ctx
 
   @doc false
