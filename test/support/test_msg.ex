@@ -194,7 +194,22 @@ defmodule TestMsg do
       :sint64,
       :fixed64,
       :sfixed64,
-      :bytes
+      :bytes,
+      :repeated_string,
+      :repeated_bool,
+      :repeated_float,
+      :repeated_double,
+      :repeated_int32,
+      :repeated_uint32,
+      :repeated_sint32,
+      :repeated_fixed32,
+      :repeated_sfixed32,
+      :repeated_int64,
+      :repeated_uint64,
+      :repeated_sint64,
+      :repeated_fixed64,
+      :repeated_sfixed64,
+      :repeated_bytes
     ]
 
     field :string, 1, type: :string
@@ -216,6 +231,26 @@ defmodule TestMsg do
     field :sfixed64, 14, type: :sfixed64
 
     field :bytes, 15, type: :bytes
+
+    field :repeated_string, 16, repeated: true, type: :string
+    field :repeated_bool, 17, repeated: true, type: :bool
+
+    field :repeated_float, 18, repeated: true, type: :float
+    field :repeated_double, 19, repeated: true, type: :double
+
+    field :repeated_int32, 20, repeated: true, type: :int32
+    field :repeated_uint32, 21, repeated: true, type: :uint32
+    field :repeated_sint32, 22, repeated: true, type: :sint32
+    field :repeated_fixed32, 23, repeated: true, type: :fixed32
+    field :repeated_sfixed32, 24, repeated: true, type: :sfixed32
+
+    field :repeated_int64, 25, repeated: true, type: :int64
+    field :repeated_uint64, 26, repeated: true, type: :uint64
+    field :repeated_sint64, 27, repeated: true, type: :sint64
+    field :repeated_fixed64, 28, repeated: true, type: :fixed64
+    field :repeated_sfixed64, 29, repeated: true, type: :sfixed64
+
+    field :repeated_bytes, 30, repeated: true, type: :bytes
   end
 
   defmodule MapIntToInt do
