@@ -53,8 +53,8 @@ end
 1. Install `protoc`(cpp) [here](https://github.com/google/protobuf/blob/master/src/README.md) or
    `brew install protobuf` on MacOS.
 
-2.  Install protoc plugin `protoc-gen-elixir` for Elixir . NOTE: You have to
-    make sure `protoc-gen-elixir`(this name is important) is in your PATH.
+2.  Install protoc plugin `protoc-gen-elixir` for Elixir using the command below. NOTE: You have to
+    make sure `protoc-gen-elixir` (this name is important) is in your PATH. Either add `PATH=~/.mix/escripts:$PATH` to your bash or zsh profile, or if you used asdf to install elixir, run `asdf reshim` and then check that protoc-gen-elixir works. 
 
     ```bash
     $ mix escript.install hex protobuf
