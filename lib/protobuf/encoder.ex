@@ -245,7 +245,7 @@ defmodule Protobuf.Encoder do
     end
   end
 
-  defp skip_enum?(syntax, prop, value)
+  defp skip_enum?(syntax, value, prop)
   defp skip_enum?(:proto2, _, _), do: false
   defp skip_enum?(_, _, %{enum?: false}), do: false
   defp skip_enum?(_, _, %{enum?: true, oneof: oneof}) when not is_nil(oneof), do: false
@@ -286,7 +286,7 @@ defmodule Protobuf.Encoder do
     Enum.reduce(pb_exts, encoded, fn {{ext_mod, key}, val}, acc ->
       case Protobuf.Extension.get_extension_props(mod, ext_mod, key) do
         %{field_props: prop} ->
-          if skip_field?(:proto2, val, prop) do
+          if skip_field?(:proto2, val, prop) || skip_enum?(:proto2, val, prop) do
             encoded
           else
             [encode_field(class_field(prop), val, prop) | acc]
