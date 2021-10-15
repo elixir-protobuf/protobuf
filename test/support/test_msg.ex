@@ -87,6 +87,24 @@ defmodule TestMsg do
     field :non_matched, 101, type: :int32, optional: true
   end
 
+  defmodule SignedInt32Repeated do
+    @moduledoc false
+    use Protobuf, syntax: :proto2
+
+    defstruct [:a]
+
+    field :a, 1, repeated: true, type: :sint32
+  end
+
+  defmodule SignedInt32RepeatedPacked do
+    @moduledoc false
+    use Protobuf, syntax: :proto2
+
+    defstruct [:a]
+
+    field :a, 1, repeated: true, type: :sint32, packed: true
+  end
+
   defmodule Oneof do
     @moduledoc false
     use Protobuf
