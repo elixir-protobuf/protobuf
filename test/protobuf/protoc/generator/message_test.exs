@@ -460,8 +460,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [msg]} = Generator.generate(ctx, desc)
-    assert msg =~ "first: {atom, any},\n"
-    assert msg =~ "second: {atom, any},\n"
+    assert msg =~ "first: {:a, integer} | {:b, integer},\n"
+    assert msg =~ "second: {:c, integer} | {:d, integer},\n"
     assert msg =~ "other: integer\n"
     refute msg =~ "a: integer,\n"
     assert msg =~ "defstruct [:first, :second, :other]\n"

@@ -110,16 +110,24 @@ defmodule Protobuf.Protoc.Generator.Message do
   def typespec_str(fields, oneofs, extensions) do
     longest_field = fields |> Enum.max_by(&String.length(&1[:name]))
     longest_width = String.length(longest_field[:name])
-    fields = Enum.filter(fields, fn f -> !f[:oneof] end)
+
+    {regular_fields, oneof_fields_by_index} =
+      fields
+      |> Enum.group_by(& &1[:oneof])
+      |> Map.pop(nil, %{})
 
     types =
-      Enum.map(oneofs, fn f ->
-        {fmt_type_name(f.name, longest_width), "{atom, any}"}
+      oneofs
+      |> Enum.with_index()
+      |> Enum.map(fn {oneof, index} ->
+        oneof_fields = oneof_fields_by_index[index]
+        oneof_type = Enum.map_join(oneof_fields, " | ", &"{:#{&1[:name]}, #{fmt_type(&1)}}")
+        {fmt_type_name(oneof.name, longest_width), oneof_type}
       end)
 
     types =
       types ++
-        Enum.map(fields, fn f ->
+        Enum.map(regular_fields, fn f ->
           {fmt_type_name(f[:name], longest_width), fmt_type(f)}
         end)
 

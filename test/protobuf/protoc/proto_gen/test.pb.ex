@@ -250,7 +250,17 @@ defmodule My.Test.Communique do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          union: {atom, any},
+          union:
+            {:number, integer}
+            | {:name, String.t()}
+            | {:data, binary}
+            | {:temp_c, float | :infinity | :negative_infinity | :nan}
+            | {:height, float | :infinity | :negative_infinity | :nan}
+            | {:today, My.Test.Days.t()}
+            | {:maybe, boolean}
+            | {:delta, integer}
+            | {:msg, My.Test.Reply.t() | nil}
+            | {:somegroup, any},
           make_me_cry: boolean
         }
 
