@@ -12,10 +12,10 @@ defmodule Google.Protobuf.Compiler.Version do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          major: integer,
-          minor: integer,
-          patch: integer,
-          suffix: String.t()
+          major: integer | nil,
+          minor: integer | nil,
+          patch: integer | nil,
+          suffix: String.t() | nil
         }
 
   defstruct [:major, :minor, :patch, :suffix]
@@ -33,8 +33,8 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorRequest do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          file_to_generate: String.t(),
-          parameter: String.t(),
+          file_to_generate: [String.t()],
+          parameter: String.t() | nil,
           proto_file: [Google.Protobuf.FileDescriptorProto.t()],
           compiler_version: Google.Protobuf.Compiler.Version.t() | nil
         }
@@ -54,9 +54,9 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorResponse.File do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          name: String.t(),
-          insertion_point: String.t(),
-          content: String.t(),
+          name: String.t() | nil,
+          insertion_point: String.t() | nil,
+          content: String.t() | nil,
           generated_code_info: Google.Protobuf.GeneratedCodeInfo.t() | nil
         }
 
@@ -75,8 +75,8 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorResponse do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          error: String.t(),
-          supported_features: non_neg_integer,
+          error: String.t() | nil,
+          supported_features: non_neg_integer | nil,
           file: [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()]
         }
 

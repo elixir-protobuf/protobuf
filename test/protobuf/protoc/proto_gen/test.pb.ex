@@ -41,7 +41,7 @@ defmodule My.Test.Request.SomeGroup do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          group_field: integer
+          group_field: integer | nil
         }
 
   defstruct [:group_field]
@@ -56,8 +56,8 @@ defmodule My.Test.Request.NameMappingEntry do
   use Protobuf, map: true, syntax: :proto2
 
   @type t :: %__MODULE__{
-          key: integer,
-          value: String.t()
+          key: integer | nil,
+          value: String.t() | nil
         }
 
   defstruct [:key, :value]
@@ -73,7 +73,7 @@ defmodule My.Test.Request.MsgMappingEntry do
   use Protobuf, map: true, syntax: :proto2
 
   @type t :: %__MODULE__{
-          key: integer,
+          key: integer | nil,
           value: My.Test.Reply.t() | nil
         }
 
@@ -90,15 +90,15 @@ defmodule My.Test.Request do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          key: integer,
-          hue: My.Test.Request.Color.t(),
-          hat: My.Test.HatType.t(),
-          deadline: float | :infinity | :negative_infinity | :nan,
-          somegroup: any,
-          name_mapping: %{integer => String.t()},
+          key: [integer],
+          hue: My.Test.Request.Color.t() | nil,
+          hat: My.Test.HatType.t() | nil,
+          deadline: float | :infinity | :negative_infinity | :nan | nil,
+          somegroup: any | nil,
+          name_mapping: %{integer => String.t() | nil},
           msg_mapping: %{integer => My.Test.Reply.t() | nil},
-          reset: integer,
-          get_key: String.t()
+          reset: integer | nil,
+          get_key: String.t() | nil
         }
 
   defstruct [
@@ -132,8 +132,8 @@ defmodule My.Test.Reply.Entry do
 
   @type t :: %__MODULE__{
           key_that_needs_1234camel_CasIng: integer,
-          value: integer,
-          _my_field_name_2: integer
+          value: integer | nil,
+          _my_field_name_2: integer | nil
         }
 
   defstruct [:key_that_needs_1234camel_CasIng, :value, :_my_field_name_2]
@@ -151,7 +151,7 @@ defmodule My.Test.Reply do
 
   @type t :: %__MODULE__{
           found: [My.Test.Reply.Entry.t()],
-          compact_keys: integer,
+          compact_keys: [integer],
           __pb_extensions__: map
         }
 
@@ -170,7 +170,7 @@ defmodule My.Test.OtherBase do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          name: String.t(),
+          name: String.t() | nil,
           __pb_extensions__: map
         }
 
@@ -198,7 +198,7 @@ defmodule My.Test.OtherReplyExtensions do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          key: integer
+          key: integer | nil
         }
 
   defstruct [:key]
@@ -225,7 +225,7 @@ defmodule My.Test.Communique.SomeGroup do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          member: String.t()
+          member: String.t() | nil
         }
 
   defstruct [:member]
@@ -251,17 +251,17 @@ defmodule My.Test.Communique do
 
   @type t :: %__MODULE__{
           union:
-            {:number, integer}
-            | {:name, String.t()}
-            | {:data, binary}
-            | {:temp_c, float | :infinity | :negative_infinity | :nan}
-            | {:height, float | :infinity | :negative_infinity | :nan}
-            | {:today, My.Test.Days.t()}
-            | {:maybe, boolean}
-            | {:delta, integer}
+            {:number, integer | nil}
+            | {:name, String.t() | nil}
+            | {:data, binary | nil}
+            | {:temp_c, float | :infinity | :negative_infinity | :nan | nil}
+            | {:height, float | :infinity | :negative_infinity | :nan | nil}
+            | {:today, My.Test.Days.t() | nil}
+            | {:maybe, boolean | nil}
+            | {:delta, integer | nil}
             | {:msg, My.Test.Reply.t() | nil}
-            | {:somegroup, any},
-          make_me_cry: boolean
+            | {:somegroup, any | nil},
+          make_me_cry: boolean | nil
         }
 
   defstruct [:union, :make_me_cry]
@@ -288,7 +288,7 @@ defmodule My.Test.Options do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          opt1: String.t()
+          opt1: String.t() | nil
         }
 
   defstruct [:opt1]

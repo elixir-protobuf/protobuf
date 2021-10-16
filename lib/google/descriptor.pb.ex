@@ -113,18 +113,18 @@ defmodule Google.Protobuf.FileDescriptorProto do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          name: String.t(),
-          package: String.t(),
-          dependency: String.t(),
-          public_dependency: integer,
-          weak_dependency: integer,
+          name: String.t() | nil,
+          package: String.t() | nil,
+          dependency: [String.t()],
+          public_dependency: [integer],
+          weak_dependency: [integer],
           message_type: [Google.Protobuf.DescriptorProto.t()],
           enum_type: [Google.Protobuf.EnumDescriptorProto.t()],
           service: [Google.Protobuf.ServiceDescriptorProto.t()],
           extension: [Google.Protobuf.FieldDescriptorProto.t()],
           options: Google.Protobuf.FileOptions.t() | nil,
           source_code_info: Google.Protobuf.SourceCodeInfo.t() | nil,
-          syntax: String.t()
+          syntax: String.t() | nil
         }
 
   defstruct [
@@ -163,8 +163,8 @@ defmodule Google.Protobuf.DescriptorProto.ExtensionRange do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          start: integer,
-          end: integer,
+          start: integer | nil,
+          end: integer | nil,
           options: Google.Protobuf.ExtensionRangeOptions.t() | nil
         }
 
@@ -182,8 +182,8 @@ defmodule Google.Protobuf.DescriptorProto.ReservedRange do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          start: integer,
-          end: integer
+          start: integer | nil,
+          end: integer | nil
         }
 
   defstruct [:start, :end]
@@ -199,7 +199,7 @@ defmodule Google.Protobuf.DescriptorProto do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          name: String.t(),
+          name: String.t() | nil,
           field: [Google.Protobuf.FieldDescriptorProto.t()],
           extension: [Google.Protobuf.FieldDescriptorProto.t()],
           nested_type: [Google.Protobuf.DescriptorProto.t()],
@@ -208,7 +208,7 @@ defmodule Google.Protobuf.DescriptorProto do
           oneof_decl: [Google.Protobuf.OneofDescriptorProto.t()],
           options: Google.Protobuf.MessageOptions.t() | nil,
           reserved_range: [Google.Protobuf.DescriptorProto.ReservedRange.t()],
-          reserved_name: String.t()
+          reserved_name: [String.t()]
         }
 
   defstruct [
@@ -261,17 +261,17 @@ defmodule Google.Protobuf.FieldDescriptorProto do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          name: String.t(),
-          number: integer,
-          label: Google.Protobuf.FieldDescriptorProto.Label.t(),
-          type: Google.Protobuf.FieldDescriptorProto.Type.t(),
-          type_name: String.t(),
-          extendee: String.t(),
-          default_value: String.t(),
-          oneof_index: integer,
-          json_name: String.t(),
+          name: String.t() | nil,
+          number: integer | nil,
+          label: Google.Protobuf.FieldDescriptorProto.Label.t() | nil,
+          type: Google.Protobuf.FieldDescriptorProto.Type.t() | nil,
+          type_name: String.t() | nil,
+          extendee: String.t() | nil,
+          default_value: String.t() | nil,
+          oneof_index: integer | nil,
+          json_name: String.t() | nil,
           options: Google.Protobuf.FieldOptions.t() | nil,
-          proto3_optional: boolean
+          proto3_optional: boolean | nil
         }
 
   defstruct [
@@ -308,7 +308,7 @@ defmodule Google.Protobuf.OneofDescriptorProto do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          name: String.t(),
+          name: String.t() | nil,
           options: Google.Protobuf.OneofOptions.t() | nil
         }
 
@@ -325,8 +325,8 @@ defmodule Google.Protobuf.EnumDescriptorProto.EnumReservedRange do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          start: integer,
-          end: integer
+          start: integer | nil,
+          end: integer | nil
         }
 
   defstruct [:start, :end]
@@ -342,11 +342,11 @@ defmodule Google.Protobuf.EnumDescriptorProto do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          name: String.t(),
+          name: String.t() | nil,
           value: [Google.Protobuf.EnumValueDescriptorProto.t()],
           options: Google.Protobuf.EnumOptions.t() | nil,
           reserved_range: [Google.Protobuf.EnumDescriptorProto.EnumReservedRange.t()],
-          reserved_name: String.t()
+          reserved_name: [String.t()]
         }
 
   defstruct [:name, :value, :options, :reserved_range, :reserved_name]
@@ -369,8 +369,8 @@ defmodule Google.Protobuf.EnumValueDescriptorProto do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          name: String.t(),
-          number: integer,
+          name: String.t() | nil,
+          number: integer | nil,
           options: Google.Protobuf.EnumValueOptions.t() | nil
         }
 
@@ -388,7 +388,7 @@ defmodule Google.Protobuf.ServiceDescriptorProto do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          name: String.t(),
+          name: String.t() | nil,
           method: [Google.Protobuf.MethodDescriptorProto.t()],
           options: Google.Protobuf.ServiceOptions.t() | nil
         }
@@ -407,12 +407,12 @@ defmodule Google.Protobuf.MethodDescriptorProto do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          name: String.t(),
-          input_type: String.t(),
-          output_type: String.t(),
+          name: String.t() | nil,
+          input_type: String.t() | nil,
+          output_type: String.t() | nil,
           options: Google.Protobuf.MethodOptions.t() | nil,
-          client_streaming: boolean,
-          server_streaming: boolean
+          client_streaming: boolean | nil,
+          server_streaming: boolean | nil
         }
 
   defstruct [:name, :input_type, :output_type, :options, :client_streaming, :server_streaming]
@@ -432,26 +432,26 @@ defmodule Google.Protobuf.FileOptions do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          java_package: String.t(),
-          java_outer_classname: String.t(),
-          java_multiple_files: boolean,
-          java_generate_equals_and_hash: boolean,
-          java_string_check_utf8: boolean,
-          optimize_for: Google.Protobuf.FileOptions.OptimizeMode.t(),
-          go_package: String.t(),
-          cc_generic_services: boolean,
-          java_generic_services: boolean,
-          py_generic_services: boolean,
-          php_generic_services: boolean,
-          deprecated: boolean,
-          cc_enable_arenas: boolean,
-          objc_class_prefix: String.t(),
-          csharp_namespace: String.t(),
-          swift_prefix: String.t(),
-          php_class_prefix: String.t(),
-          php_namespace: String.t(),
-          php_metadata_namespace: String.t(),
-          ruby_package: String.t(),
+          java_package: String.t() | nil,
+          java_outer_classname: String.t() | nil,
+          java_multiple_files: boolean | nil,
+          java_generate_equals_and_hash: boolean | nil,
+          java_string_check_utf8: boolean | nil,
+          optimize_for: Google.Protobuf.FileOptions.OptimizeMode.t() | nil,
+          go_package: String.t() | nil,
+          cc_generic_services: boolean | nil,
+          java_generic_services: boolean | nil,
+          py_generic_services: boolean | nil,
+          php_generic_services: boolean | nil,
+          deprecated: boolean | nil,
+          cc_enable_arenas: boolean | nil,
+          objc_class_prefix: String.t() | nil,
+          csharp_namespace: String.t() | nil,
+          swift_prefix: String.t() | nil,
+          php_class_prefix: String.t() | nil,
+          php_namespace: String.t() | nil,
+          php_metadata_namespace: String.t() | nil,
+          ruby_package: String.t() | nil,
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()],
           __pb_extensions__: map
         }
@@ -519,10 +519,10 @@ defmodule Google.Protobuf.MessageOptions do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          message_set_wire_format: boolean,
-          no_standard_descriptor_accessor: boolean,
-          deprecated: boolean,
-          map_entry: boolean,
+          message_set_wire_format: boolean | nil,
+          no_standard_descriptor_accessor: boolean | nil,
+          deprecated: boolean | nil,
+          map_entry: boolean | nil,
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()],
           __pb_extensions__: map
         }
@@ -552,12 +552,12 @@ defmodule Google.Protobuf.FieldOptions do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          ctype: Google.Protobuf.FieldOptions.CType.t(),
-          packed: boolean,
-          jstype: Google.Protobuf.FieldOptions.JSType.t(),
-          lazy: boolean,
-          deprecated: boolean,
-          weak: boolean,
+          ctype: Google.Protobuf.FieldOptions.CType.t() | nil,
+          packed: boolean | nil,
+          jstype: Google.Protobuf.FieldOptions.JSType.t() | nil,
+          lazy: boolean | nil,
+          deprecated: boolean | nil,
+          weak: boolean | nil,
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()],
           __pb_extensions__: map
         }
@@ -620,8 +620,8 @@ defmodule Google.Protobuf.EnumOptions do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          allow_alias: boolean,
-          deprecated: boolean,
+          allow_alias: boolean | nil,
+          deprecated: boolean | nil,
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()],
           __pb_extensions__: map
         }
@@ -642,7 +642,7 @@ defmodule Google.Protobuf.EnumValueOptions do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          deprecated: boolean,
+          deprecated: boolean | nil,
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()],
           __pb_extensions__: map
         }
@@ -662,7 +662,7 @@ defmodule Google.Protobuf.ServiceOptions do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          deprecated: boolean,
+          deprecated: boolean | nil,
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()],
           __pb_extensions__: map
         }
@@ -682,8 +682,8 @@ defmodule Google.Protobuf.MethodOptions do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          deprecated: boolean,
-          idempotency_level: Google.Protobuf.MethodOptions.IdempotencyLevel.t(),
+          deprecated: boolean | nil,
+          idempotency_level: Google.Protobuf.MethodOptions.IdempotencyLevel.t() | nil,
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()],
           __pb_extensions__: map
         }
@@ -728,12 +728,12 @@ defmodule Google.Protobuf.UninterpretedOption do
 
   @type t :: %__MODULE__{
           name: [Google.Protobuf.UninterpretedOption.NamePart.t()],
-          identifier_value: String.t(),
-          positive_int_value: non_neg_integer,
-          negative_int_value: integer,
-          double_value: float | :infinity | :negative_infinity | :nan,
-          string_value: binary,
-          aggregate_value: String.t()
+          identifier_value: String.t() | nil,
+          positive_int_value: non_neg_integer | nil,
+          negative_int_value: integer | nil,
+          double_value: float | :infinity | :negative_infinity | :nan | nil,
+          string_value: binary | nil,
+          aggregate_value: String.t() | nil
         }
 
   defstruct [
@@ -762,11 +762,11 @@ defmodule Google.Protobuf.SourceCodeInfo.Location do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          path: integer,
-          span: integer,
-          leading_comments: String.t(),
-          trailing_comments: String.t(),
-          leading_detached_comments: String.t()
+          path: [integer],
+          span: [integer],
+          leading_comments: String.t() | nil,
+          trailing_comments: String.t() | nil,
+          leading_detached_comments: [String.t()]
         }
 
   defstruct [:path, :span, :leading_comments, :trailing_comments, :leading_detached_comments]
@@ -800,10 +800,10 @@ defmodule Google.Protobuf.GeneratedCodeInfo.Annotation do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          path: integer,
-          source_file: String.t(),
-          begin: integer,
-          end: integer
+          path: [integer],
+          source_file: String.t() | nil,
+          begin: integer | nil,
+          end: integer | nil
         }
 
   defstruct [:path, :source_file, :begin, :end]
