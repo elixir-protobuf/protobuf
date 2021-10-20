@@ -5,7 +5,10 @@ defmodule Protobuf.Protoc.ExtTest.Foo do
   @type t :: %__MODULE__{
           a: String.t()
         }
+
   defstruct [:a]
 
   field :a, 1, optional: true, type: :string
+
+  def transform_module(), do: nil
 end

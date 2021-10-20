@@ -5,14 +5,16 @@ defmodule Elixirpb.FileOptions do
   @type t :: %__MODULE__{
           module_prefix: String.t()
         }
+
   defstruct [:module_prefix]
 
   field :module_prefix, 1, optional: true, type: :string
+
+  def transform_module(), do: nil
 end
 
 defmodule Elixirpb.PbExtension do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   extend Google.Protobuf.FileOptions, :file, 1047, optional: true, type: Elixirpb.FileOptions
 end
