@@ -27,7 +27,7 @@ defmodule Protobuf.TypeUtil do
   def enum_to_spec(:TYPE_FIXED64), do: "non_neg_integer"
   def enum_to_spec(:TYPE_FIXED32), do: "non_neg_integer"
   def enum_to_spec(:TYPE_BOOL), do: "boolean"
-  def enum_to_spec(:TYPE_STRING), do: "String.t"
+  def enum_to_spec(:TYPE_STRING), do: "String.t()"
   def enum_to_spec(:TYPE_GROUP), do: "any"
   def enum_to_spec(:TYPE_MESSAGE), do: "binary"
   def enum_to_spec(:TYPE_BYTES), do: "binary"

@@ -178,8 +178,8 @@ defmodule Protobuf.Protoc.Generator.Message do
     end
   end
 
-  defp type_to_spec(:TYPE_MESSAGE, type), do: "#{type}.t"
-  defp type_to_spec(:TYPE_ENUM, type), do: "#{type}.t"
+  defp type_to_spec(:TYPE_MESSAGE, type), do: "#{type}.t()"
+  defp type_to_spec(:TYPE_ENUM, type), do: "#{type}.t()"
   defp type_to_spec(type_scalar, _type), do: TypeUtil.enum_to_spec(type_scalar)
 
   def get_fields(ctx, desc) do

@@ -73,7 +73,7 @@ end
       use Protobuf, syntax: :proto3
 
       @type t :: %__MODULE__{
-        name: String.t
+        name: String.t()
       }
       defstruct [:name]
 
@@ -84,7 +84,7 @@ end
       use Protobuf, syntax: :proto3
 
       @type t :: %__MODULE__{
-        message: String.t
+        message: String.t()
       }
       defstruct [:message]
 
