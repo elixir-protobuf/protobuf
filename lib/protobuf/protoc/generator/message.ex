@@ -108,32 +108,43 @@ defmodule Protobuf.Protoc.Generator.Message do
   def typespec_str([], [], [_ | _]), do: "  @type t :: %__MODULE__{__pb_extensions__: map}\n"
 
   def typespec_str(fields, oneofs, extensions) do
-    longest_field = fields |> Enum.max_by(&String.length(&1[:name]))
-    longest_width = String.length(longest_field[:name])
-    fields = Enum.filter(fields, fn f -> !f[:oneof] end)
+    longest_width = fields |> Enum.map(&String.length(&1.name)) |> Enum.max()
 
-    types =
-      Enum.map(oneofs, fn f ->
-        {fmt_type_name(f.name, longest_width), "{atom, any}"}
-      end)
+    {oneof_fields, regular_fields} = Enum.split_with(fields, & &1[:oneof])
 
-    types =
-      types ++
-        Enum.map(fields, fn f ->
-          {fmt_type_name(f[:name], longest_width), fmt_type(f)}
-        end)
+    oneof_types = oneof_types(oneofs, oneof_fields, longest_width)
+    regular_types = regular_types(regular_fields, longest_width)
+    extensions_types = extensions_types(extensions, longest_width)
 
-    types =
-      if Enum.empty?(extensions) do
-        types
-      else
-        types ++ [{fmt_type_name(:__pb_extensions__, longest_width), "map"}]
-      end
+    types = oneof_types ++ regular_types ++ extensions_types
 
     "  @type t :: %__MODULE__{\n" <>
       Enum.map_join(types, ",\n", fn {k, v} ->
         "    #{k} #{v}"
       end) <> "\n  }\n"
+  end
+
+  defp oneof_types(oneofs, oneof_fields, longest_width) do
+    oneofs
+    |> Enum.with_index()
+    |> Enum.map(fn {oneof, index} ->
+      typespec =
+        oneof_fields
+        |> Enum.filter(&(&1.oneof == index))
+        |> Enum.map_join(" | ", &"{:#{&1.name}, #{fmt_type(&1)}}")
+
+      {fmt_type_name(oneof.name, longest_width), typespec}
+    end)
+  end
+
+  defp regular_types(fields, longest_width) do
+    for f <- fields, do: {fmt_type_name(f.name, longest_width), fmt_type(f)}
+  end
+
+  defp extensions_types(_extensions = [], _longest_width), do: []
+
+  defp extensions_types(_extensions, longest_width) do
+    [{fmt_type_name(:__pb_extensions__, longest_width), "map"}]
   end
 
   defp oneofs_str(oneofs) do
