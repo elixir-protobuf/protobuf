@@ -3,7 +3,7 @@ defmodule Protobuf.Protoc.ExtTest.Foo do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          a: String.t() | nil
+          a: String.t()
         }
 
   defstruct [:a]

@@ -41,7 +41,7 @@ defmodule My.Test.Request.SomeGroup do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          group_field: integer | nil
+          group_field: integer
         }
 
   defstruct [:group_field]
@@ -56,8 +56,8 @@ defmodule My.Test.Request.NameMappingEntry do
   use Protobuf, map: true, syntax: :proto2
 
   @type t :: %__MODULE__{
-          key: integer | nil,
-          value: String.t() | nil
+          key: integer,
+          value: String.t()
         }
 
   defstruct [:key, :value]
@@ -73,7 +73,7 @@ defmodule My.Test.Request.MsgMappingEntry do
   use Protobuf, map: true, syntax: :proto2
 
   @type t :: %__MODULE__{
-          key: integer | nil,
+          key: integer,
           value: My.Test.Reply.t() | nil
         }
 
@@ -91,14 +91,14 @@ defmodule My.Test.Request do
 
   @type t :: %__MODULE__{
           key: [integer],
-          hue: My.Test.Request.Color.t() | nil,
-          hat: My.Test.HatType.t() | nil,
-          deadline: float | :infinity | :negative_infinity | :nan | nil,
-          somegroup: any | nil,
+          hue: My.Test.Request.Color.t(),
+          hat: My.Test.HatType.t(),
+          deadline: float | :infinity | :negative_infinity | :nan,
+          somegroup: any,
           name_mapping: %{integer => String.t() | nil},
           msg_mapping: %{integer => My.Test.Reply.t() | nil},
-          reset: integer | nil,
-          get_key: String.t() | nil
+          reset: integer,
+          get_key: String.t()
         }
 
   defstruct [
@@ -132,8 +132,8 @@ defmodule My.Test.Reply.Entry do
 
   @type t :: %__MODULE__{
           key_that_needs_1234camel_CasIng: integer,
-          value: integer | nil,
-          _my_field_name_2: integer | nil
+          value: integer,
+          _my_field_name_2: integer
         }
 
   defstruct [:key_that_needs_1234camel_CasIng, :value, :_my_field_name_2]
@@ -170,7 +170,7 @@ defmodule My.Test.OtherBase do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          name: String.t() | nil,
+          name: String.t(),
           __pb_extensions__: map
         }
 
@@ -198,7 +198,7 @@ defmodule My.Test.OtherReplyExtensions do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          key: integer | nil
+          key: integer
         }
 
   defstruct [:key]
@@ -225,7 +225,7 @@ defmodule My.Test.Communique.SomeGroup do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          member: String.t() | nil
+          member: String.t()
         }
 
   defstruct [:member]
@@ -251,17 +251,17 @@ defmodule My.Test.Communique do
 
   @type t :: %__MODULE__{
           union:
-            {:number, integer | nil}
-            | {:name, String.t() | nil}
-            | {:data, binary | nil}
-            | {:temp_c, float | :infinity | :negative_infinity | :nan | nil}
-            | {:height, float | :infinity | :negative_infinity | :nan | nil}
-            | {:today, My.Test.Days.t() | nil}
-            | {:maybe, boolean | nil}
-            | {:delta, integer | nil}
+            {:number, integer}
+            | {:name, String.t()}
+            | {:data, binary}
+            | {:temp_c, float | :infinity | :negative_infinity | :nan}
+            | {:height, float | :infinity | :negative_infinity | :nan}
+            | {:today, My.Test.Days.t()}
+            | {:maybe, boolean}
+            | {:delta, integer}
             | {:msg, My.Test.Reply.t() | nil}
-            | {:somegroup, any | nil},
-          make_me_cry: boolean | nil
+            | {:somegroup, any},
+          make_me_cry: boolean
         }
 
   defstruct [:union, :make_me_cry]
@@ -288,7 +288,7 @@ defmodule My.Test.Options do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          opt1: String.t() | nil
+          opt1: String.t()
         }
 
   defstruct [:opt1]

@@ -171,10 +171,10 @@ defmodule Protobuf.Protoc.Generator.Message do
   defp fmt_type(%{label: label, type_enum: type_enum, type: type}) do
     spec = type_to_spec(type_enum, type)
 
-    case label do
-      "optional" -> "#{spec} | nil"
-      "required" -> spec
-      "repeated" -> "[#{spec}]"
+    cond do
+      label == "repeated" -> "[#{spec}]"
+      type_enum == :TYPE_MESSAGE -> "#{spec} | nil"
+      true -> spec
     end
   end
 

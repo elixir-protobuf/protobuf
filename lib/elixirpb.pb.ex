@@ -3,7 +3,7 @@ defmodule Elixirpb.FileOptions do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          module_prefix: String.t() | nil
+          module_prefix: String.t()
         }
 
   defstruct [:module_prefix]
