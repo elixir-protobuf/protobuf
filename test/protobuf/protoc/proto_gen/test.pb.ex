@@ -95,7 +95,7 @@ defmodule My.Test.Request do
           hat: My.Test.HatType.t(),
           deadline: float | :infinity | :negative_infinity | :nan,
           somegroup: any,
-          name_mapping: %{integer => String.t() | nil},
+          name_mapping: %{integer => String.t()},
           msg_mapping: %{integer => My.Test.Reply.t() | nil},
           reset: integer,
           get_key: String.t()
