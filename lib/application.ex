@@ -11,7 +11,8 @@ defmodule Protobuf.Application do
   @doc false
   @impl true
   def start(_type, _args) do
-    Protobuf.Extension.__cal_extensions__(get_all_modules())
+    # TODO: Deprecate automatically loading modules, in favor of Protobuf.load_extensions/0
+    Protobuf.Extension.__cal_extensions__()
 
     Supervisor.start_link(_children = [], strategy: :one_for_one)
   end
@@ -21,26 +22,5 @@ defmodule Protobuf.Application do
   def stop(_state) do
     Protobuf.Extension.__unload_extensions__()
     :ok
-  end
-
-  defp get_all_modules do
-    case Application.get_env(:protobuf, :extensions) do
-      :enabled ->
-        case :code.get_mode() do
-          :embedded ->
-            :erlang.loaded()
-
-          :interactive ->
-            Enum.flat_map(Application.loaded_applications(), fn {app, _desc, _vsn} ->
-              {:ok, modules} = :application.get_key(app, :modules)
-              modules
-            end)
-        end
-
-      _disabled ->
-        # Extensions in Protobuf are required for generating code
-        {:ok, mods} = :application.get_key(:protobuf, :modules)
-        mods
-    end
   end
 end

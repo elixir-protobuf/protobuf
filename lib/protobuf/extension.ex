@@ -113,9 +113,9 @@ defmodule Protobuf.Extension do
   end
 
   @doc false
-  def __cal_extensions__(mods) do
-    for mod <- mods,
-        to_string(mod) =~ ~r/\.PbExtension$/,
+  def __cal_extensions__() do
+    for mod <- get_all_modules(),
+        String.ends_with?(Atom.to_string(mod), ".PbExtension"),
         Code.ensure_loaded?(mod),
         function_exported?(mod, :__protobuf_info__, 1),
         %{extensions: extensions} = mod.__protobuf_info__(:extension_props) do
@@ -136,6 +136,27 @@ defmodule Protobuf.Extension do
   def __unload_extensions__ do
     for {{Protobuf.Extension, _extendee, _tag} = key, _mod} <- :persistent_term.get() do
       :persistent_term.erase(key)
+    end
+  end
+
+  defp get_all_modules do
+    case Application.get_env(:protobuf, :extensions) do
+      :enabled ->
+        case :code.get_mode() do
+          :embedded ->
+            :erlang.loaded()
+
+          :interactive ->
+            Enum.flat_map(Application.loaded_applications(), fn {app, _desc, _vsn} ->
+              {:ok, modules} = :application.get_key(app, :modules)
+              modules
+            end)
+        end
+
+      _disabled ->
+        # Extensions in Protobuf are required for generating code
+        {:ok, mods} = :application.get_key(:protobuf, :modules)
+        mods
     end
   end
 end

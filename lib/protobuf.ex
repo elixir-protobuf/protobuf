@@ -119,4 +119,28 @@ defmodule Protobuf do
   def encode(struct) do
     Protobuf.Encoder.encode(struct)
   end
+
+  @doc """
+  Loads extensions modules.
+
+  This function should be called in your application's `start/2` callback,
+  as seen in the example below, if you wish to use extensions.
+
+  ## Example
+
+      def start(_type, _args) do
+        Protobuf.load_extensions()
+        Supervisor.start_link([], strategy: :one_for_one)
+      end
+  """
+  @spec load_extensions() :: :ok
+  def load_extensions() do
+    # Prevent double loading in embedded mode, for faster application startup
+    if :code.get_mode() == :interactive do
+      Protobuf.Extension.__unload_extensions__()
+      Protobuf.Extension.__cal_extensions__()
+    end
+
+    :ok
+  end
 end
