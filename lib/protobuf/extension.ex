@@ -10,10 +10,12 @@ defmodule Protobuf.Extension do
       # Functions like `get_extension` and `put_extension` still exist, but they don't work.
       config :protobuf, extensions: :enabled
 
-  To know what extensions a module has and what are their metadata, all modules are scanned
-  when :protobuf application starts. Now `:persistent_term` is used to store the runtime information.
-  The runtime info is used to validate the extension when calling `put_extension` and decode/encode
-  the extensions.
+  To load extensions you should call `Protobuf.load_extensions/0` when your application starts:
+
+      def start(_type, _args) do
+        Protobuf.load_extensions()
+        Supervisor.start_link([], strategy: :one_for_one)
+      end
 
   ## Examples
 
