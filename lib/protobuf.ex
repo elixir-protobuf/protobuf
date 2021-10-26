@@ -137,7 +137,6 @@ defmodule Protobuf do
   def load_extensions() do
     # Prevent double loading in embedded mode, for faster application startup
     if :code.get_mode() == :interactive do
-      Protobuf.Extension.__unload_extensions__()
       Protobuf.Extension.__cal_extensions__()
     end
 
