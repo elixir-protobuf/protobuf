@@ -90,7 +90,7 @@ defmodule My.Test.Request do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          key: integer,
+          key: [integer],
           hue: My.Test.Request.Color.t(),
           hat: My.Test.HatType.t(),
           deadline: float | :infinity | :negative_infinity | :nan,
@@ -151,7 +151,7 @@ defmodule My.Test.Reply do
 
   @type t :: %__MODULE__{
           found: [My.Test.Reply.Entry.t()],
-          compact_keys: integer,
+          compact_keys: [integer],
           __pb_extensions__: map
         }
 

@@ -159,29 +159,32 @@ defmodule Protobuf.Protoc.Generator.Message do
     String.pad_trailing("#{name}:", len + 1)
   end
 
-  defp fmt_type(%{opts: %{map: true}, map: {{k_type, k_name}, {v_type, v_name}}}) do
-    k_type = type_to_spec(k_type, k_name)
-    v_type = type_to_spec(v_type, v_name)
-    "%{#{k_type} => #{v_type}}"
+  defp fmt_type(%{opts: %{map: true}, map: {{k_type_enum, _k_type}, {v_type_enum, v_type}}}) do
+    # Keys are guaranteed to be scalars. Values can be anything except another map. Map fields
+    # cannot be `repeated`.
+    k_spec = TypeUtil.enum_to_spec(k_type_enum)
+    v_spec = type_to_spec(v_type_enum, v_type)
+    v_spec = optional_if_message(v_type_enum, v_spec)
+
+    "%{#{k_spec} => #{v_spec}}"
   end
 
-  defp fmt_type(%{label: "repeated", type_enum: type_enum, type: type}) do
-    type_to_spec(type_enum, type, true)
+  defp fmt_type(%{label: label, type_enum: type_enum, type: type}) do
+    spec = type_to_spec(type_enum, type)
+
+    if label == "repeated" do
+      "[#{spec}]"
+    else
+      optional_if_message(type_enum, spec)
+    end
   end
 
-  defp fmt_type(%{type_enum: type_enum, type: type}) do
-    "#{type_to_spec(type_enum, type)}"
-  end
+  defp type_to_spec(:TYPE_MESSAGE, type), do: "#{type}.t()"
+  defp type_to_spec(:TYPE_ENUM, type), do: "#{type}.t()"
+  defp type_to_spec(type_scalar, _type), do: TypeUtil.enum_to_spec(type_scalar)
 
-  defp type_to_spec(enum, type, repeated \\ false)
-
-  defp type_to_spec(:TYPE_MESSAGE, type, repeated),
-    do: TypeUtil.enum_to_spec(:TYPE_MESSAGE, type, repeated)
-
-  defp type_to_spec(:TYPE_ENUM, type, repeated),
-    do: TypeUtil.enum_to_spec(:TYPE_ENUM, type, repeated)
-
-  defp type_to_spec(enum, _, _), do: TypeUtil.enum_to_spec(enum)
+  defp optional_if_message(:TYPE_MESSAGE, spec), do: "#{spec} | nil"
+  defp optional_if_message(_type_others, spec), do: spec
 
   def get_fields(ctx, desc) do
     oneofs = Enum.map(desc.oneof_decl, & &1.name)

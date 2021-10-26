@@ -33,7 +33,7 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorRequest do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          file_to_generate: String.t(),
+          file_to_generate: [String.t()],
           parameter: String.t(),
           proto_file: [Google.Protobuf.FileDescriptorProto.t()],
           compiler_version: Google.Protobuf.Compiler.Version.t() | nil

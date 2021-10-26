@@ -115,9 +115,9 @@ defmodule Google.Protobuf.FileDescriptorProto do
   @type t :: %__MODULE__{
           name: String.t(),
           package: String.t(),
-          dependency: String.t(),
-          public_dependency: integer,
-          weak_dependency: integer,
+          dependency: [String.t()],
+          public_dependency: [integer],
+          weak_dependency: [integer],
           message_type: [Google.Protobuf.DescriptorProto.t()],
           enum_type: [Google.Protobuf.EnumDescriptorProto.t()],
           service: [Google.Protobuf.ServiceDescriptorProto.t()],
@@ -208,7 +208,7 @@ defmodule Google.Protobuf.DescriptorProto do
           oneof_decl: [Google.Protobuf.OneofDescriptorProto.t()],
           options: Google.Protobuf.MessageOptions.t() | nil,
           reserved_range: [Google.Protobuf.DescriptorProto.ReservedRange.t()],
-          reserved_name: String.t()
+          reserved_name: [String.t()]
         }
 
   defstruct [
@@ -346,7 +346,7 @@ defmodule Google.Protobuf.EnumDescriptorProto do
           value: [Google.Protobuf.EnumValueDescriptorProto.t()],
           options: Google.Protobuf.EnumOptions.t() | nil,
           reserved_range: [Google.Protobuf.EnumDescriptorProto.EnumReservedRange.t()],
-          reserved_name: String.t()
+          reserved_name: [String.t()]
         }
 
   defstruct [:name, :value, :options, :reserved_range, :reserved_name]
@@ -762,11 +762,11 @@ defmodule Google.Protobuf.SourceCodeInfo.Location do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          path: integer,
-          span: integer,
+          path: [integer],
+          span: [integer],
           leading_comments: String.t(),
           trailing_comments: String.t(),
-          leading_detached_comments: String.t()
+          leading_detached_comments: [String.t()]
         }
 
   defstruct [:path, :span, :leading_comments, :trailing_comments, :leading_detached_comments]
@@ -800,7 +800,7 @@ defmodule Google.Protobuf.GeneratedCodeInfo.Annotation do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          path: integer,
+          path: [integer],
           source_file: String.t(),
           begin: integer,
           end: integer
