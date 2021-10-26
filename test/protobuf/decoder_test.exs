@@ -83,6 +83,10 @@ defmodule Protobuf.DecoderTest do
 
     struct = Decoder.decode(<<88, 2>>, TestMsg.Foo)
     assert struct == TestMsg.Foo.new(j: :B)
+
+    # Proto2 enums that are not zero-based default to their first value declared.
+    struct = Decoder.decode(<<>>, My.Test.Request)
+    assert struct.hat == :FEDORA
   end
 
   test "decodes unknown enum value" do
