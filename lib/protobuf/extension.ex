@@ -10,10 +10,12 @@ defmodule Protobuf.Extension do
       # Functions like `get_extension` and `put_extension` still exist, but they don't work.
       config :protobuf, extensions: :enabled
 
-  To know what extensions a module has and what are their metadata, all modules are scanned
-  when :protobuf application starts. Now `:persistent_term` is used to store the runtime information.
-  The runtime info is used to validate the extension when calling `put_extension` and decode/encode
-  the extensions.
+  To load extensions you should call `Protobuf.load_extensions/0` when your application starts:
+
+      def start(_type, _args) do
+        Protobuf.load_extensions()
+        Supervisor.start_link([], strategy: :one_for_one)
+      end
 
   ## Examples
 
@@ -113,20 +115,15 @@ defmodule Protobuf.Extension do
   end
 
   @doc false
-  def __cal_extensions__(mods) do
-    for mod <- mods,
-        to_string(mod) =~ ~r/\.PbExtension$/,
+  def __cal_extensions__() do
+    for mod <- get_all_modules(),
+        String.ends_with?(Atom.to_string(mod), ".PbExtension"),
         Code.ensure_loaded?(mod),
         function_exported?(mod, :__protobuf_info__, 1),
         %{extensions: extensions} = mod.__protobuf_info__(:extension_props) do
       Enum.each(extensions, fn {_, ext} ->
         fnum = ext.field_props.fnum
         fnum_key = {Protobuf.Extension, ext.extendee, fnum}
-
-        if :persistent_term.get(fnum_key, nil) do
-          raise "Extension #{inspect(ext.extendee)}##{fnum} already exists"
-        end
-
         :persistent_term.put(fnum_key, mod)
       end)
     end
@@ -136,6 +133,27 @@ defmodule Protobuf.Extension do
   def __unload_extensions__ do
     for {{Protobuf.Extension, _extendee, _tag} = key, _mod} <- :persistent_term.get() do
       :persistent_term.erase(key)
+    end
+  end
+
+  defp get_all_modules do
+    case Application.get_env(:protobuf, :extensions) do
+      :enabled ->
+        case :code.get_mode() do
+          :embedded ->
+            :erlang.loaded()
+
+          :interactive ->
+            Enum.flat_map(Application.loaded_applications(), fn {app, _desc, _vsn} ->
+              {:ok, modules} = :application.get_key(app, :modules)
+              modules
+            end)
+        end
+
+      _disabled ->
+        # Extensions in Protobuf are required for generating code
+        {:ok, mods} = :application.get_key(:protobuf, :modules)
+        mods
     end
   end
 end
