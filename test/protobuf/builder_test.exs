@@ -54,13 +54,13 @@ defmodule Protobuf.BuilderTest do
     end
   end
 
-  test "new!/2 raises for non matched strct" do
+  test "new!/2 raises for non matched struct" do
     assert_raise ArgumentError, fn ->
       Foo.new!(Foo2.new())
     end
   end
 
-  test "new/2 build correct message for non matched strct" do
+  test "new/2 build correct message for non matched struct" do
     foo = Foo.new(Foo2.new(non_matched: 1))
 
     assert_raise Protobuf.EncodeError, fn ->
