@@ -208,6 +208,16 @@ defmodule Protobuf.EncoderTest do
 
     msg = TestMsg.EnumFoo2.new(a: 0, b: 1)
     assert Encoder.encode(msg) == <<8, 0, 16, 1>>
+
+    # Proto2 enums that are not zero-based default to their first value declared.
+    msg = My.Test.Request.new(deadline: nil)
+    assert Encoder.encode(msg) == <<32, 1>>
+
+    msg = My.Test.Request.new(deadline: nil, hat: 1)
+    assert Encoder.encode(msg) == <<32, 1>>
+
+    msg = My.Test.Request.new(deadline: nil, hat: :FEDORA)
+    assert Encoder.encode(msg) == <<32, 1>>
   end
 
   test "encodes with transformer module" do
