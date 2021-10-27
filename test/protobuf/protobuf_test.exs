@@ -2,9 +2,9 @@ defmodule Protobuf.ProtobufTest do
   use ExUnit.Case, async: false
 
   test "load_extensions/0 is a noop" do
-    num_modules = loaded_extensions()
     Protobuf.load_extensions()
-    assert loaded_extensions() == num_modules
+    assert loaded_extensions() == 10
+    assert loaded_extensions() == 10
   end
 
   defp loaded_extensions do

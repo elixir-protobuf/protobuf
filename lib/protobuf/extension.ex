@@ -4,12 +4,6 @@ defmodule Protobuf.Extension do
   let you set extra fields for previously defined messages(even for messages in other packages)
   without changing the original message.
 
-  **This is an experimental feature**, the following config should be set to use it:
-
-      # Without this, modules won't be scanned to get extensions metadata.
-      # Functions like `get_extension` and `put_extension` still exist, but they don't work.
-      config :protobuf, extensions: :enabled
-
   To load extensions you should call `Protobuf.load_extensions/0` when your application starts:
 
       def start(_type, _args) do
@@ -129,31 +123,10 @@ defmodule Protobuf.Extension do
     end
   end
 
-  @doc false
-  def __unload_extensions__ do
-    for {{Protobuf.Extension, _extendee, _tag} = key, _mod} <- :persistent_term.get() do
-      :persistent_term.erase(key)
-    end
-  end
-
   defp get_all_modules do
-    case Application.get_env(:protobuf, :extensions) do
-      :enabled ->
-        case :code.get_mode() do
-          :embedded ->
-            :erlang.loaded()
-
-          :interactive ->
-            Enum.flat_map(Application.loaded_applications(), fn {app, _desc, _vsn} ->
-              {:ok, modules} = :application.get_key(app, :modules)
-              modules
-            end)
-        end
-
-      _disabled ->
-        # Extensions in Protobuf are required for generating code
-        {:ok, mods} = :application.get_key(:protobuf, :modules)
-        mods
-    end
+    Enum.flat_map(Application.loaded_applications(), fn {app, _desc, _vsn} ->
+      {:ok, modules} = :application.get_key(app, :modules)
+      modules
+    end)
   end
 end
