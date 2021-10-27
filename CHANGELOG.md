@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.8.0-beta.2
+## v0.8.0
 
 ### Enhancements
 
