@@ -27,7 +27,7 @@ defmodule Protobuf.Wire do
 
   @type proto_float :: :infinity | :negative_infinity | :nan | float
 
-  @type proto_value :: binary | integer | bool | proto_float | atom
+  @type proto_value :: binary | integer | boolean | proto_float | atom
 
   @sint32_range -0x80000000..0x7FFFFFFF
   @sint64_range -0x8000000000000000..0x7FFFFFFFFFFFFFFF
