@@ -28,6 +28,8 @@ defmodule Protobuf.Protoc.CLI do
   end
 
   def main(_) do
+    Protobuf.load_extensions()
+
     # https://groups.google.com/forum/#!topic/elixir-lang-talk/T5enez_BBTI
     :io.setopts(:standard_io, encoding: :latin1)
     bin = IO.binread(:all)
