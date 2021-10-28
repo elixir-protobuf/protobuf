@@ -149,11 +149,7 @@ defmodule Protobuf do
   """
   @spec load_extensions() :: :ok
   def load_extensions() do
-    # Prevent double loading in embedded mode, for faster application startup
-    if :code.get_mode() == :interactive do
-      Protobuf.Extension.__cal_extensions__()
-    end
-
+    Protobuf.Extension.__cal_extensions__()
     :ok
   end
 end

@@ -23,7 +23,6 @@ defmodule Protobuf.Mixfile do
 
   def application do
     [
-      mod: {Protobuf.Application, []},
       extra_applications: [:logger, :eex]
     ]
   end
