@@ -19,7 +19,7 @@
 
 ### Bug fixes
 
-  * Fix decoding of proto2 payloads contaning legacy `group` fields. Instead of
+  * Fix decoding of proto2 payloads containing legacy `group` fields. Instead of
     crashing the decoder, those fields are now skipped.
   * Fix compilation warnings on recent versions of Elixir.
   * Fix `new!` to raise `ArgumentError` when given struct and module don't match.
