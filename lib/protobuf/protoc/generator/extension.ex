@@ -22,7 +22,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
     if Enum.empty?(extends) do
       ""
     else
-      name = Util.trans_name(@ext_postfix)
+      name = Macro.camelize(@ext_postfix)
       msg_name = Util.mod_name(ctx, ns ++ [name])
       Protobuf.Protoc.Template.extension(msg_name, msg_opts(ctx, desc), extends)
     end
@@ -53,7 +53,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
     msgs
     |> Enum.filter(fn m -> !Enum.empty?(m.extension) end)
     |> Enum.reduce(acc0, fn m, acc ->
-      new_ns = ns ++ [Util.trans_name(m.name)]
+      new_ns = ns ++ [Macro.camelize(m.name)]
       extension = {new_ns, m.extension}
       acc = [extension | acc]
 

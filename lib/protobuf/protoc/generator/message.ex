@@ -20,7 +20,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   def parse_desc(%{namespace: ns} = ctx, desc) do
-    new_ns = ns ++ [Util.trans_name(desc.name)]
+    new_ns = ns ++ [Macro.camelize(desc.name)]
     fields = get_fields(ctx, desc)
     extensions = get_extensions(desc)
     generate_desc = if ctx.gen_descriptors?, do: desc, else: nil

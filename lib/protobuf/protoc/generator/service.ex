@@ -12,7 +12,7 @@ defmodule Protobuf.Protoc.Generator.Service do
 
   def generate(ctx, desc) do
     # service can't be nested
-    mod_name = Util.mod_name(ctx, [Util.trans_name(desc.name)])
+    mod_name = Util.mod_name(ctx, [Macro.camelize(desc.name)])
     name = Util.attach_raw_pkg(desc.name, ctx.package)
     methods = Enum.map(desc.method, fn m -> generate_service_method(ctx, m) end)
     generate_desc = if ctx.gen_descriptors?, do: desc, else: nil

@@ -30,4 +30,23 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
            ) ==
              "Overrides.Foo.Bar"
   end
+
+  describe "normalize_type_name/1" do
+    test "splits the name and normalizes it" do
+      assert normalize_type_name("pkg.Msg") == "Pkg.Msg"
+      assert normalize_type_name("FooBar.Prefix.Msg") == "FooBar.Prefix.Msg"
+    end
+  end
+
+  describe "options_to_str/1" do
+    test "stringifies a map of options" do
+      assert options_to_str(%{}) == ""
+      assert options_to_str(%{enum: true, syntax: nil}) == "enum: true"
+      assert options_to_str(%{syntax: :proto2}) == "syntax: :proto2"
+      assert options_to_str(%{default: nil, enum: false}) == ""
+      assert options_to_str(%{deprecated: nil, map: nil, syntax: nil}) == ""
+      assert options_to_str(%{default: "42", enum: false}) == "default: 42"
+      assert options_to_str(%{json_name: "\"theFieldName\""}) == "json_name: \"theFieldName\""
+    end
+  end
 end

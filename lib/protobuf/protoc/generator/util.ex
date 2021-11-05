@@ -1,8 +1,5 @@
 defmodule Protobuf.Protoc.Generator.Util do
   @moduledoc false
-  def trans_name(name) do
-    Macro.camelize(name)
-  end
 
   def join_name(list) do
     Enum.join(list, ".")
@@ -37,12 +34,14 @@ defmodule Protobuf.Protoc.Generator.Util do
   def attach_raw_pkg(nil, pkg), do: pkg
   def attach_raw_pkg(name, pkg), do: pkg <> "." <> name
 
-  def options_to_str(opts) do
+  def options_to_str(opts) when is_map(opts) do
     opts
-    |> Enum.filter(fn {_, v} -> v end)
-    |> Enum.map(fn {k, v} -> "#{k}: #{print(v)}" end)
-    |> Enum.join(", ")
+    |> Enum.reject(fn {_key, val} -> val in [nil, false] end)
+    |> Enum.map_join(", ", fn {key, val} -> "#{key}: #{print(val)}" end)
   end
+
+  defp print(atom) when is_atom(atom), do: inspect(atom)
+  defp print(val), do: val
 
   def type_from_type_name(ctx, type_name) do
     # The doc says there's a situation where type_name begins without a `.`, but I never got that.
@@ -54,12 +53,9 @@ defmodule Protobuf.Protoc.Generator.Util do
     metadata[:type_name]
   end
 
-  def normalize_type_name(name) do
+  def normalize_type_name(name) when is_binary(name) do
     name
     |> String.split(".")
-    |> Enum.map_join(".", &trans_name/1)
+    |> Enum.map_join(".", &Macro.camelize/1)
   end
-
-  def print(v) when is_atom(v), do: inspect(v)
-  def print(v), do: v
 end

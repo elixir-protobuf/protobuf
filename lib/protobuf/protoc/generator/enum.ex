@@ -7,7 +7,7 @@ defmodule Protobuf.Protoc.Generator.Enum do
   end
 
   def generate(%{namespace: ns} = ctx, desc) do
-    name = Util.trans_name(desc.name)
+    name = Macro.camelize(desc.name)
     fields = Enum.map(desc.value, fn f -> generate_field(f) end)
     msg_name = Util.mod_name(ctx, ns ++ [name])
     generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
