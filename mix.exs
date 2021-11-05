@@ -3,6 +3,7 @@ defmodule Protobuf.Mixfile do
 
   @source_url "https://github.com/elixir-protobuf/protobuf"
   @version "0.8.0"
+  @description "A pure Elixir implementation of Google Protobuf."
 
   def project do
     [
@@ -15,7 +16,7 @@ defmodule Protobuf.Mixfile do
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       escript: escript(),
-      description: description(),
+      description: @description,
       package: package(),
       docs: docs()
     ]
@@ -44,16 +45,21 @@ defmodule Protobuf.Mixfile do
     [main_module: Protobuf.Protoc.CLI, name: "protoc-gen-elixir"]
   end
 
-  defp description do
-    "A pure Elixir implementation of Google Protobuf."
-  end
-
   defp package do
     [
-      maintainers: ["Bing Han"],
+      maintainers: ["Bing Han", "Andrea Leopardi"],
       licenses: ["MIT"],
-      files:
-        ~w(mix.exs README.md lib/google lib/protobuf lib/*.ex src LICENSE priv/templates .formatter.exs),
+      files: ~w(
+        mix.exs
+        README.md
+        lib/google
+        lib/protobuf
+        lib/*.ex
+        src
+        LICENSE
+        priv/templates
+        .formatter.exs
+      ),
       links: %{"GitHub" => @source_url}
     ]
   end

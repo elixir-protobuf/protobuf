@@ -6,8 +6,6 @@ defmodule Protobuf.Decoder do
 
   alias Protobuf.{DecodeError, Wire}
 
-  require Logger
-
   @compile {:inline,
             decode_field: 3, skip_varint: 4, skip_delimited: 4, reverse_repeated: 2, field_key: 2}
 
