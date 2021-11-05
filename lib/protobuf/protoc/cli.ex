@@ -45,7 +45,7 @@ defmodule Protobuf.Protoc.CLI do
 
     ctx =
       %Protobuf.Protoc.Context{}
-      |> parse_params(request.parameter)
+      |> parse_params(request.parameter || "")
       |> find_types(request.proto_file)
 
     files =
