@@ -1,6 +1,7 @@
 defmodule Protobuf.Protoc.Generator do
   @moduledoc false
 
+  alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator.Message, as: MessageGenerator
   alias Protobuf.Protoc.Generator.Enum, as: EnumGenerator
   alias Protobuf.Protoc.Generator.Service, as: ServiceGenerator
@@ -8,8 +9,11 @@ defmodule Protobuf.Protoc.Generator do
 
   @locals_without_parens [field: 2, field: 3, oneof: 2, rpc: 3, extend: 4, extensions: 1]
 
-  def generate(ctx, desc) do
-    name = new_file_name(desc.name)
+  @spec generate(Context.t(), %Google.Protobuf.FileDescriptorProto{}) ::
+          Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()
+  def generate(%Context{} = ctx, %Google.Protobuf.FileDescriptorProto{} = desc) do
+    # desc.name is the filename, ending in ".proto".
+    name = Path.rootname(desc.name) <> ".pb.ex"
 
     Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(
       name: name,
@@ -17,12 +21,8 @@ defmodule Protobuf.Protoc.Generator do
     )
   end
 
-  defp new_file_name(name) do
-    String.replace_suffix(name, ".proto", ".pb.ex")
-  end
-
-  def generate_content(ctx, desc) do
-    ctx = %{
+  defp generate_content(ctx, desc) do
+    ctx = %Context{
       ctx
       | syntax: syntax(desc.syntax),
         package: desc.package || "",
@@ -31,19 +31,16 @@ defmodule Protobuf.Protoc.Generator do
 
     ctx = Protobuf.Protoc.Context.cal_file_options(ctx, desc.options)
 
-    {enums, msgs} = MessageGenerator.generate_list(ctx, desc.message_type)
-
-    list =
-      EnumGenerator.generate_list(ctx, desc.enum_type) ++
-        enums ++ msgs ++ ServiceGenerator.generate_list(ctx, desc.service)
-
     nested_extensions =
       ExtensionGenerator.get_nested_extensions(ctx, desc.message_type)
       |> Enum.reverse()
 
-    list = list ++ [ExtensionGenerator.generate(ctx, desc, nested_extensions)]
+    enum_list = EnumGenerator.generate_list(ctx, desc.enum_type)
+    {enums, msgs} = MessageGenerator.generate_list(ctx, desc.message_type)
+    service_list = ServiceGenerator.generate_list(ctx, desc.service)
+    extension_list = ExtensionGenerator.generate(ctx, desc, nested_extensions)
 
-    list
+    [enum_list, enums, msgs, service_list, extension_list]
     |> List.flatten()
     |> Enum.join("\n")
     |> format_code()
@@ -68,9 +65,9 @@ defmodule Protobuf.Protoc.Generator do
   defp syntax("proto3"), do: :proto3
   defp syntax(_), do: :proto2
 
-  def format_code(code) do
+  defp format_code(code) do
     formatted =
-      if Code.ensure_loaded?(Code) && function_exported?(Code, :format_string!, 2) do
+      if Code.ensure_loaded?(Code) and function_exported?(Code, :format_string!, 2) do
         code
         |> Code.format_string!(locals_without_parens: @locals_without_parens)
         |> IO.iodata_to_binary()
