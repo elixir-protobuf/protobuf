@@ -4,6 +4,16 @@ defmodule Protobuf.Protoc.Generator.Service do
   alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator.Util
 
+  require EEx
+
+  EEx.function_from_file(
+    :defp,
+    :service_template,
+    Path.expand("./templates/service.ex.eex", :code.priv_dir(:protobuf)),
+    [:mod_name, :name, :methods, :desc],
+    trim: true
+  )
+
   @spec generate_list(Context.t(), [Google.Protobuf.ServiceDescriptorProto.t()]) :: [String.t()]
   def generate_list(%Context{} = ctx, descs) when is_list(descs) do
     if Enum.member?(ctx.plugins, "grpc") do
@@ -20,12 +30,15 @@ defmodule Protobuf.Protoc.Generator.Service do
     name = Util.attach_raw_pkg(desc.name, ctx.package)
     methods = Enum.map(desc.method, &generate_service_method(ctx, &1))
     generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
-    Protobuf.Protoc.Template.service(mod_name, name, methods, generate_desc)
+    service_template(mod_name, name, methods, generate_desc)
   end
 
   defp generate_service_method(ctx, method) do
     input = service_arg(Util.type_from_type_name(ctx, method.input_type), method.client_streaming)
-    output = service_arg(Util.type_from_type_name(ctx, method.output_type), method.server_streaming)
+
+    output =
+      service_arg(Util.type_from_type_name(ctx, method.output_type), method.server_streaming)
+
     ":#{method.name}, #{input}, #{output}"
   end
 

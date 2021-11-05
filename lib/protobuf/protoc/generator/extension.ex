@@ -1,8 +1,19 @@
 defmodule Protobuf.Protoc.Generator.Extension do
   @moduledoc false
+
   alias Protobuf.Protoc.Generator.Util
 
+  require EEx
+
   @ext_postfix "PbExtension"
+
+  EEx.function_from_file(
+    :defp,
+    :extension_template,
+    Path.expand("./templates/extension.ex.eex", :code.priv_dir(:protobuf)),
+    [:name, :options, :extends],
+    trim: true
+  )
 
   def generate(%{namespace: ns} = ctx, desc, nested_extensions) do
     extends = Enum.map(desc.extension, fn ext -> generate_extend(ctx, ext) end)
@@ -24,7 +35,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
     else
       name = Macro.camelize(@ext_postfix)
       msg_name = Util.mod_name(ctx, ns ++ [name])
-      Protobuf.Protoc.Template.extension(msg_name, msg_opts(ctx, desc), extends)
+      extension_template(msg_name, msg_opts(ctx, desc), extends)
     end
   end
 

@@ -4,6 +4,26 @@ defmodule Protobuf.Protoc.Generator.Message do
   alias Protobuf.TypeUtil
   alias Protobuf.Protoc.Generator.Enum, as: EnumGenerator
 
+  require EEx
+
+  EEx.function_from_file(
+    :defp,
+    :message_template,
+    Path.expand("./templates/message.ex.eex", :code.priv_dir(:protobuf)),
+    [
+      :name,
+      :options,
+      :struct_fields,
+      :typespec,
+      :oneofs,
+      :fields,
+      :desc,
+      :transform_module,
+      :extensions
+    ],
+    trim: true
+  )
+
   def generate_list(ctx, descs) do
     descs
     |> Enum.map(fn desc -> generate(ctx, desc) end)
@@ -40,7 +60,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp gen_msg(syntax, msg_struct) do
-    Protobuf.Protoc.Template.message(
+    message_template(
       msg_struct[:name],
       msg_struct[:options],
       msg_struct[:structs],

@@ -4,6 +4,16 @@ defmodule Protobuf.Protoc.Generator.Enum do
   alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator.Util
 
+  require EEx
+
+  EEx.function_from_file(
+    :defp,
+    :enum_template,
+    Path.expand("./templates/enum.ex.eex", :code.priv_dir(:protobuf)),
+    [:name, :options, :fields, :type, :desc],
+    trim: true
+  )
+
   @spec generate_list(Context.t(), [Google.Protobuf.EnumDescriptorProto.t()]) :: [String.t()]
   def generate_list(%Context{} = ctx, descs) when is_list(descs) do
     Enum.map(descs, &generate(ctx, &1))
@@ -16,7 +26,7 @@ defmodule Protobuf.Protoc.Generator.Enum do
     generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
     type = generate_type(desc.value)
 
-    Protobuf.Protoc.Template.enum(msg_name, msg_opts(ctx, desc), fields, type, generate_desc)
+    enum_template(msg_name, msg_opts(ctx, desc), fields, type, generate_desc)
   end
 
   defp generate_type(fields) do
