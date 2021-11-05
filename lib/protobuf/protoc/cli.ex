@@ -20,6 +20,7 @@ defmodule Protobuf.Protoc.CLI do
 
   # Entrypoint for the escript (protoc-gen-elixir).
   @doc false
+  @spec main([String.t()]) :: :ok
   def main(args)
 
   def main(["--version"]) do
