@@ -500,7 +500,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         )
 
       {[], [msg]} = Generator.generate(ctx, desc)
-      assert msg =~ "defstruct [:simple, :the_field_name]\n"
+      assert msg =~ "defstruct [simple: 0, the_field_name: \"\"]\n"
       assert msg =~ "field :simple, 1, type: :int32\n"
       assert msg =~ "field :the_field_name, 2, type: :string, json_name: \"theFieldName\"\n"
     end
@@ -523,7 +523,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         )
 
       {[], [msg]} = Generator.generate(ctx, desc)
-      assert msg =~ "defstruct [:the_field_name]\n"
+      assert msg =~ "defstruct [the_field_name: nil]\n"
       assert msg =~ "field :the_field_name, 1, required: true, type: :string\n"
     end
   end
