@@ -1,37 +1,39 @@
 defmodule Protobuf.Protoc.Generator.Enum do
   @moduledoc false
+
+  alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator.Util
 
-  def generate_list(ctx, descs) do
-    Enum.map(descs, fn desc -> generate(ctx, desc) end)
+  @spec generate_list(Context.t(), [Google.Protobuf.EnumDescriptorProto.t()]) :: [String.t()]
+  def generate_list(%Context{} = ctx, descs) when is_list(descs) do
+    Enum.map(descs, &generate(ctx, &1))
   end
 
-  def generate(%{namespace: ns} = ctx, desc) do
-    name = Macro.camelize(desc.name)
-    fields = Enum.map(desc.value, fn f -> generate_field(f) end)
-    msg_name = Util.mod_name(ctx, ns ++ [name])
+  @spec generate(Context.t(), Google.Protobuf.EnumDescriptorProto.t()) :: String.t()
+  def generate(%Context{namespace: ns} = ctx, %Google.Protobuf.EnumDescriptorProto{} = desc) do
+    msg_name = Util.mod_name(ctx, ns ++ [Macro.camelize(desc.name)])
+    fields = Enum.map(desc.value, &generate_field/1)
     generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
     type = generate_type(desc.value)
 
     Protobuf.Protoc.Template.enum(msg_name, msg_opts(ctx, desc), fields, type, generate_desc)
   end
 
-  def generate_type(fields) do
-    field_values =
-      fields
-      |> Enum.map(fn f -> ":#{f.name}" end)
-      |> Enum.join(" | ")
-
-    "@type t :: integer | " <> field_values
+  defp generate_type(fields) do
+    union = Enum.map_join(fields, " | ", &enum_value_name_to_atom_string(&1.name))
+    # An enum can always be passed as an integer so we hardcode the integer/0 type here
+    # alongside the union of atoms.
+    "@type t :: integer | " <> union
   end
 
-  def generate_field(f) do
-    ":#{f.name}, #{f.number}"
+  defp generate_field(%Google.Protobuf.EnumValueDescriptorProto{name: name, number: number}) do
+    "#{enum_value_name_to_atom_string(name)}, #{number}"
   end
 
   defp msg_opts(%{syntax: syntax}, _desc) do
     opts = %{syntax: syntax, enum: true}
-    str = Util.options_to_str(opts)
-    ", " <> str
+    ", " <> Util.options_to_str(opts)
   end
+
+  defp enum_value_name_to_atom_string(name) when is_binary(name), do: ":" <> name
 end
