@@ -49,4 +49,25 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
       assert options_to_str(%{json_name: "\"theFieldName\""}) == "json_name: \"theFieldName\""
     end
   end
+
+  describe "type_from_type_name/2" do
+    test "fetches the right type" do
+      ctx = %Protobuf.Protoc.Context{
+        dep_type_mapping: %{
+          ".Bar" => %{type_name: "Bar"},
+          ".Baz" => %{type_name: "Baz"}
+        }
+      }
+
+      assert type_from_type_name(ctx, ".Baz") == "Baz"
+
+      ctx = %Protobuf.Protoc.Context{
+        dep_type_mapping: %{
+          ".foo_bar.ab_cd.Bar" => %{type_name: "FooBar.AbCd.Bar"}
+        }
+      }
+
+      assert type_from_type_name(ctx, ".foo_bar.ab_cd.Bar")
+    end
+  end
 end
