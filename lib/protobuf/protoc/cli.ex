@@ -159,9 +159,7 @@ defmodule Protobuf.Protoc.CLI do
   end
 
   defp join_names(pkg, ns, name) do
-    ns_str = Protobuf.Protoc.Generator.Util.join_name(ns)
-
-    [pkg, ns_str, name]
+    [pkg, Enum.join(ns, "."), name]
     |> Enum.filter(&(&1 && &1 != ""))
     |> Enum.join(".")
   end

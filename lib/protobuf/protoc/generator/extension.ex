@@ -9,7 +9,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
 
     nested_extends =
       Enum.map(nested_extensions, fn {ns, exts} ->
-        ns = Util.join_name(ns)
+        ns = Enum.join(ns, ".")
 
         Enum.map(exts, fn ext ->
           generate_extend(ctx, ext, ns)
@@ -37,7 +37,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
       if ns == "" do
         f.name
       else
-        inspect(Util.join_name([ns, f.name]))
+        inspect("#{ns}.#{f.name}")
       end
 
     "#{extendee}, :#{name}, #{f.number}, #{label_str}type: #{f.type}#{f.opts_str}"

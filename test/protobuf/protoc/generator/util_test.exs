@@ -3,32 +3,31 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
 
   import Protobuf.Protoc.Generator.Util
 
-  test "mod_name can handle nil prefix" do
-    assert mod_name(%{module_prefix: nil}, ["Foo", "Bar"]) == "Foo.Bar"
-  end
+  alias Protobuf.Protoc.Context
 
-  test "mod_name can handle empty package" do
-    assert mod_name(%{module_prefix: ""}, ["Foo", "Bar"]) == "Foo.Bar"
-  end
+  describe "mod_name/2" do
+    test "can handle nil prefix" do
+      assert mod_name(%Context{module_prefix: nil}, ["Foo", "Bar"]) == "Foo.Bar"
+    end
 
-  test "mod_name returns right name" do
-    assert mod_name(%{module_prefix: "custom.prefix"}, ["Foo", "Bar"]) == "Custom.Prefix.Foo.Bar"
-  end
+    test "can handle empty package" do
+      assert mod_name(%Context{module_prefix: ""}, ["Foo", "Bar"]) == "Foo.Bar"
+    end
 
-  test "mod_name returns prefixed package name" do
-    assert mod_name(%{package_prefix: "custom.prefix", package: "pkg", module_prefix: nil}, [
-             "Foo",
-             "Bar"
-           ]) ==
-             "Custom.Prefix.Pkg.Foo.Bar"
-  end
+    test "returns right name" do
+      assert mod_name(%Context{module_prefix: "custom.prefix"}, ["Foo", "Bar"]) ==
+               "Custom.Prefix.Foo.Bar"
+    end
 
-  test "mod_name returns module prefix when  package prefix is present" do
-    assert mod_name(
-             %{module_prefix: "overrides", package_prefix: "custom.prefix", package: "pkg"},
-             ["Foo", "Bar"]
-           ) ==
-             "Overrides.Foo.Bar"
+    test "returns prefixed package name" do
+      ctx = %Context{package_prefix: "custom.prefix", package: "pkg", module_prefix: nil}
+      assert mod_name(ctx, ["Foo", "Bar"]) == "Custom.Prefix.Pkg.Foo.Bar"
+    end
+
+    test "returns module prefix when package prefix is present" do
+      ctx = %Context{module_prefix: "overrides", package_prefix: "custom.prefix", package: "pkg"}
+      assert mod_name(ctx, ["Foo", "Bar"]) == "Overrides.Foo.Bar"
+    end
   end
 
   describe "normalize_type_name/1" do
@@ -52,7 +51,7 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
 
   describe "type_from_type_name/2" do
     test "fetches the right type" do
-      ctx = %Protobuf.Protoc.Context{
+      ctx = %Context{
         dep_type_mapping: %{
           ".Bar" => %{type_name: "Bar"},
           ".Baz" => %{type_name: "Baz"}
@@ -61,10 +60,8 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
 
       assert type_from_type_name(ctx, ".Baz") == "Baz"
 
-      ctx = %Protobuf.Protoc.Context{
-        dep_type_mapping: %{
-          ".foo_bar.ab_cd.Bar" => %{type_name: "FooBar.AbCd.Bar"}
-        }
+      ctx = %Context{
+        dep_type_mapping: %{".foo_bar.ab_cd.Bar" => %{type_name: "FooBar.AbCd.Bar"}}
       }
 
       assert type_from_type_name(ctx, ".foo_bar.ab_cd.Bar")

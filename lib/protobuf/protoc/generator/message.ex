@@ -236,7 +236,7 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   # Map of protobuf are actually nested(one level) messages
   defp nested_maps(ctx, desc) do
-    full_name = Util.join_name([ctx.package | ctx.namespace] ++ [desc.name])
+    full_name = Enum.join([ctx.package | ctx.namespace] ++ [desc.name], ".")
     prefix = "." <> full_name
 
     Enum.reduce(desc.nested_type, %{}, fn desc, acc ->
@@ -245,7 +245,7 @@ defmodule Protobuf.Protoc.Generator.Message do
 
         pair = {{k.type, field_type_name(ctx, k)}, {v.type, field_type_name(ctx, v)}}
 
-        Map.put(acc, Util.join_name([prefix, desc.name]), pair)
+        Map.put(acc, "#{prefix}.#{desc.name}", pair)
       else
         acc
       end

@@ -1,6 +1,8 @@
 defmodule Protobuf.Protoc.Context do
   @moduledoc false
 
+  @type t() :: %__MODULE__{}
+
   # Plugins passed by options
   defstruct plugins: [],
 
