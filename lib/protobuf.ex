@@ -42,31 +42,32 @@ defmodule Protobuf do
 
       @behaviour Protobuf
 
+      @impl unquote(__MODULE__)
       def new() do
         Protobuf.Builder.new(__MODULE__)
       end
 
+      @impl unquote(__MODULE__)
       def new(attrs) do
         Protobuf.Builder.new(__MODULE__, attrs)
       end
 
+      @impl unquote(__MODULE__)
       def new!(attrs) do
         Protobuf.Builder.new!(__MODULE__, attrs)
       end
 
+      @impl unquote(__MODULE__)
       def transform_module() do
         nil
       end
 
       defoverridable transform_module: 0
 
-      unquote(def_encode_decode())
-    end
-  end
-
-  defp def_encode_decode() do
-    quote do
+      @impl unquote(__MODULE__)
       def decode(data), do: Protobuf.Decoder.decode(data, __MODULE__)
+
+      @impl unquote(__MODULE__)
       def encode(struct), do: Protobuf.Encoder.encode(struct)
     end
   end
@@ -137,15 +138,17 @@ defmodule Protobuf do
   @doc """
   Loads extensions modules.
 
-  This function should be called in your application's `start/2` callback,
+  This function should be called in your application's `c:Application.start/2` callback,
   as seen in the example below, if you wish to use extensions.
 
   ## Example
 
+      @impl Application
       def start(_type, _args) do
         Protobuf.load_extensions()
         Supervisor.start_link([], strategy: :one_for_one)
       end
+
   """
   @spec load_extensions() :: :ok
   def load_extensions() do
