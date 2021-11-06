@@ -90,5 +90,24 @@ defmodule Protobuf.Protoc.GeneratorTest do
 
       purge_modules([enum_mod, message_mod])
     end
+
+    test "can generate a GRPC service" do
+      ctx = %Context{
+        package: "foo",
+        plugins: ["grpc"],
+        global_type_mapping: %{"name.proto" => %{}, "my_dep" => %{}}
+      }
+
+      desc =
+        Google.Protobuf.FileDescriptorProto.new(
+          name: "name.proto",
+          dependency: ["my_dep"],
+          service: [Google.Protobuf.ServiceDescriptorProto.new(name: "my_service")]
+        )
+
+      # We can't compile the generated service module because we haven't loaded GRPC.Service here.
+      assert %CodeGeneratorResponse.File{} = file = Generator.generate(ctx, desc)
+      assert file.content =~ "defmodule MyService.Service do"
+    end
   end
 end

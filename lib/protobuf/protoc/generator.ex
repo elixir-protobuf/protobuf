@@ -2,10 +2,7 @@ defmodule Protobuf.Protoc.Generator do
   @moduledoc false
 
   alias Protobuf.Protoc.Context
-  alias Protobuf.Protoc.Generator.Message, as: MessageGenerator
-  alias Protobuf.Protoc.Generator.Enum, as: EnumGenerator
-  alias Protobuf.Protoc.Generator.Service, as: ServiceGenerator
-  alias Protobuf.Protoc.Generator.Extension, as: ExtensionGenerator
+  alias Protobuf.Protoc.Generator
 
   @locals_without_parens [field: 2, field: 3, oneof: 2, rpc: 3, extend: 4, extensions: 1]
 
@@ -32,19 +29,19 @@ defmodule Protobuf.Protoc.Generator do
       |> Protobuf.Protoc.Context.custom_file_options_from_file_desc(desc)
 
     nested_extensions =
-      ExtensionGenerator.get_nested_extensions(ctx, desc.message_type)
+      Generator.Extension.get_nested_extensions(ctx, desc.message_type)
       |> Enum.reverse()
 
-    enum_defmodules = Enum.map(desc.enum_type, &EnumGenerator.generate(ctx, &1))
+    enum_defmodules = Enum.map(desc.enum_type, &Generator.Enum.generate(ctx, &1))
 
     {nested_enum_defmodules, message_defmodules} =
-      MessageGenerator.generate_list(ctx, desc.message_type)
+      Generator.Message.generate_list(ctx, desc.message_type)
 
-    extension_defmodules = ExtensionGenerator.generate(ctx, desc, nested_extensions)
+    extension_defmodules = Generator.Extension.generate(ctx, desc, nested_extensions)
 
     service_defmodules =
       if "grpc" in ctx.plugins do
-        Enum.map(desc.service, &ServiceGenerator.generate(ctx, &1))
+        Enum.map(desc.service, &Generator.Service.generate(ctx, &1))
       else
         []
       end
