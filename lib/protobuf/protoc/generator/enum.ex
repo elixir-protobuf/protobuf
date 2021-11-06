@@ -10,7 +10,7 @@ defmodule Protobuf.Protoc.Generator.Enum do
     :defp,
     :enum_template,
     Path.expand("./templates/enum.ex.eex", :code.priv_dir(:protobuf)),
-    [:name, :options, :fields, :type, :desc],
+    [:name, :use_options, :fields, :descriptor_fun_body],
     trim: true
   )
 
@@ -22,28 +22,25 @@ defmodule Protobuf.Protoc.Generator.Enum do
   @spec generate(Context.t(), Google.Protobuf.EnumDescriptorProto.t()) :: String.t()
   def generate(%Context{namespace: ns} = ctx, %Google.Protobuf.EnumDescriptorProto{} = desc) do
     msg_name = Util.mod_name(ctx, ns ++ [Macro.camelize(desc.name)])
-    fields = Enum.map(desc.value, &generate_field/1)
-    generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
-    type = generate_type(desc.value)
+    use_options = Util.options_to_str(%{syntax: ctx.syntax, enum: true})
 
-    enum_template(msg_name, msg_opts(ctx, desc), fields, type, generate_desc)
+    descriptor_fun_body =
+      if ctx.gen_descriptors? do
+        descriptor_fun_body(desc)
+      else
+        nil
+      end
+
+    enum_template(msg_name, use_options, _fields = desc.value, descriptor_fun_body)
   end
 
-  defp generate_type(fields) do
-    union = Enum.map_join(fields, " | ", &enum_value_name_to_atom_string(&1.name))
-    # An enum can always be passed as an integer so we hardcode the integer/0 type here
-    # alongside the union of atoms.
-    "@type t :: integer | " <> union
+  defp descriptor_fun_body(%mod{} = desc) do
+    desc
+    |> Map.from_struct()
+    |> Enum.filter(fn {_key, val} -> not is_nil(val) end)
+    |> mod.new()
+    |> mod.encode()
+    |> mod.decode()
+    |> inspect(limit: :infinity)
   end
-
-  defp generate_field(%Google.Protobuf.EnumValueDescriptorProto{name: name, number: number}) do
-    "#{enum_value_name_to_atom_string(name)}, #{number}"
-  end
-
-  defp msg_opts(%{syntax: syntax}, _desc) do
-    opts = %{syntax: syntax, enum: true}
-    ", " <> Util.options_to_str(opts)
-  end
-
-  defp enum_value_name_to_atom_string(name) when is_binary(name), do: ":" <> name
 end

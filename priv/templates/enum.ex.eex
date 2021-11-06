@@ -1,18 +1,16 @@
 defmodule <%= name %> do
   @moduledoc false
-  use Protobuf<%= options %>
+  use Protobuf, <%= use_options %>
 
-  <%= type %>
+  @type t :: integer | <%= Enum.map_join(fields, " | ", &(":#{&1.name}")) %>
 
-  <%= if not is_nil(desc) do %>
+  <%= if descriptor_fun_body do %>
   def descriptor do
     # credo:disable-for-next-line
-    <%= desc.__struct__ %>.decode(
-      <%= desc.__struct__.encode(desc |> Map.from_struct() |> Enum.filter(fn {_, x} -> x != nil end) |> desc.__struct__.new()) |> inspect(limit: :infinity) %>
-    )
+    <%= descriptor_fun_body %>
   end
   <% end %>
 
-<%= Enum.map fields, fn(field) -> %>  field <%= field %>
-<% end %>
+<%= for %Google.Protobuf.EnumValueDescriptorProto{name: name, number: number} <- fields do %>
+  field :<%= name %>, <%= number %><% end %>
 end
