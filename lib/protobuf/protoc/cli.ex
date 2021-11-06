@@ -106,19 +106,20 @@ defmodule Protobuf.Protoc.CLI do
     System.halt(1)
   end
 
+  # Made public for testing.
   @doc false
-  def find_types(ctx, descs) do
+  def find_types(%Context{} = ctx, descs) do
     global_type_mapping =
-      Enum.reduce(descs, %{}, fn desc, acc ->
-        types = find_types_in_proto(ctx, desc)
-        Map.put(acc, desc.name, types)
+      Map.new(descs, fn desc ->
+        {desc.name, find_types_in_proto(ctx, desc)}
       end)
 
-    %{ctx | global_type_mapping: global_type_mapping}
+    %Context{ctx | global_type_mapping: global_type_mapping}
   end
 
+  # Made public for testing.
   @doc false
-  def find_types_in_proto(ctx, %Google.Protobuf.FileDescriptorProto{} = desc) do
+  def find_types_in_proto(%Context{} = ctx, %Google.Protobuf.FileDescriptorProto{} = desc) do
     ctx =
       %Protobuf.Protoc.Context{
         namespace: [],
@@ -127,9 +128,7 @@ defmodule Protobuf.Protoc.CLI do
       }
       |> Protobuf.Protoc.Context.custom_file_options_from_file_desc(desc)
 
-    %{}
-    |> find_types_in_proto(ctx, desc.message_type)
-    |> find_types_in_proto(ctx, desc.enum_type)
+    find_types_in_proto(_types = %{}, ctx, desc.message_type ++ desc.enum_type)
   end
 
   defp find_types_in_proto(types, ctx, descs) when is_list(descs) do
