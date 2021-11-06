@@ -40,7 +40,7 @@ defmodule Protobuf.Protoc.Generator.Message do
 
     descriptor_fun_body =
       if ctx.gen_descriptors? do
-        descriptor_fun_body(desc)
+        Util.descriptor_fun_body(desc)
       else
         nil
       end
@@ -341,16 +341,6 @@ defmodule Protobuf.Protoc.Generator.Message do
     opts
     |> Map.put(:packed, f.options.packed)
     |> Map.put(:deprecated, f.options.deprecated)
-  end
-
-  defp descriptor_fun_body(%mod{} = desc) do
-    desc
-    |> Map.from_struct()
-    |> Enum.filter(fn {_key, val} -> not is_nil(val) end)
-    |> mod.new()
-    |> mod.encode()
-    |> mod.decode()
-    |> inspect(limit: :infinity)
   end
 
   # Omit `json_name` from the options list when it matches the original field

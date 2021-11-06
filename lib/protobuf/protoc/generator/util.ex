@@ -56,4 +56,15 @@ defmodule Protobuf.Protoc.Generator.Util do
     |> String.split(".")
     |> Enum.map_join(".", &Macro.camelize/1)
   end
+
+  @spec descriptor_fun_body(desc :: struct()) :: String.t()
+  def descriptor_fun_body(%mod{} = desc) do
+    desc
+    |> Map.from_struct()
+    |> Enum.filter(fn {_key, val} -> not is_nil(val) end)
+    |> mod.new()
+    |> mod.encode()
+    |> mod.decode()
+    |> inspect(limit: :infinity)
+  end
 end

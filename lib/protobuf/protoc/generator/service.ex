@@ -32,7 +32,7 @@ defmodule Protobuf.Protoc.Generator.Service do
 
     descriptor_fun_body =
       if ctx.gen_descriptors? do
-        descriptor_fun_body(desc)
+        Util.descriptor_fun_body(desc)
       else
         nil
       end
@@ -56,14 +56,4 @@ defmodule Protobuf.Protoc.Generator.Service do
 
   defp service_arg(type, _streaming? = true), do: "stream(#{type})"
   defp service_arg(type, _streaming?), do: type
-
-  defp descriptor_fun_body(%mod{} = desc) do
-    desc
-    |> Map.from_struct()
-    |> Enum.filter(fn {_key, val} -> not is_nil(val) end)
-    |> mod.new()
-    |> mod.encode()
-    |> mod.decode()
-    |> inspect(limit: :infinity)
-  end
 end
