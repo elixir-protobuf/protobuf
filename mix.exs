@@ -14,6 +14,8 @@ defmodule Protobuf.Mixfile do
       start_permanent: Mix.env() == :prod,
       dialyzer: [plt_add_apps: [:mix, :jason]],
       elixirc_paths: elixirc_paths(Mix.env()),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [coveralls: :test, "coveralls.html": :test],
       deps: deps(),
       escript: escript(),
       description: @description,
@@ -37,7 +39,8 @@ defmodule Protobuf.Mixfile do
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:stream_data, "~> 0.5.0", only: [:dev, :test]}
+      {:stream_data, "~> 0.5.0", only: [:dev, :test]},
+      {:excoveralls, "~> 0.14.4", only: :test}
     ]
   end
 
