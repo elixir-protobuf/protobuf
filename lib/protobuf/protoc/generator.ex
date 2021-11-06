@@ -29,7 +29,7 @@ defmodule Protobuf.Protoc.Generator do
         dep_type_mapping: get_dep_type_mapping(ctx, desc.dependency, desc.name)
     }
 
-    ctx = Protobuf.Protoc.Context.cal_file_options(ctx, desc.options)
+    ctx = Protobuf.Protoc.Context.custom_file_options_from_file_desc(ctx, desc)
 
     nested_extensions =
       ExtensionGenerator.get_nested_extensions(ctx, desc.message_type)

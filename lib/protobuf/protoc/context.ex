@@ -37,21 +37,28 @@ defmodule Protobuf.Protoc.Context do
             # Elixirpb.FileOptions
             custom_file_options: %{}
 
-  def cal_file_options(ctx, nil) do
-    %{ctx | custom_file_options: %{}}
+  @spec custom_file_options_from_file_desc(t(), Google.Protobuf.FileDescriptorProto.t()) :: t()
+  def custom_file_options_from_file_desc(ctx, desc)
+
+  def custom_file_options_from_file_desc(
+        %__MODULE__{} = ctx,
+        %Google.Protobuf.FileDescriptorProto{options: nil}
+      ) do
+    %__MODULE__{ctx | custom_file_options: %{}}
   end
 
-  def cal_file_options(ctx, options) do
-    opts =
-      case Google.Protobuf.FileOptions.get_extension(options, Elixirpb.PbExtension, :file) do
-        nil ->
-          %{}
+  def custom_file_options_from_file_desc(
+        %__MODULE__{} = ctx,
+        %Google.Protobuf.FileDescriptorProto{options: options}
+      ) do
+    custom_file_opts =
+      Google.Protobuf.FileOptions.get_extension(options, Elixirpb.PbExtension, :file) ||
+        Elixirpb.PbExtension.new()
 
-        opts ->
-          opts
-      end
-
-    module_prefix = Map.get(opts, :module_prefix)
-    %{ctx | custom_file_options: opts, module_prefix: module_prefix}
+    %__MODULE__{
+      ctx
+      | custom_file_options: custom_file_opts,
+        module_prefix: custom_file_opts.module_prefix
+    }
   end
 end

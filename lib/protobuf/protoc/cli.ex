@@ -18,6 +18,8 @@ defmodule Protobuf.Protoc.CLI do
 
   """
 
+  alias Protobuf.Protoc.Context
+
   # Entrypoint for the escript (protoc-gen-elixir).
   @doc false
   @spec main([String.t()]) :: :ok
@@ -45,7 +47,7 @@ defmodule Protobuf.Protoc.CLI do
     request = Protobuf.Decoder.decode(bin, Google.Protobuf.Compiler.CodeGeneratorRequest)
 
     ctx =
-      %Protobuf.Protoc.Context{}
+      %Context{}
       |> parse_params(request.parameter || "")
       |> find_types(request.proto_file)
 
@@ -65,20 +67,20 @@ defmodule Protobuf.Protoc.CLI do
 
   # Made public for testing.
   @doc false
-  def parse_params(%Protobuf.Protoc.Context{} = ctx, params_str) when is_binary(params_str) do
+  def parse_params(%Context{} = ctx, params_str) when is_binary(params_str) do
     params_str
     |> String.split(",")
     |> Enum.reduce(ctx, &parse_param/2)
   end
 
   defp parse_param("plugins=" <> plugins, ctx) do
-    %{ctx | plugins: String.split(plugins, "+")}
+    %Context{ctx | plugins: String.split(plugins, "+")}
   end
 
   defp parse_param("gen_descriptors=" <> value, ctx) do
     case value do
       "true" ->
-        %{ctx | gen_descriptors?: true}
+        %Context{ctx | gen_descriptors?: true}
 
       other ->
         fail_and_halt(
@@ -88,11 +90,11 @@ defmodule Protobuf.Protoc.CLI do
   end
 
   defp parse_param("package_prefix=" <> package, ctx) do
-    %{ctx | package_prefix: package}
+    %Context{ctx | package_prefix: package}
   end
 
   defp parse_param("transform_module=" <> module, ctx) do
-    %{ctx | transform_module: Module.concat([module])}
+    %Context{ctx | transform_module: Module.concat([module])}
   end
 
   defp parse_param(_unknown, ctx) do
@@ -123,7 +125,7 @@ defmodule Protobuf.Protoc.CLI do
         package_prefix: ctx.package_prefix,
         package: desc.package
       }
-      |> Protobuf.Protoc.Context.cal_file_options(desc.options)
+      |> Protobuf.Protoc.Context.custom_file_options_from_file_desc(desc)
 
     %{}
     |> find_types_in_proto(ctx, desc.message_type)
