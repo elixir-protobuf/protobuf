@@ -10,7 +10,7 @@ defmodule Protobuf.Protoc.Generator.Enum do
     :defp,
     :enum_template,
     Path.expand("./templates/enum.ex.eex", :code.priv_dir(:protobuf)),
-    [:name, :use_options, :fields, :descriptor_fun_body],
+    [:assigns],
     trim: true
   )
 
@@ -31,7 +31,12 @@ defmodule Protobuf.Protoc.Generator.Enum do
         nil
       end
 
-    enum_template(msg_name, use_options, _fields = desc.value, descriptor_fun_body)
+    enum_template(
+      module: msg_name,
+      use_options: use_options,
+      fields: desc.value,
+      descriptor_fun_body: descriptor_fun_body
+    )
   end
 
   defp descriptor_fun_body(%mod{} = desc) do

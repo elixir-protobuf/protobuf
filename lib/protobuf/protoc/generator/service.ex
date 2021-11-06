@@ -10,7 +10,7 @@ defmodule Protobuf.Protoc.Generator.Service do
     :defp,
     :service_template,
     Path.expand("./templates/service.ex.eex", :code.priv_dir(:protobuf)),
-    [:mod_name, :name, :methods, :descriptor_fun_body],
+    [:assigns],
     trim: true
   )
 
@@ -37,7 +37,12 @@ defmodule Protobuf.Protoc.Generator.Service do
         nil
       end
 
-    service_template(mod_name, name, methods, descriptor_fun_body)
+    service_template(
+      module: mod_name,
+      service_name: name,
+      methods: methods,
+      descriptor_fun_body: descriptor_fun_body
+    )
   end
 
   defp generate_service_method(ctx, method) do

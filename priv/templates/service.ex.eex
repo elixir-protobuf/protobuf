@@ -1,19 +1,19 @@
-defmodule <%= mod_name %>.Service do
+defmodule <%= @module %>.Service do
   @moduledoc false
-  use GRPC.Service, name: <%= inspect(name) %>
+  use GRPC.Service, name: <%= inspect(@service_name) %>
 
-  <%= if descriptor_fun_body do %>
+  <%= if @descriptor_fun_body do %>
   def descriptor do
     # credo:disable-for-next-line
-    <%= descriptor_fun_body %>
+    <%= @descriptor_fun_body %>
   end
   <% end %>
 
-  <%= for {method_name, input, output} <- methods do %>
+  <%= for {method_name, input, output} <- @methods do %>
   rpc :<%= method_name %>, <%= input %>, <%= output %><% end %>
 end
 
-defmodule <%= mod_name %>.Stub do
+defmodule <%= @module %>.Stub do
   @moduledoc false
-  use GRPC.Stub, service: <%= mod_name %>.Service
+  use GRPC.Stub, service: <%= @module %>.Service
 end
