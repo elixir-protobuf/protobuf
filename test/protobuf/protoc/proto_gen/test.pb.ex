@@ -47,7 +47,6 @@ defmodule My.Test.Request.SomeGroup do
   defstruct [:group_field]
 
   field :group_field, 9, optional: true, type: :int32
-
   def transform_module(), do: nil
 end
 
@@ -64,7 +63,6 @@ defmodule My.Test.Request.NameMappingEntry do
 
   field :key, 1, optional: true, type: :int32
   field :value, 2, optional: true, type: :string
-
   def transform_module(), do: nil
 end
 
@@ -81,7 +79,6 @@ defmodule My.Test.Request.MsgMappingEntry do
 
   field :key, 1, optional: true, type: :sint64
   field :value, 2, optional: true, type: My.Test.Reply
-
   def transform_module(), do: nil
 end
 
@@ -122,7 +119,6 @@ defmodule My.Test.Request do
   field :msg_mapping, 15, repeated: true, type: My.Test.Request.MsgMappingEntry, map: true
   field :reset, 12, optional: true, type: :int32
   field :get_key, 16, optional: true, type: :string
-
   def transform_module(), do: nil
 end
 
@@ -141,7 +137,6 @@ defmodule My.Test.Reply.Entry do
   field :key_that_needs_1234camel_CasIng, 1, required: true, type: :int64
   field :value, 2, optional: true, type: :int64, default: 7
   field :_my_field_name_2, 3, optional: true, type: :int64
-
   def transform_module(), do: nil
 end
 
@@ -159,7 +154,6 @@ defmodule My.Test.Reply do
 
   field :found, 1, repeated: true, type: My.Test.Reply.Entry
   field :compact_keys, 2, repeated: true, type: :int32, packed: true
-
   def transform_module(), do: nil
 
   extensions [{100, 536_870_912}]
@@ -177,7 +171,6 @@ defmodule My.Test.OtherBase do
   defstruct [:name, :__pb_extensions__]
 
   field :name, 1, optional: true, type: :string
-
   def transform_module(), do: nil
 
   extensions [{100, 536_870_912}]
@@ -187,7 +180,6 @@ defmodule My.Test.ReplyExtensions do
   @moduledoc false
   use Protobuf, syntax: :proto2
   @type t :: %__MODULE__{}
-
   defstruct []
 
   def transform_module(), do: nil
@@ -204,7 +196,6 @@ defmodule My.Test.OtherReplyExtensions do
   defstruct [:key]
 
   field :key, 1, optional: true, type: :int32
-
   def transform_module(), do: nil
 end
 
@@ -212,7 +203,6 @@ defmodule My.Test.OldReply do
   @moduledoc false
   use Protobuf, syntax: :proto2
   @type t :: %__MODULE__{__pb_extensions__: map}
-
   defstruct [:__pb_extensions__]
 
   def transform_module(), do: nil
@@ -231,7 +221,6 @@ defmodule My.Test.Communique.SomeGroup do
   defstruct [:member]
 
   field :member, 15, optional: true, type: :string
-
   def transform_module(), do: nil
 end
 
@@ -239,7 +228,6 @@ defmodule My.Test.Communique.Delta do
   @moduledoc false
   use Protobuf, syntax: :proto2
   @type t :: %__MODULE__{}
-
   defstruct []
 
   def transform_module(), do: nil
@@ -279,7 +267,6 @@ defmodule My.Test.Communique do
   field :delta, 12, optional: true, type: :sint32, oneof: 0
   field :msg, 13, optional: true, type: My.Test.Reply, oneof: 0
   field :somegroup, 14, optional: true, type: :group, oneof: 0
-
   def transform_module(), do: nil
 end
 
@@ -294,13 +281,13 @@ defmodule My.Test.Options do
   defstruct [:opt1]
 
   field :opt1, 1, optional: true, type: :string, deprecated: true
-
   def transform_module(), do: nil
 end
 
 defmodule My.Test.PbExtension do
   @moduledoc false
   use Protobuf, syntax: :proto2
+
   extend My.Test.Reply, :tag, 103, optional: true, type: :string
   extend My.Test.Reply, :donut, 106, optional: true, type: My.Test.OtherReplyExtensions
   extend My.Test.Reply, :"ReplyExtensions.time", 101, optional: true, type: :double

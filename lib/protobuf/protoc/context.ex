@@ -58,7 +58,7 @@ defmodule Protobuf.Protoc.Context do
     %__MODULE__{
       ctx
       | custom_file_options: custom_file_opts,
-        module_prefix: custom_file_opts.module_prefix
+        module_prefix: Map.get(custom_file_opts, :module_prefix)
     }
   end
 end

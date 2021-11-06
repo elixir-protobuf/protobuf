@@ -3,8 +3,8 @@ syntax = "proto2";
 // This package holds interesting messages.
 package test;  // dotted package name
 
-//import "imp.proto";
-import "multi/multi1.proto";  // unused import
+// import "imp.proto";
+import "multi/multi1.proto"; // unused import
 
 enum HatType {
   // deliberately skipping 0
@@ -29,20 +29,19 @@ message Request {
     BLUE = 2;
   }
   repeated int64 key = 1;
-//  optional imp.ImportedMessage imported_message = 2;
-  optional Color hue = 3; // no default
-  optional HatType hat = 4 [default=FEDORA];
-//  optional imp.ImportedMessage.Owner owner = 6;
-  optional float deadline = 7 [default=inf];
+  //  optional imp.ImportedMessage imported_message = 2;
+  optional Color hue = 3;  // no default
+  optional HatType hat = 4 [default = FEDORA];
+  //  optional imp.ImportedMessage.Owner owner = 6;
+  optional float deadline = 7 [default = inf];
   optional group SomeGroup = 8 {
     optional int32 group_field = 9;
   }
 
   // These foreign types are in imp2.proto,
   // which is publicly imported by imp.proto.
-//  optional imp.PubliclyImportedMessage pub = 10;
-//  optional imp.PubliclyImportedEnum pub_enum = 13 [default=HAIR];
-
+  //  optional imp.PubliclyImportedMessage pub = 10;
+  //  optional imp.PubliclyImportedEnum pub_enum = 13 [default=HAIR];
 
   // This is a map field. It will generate map[int32]string.
   map<int32, string> name_mapping = 14;
@@ -57,7 +56,7 @@ message Request {
 message Reply {
   message Entry {
     required int64 key_that_needs_1234camel_CasIng = 1;
-    optional int64 value = 2 [default=7];
+    optional int64 value = 2 [default = 7];
     optional int64 _my_field_name_2 = 3;
     enum Game {
       FOOTBALL = 1;
@@ -65,7 +64,7 @@ message Reply {
     }
   }
   repeated Entry found = 1;
-  repeated int32 compact_keys = 2 [packed=true];
+  repeated int32 compact_keys = 2 [packed = true];
   extensions 100 to max;
 }
 
@@ -92,7 +91,7 @@ message OtherReplyExtensions {
 extend Reply {
   optional string tag = 103;
   optional OtherReplyExtensions donut = 106;
-//  optional imp.ImportedMessage elephant = 107;  // extend with message from another file.
+  //  optional imp.ImportedMessage elephant = 107;  // extend with message from another file.
 }
 
 message OldReply {
@@ -120,9 +119,10 @@ message Communique {
     }
   }
 
-  message Delta {}
+  message Delta {
+  }
 }
 
 message Options {
-  optional string opt1 = 1 [deprecated=true];
+  optional string opt1 = 1 [deprecated = true];
 }
