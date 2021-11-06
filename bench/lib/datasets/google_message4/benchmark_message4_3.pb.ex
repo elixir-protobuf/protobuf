@@ -1,7 +1,6 @@
 defmodule Benchmarks.GoogleMessage4.UnusedEnum do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :UNUSED_ENUM_VALUE1 | :UNUSED_ENUM_VALUE2
 
   field :UNUSED_ENUM_VALUE1, 0
@@ -36,7 +35,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum2834 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE2835 | :ENUM_VALUE2836 | :ENUM_VALUE2837
 
   field :ENUM_VALUE2835, 0
@@ -562,7 +560,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum5862 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE5863 | :ENUM_VALUE5864 | :ENUM_VALUE5865
 
   field :ENUM_VALUE5863, 1
@@ -573,7 +570,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum5868 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE5869 | :ENUM_VALUE5870 | :ENUM_VALUE5871 | :ENUM_VALUE5872
 
   field :ENUM_VALUE5869, 0
@@ -585,7 +581,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum5873 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE5874 | :ENUM_VALUE5875 | :ENUM_VALUE5876
 
   field :ENUM_VALUE5874, 0
@@ -596,7 +591,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum5904 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE5905 | :ENUM_VALUE5906
 
   field :ENUM_VALUE5905, 0
@@ -606,7 +600,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum5909 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE5910 | :ENUM_VALUE5911
 
   field :ENUM_VALUE5910, 0
@@ -616,7 +609,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum5912 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE5913 | :ENUM_VALUE5914
 
   field :ENUM_VALUE5913, 0
@@ -626,7 +618,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum5915 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE5916 | :ENUM_VALUE5917 | :ENUM_VALUE5918 | :ENUM_VALUE5919
 
   field :ENUM_VALUE5916, 0
@@ -638,7 +629,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum5920 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE5921 | :ENUM_VALUE5922
 
   field :ENUM_VALUE5921, 0
@@ -648,7 +638,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum5923 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE5924 | :ENUM_VALUE5925 | :ENUM_VALUE5926 | :ENUM_VALUE5927
 
   field :ENUM_VALUE5924, 0
@@ -660,7 +649,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum5928 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE5929 | :ENUM_VALUE5930
 
   field :ENUM_VALUE5929, 0
@@ -670,7 +658,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum5931 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE5932 | :ENUM_VALUE5933 | :ENUM_VALUE5934
 
   field :ENUM_VALUE5932, 0
@@ -681,7 +668,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum5935 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE5936 | :ENUM_VALUE5937 | :ENUM_VALUE5938
 
   field :ENUM_VALUE5936, 0
@@ -742,7 +728,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum5957 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE5958 | :ENUM_VALUE5959 | :ENUM_VALUE5960 | :ENUM_VALUE5961
 
   field :ENUM_VALUE5958, 0
@@ -754,7 +739,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum5962 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE5963 | :ENUM_VALUE5964
 
   field :ENUM_VALUE5963, 0
@@ -893,7 +877,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum6130 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE6131 | :ENUM_VALUE6132
 
   field :ENUM_VALUE6131, 0
@@ -1005,7 +988,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum7288 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE7289 | :ENUM_VALUE7290 | :ENUM_VALUE7291 | :ENUM_VALUE7292
 
   field :ENUM_VALUE7289, 0
@@ -1465,7 +1447,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum10335 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE10336
 
   field :ENUM_VALUE10336, 0
@@ -1474,7 +1455,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum10337 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE10338 | :ENUM_VALUE10339
 
   field :ENUM_VALUE10338, 0
@@ -1484,7 +1464,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum11901 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE11902 | :ENUM_VALUE11903 | :ENUM_VALUE11904 | :ENUM_VALUE11905
 
   field :ENUM_VALUE11902, 0
@@ -1496,7 +1475,6 @@ end
 defmodule Benchmarks.GoogleMessage4.Enum12735 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
   @type t :: integer | :ENUM_VALUE12736 | :ENUM_VALUE12737 | :ENUM_VALUE12738 | :ENUM_VALUE12739
 
   field :ENUM_VALUE12736, 0

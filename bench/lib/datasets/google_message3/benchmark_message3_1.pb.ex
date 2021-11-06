@@ -5,9 +5,11 @@ defmodule Benchmarks.GoogleMessage3.Message34390 do
   @type t :: %__MODULE__{
           field34452: [Benchmarks.GoogleMessage3.Message34387.t()]
         }
+
   defstruct [:field34452]
 
   field :field34452, 1, repeated: true, type: Benchmarks.GoogleMessage3.Message34387
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message34624 do
@@ -18,10 +20,12 @@ defmodule Benchmarks.GoogleMessage3.Message34624 do
           field34683: Benchmarks.GoogleMessage3.Message34621.t() | nil,
           field34684: Benchmarks.GoogleMessage3.Message34621.t() | nil
         }
+
   defstruct [:field34683, :field34684]
 
   field :field34683, 1, optional: true, type: Benchmarks.GoogleMessage3.Message34621
   field :field34684, 2, optional: true, type: Benchmarks.GoogleMessage3.Message34621
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message34791.Message34792 do
@@ -32,10 +36,12 @@ defmodule Benchmarks.GoogleMessage3.Message34791.Message34792 do
           field34808: String.t(),
           field34809: String.t()
         }
+
   defstruct [:field34808, :field34809]
 
   field :field34808, 3, required: true, type: :string
   field :field34809, 4, optional: true, type: :string
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message34791 do
@@ -58,6 +64,7 @@ defmodule Benchmarks.GoogleMessage3.Message34791 do
           field34805: integer,
           field34806: [non_neg_integer]
         }
+
   defstruct [
     :field34793,
     :message34792,
@@ -89,6 +96,7 @@ defmodule Benchmarks.GoogleMessage3.Message34791 do
   field :field34804, 14, optional: true, type: :string
   field :field34805, 15, optional: true, type: :int64
   field :field34806, 17, repeated: true, type: :fixed64, packed: true
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message35483 do
@@ -103,6 +111,7 @@ defmodule Benchmarks.GoogleMessage3.Message35483 do
           field35503: [Benchmarks.GoogleMessage3.Message35476.t()],
           field35504: Benchmarks.GoogleMessage3.UnusedEmptyMessage.t() | nil
         }
+
   defstruct [:field35499, :field35500, :field35501, :field35502, :field35503, :field35504]
 
   field :field35499, 1, optional: true, type: :int32
@@ -111,6 +120,7 @@ defmodule Benchmarks.GoogleMessage3.Message35483 do
   field :field35502, 4, optional: true, type: :string
   field :field35503, 5, repeated: true, type: Benchmarks.GoogleMessage3.Message35476
   field :field35504, 6, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message35807 do
@@ -127,6 +137,7 @@ defmodule Benchmarks.GoogleMessage3.Message35807 do
           field35816: integer,
           field35817: integer
         }
+
   defstruct [
     :field35810,
     :field35811,
@@ -146,6 +157,7 @@ defmodule Benchmarks.GoogleMessage3.Message35807 do
   field :field35815, 6, optional: true, type: :int32
   field :field35816, 7, optional: true, type: :int32
   field :field35817, 8, optional: true, type: :int32
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message37487 do
@@ -156,10 +168,12 @@ defmodule Benchmarks.GoogleMessage3.Message37487 do
           field37501: binary,
           field37502: boolean
         }
+
   defstruct [:field37501, :field37502]
 
   field :field37501, 2, optional: true, type: :bytes
   field :field37502, 3, optional: true, type: :bool
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message13062 do
@@ -173,6 +187,7 @@ defmodule Benchmarks.GoogleMessage3.Message13062 do
           field13078: String.t(),
           field13079: integer
         }
+
   defstruct [:field13075, :field13076, :field13077, :field13078, :field13079]
 
   field :field13075, 1, optional: true, type: :int64
@@ -180,6 +195,7 @@ defmodule Benchmarks.GoogleMessage3.Message13062 do
   field :field13077, 3, optional: true, type: :int32
   field :field13078, 4, optional: true, type: :string
   field :field13079, 5, optional: true, type: :int32
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message952 do
@@ -189,9 +205,11 @@ defmodule Benchmarks.GoogleMessage3.Message952 do
   @type t :: %__MODULE__{
           field963: [Benchmarks.GoogleMessage3.Message949.t()]
         }
+
   defstruct [:field963]
 
   field :field963, 1, repeated: true, type: Benchmarks.GoogleMessage3.Message949
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36877 do
@@ -205,6 +223,7 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36877 do
           field37047: integer,
           field37048: integer
         }
+
   defstruct [:field37044, :field37045, :field37046, :field37047, :field37048]
 
   field :field37044, 112, required: true, type: :string
@@ -212,14 +231,16 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36877 do
   field :field37046, 114, optional: true, type: :bytes
   field :field37047, 115, optional: true, type: :int32
   field :field37048, 157, optional: true, type: :int32
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36878 do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   @type t :: %__MODULE__{}
   defstruct []
+
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36879 do
@@ -230,74 +251,84 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36879 do
           field37050: String.t(),
           field37051: integer
         }
+
   defstruct [:field37050, :field37051]
 
   field :field37050, 56, required: true, type: :string
   field :field37051, 69, optional: true, type: :int32
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36880 do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   @type t :: %__MODULE__{}
   defstruct []
+
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36881 do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   @type t :: %__MODULE__{}
   defstruct []
+
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36882 do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   @type t :: %__MODULE__{}
   defstruct []
+
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36883 do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   @type t :: %__MODULE__{}
   defstruct []
+
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36884 do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   @type t :: %__MODULE__{}
   defstruct []
+
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36885 do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   @type t :: %__MODULE__{}
   defstruct []
+
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36886 do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   @type t :: %__MODULE__{}
   defstruct []
+
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36887 do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   @type t :: %__MODULE__{}
   defstruct []
+
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36888 do
@@ -312,6 +343,7 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36888 do
           field37093: non_neg_integer,
           field37094: binary
         }
+
   defstruct [:field37089, :field37090, :field37091, :field37092, :field37093, :field37094]
 
   field :field37089, 75, optional: true, type: :uint64
@@ -320,6 +352,7 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36888 do
   field :field37092, 166, optional: true, type: :double
   field :field37093, 109, optional: true, type: :uint64
   field :field37094, 122, optional: true, type: :bytes
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36889 do
@@ -337,7 +370,7 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36889 do
           field37102: Benchmarks.GoogleMessage3.Message13174.t() | nil,
           field37103: Benchmarks.GoogleMessage3.Message13169.t() | nil,
           field37104: non_neg_integer,
-          field37105: [[Benchmarks.GoogleMessage3.Enum36890.t()]],
+          field37105: [Benchmarks.GoogleMessage3.Enum36890.t()],
           field37106: boolean,
           field37107: boolean,
           field37108: Benchmarks.GoogleMessage3.UnusedEmptyMessage.t() | nil,
@@ -349,10 +382,11 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36889 do
           field37114: boolean,
           field37115: Benchmarks.GoogleMessage3.UnusedEmptyMessage.t() | nil,
           field37116: Benchmarks.GoogleMessage3.UnusedEnum.t(),
-          field37117: [[Benchmarks.GoogleMessage3.UnusedEnum.t()]],
+          field37117: [Benchmarks.GoogleMessage3.UnusedEnum.t()],
           field37118: integer,
           field37119: [String.t()]
         }
+
   defstruct [
     :field37095,
     :field37096,
@@ -406,14 +440,16 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36889 do
   field :field37117, 159, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEnum, enum: true
   field :field37118, 160, optional: true, type: :int32
   field :field37119, 161, repeated: true, type: :string
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36910 do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   @type t :: %__MODULE__{}
   defstruct []
+
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36911 do
@@ -426,12 +462,14 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36911 do
           field37123: Benchmarks.GoogleMessage3.Message35540.t() | nil,
           field37124: Benchmarks.GoogleMessage3.Message35542.t() | nil
         }
+
   defstruct [:field37121, :field37122, :field37123, :field37124]
 
   field :field37121, 127, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
   field :field37122, 130, optional: true, type: Benchmarks.GoogleMessage3.Message35538
   field :field37123, 144, optional: true, type: Benchmarks.GoogleMessage3.Message35540
   field :field37124, 150, optional: true, type: Benchmarks.GoogleMessage3.Message35542
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36912 do
@@ -442,10 +480,12 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36912 do
           field37125: Benchmarks.GoogleMessage3.Message3901.t() | nil,
           field37126: Benchmarks.GoogleMessage3.Message3901.t() | nil
         }
+
   defstruct [:field37125, :field37126]
 
   field :field37125, 153, optional: true, type: Benchmarks.GoogleMessage3.Message3901
   field :field37126, 162, optional: true, type: Benchmarks.GoogleMessage3.Message3901
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message36876 do
@@ -493,7 +533,7 @@ defmodule Benchmarks.GoogleMessage3.Message36876 do
           message36884: [any],
           message36885: [any],
           message36886: any,
-          field37020: [[Benchmarks.GoogleMessage3.UnusedEnum.t()]],
+          field37020: [Benchmarks.GoogleMessage3.UnusedEnum.t()],
           field37021: [integer],
           field37022: Benchmarks.GoogleMessage3.UnusedEmptyMessage.t() | nil,
           field37023: Benchmarks.GoogleMessage3.Message13090.t() | nil,
@@ -517,6 +557,7 @@ defmodule Benchmarks.GoogleMessage3.Message36876 do
           message36912: any,
           field37042: Benchmarks.GoogleMessage3.UnusedEmptyMessage.t() | nil
         }
+
   defstruct [
     :field36980,
     :message36877,
@@ -646,22 +687,25 @@ defmodule Benchmarks.GoogleMessage3.Message36876 do
   field :message36911, 126, optional: true, type: :group
   field :message36912, 152, optional: true, type: :group
   field :field37042, 155, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message1328 do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   @type t :: %__MODULE__{}
   defstruct []
+
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message6850 do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   @type t :: %__MODULE__{}
   defstruct []
+
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message6863 do
@@ -703,6 +747,7 @@ defmodule Benchmarks.GoogleMessage3.Message6863 do
           field6962: Benchmarks.GoogleMessage3.UnusedEmptyMessage.t() | nil,
           field6963: boolean
         }
+
   defstruct [
     :field6931,
     :field6932,
@@ -772,14 +817,16 @@ defmodule Benchmarks.GoogleMessage3.Message6863 do
   field :field6961, 29, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
   field :field6962, 33, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
   field :field6963, 34, optional: true, type: :bool
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message6871 do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   @type t :: %__MODULE__{}
   defstruct []
+
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message7547 do
@@ -790,10 +837,12 @@ defmodule Benchmarks.GoogleMessage3.Message7547 do
           field7549: binary,
           field7550: integer
         }
+
   defstruct [:field7549, :field7550]
 
   field :field7549, 1, required: true, type: :bytes
   field :field7550, 2, required: true, type: :int32
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message7648 do
@@ -814,6 +863,7 @@ defmodule Benchmarks.GoogleMessage3.Message7648 do
           field7679: boolean,
           field7680: boolean
         }
+
   defstruct [
     :field7669,
     :field7670,
@@ -841,14 +891,16 @@ defmodule Benchmarks.GoogleMessage3.Message7648 do
   field :field7678, 10, optional: true, type: :bool
   field :field7679, 11, optional: true, type: :bool
   field :field7680, 12, optional: true, type: :bool
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message7865 do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
   @type t :: %__MODULE__{}
   defstruct []
+
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message7928 do
@@ -859,10 +911,12 @@ defmodule Benchmarks.GoogleMessage3.Message7928 do
           field7940: String.t(),
           field7941: integer
         }
+
   defstruct [:field7940, :field7941]
 
   field :field7940, 1, optional: true, type: :string
   field :field7941, 2, optional: true, type: :int64
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message7919 do
@@ -874,11 +928,13 @@ defmodule Benchmarks.GoogleMessage3.Message7919 do
           field7932: integer,
           field7933: binary
         }
+
   defstruct [:field7931, :field7932, :field7933]
 
   field :field7931, 1, optional: true, type: :fixed64
   field :field7932, 2, optional: true, type: :int64
   field :field7933, 3, optional: true, type: :bytes
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message7920 do
@@ -889,10 +945,12 @@ defmodule Benchmarks.GoogleMessage3.Message7920 do
           field7934: integer,
           field7935: integer
         }
+
   defstruct [:field7934, :field7935]
 
   field :field7934, 1, optional: true, type: :int64
   field :field7935, 2, optional: true, type: :int64
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message7921 do
@@ -905,12 +963,14 @@ defmodule Benchmarks.GoogleMessage3.Message7921 do
           field7938: float | :infinity | :negative_infinity | :nan,
           field7939: Benchmarks.GoogleMessage3.UnusedEnum.t()
         }
+
   defstruct [:field7936, :field7937, :field7938, :field7939]
 
   field :field7936, 1, optional: true, type: :int32
   field :field7937, 2, optional: true, type: :int64
   field :field7938, 3, optional: true, type: :float
   field :field7939, 4, optional: true, type: Benchmarks.GoogleMessage3.UnusedEnum, enum: true
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message8511 do
@@ -924,6 +984,7 @@ defmodule Benchmarks.GoogleMessage3.Message8511 do
           field8542: integer,
           field8543: String.t()
         }
+
   defstruct [:field8539, :field8540, :field8541, :field8542, :field8543]
 
   field :field8539, 1, optional: true, type: Benchmarks.GoogleMessage3.Message8224
@@ -931,6 +992,7 @@ defmodule Benchmarks.GoogleMessage3.Message8511 do
   field :field8541, 3, optional: true, type: :bool
   field :field8542, 4, optional: true, type: :int64
   field :field8543, 5, optional: true, type: :string
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message8512 do
@@ -945,6 +1007,7 @@ defmodule Benchmarks.GoogleMessage3.Message8512 do
           field8548: integer,
           field8549: String.t()
         }
+
   defstruct [:field8544, :field8545, :field8546, :field8547, :field8548, :field8549]
 
   field :field8544, 1, optional: true, type: Benchmarks.GoogleMessage3.Message8301
@@ -953,6 +1016,7 @@ defmodule Benchmarks.GoogleMessage3.Message8512 do
   field :field8547, 4, optional: true, type: :bool
   field :field8548, 5, optional: true, type: :int64
   field :field8549, 6, optional: true, type: :string
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message8513 do
@@ -965,12 +1029,14 @@ defmodule Benchmarks.GoogleMessage3.Message8513 do
           field8552: boolean,
           field8553: String.t()
         }
+
   defstruct [:field8550, :field8551, :field8552, :field8553]
 
   field :field8550, 1, repeated: true, type: Benchmarks.GoogleMessage3.Message8392
   field :field8551, 2, optional: true, type: :string
   field :field8552, 3, optional: true, type: :bool
   field :field8553, 4, optional: true, type: :string
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message8514 do
@@ -984,6 +1050,7 @@ defmodule Benchmarks.GoogleMessage3.Message8514 do
           field8557: [Benchmarks.GoogleMessage3.Message8130.t()],
           field8558: String.t()
         }
+
   defstruct [:field8554, :field8555, :field8556, :field8557, :field8558]
 
   field :field8554, 1, optional: true, type: :string
@@ -991,6 +1058,7 @@ defmodule Benchmarks.GoogleMessage3.Message8514 do
   field :field8556, 3, optional: true, type: :bool
   field :field8557, 4, repeated: true, type: Benchmarks.GoogleMessage3.Message8130
   field :field8558, 5, optional: true, type: :string
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message8515 do
@@ -1002,11 +1070,13 @@ defmodule Benchmarks.GoogleMessage3.Message8515 do
           field8560: Benchmarks.GoogleMessage3.Message8478.t() | nil,
           field8561: String.t()
         }
+
   defstruct [:field8559, :field8560, :field8561]
 
   field :field8559, 1, optional: true, type: Benchmarks.GoogleMessage3.Message8479
   field :field8560, 2, optional: true, type: Benchmarks.GoogleMessage3.Message8478
   field :field8561, 3, optional: true, type: :string
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message10320 do
@@ -1022,6 +1092,7 @@ defmodule Benchmarks.GoogleMessage3.Message10320 do
           field10352: integer,
           field10353: Benchmarks.GoogleMessage3.Enum10337.t()
         }
+
   defstruct [
     :field10347,
     :field10348,
@@ -1039,6 +1110,7 @@ defmodule Benchmarks.GoogleMessage3.Message10320 do
   field :field10351, 5, optional: true, type: :int32
   field :field10352, 6, optional: true, type: :int32
   field :field10353, 7, optional: true, type: Benchmarks.GoogleMessage3.Enum10337, enum: true
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message10321 do
@@ -1050,11 +1122,13 @@ defmodule Benchmarks.GoogleMessage3.Message10321 do
           field10355: integer,
           field10356: non_neg_integer
         }
+
   defstruct [:field10354, :field10355, :field10356]
 
   field :field10354, 1, optional: true, type: :int32
   field :field10355, 2, optional: true, type: :int32
   field :field10356, 3, optional: true, type: :uint64
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message10322 do
@@ -1066,11 +1140,13 @@ defmodule Benchmarks.GoogleMessage3.Message10322 do
           field10358: boolean,
           field10359: boolean
         }
+
   defstruct [:field10357, :field10358, :field10359]
 
   field :field10357, 1, optional: true, type: Benchmarks.GoogleMessage3.Message4016
   field :field10358, 2, optional: true, type: :bool
   field :field10359, 3, optional: true, type: :bool
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message11988 do
@@ -1083,12 +1159,14 @@ defmodule Benchmarks.GoogleMessage3.Message11988 do
           field12023: Benchmarks.GoogleMessage3.UnusedEmptyMessage.t() | nil,
           field12024: Benchmarks.GoogleMessage3.Message10155.t() | nil
         }
+
   defstruct [:field12021, :field12022, :field12023, :field12024]
 
   field :field12021, 1, optional: true, type: :string
   field :field12022, 2, optional: true, type: :string
   field :field12023, 3, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
   field :field12024, 4, optional: true, type: Benchmarks.GoogleMessage3.Message10155
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message12668 do
@@ -1101,12 +1179,14 @@ defmodule Benchmarks.GoogleMessage3.Message12668 do
           field12679: integer,
           field12680: integer
         }
+
   defstruct [:field12677, :field12678, :field12679, :field12680]
 
   field :field12677, 1, repeated: true, type: Benchmarks.GoogleMessage3.Message12669
   field :field12678, 2, optional: true, type: :int32
   field :field12679, 3, optional: true, type: :int32
   field :field12680, 4, optional: true, type: :int32
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message12825 do
@@ -1122,6 +1202,7 @@ defmodule Benchmarks.GoogleMessage3.Message12825 do
           field12867: [Benchmarks.GoogleMessage3.Message12821.t()],
           field12868: [Benchmarks.GoogleMessage3.UnusedEmptyMessage.t()]
         }
+
   defstruct [
     :field12862,
     :field12863,
@@ -1139,6 +1220,7 @@ defmodule Benchmarks.GoogleMessage3.Message12825 do
   field :field12866, 5, optional: true, type: :int32
   field :field12867, 6, repeated: true, type: Benchmarks.GoogleMessage3.Message12821
   field :field12868, 7, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message16478 do
@@ -1150,11 +1232,13 @@ defmodule Benchmarks.GoogleMessage3.Message16478 do
           field16482: boolean,
           field16483: integer
         }
+
   defstruct [:field16481, :field16482, :field16483]
 
   field :field16481, 1, repeated: true, type: Benchmarks.GoogleMessage3.Message16479
   field :field16482, 3, optional: true, type: :bool
   field :field16483, 2, optional: true, type: :int32
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message16552 do
@@ -1166,11 +1250,13 @@ defmodule Benchmarks.GoogleMessage3.Message16552 do
           field16566: integer,
           field16567: Benchmarks.GoogleMessage3.Enum16553.t()
         }
+
   defstruct [:field16565, :field16566, :field16567]
 
   field :field16565, 1, optional: true, type: :fixed64
   field :field16566, 2, optional: true, type: :int32
   field :field16567, 3, optional: true, type: Benchmarks.GoogleMessage3.Enum16553, enum: true
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message16660 do
@@ -1182,11 +1268,13 @@ defmodule Benchmarks.GoogleMessage3.Message16660 do
           field16669: String.t(),
           field16670: integer
         }
+
   defstruct [:field16668, :field16669, :field16670]
 
   field :field16668, 1, optional: true, type: :string
   field :field16669, 2, optional: true, type: :string
   field :field16670, 3, optional: true, type: :int32
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message16727 do
@@ -1220,6 +1308,7 @@ defmodule Benchmarks.GoogleMessage3.Message16727 do
           field16805: Benchmarks.GoogleMessage3.UnusedEmptyMessage.t() | nil,
           __pb_extensions__: map
         }
+
   defstruct [
     :field16782,
     :field16783,
@@ -1272,6 +1361,7 @@ defmodule Benchmarks.GoogleMessage3.Message16727 do
   field :field16803, 20, optional: true, type: Benchmarks.GoogleMessage3.Message16724
   field :field16804, 22, optional: true, type: :bool
   field :field16805, 25, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
+  def transform_module(), do: nil
 
   extensions [{1000, 536_870_912}]
 end
@@ -1284,10 +1374,12 @@ defmodule Benchmarks.GoogleMessage3.Message16725 do
           field16774: Benchmarks.GoogleMessage3.Enum16728.t(),
           field16775: [String.t()]
         }
+
   defstruct [:field16774, :field16775]
 
   field :field16774, 1, optional: true, type: Benchmarks.GoogleMessage3.Enum16728, enum: true
   field :field16775, 2, repeated: true, type: :string
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message17726 do
@@ -1318,6 +1410,7 @@ defmodule Benchmarks.GoogleMessage3.Message17726 do
           field17821: [Benchmarks.GoogleMessage3.Message17728.t()],
           field17822: [Benchmarks.GoogleMessage3.UnusedEmptyMessage.t()]
         }
+
   defstruct [
     :field17801,
     :field17802,
@@ -1365,6 +1458,7 @@ defmodule Benchmarks.GoogleMessage3.Message17726 do
   field :field17820, 20, repeated: true, type: Benchmarks.GoogleMessage3.Message17728
   field :field17821, 21, repeated: true, type: Benchmarks.GoogleMessage3.Message17728
   field :field17822, 30, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message17782 do
@@ -1375,10 +1469,12 @@ defmodule Benchmarks.GoogleMessage3.Message17782 do
           field18153: String.t(),
           field18154: String.t()
         }
+
   defstruct [:field18153, :field18154]
 
   field :field18153, 1, optional: true, type: :string
   field :field18154, 2, optional: true, type: :string
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message17783.Message17784 do
@@ -1393,6 +1489,7 @@ defmodule Benchmarks.GoogleMessage3.Message17783.Message17784 do
           field18166: String.t(),
           field18167: String.t()
         }
+
   defstruct [:field18162, :field18163, :field18164, :field18165, :field18166, :field18167]
 
   field :field18162, 5, optional: true, type: :string
@@ -1401,6 +1498,7 @@ defmodule Benchmarks.GoogleMessage3.Message17783.Message17784 do
   field :field18165, 8, repeated: true, type: :string
   field :field18166, 17, optional: true, type: :string
   field :field18167, 18, optional: true, type: :string
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message17783.Message17785 do
@@ -1415,6 +1513,7 @@ defmodule Benchmarks.GoogleMessage3.Message17783.Message17785 do
           field18172: String.t(),
           field18173: [String.t()]
         }
+
   defstruct [:field18168, :field18169, :field18170, :field18171, :field18172, :field18173]
 
   field :field18168, 10, optional: true, type: :string
@@ -1423,6 +1522,7 @@ defmodule Benchmarks.GoogleMessage3.Message17783.Message17785 do
   field :field18171, 13, optional: true, type: :string
   field :field18172, 14, optional: true, type: :string
   field :field18173, 15, repeated: true, type: :string
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message17783 do
@@ -1437,6 +1537,7 @@ defmodule Benchmarks.GoogleMessage3.Message17783 do
           message17785: [any],
           field18160: [String.t()]
         }
+
   defstruct [:field18155, :field18156, :field18157, :message17784, :message17785, :field18160]
 
   field :field18155, 1, optional: true, type: :string
@@ -1445,6 +1546,7 @@ defmodule Benchmarks.GoogleMessage3.Message17783 do
   field :message17784, 4, repeated: true, type: :group
   field :message17785, 9, repeated: true, type: :group
   field :field18160, 16, repeated: true, type: :string
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.GoogleMessage3.Message16945 do
@@ -1533,6 +1635,7 @@ defmodule Benchmarks.GoogleMessage3.Message16945 do
           field17024: [String.t()],
           __pb_extensions__: map
         }
+
   defstruct [
     :field16946,
     :field16947,
@@ -1695,6 +1798,7 @@ defmodule Benchmarks.GoogleMessage3.Message16945 do
   field :field17022, 101, repeated: true, type: :string
   field :field17023, 102, repeated: true, type: Benchmarks.GoogleMessage3.Message0
   field :field17024, 274, repeated: true, type: :string
+  def transform_module(), do: nil
 
   extensions [
     {17, 18},

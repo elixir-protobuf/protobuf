@@ -45,6 +45,7 @@ defmodule Benchmarks.Proto2.GoogleMessage1 do
           field129: String.t(),
           field131: integer
         }
+
   defstruct [
     :field1,
     :field9,
@@ -130,6 +131,7 @@ defmodule Benchmarks.Proto2.GoogleMessage1 do
   field :field128, 128, optional: true, type: :int32, default: 0
   field :field129, 129, optional: true, type: :string, default: "xxxxxxxxxxxxxxxxxxxxx"
   field :field131, 131, optional: true, type: :int32, default: 0
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.Proto2.GoogleMessage1SubMessage do
@@ -158,6 +160,7 @@ defmodule Benchmarks.Proto2.GoogleMessage1SubMessage do
           field207: non_neg_integer,
           field300: non_neg_integer
         }
+
   defstruct [
     :field1,
     :field2,
@@ -201,4 +204,5 @@ defmodule Benchmarks.Proto2.GoogleMessage1SubMessage do
   field :field205, 205, optional: true, type: :string
   field :field207, 207, optional: true, type: :uint64
   field :field300, 300, optional: true, type: :uint64
+  def transform_module(), do: nil
 end

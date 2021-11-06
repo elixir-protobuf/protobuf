@@ -20,6 +20,7 @@ defmodule Benchmarks.Proto2.GoogleMessage2.Group1 do
           field24: String.t(),
           field31: Benchmarks.Proto2.GoogleMessage2GroupedMessage.t() | nil
         }
+
   defstruct [
     :field11,
     :field26,
@@ -55,6 +56,7 @@ defmodule Benchmarks.Proto2.GoogleMessage2.Group1 do
   field :field20, 20, optional: true, type: :int32, default: 0
   field :field24, 24, optional: true, type: :string
   field :field31, 31, optional: true, type: Benchmarks.Proto2.GoogleMessage2GroupedMessage
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.Proto2.GoogleMessage2 do
@@ -93,6 +95,7 @@ defmodule Benchmarks.Proto2.GoogleMessage2 do
           field205: boolean,
           field206: boolean
         }
+
   defstruct [
     :field1,
     :field3,
@@ -156,6 +159,7 @@ defmodule Benchmarks.Proto2.GoogleMessage2 do
   field :field130, 130, repeated: true, type: :int64
   field :field205, 205, optional: true, type: :bool, default: false
   field :field206, 206, optional: true, type: :bool, default: false
+  def transform_module(), do: nil
 end
 
 defmodule Benchmarks.Proto2.GoogleMessage2GroupedMessage do
@@ -175,6 +179,7 @@ defmodule Benchmarks.Proto2.GoogleMessage2GroupedMessage do
           field10: float | :infinity | :negative_infinity | :nan,
           field11: integer
         }
+
   defstruct [
     :field1,
     :field2,
@@ -200,4 +205,5 @@ defmodule Benchmarks.Proto2.GoogleMessage2GroupedMessage do
   field :field9, 9, optional: true, type: :bool
   field :field10, 10, optional: true, type: :float
   field :field11, 11, optional: true, type: :int64
+  def transform_module(), do: nil
 end
