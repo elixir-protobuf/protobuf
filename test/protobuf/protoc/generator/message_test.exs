@@ -113,17 +113,32 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
             number: 3,
             type: :TYPE_INT32,
             label: :LABEL_REPEATED
-          )
+          ),
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "d",
+            json_name: "d",
+            number: 4,
+            type: :TYPE_BOOL,
+            label: :LABEL_OPTIONAL
+          ),
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "e",
+            json_name: "e",
+            number: 5,
+            type: :TYPE_BYTES,
+            label: :LABEL_OPTIONAL
+          ),
         ]
       )
 
     {[], [msg]} = Generator.generate(ctx, desc)
-    assert msg =~ "defstruct [a: 0, b: \"\", c: []]\n"
+    assert msg =~ ~s(defstruct [a: 0, b: "", c: [], d: false, e: ""]\n)
     assert msg =~ "a: integer"
     assert msg =~ "b: String.t()"
     assert msg =~ "field :a, 1, type: :int32\n"
     assert msg =~ "field :b, 2, type: :string\n"
     assert msg =~ "field :c, 3, repeated: true, type: :int32\n"
+    assert msg =~ "field :d, 4, type: :bool"
   end
 
   test "generate/2 supports option :default" do

@@ -113,27 +113,32 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   def structs_str(ctx, desc, extensions) do
     oneof_fields = Enum.map(desc.oneof_decl, &{&1.name, nil})
-    proto3? = ctx.syntax == :proto3
 
     fields =
       for f <- desc.field,
           !f.oneof_index,
-          do: {f.name, struct_default_value(f, proto3?)}
+          do: {f.name, struct_default_value(f, ctx.syntax)}
 
     extensions = if Enum.empty?(extensions), do: [], else: [{:__pb_extensions__, nil}]
 
     Enum.map_join(oneof_fields ++ fields ++ extensions, ", ", fn {name, default_value} ->
-      "#{name}: #{default_value || inspect(nil)}"
+      default_value =
+        case default_value do
+          nil -> "nil"
+          other -> to_string(other)
+        end
+
+      "#{name}: #{default_value}"
     end)
   end
 
-  defp struct_default_value(%{default_value: nil, label: :LABEL_REPEATED} = _field, _proto3?),
+  defp struct_default_value(%{default_value: nil, label: :LABEL_REPEATED} = _field, _syntax),
     do: "[]"
 
-  defp struct_default_value(%{type: type, default_value: nil} = _field, true = _proto3?),
+  defp struct_default_value(%{type: type, default_value: nil} = _field, _syntax = :proto3),
     do: type |> TypeUtil.from_enum() |> Protobuf.Builder.type_default() |> inspect()
 
-  defp struct_default_value(%{type: type, default_value: default_value} = _field, _proto3?),
+  defp struct_default_value(%{type: type, default_value: default_value} = _field, _syntax),
     do: default_value(type, default_value)
 
   def typespec_str([], [], []), do: "  @type t :: %__MODULE__{}\n"
