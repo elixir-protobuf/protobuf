@@ -19,4 +19,14 @@ defmodule Protobuf.JSONTest do
     json = ~S|{"string":"   \xff   "}|
     assert {:error, %Jason.DecodeError{}} = Protobuf.JSON.decode(json, Scalars)
   end
+
+  describe "bang variants of encode and decode" do
+    test "decode!/2" do
+      json = ~S|{"string":"   \xff   "}|
+
+      assert_raise Jason.DecodeError, fn ->
+        Protobuf.JSON.decode!(json, Scalars)
+      end
+    end
+  end
 end
