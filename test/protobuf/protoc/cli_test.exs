@@ -2,11 +2,28 @@ defmodule Protobuf.Protoc.CLITest do
   use ExUnit.Case, async: true
 
   import Protobuf.Protoc.CLI
+  import ExUnit.CaptureIO
 
   alias Protobuf.Protoc.Context
   alias Google.Protobuf.FileDescriptorProto
   alias Google.Protobuf.DescriptorProto
   alias Google.Protobuf.EnumDescriptorProto
+
+  describe "main/1" do
+    test "--version" do
+      assert capture_io(fn ->
+               main(["--version"])
+             end) == Mix.Project.config()[:version] <> "\n"
+    end
+
+    test "--help" do
+      for flag <- ["--help", "-h"] do
+        assert capture_io(fn ->
+                 main([flag])
+               end) =~ "`protoc` plugin for generating Elixir code"
+      end
+    end
+  end
 
   describe "parse_params/2" do
     test "parses all the right parameters, regardless of the order" do
@@ -28,6 +45,10 @@ defmodule Protobuf.Protoc.CLITest do
                package_prefix: "elixir.protobuf",
                transform_module: My.Transform.Module
              }
+    end
+
+    test "ignores unknown parameters" do
+      assert parse_params(%Context{}, "unknown=true") == %Context{}
     end
   end
 
