@@ -14,15 +14,6 @@ defmodule Protobuf.Protoc.Generator.Service do
     trim: true
   )
 
-  @spec generate_list(Context.t(), [Google.Protobuf.ServiceDescriptorProto.t()]) :: [String.t()]
-  def generate_list(%Context{} = ctx, descs) when is_list(descs) do
-    if Enum.member?(ctx.plugins, "grpc") do
-      Enum.map(descs, fn desc -> generate(ctx, desc) end)
-    else
-      []
-    end
-  end
-
   @spec generate(Context.t(), Google.Protobuf.ServiceDescriptorProto.t()) :: String.t()
   def generate(%Context{} = ctx, %Google.Protobuf.ServiceDescriptorProto{} = desc) do
     # service can't be nested

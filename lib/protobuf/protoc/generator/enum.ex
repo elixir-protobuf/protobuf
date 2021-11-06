@@ -14,11 +14,6 @@ defmodule Protobuf.Protoc.Generator.Enum do
     trim: true
   )
 
-  @spec generate_list(Context.t(), [Google.Protobuf.EnumDescriptorProto.t()]) :: [String.t()]
-  def generate_list(%Context{} = ctx, descs) when is_list(descs) do
-    Enum.map(descs, &generate(ctx, &1))
-  end
-
   @spec generate(Context.t(), Google.Protobuf.EnumDescriptorProto.t()) :: String.t()
   def generate(%Context{namespace: ns} = ctx, %Google.Protobuf.EnumDescriptorProto{} = desc) do
     msg_name = Util.mod_name(ctx, ns ++ [Macro.camelize(desc.name)])

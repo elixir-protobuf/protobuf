@@ -35,13 +35,19 @@ defmodule Protobuf.Protoc.Generator do
       ExtensionGenerator.get_nested_extensions(ctx, desc.message_type)
       |> Enum.reverse()
 
-    enum_defmodules = EnumGenerator.generate_list(ctx, desc.enum_type)
+    enum_defmodules = Enum.map(desc.enum_type, &EnumGenerator.generate(ctx, &1))
 
     {nested_enum_defmodules, message_defmodules} =
       MessageGenerator.generate_list(ctx, desc.message_type)
 
-    service_defmodules = ServiceGenerator.generate_list(ctx, desc.service)
     extension_defmodules = ExtensionGenerator.generate(ctx, desc, nested_extensions)
+
+    service_defmodules =
+      if "grpc" in ctx.plugins do
+        Enum.map(desc.service, &ServiceGenerator.generate(ctx, &1))
+      else
+        []
+      end
 
     [
       enum_defmodules,
