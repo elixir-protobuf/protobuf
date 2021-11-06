@@ -1,5 +1,7 @@
 defmodule Protobuf.Protoc.Generator.Message do
   @moduledoc false
+
+  alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator.Util
   alias Protobuf.TypeUtil
   alias Protobuf.Protoc.Generator.Enum, as: EnumGenerator
@@ -10,40 +12,38 @@ defmodule Protobuf.Protoc.Generator.Message do
     :defp,
     :message_template,
     Path.expand("./templates/message.ex.eex", :code.priv_dir(:protobuf)),
-    [
-      :name,
-      :options,
-      :struct_fields,
-      :typespec,
-      :oneofs,
-      :fields,
-      :desc,
-      :transform_module,
-      :extensions
-    ],
+    [:assigns],
     trim: true
   )
 
-  def generate_list(ctx, descs) do
+  @spec generate_list(Context.t(), [Google.Protobuf.DescriptorProto.t()]) :: {any(), any()}
+  def generate_list(%Context{} = ctx, descs) when is_list(descs) do
     descs
     |> Enum.map(fn desc -> generate(ctx, desc) end)
     |> Enum.unzip()
   end
 
-  def generate(ctx, desc) do
+  @spec generate(Context.t(), Google.Protobuf.DescriptorProto.t()) :: {any(), any()}
+  def generate(%Context{} = ctx, %Google.Protobuf.DescriptorProto{} = desc) do
     msg_struct = parse_desc(ctx, desc)
-    ctx = %{ctx | namespace: msg_struct[:new_namespace]}
+    ctx = %Context{ctx | namespace: msg_struct[:new_namespace]}
     {nested_enums, nested_msgs} = Enum.unzip(gen_nested_msgs(ctx, desc))
 
     {gen_nested_enums(ctx, desc) ++ nested_enums,
      nested_msgs ++ [gen_msg(ctx.syntax, msg_struct)]}
   end
 
-  def parse_desc(%{namespace: ns} = ctx, desc) do
+  defp parse_desc(%Context{namespace: ns} = ctx, desc) do
     new_ns = ns ++ [Macro.camelize(desc.name)]
     fields = get_fields(ctx, desc)
     extensions = get_extensions(desc)
-    generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
+
+    descriptor_fun_body =
+      if ctx.gen_descriptors? do
+        descriptor_fun_body(desc)
+      else
+        nil
+      end
 
     %{
       new_namespace: new_ns,
@@ -53,7 +53,7 @@ defmodule Protobuf.Protoc.Generator.Message do
       typespec: typespec_str(fields, desc.oneof_decl, extensions),
       fields: fields,
       oneofs: oneofs_str(desc.oneof_decl),
-      desc: generate_desc,
+      descriptor_fun_body: descriptor_fun_body,
       transform_module: ctx.transform_module,
       extensions: extensions
     }
@@ -61,15 +61,15 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   defp gen_msg(syntax, msg_struct) do
     message_template(
-      msg_struct[:name],
-      msg_struct[:options],
-      msg_struct[:structs],
-      msg_struct[:typespec],
-      msg_struct[:oneofs],
-      gen_fields(syntax, msg_struct[:fields]),
-      msg_struct[:desc],
-      msg_struct[:transform_module],
-      gen_extensions(msg_struct[:extensions])
+      module: msg_struct[:name],
+      use_options: msg_struct[:options],
+      struct_fields: msg_struct[:structs],
+      typespec: msg_struct[:typespec],
+      oneofs: msg_struct[:oneofs],
+      fields: gen_fields(syntax, msg_struct[:fields]),
+      descriptor_fun_body: msg_struct[:descriptor_fun_body],
+      transform_module: msg_struct[:transform_module],
+      extensions: gen_extensions(msg_struct[:extensions])
     )
   end
 
@@ -124,10 +124,15 @@ defmodule Protobuf.Protoc.Generator.Message do
     Enum.map_join(struct.oneof_decl ++ fields, ", ", fn f -> ":#{f.name}" end)
   end
 
-  def typespec_str([], [], []), do: "  @type t :: %__MODULE__{}\n"
-  def typespec_str([], [], [_ | _]), do: "  @type t :: %__MODULE__{__pb_extensions__: map}\n"
+  defp typespec_str(_fields = [], _oneofs = [], _extensions = []) do
+    "%__MODULE__{}"
+  end
 
-  def typespec_str(fields, oneofs, extensions) do
+  defp typespec_str(_fields = [], _oneofs = [], _extensions = [_ | _]) do
+    "%__MODULE__{__pb_extensions__: map}"
+  end
+
+  defp typespec_str(fields, oneofs, extensions) do
     longest_width = fields |> Enum.map(&String.length(&1.name)) |> Enum.max()
 
     {oneof_fields, regular_fields} = Enum.split_with(fields, & &1[:oneof])
@@ -138,10 +143,11 @@ defmodule Protobuf.Protoc.Generator.Message do
 
     types = oneof_types ++ regular_types ++ extensions_types
 
-    "  @type t :: %__MODULE__{\n" <>
-      Enum.map_join(types, ",\n", fn {k, v} ->
-        "    #{k} #{v}"
-      end) <> "\n  }\n"
+    """
+    %__MODULE__{
+      #{Enum.map_join(types, ",\n", fn {k, v} -> "    #{k} #{v}" end)}
+    }
+    """
   end
 
   defp oneof_types(oneofs, oneof_fields, longest_width) do
@@ -206,10 +212,10 @@ defmodule Protobuf.Protoc.Generator.Message do
   defp optional_if_message(:TYPE_MESSAGE, spec), do: "#{spec} | nil"
   defp optional_if_message(_type_others, spec), do: spec
 
-  def get_fields(ctx, desc) do
+  defp get_fields(ctx, desc) do
     oneofs = Enum.map(desc.oneof_decl, & &1.name)
     nested_maps = nested_maps(ctx, desc)
-    Enum.map(desc.field, fn f -> get_field(ctx, f, nested_maps, oneofs) end)
+    for field <- desc.field, do: get_field(ctx, field, nested_maps, oneofs)
   end
 
   def get_field(ctx, f, nested_maps, oneofs) do
@@ -218,7 +224,11 @@ defmodule Protobuf.Protoc.Generator.Message do
     opts = if map, do: Map.put(opts, :map, true), else: opts
 
     opts =
-      if length(oneofs) > 0 && f.oneof_index, do: Map.put(opts, :oneof, f.oneof_index), else: opts
+      if oneofs != [] && f.oneof_index do
+        Map.put(opts, :oneof, f.oneof_index)
+      else
+        opts
+      end
 
     opts_str = Util.options_to_str(opts)
     opts_str = if opts_str == "", do: "", else: ", " <> opts_str
@@ -331,6 +341,16 @@ defmodule Protobuf.Protoc.Generator.Message do
     opts
     |> Map.put(:packed, f.options.packed)
     |> Map.put(:deprecated, f.options.deprecated)
+  end
+
+  defp descriptor_fun_body(%mod{} = desc) do
+    desc
+    |> Map.from_struct()
+    |> Enum.filter(fn {_key, val} -> not is_nil(val) end)
+    |> mod.new()
+    |> mod.encode()
+    |> mod.decode()
+    |> inspect(limit: :infinity)
   end
 
   # Omit `json_name` from the options list when it matches the original field

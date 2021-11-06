@@ -1,28 +1,26 @@
-defmodule <%= name %> do
+defmodule <%= @module %> do
   @moduledoc false
-  use Protobuf<%= options %>
+  use Protobuf<%= @use_options %>
 
-  <%= typespec %>
-  defstruct [<%= struct_fields %>]
+  @type t :: <%= @typespec %>
+  defstruct [<%= @struct_fields %>]
 
-  <%= if not is_nil(desc) do %>
+  <%= if @descriptor_fun_body do %>
   def descriptor do
     # credo:disable-for-next-line
-    <%= desc.__struct__ %>.decode(
-      <%= desc.__struct__.encode(desc |> Map.from_struct() |> Enum.filter(fn {_, x} -> x != nil end) |> desc.__struct__.new()) |> inspect(limit: :infinity) %>
-    )
+    <%= @descriptor_fun_body %>
   end
   <% end %>
 
-<%= for v <- oneofs do %>  <%= v %>
-<% end %>
+  <%= for v <- @oneofs do %>
+  <%= v %><% end %>
 
-<%= for f <- fields do %>  field <%= f %>
-<% end %>
+  <%= for f <- @fields do %>
+  field <%= f %><% end %>
 
-  def transform_module(), do: <%= inspect(transform_module) %>
+  def transform_module(), do: <%= inspect(@transform_module) %>
 
-  <%= if not is_nil(extensions) do %>
-  extensions <%= extensions %>
+  <%= if @extensions do %>
+  extensions <%= @extensions %>
   <% end %>
 end
