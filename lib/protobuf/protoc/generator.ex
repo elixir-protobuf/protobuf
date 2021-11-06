@@ -22,38 +22,41 @@ defmodule Protobuf.Protoc.Generator do
   end
 
   defp generate_content(ctx, desc) do
-    ctx = %Context{
-      ctx
-      | syntax: syntax(desc.syntax),
-        package: desc.package || "",
-        dep_type_mapping: get_dep_type_mapping(ctx, desc.dependency, desc.name)
-    }
-
-    ctx = Protobuf.Protoc.Context.custom_file_options_from_file_desc(ctx, desc)
+    ctx =
+      %Context{
+        ctx
+        | syntax: syntax(desc.syntax),
+          package: desc.package || "",
+          dep_type_mapping: get_dep_type_mapping(ctx, desc.dependency, desc.name)
+      }
+      |> Protobuf.Protoc.Context.custom_file_options_from_file_desc(desc)
 
     nested_extensions =
       ExtensionGenerator.get_nested_extensions(ctx, desc.message_type)
       |> Enum.reverse()
 
-    enum_list = EnumGenerator.generate_list(ctx, desc.enum_type)
-    {enums, msgs} = MessageGenerator.generate_list(ctx, desc.message_type)
-    service_list = ServiceGenerator.generate_list(ctx, desc.service)
-    extension_list = ExtensionGenerator.generate(ctx, desc, nested_extensions)
+    enum_defmodules = EnumGenerator.generate_list(ctx, desc.enum_type)
 
-    [enum_list, enums, msgs, service_list, extension_list]
+    {nested_enum_defmodules, message_defmodules} =
+      MessageGenerator.generate_list(ctx, desc.message_type)
+
+    service_defmodules = ServiceGenerator.generate_list(ctx, desc.service)
+    extension_defmodules = ExtensionGenerator.generate(ctx, desc, nested_extensions)
+
+    [
+      enum_defmodules,
+      nested_enum_defmodules,
+      message_defmodules,
+      service_defmodules,
+      extension_defmodules
+    ]
     |> List.flatten()
     |> Enum.join("\n")
-    |> format_code()
+    |> format_code_if_possible()
+    |> append_newline_if_not_empty()
   end
 
-  @doc false
-  def get_dep_pkgs(%{pkg_mapping: mapping, package: pkg}, deps) do
-    pkgs = deps |> Enum.map(fn dep -> mapping[dep] end)
-    pkgs = if pkg && String.length(pkg) > 0, do: [pkg | pkgs], else: pkgs
-    Enum.sort(pkgs, &(byte_size(&2) <= byte_size(&1)))
-  end
-
-  def get_dep_type_mapping(%{global_type_mapping: global_mapping}, deps, file_name) do
+  defp get_dep_type_mapping(%Context{global_type_mapping: global_mapping}, deps, file_name) do
     mapping =
       Enum.reduce(deps, %{}, fn dep, acc ->
         Map.merge(acc, global_mapping[dep])
@@ -65,20 +68,16 @@ defmodule Protobuf.Protoc.Generator do
   defp syntax("proto3"), do: :proto3
   defp syntax(_), do: :proto2
 
-  defp format_code(code) do
-    formatted =
-      if Code.ensure_loaded?(Code) and function_exported?(Code, :format_string!, 2) do
-        code
-        |> Code.format_string!(locals_without_parens: @locals_without_parens)
-        |> IO.iodata_to_binary()
-      else
-        code
-      end
-
-    if formatted == "" do
-      formatted
+  defp format_code_if_possible(code) do
+    if Code.ensure_loaded?(Code) and function_exported?(Code, :format_string!, 2) do
+      code
+      |> Code.format_string!(locals_without_parens: @locals_without_parens)
+      |> IO.iodata_to_binary()
     else
-      formatted <> "\n"
+      code
     end
   end
+
+  defp append_newline_if_not_empty(""), do: ""
+  defp append_newline_if_not_empty(str), do: str <> "\n"
 end
