@@ -10,7 +10,7 @@ defmodule Protobuf.Protoc.Generator.Service do
     :defp,
     :service_template,
     Path.expand("./templates/service.ex.eex", :code.priv_dir(:protobuf)),
-    [:mod_name, :name, :methods, :desc],
+    [:mod_name, :name, :methods, :descriptor_fun_body],
     trim: true
   )
 
@@ -29,8 +29,15 @@ defmodule Protobuf.Protoc.Generator.Service do
     mod_name = Util.mod_name(ctx, [Macro.camelize(desc.name)])
     name = Util.attach_raw_pkg(desc.name, ctx.package)
     methods = Enum.map(desc.method, &generate_service_method(ctx, &1))
-    generate_desc = if ctx.gen_descriptors?, do: desc, else: nil
-    service_template(mod_name, name, methods, generate_desc)
+
+    descriptor_fun_body =
+      if ctx.gen_descriptors? do
+        descriptor_fun_body(desc)
+      else
+        nil
+      end
+
+    service_template(mod_name, name, methods, descriptor_fun_body)
   end
 
   defp generate_service_method(ctx, method) do
@@ -39,9 +46,19 @@ defmodule Protobuf.Protoc.Generator.Service do
     output =
       service_arg(Util.type_from_type_name(ctx, method.output_type), method.server_streaming)
 
-    ":#{method.name}, #{input}, #{output}"
+    {method.name, input, output}
   end
 
   defp service_arg(type, _streaming? = true), do: "stream(#{type})"
   defp service_arg(type, _streaming?), do: type
+
+  defp descriptor_fun_body(%mod{} = desc) do
+    desc
+    |> Map.from_struct()
+    |> Enum.filter(fn {_key, val} -> not is_nil(val) end)
+    |> mod.new()
+    |> mod.encode()
+    |> mod.decode()
+    |> inspect(limit: :infinity)
+  end
 end
