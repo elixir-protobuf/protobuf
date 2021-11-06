@@ -201,6 +201,6 @@ task. Make sure you have built the `protoc-gen-elixir` binary first with `mix es
 ```console
 $ cd protobuf-elixir
 $ export PROTO_BENCH=<protobuf-install-root>/benchmarks
-$ make gen-bench-protos
+$ mix gen_bench_protos
 protoc -I ~/protobuf/benchmarks --elixir_out=bench/lib --plugin=./protoc-gen-elixir benchmarks.proto ... datasets/google_message4/benchmark_message4_3.proto
 ```

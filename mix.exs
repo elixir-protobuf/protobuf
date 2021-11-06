@@ -20,7 +20,8 @@ defmodule Protobuf.Mixfile do
       escript: escript(),
       description: @description,
       package: package(),
-      docs: docs()
+      docs: docs(),
+      aliases: aliases()
     ]
   end
 
@@ -73,6 +74,58 @@ defmodule Protobuf.Mixfile do
       main: "readme",
       source_url: @source_url,
       source_ref: "v#{@version}"
+    ]
+  end
+
+  defp aliases do
+    [
+      gen_test_protos: [
+        "escript.build",
+        "cmd protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/extension.proto",
+        "cmd protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --elixir_opt=package_prefix=my --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/test.proto",
+        "cmd protoc -I src --elixir_out=lib --plugin=./protoc-gen-elixir elixirpb.proto"
+      ],
+      # $PROTO_LIB should be your local path to https://github.com/google/protobuf/tree/master/src/google/protobuf
+      gen_google_protos: [
+        "escript.build",
+        require_env_variable("PROTO_LIB"),
+        "cmd protoc -I $PROTO_LIB --elixir_out=lib/google --plugin=./protoc-gen-elixir descriptor.proto",
+        "cmd protoc -I $PROTO_LIB --elixir_out=lib/google --plugin=./protoc-gen-elixir compiler/plugin.proto"
+      ],
+      # $PROTO_BENCH should be your local path to https://github.com/google/protobuf/tree/master/benchmarks
+      gen_bench_protos: [
+        "escript.build",
+        require_env_variable("PROTO_BENCH"),
+        "cmd protoc -I $PROTO_BENCH --elixir_out=bench/lib --plugin=./protoc-gen-elixir #{Enum.join(benchmark_proto_files(), " ")}"
+      ]
+    ]
+  end
+
+  defp require_env_variable(var) do
+    fn _args ->
+      System.get_env("#{var}") || Mix.raise("$#{var} not set")
+    end
+  end
+
+  defp benchmark_proto_files do
+    [
+      "benchmarks.proto",
+      "datasets/google_message1/proto3/benchmark_message1_proto3.proto",
+      "datasets/google_message1/proto2/benchmark_message1_proto2.proto",
+      "datasets/google_message2/benchmark_message2.proto",
+      "datasets/google_message3/benchmark_message3.proto",
+      "datasets/google_message3/benchmark_message3_1.proto",
+      "datasets/google_message3/benchmark_message3_2.proto",
+      "datasets/google_message3/benchmark_message3_3.proto",
+      "datasets/google_message3/benchmark_message3_4.proto",
+      "datasets/google_message3/benchmark_message3_5.proto",
+      "datasets/google_message3/benchmark_message3_6.proto",
+      "datasets/google_message3/benchmark_message3_7.proto",
+      "datasets/google_message3/benchmark_message3_8.proto",
+      "datasets/google_message4/benchmark_message4.proto",
+      "datasets/google_message4/benchmark_message4_1.proto",
+      "datasets/google_message4/benchmark_message4_2.proto",
+      "datasets/google_message4/benchmark_message4_3.proto"
     ]
   end
 end

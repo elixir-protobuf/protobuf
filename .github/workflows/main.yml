@@ -60,8 +60,7 @@ jobs:
       - name: Compile .proto files to Elixir with protoc
         if: ${{matrix.integration}}
         run: |
-          make clean
-          make gen-protos
+          mix gen_test_protos
 
       - name: Run integration tests
         if: ${{matrix.integration}}
