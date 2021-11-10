@@ -9,35 +9,18 @@ defmodule Protobuf.Protoc.Generator do
   @spec generate(Context.t(), %Google.Protobuf.FileDescriptorProto{}) ::
           [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()]
   def generate(%Context{} = ctx, %Google.Protobuf.FileDescriptorProto{} = desc) do
-    module_definitions = generate_module_definitions(ctx, desc)
-
-    if ctx.one_file_per_module? == false do
-      # desc.name is the filename, ending in ".proto".
-      name = Path.rootname(desc.name) <> ".pb.ex"
-
-      content =
-        module_definitions
-        |> Enum.reject(&is_nil/1)
-        |> Enum.map(fn {_mod_name, contents} -> contents end)
-        |> Enum.join("\n")
-        |> format_code_if_possible()
-        |> append_newline_if_not_empty()
-
-      [
-        Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(
-          name: name,
-          content: content
-        )
-      ]
-    else
-      module_definitions
-      |> Enum.reject(&is_nil/1)
-      |> Enum.map(fn {mod_name, content} ->
-        content =
-          content
+    module_definitions =
+      for {mod_name, contents} <- generate_module_definitions(ctx, desc) do
+        contents =
+          contents
           |> format_code_if_possible()
           |> append_newline_if_not_empty()
 
+        {mod_name, contents}
+      end
+
+    if ctx.one_file_per_module? do
+      Enum.map(module_definitions, fn {mod_name, content} ->
         file_name = Macro.underscore(mod_name) <> ".pb.ex"
 
         Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(
@@ -45,6 +28,17 @@ defmodule Protobuf.Protoc.Generator do
           content: content
         )
       end)
+    else
+      # desc.name is the filename, ending in ".proto".
+      file_name = Path.rootname(desc.name) <> ".pb.ex"
+      content = Enum.map_join(module_definitions, "\n", fn {_mod_name, contents} -> contents end)
+
+      [
+        Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(
+          name: file_name,
+          content: content
+        )
+      ]
     end
   end
 
