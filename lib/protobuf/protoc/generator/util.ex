@@ -7,22 +7,22 @@ defmodule Protobuf.Protoc.Generator.Util do
 
   @spec mod_name(Context.t(), [String.t()]) :: String.t()
   def mod_name(%Context{} = ctx, ns) when is_list(ns) do
-    prefix = prefixed_name(ctx)
-    ns |> Enum.join(".") |> attach_pkg(prefix)
+    [prefixed_name(ctx) | ns]
+    |> Enum.reject(&(&1 in [nil, ""]))
+    |> Enum.join(".")
   end
 
+  def prefixed_name(%{package_prefix: nil, module_prefix: nil, package: nil} = _ctx),
+    do: nil
+
   def prefixed_name(%{package_prefix: nil, module_prefix: nil, package: pkg} = _ctx),
-    do: pkg
+    do: normalize_type_name(pkg)
 
   def prefixed_name(%{package_prefix: prefix, module_prefix: nil, package: package} = _ctx),
-    do: prepend_package_prefix(prefix, package)
+    do: normalize_type_name(prepend_package_prefix(prefix, package))
 
   def prefixed_name(%{module_prefix: module_prefix} = _ctx),
-    do: module_prefix
-
-  defp attach_pkg(name, ""), do: name
-  defp attach_pkg(name, nil), do: name
-  defp attach_pkg(name, pkg), do: normalize_type_name(pkg) <> "." <> name
+    do: normalize_type_name(module_prefix)
 
   @spec prepend_package_prefix(String.t() | nil, String.t() | nil) :: String.t()
   def prepend_package_prefix(prefix, package)
