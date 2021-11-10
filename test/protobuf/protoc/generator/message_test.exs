@@ -7,7 +7,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 has right name" do
     ctx = %Context{}
     desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
     assert msg =~ "use Protobuf\n"
     assert msg =~ "@type t :: %__MODULE__{}\n"
@@ -16,7 +16,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 has right syntax" do
     ctx = %Context{syntax: :proto3}
     desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
     assert msg =~ "use Protobuf, syntax: :proto3\n"
     assert msg =~ "@type t :: %__MODULE__{}\n"
@@ -25,19 +25,19 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 has right name with package" do
     ctx = %Context{package: "pkg.name", module_prefix: "Pkg.Name"}
     desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Pkg.Name.Foo do\n"
   end
 
   test "generate/2 adds transform_module/1" do
     ctx = %Context{}
     desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "def transform_module(), do: nil\n"
 
     ctx = %Context{transform_module: My.Transform.Module}
     desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "def transform_module(), do: My.Transform.Module\n"
   end
 
@@ -50,7 +50,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         options: Google.Protobuf.MessageOptions.new(map_entry: true)
       )
 
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "use Protobuf, map: true\n"
   end
 
@@ -78,7 +78,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "defstruct [:a, :b]\n"
     assert msg =~ "a: integer"
     assert msg =~ "b: String.t()"
@@ -117,7 +117,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "defstruct [:a, :b, :c]\n"
     assert msg =~ "a: integer"
     assert msg =~ "b: String.t()"
@@ -144,7 +144,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "a: integer"
     assert msg =~ "field :a, 1, optional: true, type: :int32, default: 42\n"
   end
@@ -167,7 +167,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: :int32, packed: true\n"
   end
 
@@ -189,7 +189,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: :int32, deprecated: true\n"
   end
 
@@ -224,7 +224,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "bar: Bar.t() | nil"
     assert msg =~ "baz: [Baz.t()]"
   end
@@ -277,7 +277,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[[]], [_, msg]} = Generator.generate(ctx, desc)
+    {[[]], [_, {_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "a: %{integer => FooBar.AbCd.Bar.t() | nil}"
     assert msg =~ "field :a, 1, repeated: true, type: FooBar.AbCd.Foo.ProjectsEntry, map: true\n"
   end
@@ -305,7 +305,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "a: FooBar.AbCd.EnumFoo.t()"
     assert msg =~ "field :a, 1, optional: true, type: FooBar.AbCd.EnumFoo, enum: true\n"
   end
@@ -331,7 +331,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: OtherPkg.EnumFoo, enum: true\n"
   end
 
@@ -356,7 +356,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "a: OtherPkg.MsgFoo.t()"
     assert msg =~ "field :a, 1, optional: true, type: OtherPkg.MsgFoo\n"
   end
@@ -372,7 +372,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[[]], [[msg], _]} = Generator.generate(ctx, desc)
+    {[[]], [[{_mod, msg}], _]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo.Nested do\n"
     assert msg =~ "defstruct []\n"
   end
@@ -399,7 +399,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[[msg]], _} = Generator.generate(ctx, desc)
+    {[[{_mod, msg}]], _} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo.Nested.EnumFoo do\n"
     assert msg =~ "use Protobuf, enum: true\n"
     assert msg =~ "field :a, 0\n  field :b, 1\n"
@@ -458,7 +458,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "first: {:a, integer} | {:b, integer},\n"
     assert msg =~ "second: {:c, integer} | {:d, integer},\n"
     assert msg =~ "other: integer\n"
@@ -498,7 +498,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
           ]
         )
 
-      {[], [msg]} = Generator.generate(ctx, desc)
+      {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
       assert msg =~ "defstruct [:simple, :the_field_name]\n"
       assert msg =~ "field :simple, 1, type: :int32\n"
       assert msg =~ "field :the_field_name, 2, type: :string, json_name: \"theFieldName\"\n"
@@ -521,7 +521,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
           ]
         )
 
-      {[], [msg]} = Generator.generate(ctx, desc)
+      {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
       assert msg =~ "defstruct [:the_field_name]\n"
       assert msg =~ "field :the_field_name, 1, required: true, type: :string\n"
     end
@@ -550,7 +550,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[], [msg]} = Generator.generate(ctx, desc)
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "a: [FooBar.AbCd.EnumFoo.t()]"
   end
 end

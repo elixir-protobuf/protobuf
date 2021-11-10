@@ -52,9 +52,10 @@ defmodule Protobuf.Protoc.CLI do
       |> find_types(request.proto_file)
 
     files =
-      for desc <- request.proto_file,
-          desc.name in request.file_to_generate,
-          do: Protobuf.Protoc.Generator.generate(ctx, desc)
+      Enum.flat_map(request.file_to_generate, fn file ->
+        desc = Enum.find(request.proto_file, &(&1.name == file))
+        Protobuf.Protoc.Generator.generate(ctx, desc)
+      end)
 
     response = Google.Protobuf.Compiler.CodeGeneratorResponse.new(file: files)
 
@@ -99,6 +100,18 @@ defmodule Protobuf.Protoc.CLI do
 
   defp parse_param("transform_module=" <> module, ctx) do
     %Context{ctx | transform_module: Module.concat([module])}
+  end
+
+  defp parse_param("one_file_per_module=" <> value, ctx) do
+    case value do
+      "true" ->
+        %Context{ctx | one_file_per_module?: true}
+
+      other ->
+        fail_and_halt(
+          "Invalid value for one_file_per_module option, expected \"true\", got: #{inspect(other)}"
+        )
+    end
   end
 
   defp parse_param(_unknown, ctx) do

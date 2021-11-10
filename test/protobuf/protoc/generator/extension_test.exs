@@ -9,8 +9,7 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
 
     desc = Google.Protobuf.FileDescriptorProto.new(extension: [])
 
-    msg = Generator.generate(ctx, desc, [])
-    assert msg == ""
+    assert Generator.generate(ctx, desc, []) == nil
   end
 
   test "generate/3 generates extensions" do
@@ -55,7 +54,7 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
         ]
       )
 
-    msg = Generator.generate(ctx, desc, [])
+    assert {_mod_name, msg} = Generator.generate(ctx, desc, [])
     assert msg =~ "defmodule Ext.PbExtension do\n"
     assert msg =~ "extend Ext.Foo1, :foo, 1047, optional: true, type: Ext.Options\n"
     assert msg =~ "extend Ext.Foo1, :foo2, 1049, repeated: true, type: :uint32\n"
@@ -89,7 +88,7 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
        ]}
     ]
 
-    msg = Generator.generate(ctx, desc, nested)
+    assert {"Ext.PbExtension", msg} = Generator.generate(ctx, desc, nested)
     assert msg =~ "defmodule Ext.PbExtension do\n"
 
     assert msg =~

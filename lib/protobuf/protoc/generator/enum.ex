@@ -14,7 +14,8 @@ defmodule Protobuf.Protoc.Generator.Enum do
     trim: true
   )
 
-  @spec generate(Context.t(), Google.Protobuf.EnumDescriptorProto.t()) :: String.t()
+  @spec generate(Context.t(), Google.Protobuf.EnumDescriptorProto.t()) ::
+          {module_name :: String.t(), file_contents :: String.t()}
   def generate(%Context{namespace: ns} = ctx, %Google.Protobuf.EnumDescriptorProto{} = desc) do
     msg_name = Util.mod_name(ctx, ns ++ [Macro.camelize(desc.name)])
     use_options = Util.options_to_str(%{syntax: ctx.syntax, enum: true})
@@ -26,11 +27,14 @@ defmodule Protobuf.Protoc.Generator.Enum do
         nil
       end
 
-    enum_template(
-      module: msg_name,
-      use_options: use_options,
-      fields: desc.value,
-      descriptor_fun_body: descriptor_fun_body
-    )
+    content =
+      enum_template(
+        module: msg_name,
+        use_options: use_options,
+        fields: desc.value,
+        descriptor_fun_body: descriptor_fun_body
+      )
+
+    {msg_name, content}
   end
 end

@@ -50,7 +50,7 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
       ]
     }
 
-    msg = Generator.generate(ctx, desc)
+    assert {"Foo.ServiceFoo", msg} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo.ServiceFoo.Service do\n"
     assert msg =~ "use GRPC.Service, name: \"foo.ServiceFoo\"\n"
     assert msg =~ "rpc :MethodA, Foo.Input0, Foo.Output0\n"

@@ -20,7 +20,7 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
       ]
     }
 
-    msg = Generator.generate(ctx, desc)
+    assert {^module, msg} = Generator.generate(ctx, desc)
 
     # Make sure the generated file is compilable.
     assert [{compiled_mod, _bytecode}] = Code.compile_string(msg)
@@ -59,7 +59,7 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
       ]
     }
 
-    msg = Generator.generate(ctx, desc)
+    assert {^module, msg} = Generator.generate(ctx, desc)
 
     # Make sure the generated file is compilable.
     assert [{compiled_mod, _bytecode}] = Code.compile_string(msg)
