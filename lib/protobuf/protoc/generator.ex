@@ -23,7 +23,7 @@ defmodule Protobuf.Protoc.Generator do
       %Context{
         ctx
         | syntax: syntax(desc.syntax),
-          package: desc.package || "",
+          package: desc.package,
           dep_type_mapping: get_dep_type_mapping(ctx, desc.dependency, desc.name)
       }
       |> Protobuf.Protoc.Context.custom_file_options_from_file_desc(desc)

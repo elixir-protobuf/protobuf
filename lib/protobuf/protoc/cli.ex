@@ -90,7 +90,11 @@ defmodule Protobuf.Protoc.CLI do
   end
 
   defp parse_param("package_prefix=" <> package, ctx) do
-    %Context{ctx | package_prefix: package}
+    if package == "" do
+      fail_and_halt("package_prefix can't be empty")
+    else
+      %Context{ctx | package_prefix: package}
+    end
   end
 
   defp parse_param("transform_module=" <> module, ctx) do

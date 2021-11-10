@@ -18,7 +18,7 @@ defmodule Protobuf.Protoc.Generator.Service do
   def generate(%Context{} = ctx, %Google.Protobuf.ServiceDescriptorProto{} = desc) do
     # service can't be nested
     mod_name = Util.mod_name(ctx, [Macro.camelize(desc.name)])
-    name = Util.attach_raw_pkg(desc.name, ctx.package)
+    name = Util.prepend_package_prefix(ctx.package, desc.name)
     methods = Enum.map(desc.method, &generate_service_method(ctx, &1))
 
     descriptor_fun_body =

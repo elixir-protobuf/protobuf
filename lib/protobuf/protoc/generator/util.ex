@@ -12,8 +12,8 @@ defmodule Protobuf.Protoc.Generator.Util do
   def prefixed_name(%{package_prefix: nil, module_prefix: nil, package: pkg} = _ctx),
     do: pkg
 
-  def prefixed_name(%{package_prefix: prefix, module_prefix: nil, package: pkg} = _ctx),
-    do: attach_raw_pkg(pkg, prefix)
+  def prefixed_name(%{package_prefix: prefix, module_prefix: nil, package: package} = _ctx),
+    do: prepend_package_prefix(prefix, package)
 
   def prefixed_name(%{module_prefix: module_prefix} = _ctx),
     do: module_prefix
@@ -22,11 +22,13 @@ defmodule Protobuf.Protoc.Generator.Util do
   defp attach_pkg(name, nil), do: name
   defp attach_pkg(name, pkg), do: normalize_type_name(pkg) <> "." <> name
 
-  def attach_raw_pkg(name, ""), do: name
-  def attach_raw_pkg(name, nil), do: name
-  def attach_raw_pkg("", pkg), do: pkg
-  def attach_raw_pkg(nil, pkg), do: pkg
-  def attach_raw_pkg(name, pkg), do: pkg <> "." <> name
+  @spec prepend_package_prefix(String.t() | nil, String.t()) :: String.t()
+  def prepend_package_prefix(prefix, package)
+      when is_nil(prefix) or (is_binary(prefix) and prefix != "") do
+    [prefix, package]
+    |> Enum.reject(&(&1 in [nil, ""]))
+    |> Enum.join(".")
+  end
 
   @spec options_to_str(%{optional(atom()) => atom() | integer() | String.t()}) :: String.t()
   def options_to_str(opts) when is_map(opts) do

@@ -67,4 +67,13 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
       assert type_from_type_name(ctx, ".foo_bar.ab_cd.Bar")
     end
   end
+
+  describe "prepend_package_prefix/2" do
+    test "ignores empty strings" do
+      assert prepend_package_prefix("foo", "") == "foo"
+      assert prepend_package_prefix("foo", nil) == "foo"
+      assert prepend_package_prefix(nil, "foo") == "foo"
+      assert prepend_package_prefix("foo", "bar") == "foo.bar"
+    end
+  end
 end
