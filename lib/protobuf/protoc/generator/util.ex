@@ -3,6 +3,8 @@ defmodule Protobuf.Protoc.Generator.Util do
 
   alias Protobuf.Protoc.Context
 
+  defguardp is_nil_or_nonempty_string(term) when is_nil(term) or (is_binary(term) and term != "")
+
   @spec mod_name(Context.t(), [String.t()]) :: String.t()
   def mod_name(%Context{} = ctx, ns) when is_list(ns) do
     prefix = prefixed_name(ctx)
@@ -22,11 +24,11 @@ defmodule Protobuf.Protoc.Generator.Util do
   defp attach_pkg(name, nil), do: name
   defp attach_pkg(name, pkg), do: normalize_type_name(pkg) <> "." <> name
 
-  @spec prepend_package_prefix(String.t() | nil, String.t()) :: String.t()
+  @spec prepend_package_prefix(String.t() | nil, String.t() | nil) :: String.t()
   def prepend_package_prefix(prefix, package)
-      when is_nil(prefix) or (is_binary(prefix) and prefix != "") do
+      when is_nil_or_nonempty_string(prefix) and is_nil_or_nonempty_string(package) do
     [prefix, package]
-    |> Enum.reject(&(&1 in [nil, ""]))
+    |> Enum.reject(&is_nil/1)
     |> Enum.join(".")
   end
 
