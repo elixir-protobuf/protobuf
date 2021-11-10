@@ -30,13 +30,6 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
     end
   end
 
-  describe "proto_name_to_module_name/1" do
-    test "splits the name and normalizes it" do
-      assert proto_name_to_module_name("pkg.Msg") == "Pkg.Msg"
-      assert proto_name_to_module_name("FooBar.Prefix.Msg") == "FooBar.Prefix.Msg"
-    end
-  end
-
   describe "options_to_str/1" do
     test "stringifies a map of options" do
       assert options_to_str(%{}) == ""

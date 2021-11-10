@@ -155,18 +155,13 @@ defmodule Protobuf.Protoc.CLI do
   end
 
   defp update_types(types, %{namespace: ns, package: pkg} = ctx, name) do
-    type_name =
-      ctx
-      |> Protobuf.Protoc.Generator.Util.camelcase_prefix()
-      |> join_names(ns, name)
-      |> Protobuf.Protoc.Generator.Util.proto_name_to_module_name()
+    type_name = Protobuf.Protoc.Generator.Util.mod_name(ctx, ns ++ [name])
 
-    Map.put(types, "." <> join_names(pkg, ns, name), %{type_name: type_name})
-  end
+    mapping_name =
+      ([pkg] ++ ns ++ [name])
+      |> Enum.reject(&is_nil/1)
+      |> Enum.join(".")
 
-  defp join_names(pkg, ns, name) do
-    [pkg, Enum.join(ns, "."), name]
-    |> Enum.filter(&(&1 && &1 != ""))
-    |> Enum.join(".")
+    Map.put(types, "." <> mapping_name, %{type_name: type_name})
   end
 end

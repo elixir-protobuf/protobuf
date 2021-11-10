@@ -16,17 +16,20 @@ defmodule Protobuf.Protoc.Generator.Util do
     Enum.join(parts, ".")
   end
 
-  @spec camelcase_prefix(Context.t()) :: nil | String.t()
-  def camelcase_prefix(ctx)
-
-  def camelcase_prefix(%{package_prefix: nil, module_prefix: nil, package: nil} = _ctx),
+  defp camelcase_prefix(%{package_prefix: nil, module_prefix: nil, package: nil} = _ctx),
     do: ""
 
-  def camelcase_prefix(%{package_prefix: prefix, module_prefix: nil, package: package} = _ctx),
+  defp camelcase_prefix(%{package_prefix: prefix, module_prefix: nil, package: package} = _ctx),
     do: proto_name_to_module_name(prepend_package_prefix(prefix, package))
 
-  def camelcase_prefix(%{module_prefix: module_prefix} = _ctx),
+  defp camelcase_prefix(%{module_prefix: module_prefix} = _ctx),
     do: proto_name_to_module_name(module_prefix)
+
+  defp proto_name_to_module_name(name) when is_binary(name) do
+    name
+    |> String.split(".")
+    |> Enum.map_join(".", &Macro.camelize/1)
+  end
 
   @spec prepend_package_prefix(String.t() | nil, String.t() | nil) :: String.t()
   def prepend_package_prefix(prefix, package)
@@ -56,13 +59,6 @@ defmodule Protobuf.Protoc.Generator.Util do
         raise "There's something wrong to get #{type_name}'s type, please contact with the lib author."
 
     metadata[:type_name]
-  end
-
-  @spec proto_name_to_module_name(String.t()) :: String.t()
-  def proto_name_to_module_name(name) when is_binary(name) do
-    name
-    |> String.split(".")
-    |> Enum.map_join(".", &Macro.camelize/1)
   end
 
   @spec descriptor_fun_body(desc :: struct()) :: String.t()
