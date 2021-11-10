@@ -34,7 +34,8 @@ defmodule Protobuf.Protoc.Context do
             # Module to transform values before and after encode and decode
             transform_module: nil,
 
-            # TODO
+            # Generate one file per module with "proper" directory structure
+            # (according to Elixir conventions) if this is true
             one_file_per_module?: false,
 
             # Elixirpb.FileOptions
