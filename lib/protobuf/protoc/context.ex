@@ -34,6 +34,9 @@ defmodule Protobuf.Protoc.Context do
             # Module to transform values before and after encode and decode
             transform_module: nil,
 
+            # TODO
+            one_file_per_module?: false,
+
             # Elixirpb.FileOptions
             custom_file_options: %{}
 

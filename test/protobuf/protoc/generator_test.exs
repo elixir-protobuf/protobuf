@@ -12,7 +12,7 @@ defmodule Protobuf.Protoc.GeneratorTest do
       desc = Google.Protobuf.FileDescriptorProto.new(name: "name.proto")
 
       assert Generator.generate(ctx, desc) ==
-               CodeGeneratorResponse.File.new(name: "name.pb.ex", content: "")
+               [CodeGeneratorResponse.File.new(name: "name.pb.ex", content: "")]
     end
 
     test "uses the package prefix" do
@@ -29,7 +29,7 @@ defmodule Protobuf.Protoc.GeneratorTest do
           message_type: [Google.Protobuf.DescriptorProto.new(name: "Foo")]
         )
 
-      assert %CodeGeneratorResponse.File{} = file = Generator.generate(ctx, desc)
+      assert [%CodeGeneratorResponse.File{} = file] = Generator.generate(ctx, desc)
 
       assert [{mod, _bytecode}] = Code.compile_string(file.content)
       assert mod == Myapp.Foo
@@ -52,7 +52,7 @@ defmodule Protobuf.Protoc.GeneratorTest do
           message_type: [Google.Protobuf.DescriptorProto.new(name: "Foo")]
         )
 
-      assert %CodeGeneratorResponse.File{} = file = Generator.generate(ctx, desc)
+      assert [%CodeGeneratorResponse.File{} = file] = Generator.generate(ctx, desc)
 
       assert [{mod, _bytecode}] = Code.compile_string(file.content)
       assert mod == Myapp.Proto.Lib.Foo
@@ -80,7 +80,7 @@ defmodule Protobuf.Protoc.GeneratorTest do
           ]
         )
 
-      assert %CodeGeneratorResponse.File{} = file = Generator.generate(ctx, desc)
+      assert [%CodeGeneratorResponse.File{} = file] = Generator.generate(ctx, desc)
 
       assert [{enum_mod, _bytecode1}, {message_mod, _bytecode2}] =
                Code.compile_string(file.content)
@@ -106,7 +106,7 @@ defmodule Protobuf.Protoc.GeneratorTest do
         )
 
       # We can't compile the generated service module because we haven't loaded GRPC.Service here.
-      assert %CodeGeneratorResponse.File{} = file = Generator.generate(ctx, desc)
+      assert [%CodeGeneratorResponse.File{} = file] = Generator.generate(ctx, desc)
       assert file.content =~ "defmodule MyService.Service do"
     end
   end

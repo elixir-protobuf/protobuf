@@ -7,18 +7,28 @@ defmodule Protobuf.Protoc.Generator do
   @locals_without_parens [field: 2, field: 3, oneof: 2, rpc: 3, extend: 4, extensions: 1]
 
   @spec generate(Context.t(), %Google.Protobuf.FileDescriptorProto{}) ::
-          Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()
+          [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()]
   def generate(%Context{} = ctx, %Google.Protobuf.FileDescriptorProto{} = desc) do
     # desc.name is the filename, ending in ".proto".
     name = Path.rootname(desc.name) <> ".pb.ex"
 
-    Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(
-      name: name,
-      content: generate_content(ctx, desc)
-    )
+    module_definitions = generate_module_definitions(ctx, desc)
+
+    content =
+      module_definitions
+      |> Enum.join("\n")
+      |> format_code_if_possible()
+      |> append_newline_if_not_empty()
+
+    [
+      Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(
+        name: name,
+        content: content
+      )
+    ]
   end
 
-  defp generate_content(ctx, desc) do
+  defp generate_module_definitions(ctx, %Google.Protobuf.FileDescriptorProto{} = desc) do
     ctx =
       %Context{
         ctx
@@ -46,17 +56,13 @@ defmodule Protobuf.Protoc.Generator do
         []
       end
 
-    [
+    List.flatten([
       enum_defmodules,
       nested_enum_defmodules,
       message_defmodules,
       service_defmodules,
       extension_defmodules
-    ]
-    |> List.flatten()
-    |> Enum.join("\n")
-    |> format_code_if_possible()
-    |> append_newline_if_not_empty()
+    ])
   end
 
   defp get_dep_type_mapping(%Context{global_type_mapping: global_mapping}, deps, file_name) do
