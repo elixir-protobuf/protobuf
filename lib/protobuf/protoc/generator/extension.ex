@@ -31,12 +31,12 @@ defmodule Protobuf.Protoc.Generator.Extension do
     extends = extends ++ nested_extends
 
     if Enum.empty?(extends) do
-      ""
+      nil
     else
       name = Macro.camelize(@ext_postfix)
       msg_name = Util.mod_name(ctx, ns ++ [name])
       use_options = Util.options_to_str(%{syntax: ctx.syntax})
-      extension_template(module: msg_name, use_options: use_options, extends: extends)
+      {msg_name, extension_template(module: msg_name, use_options: use_options, extends: extends)}
     end
   end
 

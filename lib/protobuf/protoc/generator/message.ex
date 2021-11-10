@@ -16,7 +16,9 @@ defmodule Protobuf.Protoc.Generator.Message do
     trim: true
   )
 
-  @spec generate_list(Context.t(), [Google.Protobuf.DescriptorProto.t()]) :: {any(), any()}
+  @spec generate_list(Context.t(), [Google.Protobuf.DescriptorProto.t()]) ::
+          {enums :: [{mod_name :: String.t(), contents :: String.t()}],
+           messages :: [{mod_name :: String.t(), contents :: String.t()}]}
   def generate_list(%Context{} = ctx, descs) when is_list(descs) do
     descs
     |> Enum.map(fn desc -> generate(ctx, desc) end)
@@ -60,17 +62,18 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp gen_msg(syntax, msg_struct) do
-    message_template(
-      module: msg_struct[:name],
-      use_options: msg_struct[:options],
-      struct_fields: msg_struct[:structs],
-      typespec: msg_struct[:typespec],
-      oneofs: msg_struct[:oneofs],
-      fields: gen_fields(syntax, msg_struct[:fields]),
-      descriptor_fun_body: msg_struct[:descriptor_fun_body],
-      transform_module: msg_struct[:transform_module],
-      extensions: gen_extensions(msg_struct[:extensions])
-    )
+    {msg_struct[:name],
+     message_template(
+       module: msg_struct[:name],
+       use_options: msg_struct[:options],
+       struct_fields: msg_struct[:structs],
+       typespec: msg_struct[:typespec],
+       oneofs: msg_struct[:oneofs],
+       fields: gen_fields(syntax, msg_struct[:fields]),
+       descriptor_fun_body: msg_struct[:descriptor_fun_body],
+       transform_module: msg_struct[:transform_module],
+       extensions: gen_extensions(msg_struct[:extensions])
+     )}
   end
 
   defp gen_nested_msgs(ctx, desc) do

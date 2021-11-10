@@ -7,7 +7,7 @@ defmodule Protobuf.Protoc.GeneratorTest do
   alias Google.Protobuf.Compiler.CodeGeneratorResponse
 
   describe "generate/2" do
-    test "returns a Google.Protobuf.Compiler.CodeGeneratorResponse.File struct" do
+    test "returns a list of Google.Protobuf.Compiler.CodeGeneratorResponse.File structs" do
       ctx = %Context{global_type_mapping: %{"name.proto" => %{}}}
       desc = Google.Protobuf.FileDescriptorProto.new(name: "name.proto")
 
@@ -89,6 +89,74 @@ defmodule Protobuf.Protoc.GeneratorTest do
       assert message_mod == MyMessage
 
       purge_modules([enum_mod, message_mod])
+    end
+
+    test "returns a module for each enum and message as separate files with one_file_per_module=true" do
+      ctx = %Context{
+        global_type_mapping: %{"name.proto" => %{}},
+        one_file_per_module?: true
+      }
+
+      desc =
+        Google.Protobuf.FileDescriptorProto.new(
+          name: "name.proto",
+          package: "foo",
+          message_type: [Google.Protobuf.DescriptorProto.new(name: "MyMessage.Nested")],
+          enum_type: [
+            Google.Protobuf.EnumDescriptorProto.new(
+              name: "MyEnum",
+              value: [
+                Google.Protobuf.EnumValueDescriptorProto.new(name: :MY_ENUM_NOT_SET, number: 0)
+              ]
+            )
+          ]
+        )
+
+      assert [
+               %CodeGeneratorResponse.File{} = enum_file,
+               %CodeGeneratorResponse.File{} = message_file
+             ] = Generator.generate(ctx, desc)
+
+      assert message_file.name == "foo/my_message/nested.pb.ex"
+      assert enum_file.name == "foo/my_enum.pb.ex"
+    end
+
+    test "with one_file_per_module=true and package_prefix" do
+      ctx = %Context{
+        global_type_mapping: %{"name.proto" => %{}},
+        one_file_per_module?: true,
+        package_prefix: "prfx"
+      }
+
+      desc =
+        Google.Protobuf.FileDescriptorProto.new(
+          name: "name.proto",
+          package: "foo",
+          message_type: [Google.Protobuf.DescriptorProto.new(name: "MyMessage.Nested")]
+        )
+
+      assert [%CodeGeneratorResponse.File{} = file] = Generator.generate(ctx, desc)
+
+      assert file.name == "prfx/foo/my_message/nested.pb.ex"
+    end
+
+    test "with one_file_per_module=true and module_prefix" do
+      ctx = %Context{
+        global_type_mapping: %{"name.proto" => %{}},
+        one_file_per_module?: true,
+        module_prefix: "My.Prefix"
+      }
+
+      desc =
+        Google.Protobuf.FileDescriptorProto.new(
+          name: "name.proto",
+          package: "foo",
+          message_type: [Google.Protobuf.DescriptorProto.new(name: "MyMessage.Nested")]
+        )
+
+      assert [%CodeGeneratorResponse.File{} = file] = Generator.generate(ctx, desc)
+
+      assert file.name == "my/prefix/my_message/nested.pb.ex"
     end
 
     test "can generate a GRPC service" do

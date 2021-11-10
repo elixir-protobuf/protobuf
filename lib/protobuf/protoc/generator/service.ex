@@ -28,12 +28,13 @@ defmodule Protobuf.Protoc.Generator.Service do
         nil
       end
 
-    service_template(
-      module: mod_name,
-      service_name: name,
-      methods: methods,
-      descriptor_fun_body: descriptor_fun_body
-    )
+    {mod_name,
+     service_template(
+       module: mod_name,
+       service_name: name,
+       methods: methods,
+       descriptor_fun_body: descriptor_fun_body
+     )}
   end
 
   defp generate_service_method(ctx, method) do

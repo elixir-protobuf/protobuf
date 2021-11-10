@@ -149,6 +149,22 @@ by passing `transform_module=...` in `--elixir_out`.
 $ protoc --elixir_out=transform_module=MyTransformModule:./lib/ *.proto
 ```
 
+### One file per module
+
+You can use the `one_file_per_module=true` option to change the way that files
+are generated into directories. By default, one `.pb.ex` file is generated for
+each `.proto` file you compile and each of those `.pb.ex` files can have
+multiple Elixir module definitions in it.
+
+With `one_file_per_module=true`, one `.pb.ex` file will be generated for each
+generated Elixir module and the directory structure will respect Elixir
+conventions. For example, a `MyPackage.MyMessage` message will end up in the
+`my_package/my_message.pb.ex` file.
+
+```
+$ protoc --elixir_out=one_file_per_module=true:./lib *.proto
+```
+
 ### gRPC Support
 
 If you write [services](https://developers.google.com/protocol-buffers/docs/proto#services) in

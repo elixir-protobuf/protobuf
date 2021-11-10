@@ -9,23 +9,43 @@ defmodule Protobuf.Protoc.Generator do
   @spec generate(Context.t(), %Google.Protobuf.FileDescriptorProto{}) ::
           [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()]
   def generate(%Context{} = ctx, %Google.Protobuf.FileDescriptorProto{} = desc) do
-    # desc.name is the filename, ending in ".proto".
-    name = Path.rootname(desc.name) <> ".pb.ex"
-
     module_definitions = generate_module_definitions(ctx, desc)
 
-    content =
-      module_definitions
-      |> Enum.join("\n")
-      |> format_code_if_possible()
-      |> append_newline_if_not_empty()
+    if ctx.one_file_per_module? == false do
+      # desc.name is the filename, ending in ".proto".
+      name = Path.rootname(desc.name) <> ".pb.ex"
 
-    [
-      Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(
-        name: name,
-        content: content
-      )
-    ]
+      content =
+        module_definitions
+        |> Enum.reject(&is_nil/1)
+        |> Enum.map(fn {_mod_name, contents} -> contents end)
+        |> Enum.join("\n")
+        |> format_code_if_possible()
+        |> append_newline_if_not_empty()
+
+      [
+        Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(
+          name: name,
+          content: content
+        )
+      ]
+    else
+      module_definitions
+      |> Enum.reject(&is_nil/1)
+      |> Enum.map(fn {mod_name, content} ->
+        content =
+          content
+          |> format_code_if_possible()
+          |> append_newline_if_not_empty()
+
+        file_name = Macro.underscore(mod_name) <> ".pb.ex"
+
+        Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(
+          name: file_name,
+          content: content
+        )
+      end)
+    end
   end
 
   defp generate_module_definitions(ctx, %Google.Protobuf.FileDescriptorProto{} = desc) do
