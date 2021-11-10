@@ -7,22 +7,26 @@ defmodule Protobuf.Protoc.Generator.Util do
 
   @spec mod_name(Context.t(), [String.t()]) :: String.t()
   def mod_name(%Context{} = ctx, ns) when is_list(ns) do
-    [prefixed_name(ctx) | ns]
-    |> Enum.reject(&(&1 in [nil, ""]))
-    |> Enum.join(".")
+    parts =
+      case camelcase_prefix(ctx) do
+        "" -> ns
+        prefix -> [prefix | ns]
+      end
+
+    Enum.join(parts, ".")
   end
 
-  def prefixed_name(%{package_prefix: nil, module_prefix: nil, package: nil} = _ctx),
-    do: nil
+  @spec camelcase_prefix(Context.t()) :: nil | String.t()
+  def camelcase_prefix(ctx)
 
-  def prefixed_name(%{package_prefix: nil, module_prefix: nil, package: pkg} = _ctx),
-    do: normalize_type_name(pkg)
+  def camelcase_prefix(%{package_prefix: nil, module_prefix: nil, package: nil} = _ctx),
+    do: ""
 
-  def prefixed_name(%{package_prefix: prefix, module_prefix: nil, package: package} = _ctx),
-    do: normalize_type_name(prepend_package_prefix(prefix, package))
+  def camelcase_prefix(%{package_prefix: prefix, module_prefix: nil, package: package} = _ctx),
+    do: proto_name_to_module_name(prepend_package_prefix(prefix, package))
 
-  def prefixed_name(%{module_prefix: module_prefix} = _ctx),
-    do: normalize_type_name(module_prefix)
+  def camelcase_prefix(%{module_prefix: module_prefix} = _ctx),
+    do: proto_name_to_module_name(module_prefix)
 
   @spec prepend_package_prefix(String.t() | nil, String.t() | nil) :: String.t()
   def prepend_package_prefix(prefix, package)
@@ -54,8 +58,8 @@ defmodule Protobuf.Protoc.Generator.Util do
     metadata[:type_name]
   end
 
-  @spec normalize_type_name(String.t()) :: String.t()
-  def normalize_type_name(name) when is_binary(name) do
+  @spec proto_name_to_module_name(String.t()) :: String.t()
+  def proto_name_to_module_name(name) when is_binary(name) and name != "" do
     name
     |> String.split(".")
     |> Enum.map_join(".", &Macro.camelize/1)

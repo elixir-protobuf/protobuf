@@ -30,10 +30,10 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
     end
   end
 
-  describe "normalize_type_name/1" do
+  describe "proto_name_to_module_name/1" do
     test "splits the name and normalizes it" do
-      assert normalize_type_name("pkg.Msg") == "Pkg.Msg"
-      assert normalize_type_name("FooBar.Prefix.Msg") == "FooBar.Prefix.Msg"
+      assert proto_name_to_module_name("pkg.Msg") == "Pkg.Msg"
+      assert proto_name_to_module_name("FooBar.Prefix.Msg") == "FooBar.Prefix.Msg"
     end
   end
 

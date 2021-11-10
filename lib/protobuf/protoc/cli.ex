@@ -157,9 +157,9 @@ defmodule Protobuf.Protoc.CLI do
   defp update_types(types, %{namespace: ns, package: pkg} = ctx, name) do
     type_name =
       ctx
-      |> Protobuf.Protoc.Generator.Util.prefixed_name()
+      |> Protobuf.Protoc.Generator.Util.camelcase_prefix()
       |> join_names(ns, name)
-      |> Protobuf.Protoc.Generator.Util.normalize_type_name()
+      |> Protobuf.Protoc.Generator.Util.proto_name_to_module_name()
 
     Map.put(types, "." <> join_names(pkg, ns, name), %{type_name: type_name})
   end
