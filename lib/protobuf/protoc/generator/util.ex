@@ -59,7 +59,7 @@ defmodule Protobuf.Protoc.Generator.Util do
   end
 
   @spec proto_name_to_module_name(String.t()) :: String.t()
-  def proto_name_to_module_name(name) when is_binary(name) and name != "" do
+  def proto_name_to_module_name(name) when is_binary(name) do
     name
     |> String.split(".")
     |> Enum.map_join(".", &Macro.camelize/1)
