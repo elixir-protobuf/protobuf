@@ -30,13 +30,6 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
     end
   end
 
-  describe "normalize_type_name/1" do
-    test "splits the name and normalizes it" do
-      assert normalize_type_name("pkg.Msg") == "Pkg.Msg"
-      assert normalize_type_name("FooBar.Prefix.Msg") == "FooBar.Prefix.Msg"
-    end
-  end
-
   describe "options_to_str/1" do
     test "stringifies a map of options" do
       assert options_to_str(%{}) == ""
@@ -65,6 +58,14 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
       }
 
       assert type_from_type_name(ctx, ".foo_bar.ab_cd.Bar")
+    end
+  end
+
+  describe "prepend_package_prefix/2" do
+    test "ignores nils" do
+      assert prepend_package_prefix("foo", nil) == "foo"
+      assert prepend_package_prefix(nil, "foo") == "foo"
+      assert prepend_package_prefix("foo", "bar") == "foo.bar"
     end
   end
 end

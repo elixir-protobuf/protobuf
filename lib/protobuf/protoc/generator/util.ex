@@ -3,30 +3,41 @@ defmodule Protobuf.Protoc.Generator.Util do
 
   alias Protobuf.Protoc.Context
 
+  defguardp is_nil_or_nonempty_string(term) when is_nil(term) or (is_binary(term) and term != "")
+
   @spec mod_name(Context.t(), [String.t()]) :: String.t()
   def mod_name(%Context{} = ctx, ns) when is_list(ns) do
-    prefix = prefixed_name(ctx)
-    ns |> Enum.join(".") |> attach_pkg(prefix)
+    parts =
+      case camelcase_prefix(ctx) do
+        "" -> ns
+        prefix -> [prefix | ns]
+      end
+
+    Enum.join(parts, ".")
   end
 
-  def prefixed_name(%{package_prefix: nil, module_prefix: nil, package: pkg} = _ctx),
-    do: pkg
+  defp camelcase_prefix(%{package_prefix: nil, module_prefix: nil, package: nil} = _ctx),
+    do: ""
 
-  def prefixed_name(%{package_prefix: prefix, module_prefix: nil, package: pkg} = _ctx),
-    do: attach_raw_pkg(pkg, prefix)
+  defp camelcase_prefix(%{package_prefix: prefix, module_prefix: nil, package: package} = _ctx),
+    do: proto_name_to_module_name(prepend_package_prefix(prefix, package))
 
-  def prefixed_name(%{module_prefix: module_prefix} = _ctx),
-    do: module_prefix
+  defp camelcase_prefix(%{module_prefix: module_prefix} = _ctx),
+    do: proto_name_to_module_name(module_prefix)
 
-  defp attach_pkg(name, ""), do: name
-  defp attach_pkg(name, nil), do: name
-  defp attach_pkg(name, pkg), do: normalize_type_name(pkg) <> "." <> name
+  defp proto_name_to_module_name(name) when is_binary(name) do
+    name
+    |> String.split(".")
+    |> Enum.map_join(".", &Macro.camelize/1)
+  end
 
-  def attach_raw_pkg(name, ""), do: name
-  def attach_raw_pkg(name, nil), do: name
-  def attach_raw_pkg("", pkg), do: pkg
-  def attach_raw_pkg(nil, pkg), do: pkg
-  def attach_raw_pkg(name, pkg), do: pkg <> "." <> name
+  @spec prepend_package_prefix(String.t() | nil, String.t() | nil) :: String.t()
+  def prepend_package_prefix(prefix, package)
+      when is_nil_or_nonempty_string(prefix) and is_nil_or_nonempty_string(package) do
+    [prefix, package]
+    |> Enum.reject(&is_nil/1)
+    |> Enum.join(".")
+  end
 
   @spec options_to_str(%{optional(atom()) => atom() | integer() | String.t()}) :: String.t()
   def options_to_str(opts) when is_map(opts) do
@@ -48,13 +59,6 @@ defmodule Protobuf.Protoc.Generator.Util do
         raise "There's something wrong to get #{type_name}'s type, please contact with the lib author."
 
     metadata[:type_name]
-  end
-
-  @spec normalize_type_name(String.t()) :: String.t()
-  def normalize_type_name(name) when is_binary(name) do
-    name
-    |> String.split(".")
-    |> Enum.map_join(".", &Macro.camelize/1)
   end
 
   @spec descriptor_fun_body(desc :: struct()) :: String.t()

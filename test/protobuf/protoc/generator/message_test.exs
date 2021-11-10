@@ -5,7 +5,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   alias Protobuf.Protoc.Generator.Message, as: Generator
 
   test "generate/2 has right name" do
-    ctx = %Context{package: ""}
+    ctx = %Context{}
     desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
     {[], [msg]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
@@ -14,7 +14,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generate/2 has right syntax" do
-    ctx = %Context{package: "", syntax: :proto3}
+    ctx = %Context{syntax: :proto3}
     desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
     {[], [msg]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
@@ -55,7 +55,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generate/2 has right fields" do
-    ctx = %Context{package: ""}
+    ctx = %Context{}
 
     desc =
       Google.Protobuf.DescriptorProto.new(
@@ -87,7 +87,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generate/2 has right fields for proto3" do
-    ctx = %Context{package: "", syntax: :proto3}
+    ctx = %Context{syntax: :proto3}
 
     desc =
       Google.Protobuf.DescriptorProto.new(
@@ -127,7 +127,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generate/2 supports option :default" do
-    ctx = %Context{package: ""}
+    ctx = %Context{}
 
     desc =
       Google.Protobuf.DescriptorProto.new(
@@ -150,7 +150,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generate/2 supports option :packed" do
-    ctx = %Context{package: ""}
+    ctx = %Context{}
 
     desc =
       Google.Protobuf.DescriptorProto.new(
@@ -172,7 +172,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generate/2 supports option :deprecated" do
-    ctx = %Context{package: ""}
+    ctx = %Context{}
 
     desc =
       Google.Protobuf.DescriptorProto.new(
@@ -195,7 +195,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
   test "generete/2 supports message type field" do
     ctx = %Context{
-      package: "",
       dep_type_mapping: %{
         ".Bar" => %{type_name: "Bar"},
         ".Baz" => %{type_name: "Baz"}
@@ -363,7 +362,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generate/2 supports nested messages" do
-    ctx = %Context{package: ""}
+    ctx = %Context{}
 
     desc =
       Google.Protobuf.DescriptorProto.new(
@@ -379,7 +378,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generate/2 supports nested enum messages" do
-    ctx = %Context{package: ""}
+    ctx = %Context{}
 
     desc =
       Google.Protobuf.DescriptorProto.new(
@@ -407,7 +406,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   test "generate/2 supports oneof" do
-    ctx = %Context{package: ""}
+    ctx = %Context{}
 
     desc =
       Google.Protobuf.DescriptorProto.new(
@@ -476,7 +475,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
   describe "generate/2 json_name" do
     test "is added when it differs from the original field name" do
-      ctx = %Context{package: "", syntax: :proto3}
+      ctx = %Context{syntax: :proto3}
 
       desc =
         Google.Protobuf.DescriptorProto.new(
@@ -506,7 +505,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     end
 
     test "is omitted when syntax is not proto3" do
-      ctx = %Context{package: ""}
+      ctx = %Context{}
 
       desc =
         Google.Protobuf.DescriptorProto.new(

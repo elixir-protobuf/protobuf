@@ -5,7 +5,7 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
   alias Protobuf.Protoc.Generator.Enum, as: Generator
 
   test "generate/2 generates enum type messages" do
-    ctx = %Context{package: ""}
+    ctx = %Context{}
     module = Module.concat(__MODULE__, "EnumFoo") |> inspect() |> String.replace(".", "")
 
     desc = %Google.Protobuf.EnumDescriptorProto{
@@ -44,7 +44,7 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
   end
 
   test "generate/2 generates enum type messages with descriptor" do
-    ctx = %Context{package: "", gen_descriptors?: true}
+    ctx = %Context{gen_descriptors?: true}
     module = Module.concat(__MODULE__, "EnumFooDesc") |> inspect() |> String.replace(".", "")
 
     desc = %Google.Protobuf.EnumDescriptorProto{
