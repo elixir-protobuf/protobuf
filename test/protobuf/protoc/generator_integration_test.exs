@@ -1,4 +1,4 @@
-defmodule Protobuf.Protoc.IntegrationTest do
+defmodule Protobuf.Protoc.GeneratorIntegrationTest do
   use ExUnit.Case, async: true
   @moduletag :integration
 

@@ -26,6 +26,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: '3.17.3'
+          repo-token: ${{ secrets.GITHUB_TOKEN }} # to avoid rate limiting
+
       - name: Install OTP and Elixir
         uses: erlef/setup-elixir@v1
         with:
@@ -49,13 +55,6 @@ jobs:
 
       - name: Run tests
         run: mix test --trace
-
-      - name: Install protoc
-        if: ${{matrix.integration}}
-        run: |
-          wget https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protoc-3.12.3-linux-x86_64.zip
-          unzip protoc-3.12.3-linux-x86_64.zip
-          echo "./bin" >> $GITHUB_PATH
 
       - name: Compile .proto files to Elixir with protoc
         if: ${{matrix.integration}}

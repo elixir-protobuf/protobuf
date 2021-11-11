@@ -26,3 +26,6 @@ protobuf-*.tar
 protoc-gen-elixir
 .eqc-info
 *.eqc
+
+# ExUnit's :tmp_dir tag.
+/tmp
