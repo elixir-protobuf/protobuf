@@ -10,7 +10,8 @@ defmodule <%= @module %>.Service do
   <% end %>
 
   <%= for {method_name, input, output} <- @methods do %>
-  rpc :<%= method_name %>, <%= input %>, <%= output %><% end %>
+  rpc :<%= method_name %>, <%= input %>, <%= output %>
+  <% end %>
 end
 
 defmodule <%= @module %>.Stub do
