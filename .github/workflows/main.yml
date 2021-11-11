@@ -56,13 +56,6 @@ jobs:
       - name: Run tests
         run: mix test --trace
 
-      - name: Install protoc
-        if: ${{matrix.integration}}
-        run: |
-          wget https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protoc-3.12.3-linux-x86_64.zip
-          unzip protoc-3.12.3-linux-x86_64.zip
-          echo "./bin" >> $GITHUB_PATH
-
       - name: Compile .proto files to Elixir with protoc
         if: ${{matrix.integration}}
         run: |
