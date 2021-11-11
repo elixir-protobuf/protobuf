@@ -79,6 +79,7 @@ defmodule Protobuf.Mixfile do
 
   defp aliases do
     [
+      test: ["escript.build", "test"],
       gen_test_protos: [
         "escript.build",
         "cmd protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/extension.proto",
