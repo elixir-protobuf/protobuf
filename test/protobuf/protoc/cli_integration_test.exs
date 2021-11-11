@@ -2,7 +2,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
   use ExUnit.Case
 
   # TODO: Remove when we depend on Elixir 1.11+.
-  import Protobuf.TestHelpers, only: [tmp_dir: 1]
+  import Protobuf.TestHelpers, only: [tmp_dir: 1], warn: false
 
   if Version.match?(System.version(), ">= 1.11.0") do
     @moduletag :tmp_dir
