@@ -137,13 +137,11 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp typespec_str(fields, oneofs, extensions) do
-    longest_width = fields |> Enum.map(&String.length(&1.name)) |> Enum.max()
-
     {oneof_fields, regular_fields} = Enum.split_with(fields, & &1[:oneof])
 
-    oneof_types = oneof_types(oneofs, oneof_fields, longest_width)
-    regular_types = regular_types(regular_fields, longest_width)
-    extensions_types = extensions_types(extensions, longest_width)
+    oneof_types = oneof_types(oneofs, oneof_fields)
+    regular_types = regular_types(regular_fields)
+    extensions_types = extensions_types(extensions)
 
     types = oneof_types ++ regular_types ++ extensions_types
 
@@ -154,7 +152,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     """
   end
 
-  defp oneof_types(oneofs, oneof_fields, longest_width) do
+  defp oneof_types(oneofs, oneof_fields) do
     oneofs
     |> Enum.with_index()
     |> Enum.map(fn {oneof, index} ->
@@ -163,18 +161,18 @@ defmodule Protobuf.Protoc.Generator.Message do
         |> Enum.filter(&(&1.oneof == index))
         |> Enum.map_join(" | ", &"{:#{&1.name}, #{fmt_type(&1)}}")
 
-      {fmt_type_name(oneof.name, longest_width), typespec}
+      {fmt_type_name(oneof.name), typespec}
     end)
   end
 
-  defp regular_types(fields, longest_width) do
-    for f <- fields, do: {fmt_type_name(f.name, longest_width), fmt_type(f)}
+  defp regular_types(fields) do
+    for f <- fields, do: {fmt_type_name(f.name), fmt_type(f)}
   end
 
-  defp extensions_types(_extensions = [], _longest_width), do: []
+  defp extensions_types(_extensions = []), do: []
 
-  defp extensions_types(_extensions, longest_width) do
-    [{fmt_type_name(:__pb_extensions__, longest_width), "map"}]
+  defp extensions_types(_extensions) do
+    [{fmt_type_name(:__pb_extensions__), "map"}]
   end
 
   defp oneofs_str(oneofs) do
@@ -185,8 +183,8 @@ defmodule Protobuf.Protoc.Generator.Message do
     end)
   end
 
-  defp fmt_type_name(name, len) do
-    String.pad_trailing("#{name}:", len + 1)
+  defp fmt_type_name(name) do
+    "#{name}:"
   end
 
   defp fmt_type(%{opts: %{map: true}, map: {{k_type_enum, _k_type}, {v_type_enum, v_type}}}) do

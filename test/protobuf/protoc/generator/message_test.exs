@@ -463,9 +463,15 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "first: {:a, integer} | {:b, integer},\n"
-    assert msg =~ "second: {:c, integer} | {:d, integer},\n"
-    assert msg =~ "other: integer\n"
+
+    assert msg =~ """
+             @type t :: %__MODULE__{
+                     first: {:a, integer} | {:b, integer},
+                     second: {:c, integer} | {:d, integer},
+                     other: integer
+                   }
+           """
+
     refute msg =~ "a: integer,\n"
     assert msg =~ "defstruct [:first, :second, :other]\n"
     assert msg =~ "oneof :first, 0\n"
