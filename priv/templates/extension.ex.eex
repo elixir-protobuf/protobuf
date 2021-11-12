@@ -3,5 +3,6 @@ defmodule <%= @module %> do
   use Protobuf, <%= @use_options %>
 
   <%= for ext <- @extends do %>
-  extend <%= ext %><% end %>
+  extend <%= ext %>
+  <% end %>
 end

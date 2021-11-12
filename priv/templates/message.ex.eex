@@ -13,10 +13,12 @@ defmodule <%= @module %> do
   <% end %>
 
   <%= for v <- @oneofs do %>
-  <%= v %><% end %>
+  <%= v <> "\n" %>
+  <% end %>
 
   <%= for f <- @fields do %>
-  field <%= f %><% end %>
+  field <%= f %>
+  <% end %>
 
   def transform_module(), do: <%= inspect(@transform_module) %>
 

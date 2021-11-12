@@ -11,8 +11,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
     :defp,
     :extension_template,
     Path.expand("./templates/extension.ex.eex", :code.priv_dir(:protobuf)),
-    [:assigns],
-    trim: true
+    [:assigns]
   )
 
   def generate(%{namespace: ns} = ctx, desc, nested_extensions) do
@@ -36,7 +35,11 @@ defmodule Protobuf.Protoc.Generator.Extension do
       name = Macro.camelize(@ext_postfix)
       msg_name = Util.mod_name(ctx, ns ++ [name])
       use_options = Util.options_to_str(%{syntax: ctx.syntax})
-      {msg_name, extension_template(module: msg_name, use_options: use_options, extends: extends)}
+
+      {msg_name,
+       Util.format(
+         extension_template(module: msg_name, use_options: use_options, extends: extends)
+       )}
     end
   end
 

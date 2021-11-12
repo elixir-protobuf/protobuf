@@ -4,20 +4,13 @@ defmodule Protobuf.Protoc.Generator do
   alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator
 
-  @locals_without_parens [field: 2, field: 3, oneof: 2, rpc: 3, extend: 4, extensions: 1]
-
   @spec generate(Context.t(), %Google.Protobuf.FileDescriptorProto{}) ::
           [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()]
   def generate(%Context{} = ctx, %Google.Protobuf.FileDescriptorProto{} = desc) do
     module_definitions =
-      for {mod_name, contents} <- generate_module_definitions(ctx, desc) do
-        contents =
-          contents
-          |> format_code_if_possible()
-          |> append_newline_if_not_empty()
-
-        {mod_name, contents}
-      end
+      ctx
+      |> generate_module_definitions(desc)
+      |> Enum.reject(&is_nil/1)
 
     if ctx.one_file_per_module? do
       Enum.map(module_definitions, fn {mod_name, content} ->
@@ -31,7 +24,11 @@ defmodule Protobuf.Protoc.Generator do
     else
       # desc.name is the filename, ending in ".proto".
       file_name = Path.rootname(desc.name) <> ".pb.ex"
-      content = Enum.map_join(module_definitions, "\n", fn {_mod_name, contents} -> contents end)
+
+      content =
+        module_definitions
+        |> Enum.map(fn {_mod_name, contents} -> [contents, ?\n] end)
+        |> IO.iodata_to_binary()
 
       [
         Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(
@@ -90,17 +87,4 @@ defmodule Protobuf.Protoc.Generator do
 
   defp syntax("proto3"), do: :proto3
   defp syntax(_), do: :proto2
-
-  defp format_code_if_possible(code) do
-    if Code.ensure_loaded?(Code) and function_exported?(Code, :format_string!, 2) do
-      code
-      |> Code.format_string!(locals_without_parens: @locals_without_parens)
-      |> IO.iodata_to_binary()
-    else
-      code
-    end
-  end
-
-  defp append_newline_if_not_empty(""), do: ""
-  defp append_newline_if_not_empty(str), do: str <> "\n"
 end

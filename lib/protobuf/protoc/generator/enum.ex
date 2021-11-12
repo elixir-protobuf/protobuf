@@ -10,8 +10,7 @@ defmodule Protobuf.Protoc.Generator.Enum do
     :defp,
     :enum_template,
     Path.expand("./templates/enum.ex.eex", :code.priv_dir(:protobuf)),
-    [:assigns],
-    trim: true
+    [:assigns]
   )
 
   @spec generate(Context.t(), Google.Protobuf.EnumDescriptorProto.t()) ::
@@ -35,6 +34,6 @@ defmodule Protobuf.Protoc.Generator.Enum do
         descriptor_fun_body: descriptor_fun_body
       )
 
-    {msg_name, content}
+    {msg_name, Util.format(content)}
   end
 end

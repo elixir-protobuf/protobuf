@@ -11,6 +11,6 @@ defmodule <%= @module %> do
   end
   <% end %>
 
-<%= for %Google.Protobuf.EnumValueDescriptorProto{name: name, number: number} <- @fields do %>
+  <%= for %Google.Protobuf.EnumValueDescriptorProto{name: name, number: number} <- @fields do %>
   field :<%= name %>, <%= number %><% end %>
 end
