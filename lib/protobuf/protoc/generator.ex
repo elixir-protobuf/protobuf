@@ -49,9 +49,7 @@ defmodule Protobuf.Protoc.Generator do
       }
       |> Protobuf.Protoc.Context.custom_file_options_from_file_desc(desc)
 
-    nested_extensions =
-      Generator.Extension.get_nested_extensions(ctx, desc.message_type)
-      |> Enum.reverse()
+    nested_extensions = Generator.Extension.get_nested_extensions(ctx, desc.message_type)
 
     enum_defmodules = Enum.map(desc.enum_type, &Generator.Enum.generate(ctx, &1))
 

@@ -59,20 +59,23 @@ defmodule Protobuf.Protoc.Generator.Extension do
     "#{extendee}, :#{name}, #{f.number}, #{f.label}: true, type: #{f.type}#{f.opts_str}"
   end
 
-  @spec get_nested_extensions(Context.t(), [Google.Protobuf.DescriptorProto.t()], list()) ::
+  @spec get_nested_extensions(Context.t(), [Google.Protobuf.DescriptorProto.t()]) ::
           list()
-  def get_nested_extensions(%Context{namespace: ns} = ctx, descs, acc0 \\ []) do
+  def get_nested_extensions(ctx, descs) do
+    get_nested_extensions(ctx, descs, _acc = [])
+  end
+
+  defp get_nested_extensions(_context, _descs = [], acc) do
+    Enum.reverse(acc)
+  end
+
+  defp get_nested_extensions(%Context{namespace: ns} = ctx, descs, acc) do
     descs
     |> Enum.reject(&(&1.extension == []))
-    |> Enum.reduce(acc0, fn desc, acc ->
+    |> Enum.reduce(acc, fn desc, acc ->
       new_ns = ns ++ [Macro.camelize(desc.name)]
       acc = [_extension = {new_ns, desc.extension} | acc]
-
-      if desc.nested_type == [] do
-        acc
-      else
-        get_nested_extensions(%Context{ctx | namespace: new_ns}, desc.nested_type, acc)
-      end
+      get_nested_extensions(%Context{ctx | namespace: new_ns}, desc.nested_type, acc)
     end)
   end
 end
