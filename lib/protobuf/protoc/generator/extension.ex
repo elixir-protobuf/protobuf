@@ -1,6 +1,7 @@
 defmodule Protobuf.Protoc.Generator.Extension do
   @moduledoc false
 
+  alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator.Util
 
   require EEx
@@ -14,39 +15,39 @@ defmodule Protobuf.Protoc.Generator.Extension do
     [:assigns]
   )
 
-  def generate(%{namespace: ns} = ctx, desc, nested_extensions) do
-    extends = Enum.map(desc.extension, fn ext -> generate_extend(ctx, ext) end)
+  @spec generate(Context.t(), Google.Protobuf.FileDescriptorProto.t(), %{}) ::
+          nil | {module_name :: String.t(), file_contents :: String.t()}
+  def generate(
+        %Context{namespace: ns} = ctx,
+        %Google.Protobuf.FileDescriptorProto{} = desc,
+        nested_extensions
+      ) do
+    extends = Enum.map(desc.extension, &generate_extend(ctx, &1, _ns = ""))
 
     nested_extends =
-      Enum.map(nested_extensions, fn {ns, exts} ->
+      Enum.flat_map(nested_extensions, fn {ns, exts} ->
         ns = Enum.join(ns, ".")
-
-        Enum.map(exts, fn ext ->
-          generate_extend(ctx, ext, ns)
-        end)
+        Enum.map(exts, &generate_extend(ctx, &1, ns))
       end)
-      |> Enum.concat()
 
-    extends = extends ++ nested_extends
+    case extends ++ nested_extends do
+      [] ->
+        nil
 
-    if Enum.empty?(extends) do
-      nil
-    else
-      name = Macro.camelize(@ext_postfix)
-      msg_name = Util.mod_name(ctx, ns ++ [name])
-      use_options = Util.options_to_str(%{syntax: ctx.syntax})
+      extends ->
+        msg_name = Util.mod_name(ctx, ns ++ [Macro.camelize(@ext_postfix)])
+        use_options = Util.options_to_str(%{syntax: ctx.syntax})
 
-      {msg_name,
-       Util.format(
-         extension_template(module: msg_name, use_options: use_options, extends: extends)
-       )}
+        {msg_name,
+         Util.format(
+           extension_template(module: msg_name, use_options: use_options, extends: extends)
+         )}
     end
   end
 
-  def generate_extend(ctx, f, ns \\ "") do
+  defp generate_extend(ctx, f, ns) do
     extendee = Util.type_from_type_name(ctx, f.extendee)
     f = Protobuf.Protoc.Generator.Message.get_field(ctx, f, %{}, [])
-    label_str = "#{f.label}: true, "
 
     name =
       if ns == "" do
@@ -55,21 +56,22 @@ defmodule Protobuf.Protoc.Generator.Extension do
         inspect("#{ns}.#{f.name}")
       end
 
-    "#{extendee}, :#{name}, #{f.number}, #{label_str}type: #{f.type}#{f.opts_str}"
+    "#{extendee}, :#{name}, #{f.number}, #{f.label}: true, type: #{f.type}#{f.opts_str}"
   end
 
-  def get_nested_extensions(%{namespace: ns} = ctx, msgs, acc0 \\ []) do
-    msgs
-    |> Enum.filter(fn m -> !Enum.empty?(m.extension) end)
-    |> Enum.reduce(acc0, fn m, acc ->
-      new_ns = ns ++ [Macro.camelize(m.name)]
-      extension = {new_ns, m.extension}
-      acc = [extension | acc]
+  @spec get_nested_extensions(Context.t(), [Google.Protobuf.DescriptorProto.t()], list()) ::
+          list()
+  def get_nested_extensions(%Context{namespace: ns} = ctx, descs, acc0 \\ []) do
+    descs
+    |> Enum.reject(&(&1.extension == []))
+    |> Enum.reduce(acc0, fn desc, acc ->
+      new_ns = ns ++ [Macro.camelize(desc.name)]
+      acc = [_extension = {new_ns, desc.extension} | acc]
 
-      if m.nested_type == [] do
+      if desc.nested_type == [] do
         acc
       else
-        get_nested_extensions(%{ctx | namespace: new_ns}, m.nested_type, acc)
+        get_nested_extensions(%Context{ctx | namespace: new_ns}, desc.nested_type, acc)
       end
     end)
   end
