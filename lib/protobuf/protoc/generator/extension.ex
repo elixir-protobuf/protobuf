@@ -60,22 +60,23 @@ defmodule Protobuf.Protoc.Generator.Extension do
   end
 
   @spec get_nested_extensions(Context.t(), [Google.Protobuf.DescriptorProto.t()]) ::
-          list()
-  def get_nested_extensions(ctx, descs) do
-    get_nested_extensions(ctx, descs, _acc = [])
+          [{namespace, [ext_field]}]
+        when namespace: [String.t(), ...], ext_field: Google.Protobuf.FieldDescriptorProto.t()
+  def get_nested_extensions(%Context{} = ctx, descs) when is_list(descs) do
+    get_nested_extensions(ctx.namespace, descs, _acc = [])
   end
 
-  defp get_nested_extensions(_context, _descs = [], acc) do
+  defp get_nested_extensions(_ns, _descs = [], acc) do
     Enum.reverse(acc)
   end
 
-  defp get_nested_extensions(%Context{namespace: ns} = ctx, descs, acc) do
+  defp get_nested_extensions(ns, descs, acc) do
     descs
     |> Enum.reject(&(&1.extension == []))
     |> Enum.reduce(acc, fn desc, acc ->
       new_ns = ns ++ [Macro.camelize(desc.name)]
       acc = [_extension = {new_ns, desc.extension} | acc]
-      get_nested_extensions(%Context{ctx | namespace: new_ns}, desc.nested_type, acc)
+      get_nested_extensions(new_ns, desc.nested_type, acc)
     end)
   end
 end
