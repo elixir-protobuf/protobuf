@@ -63,16 +63,18 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   defp gen_msg(syntax, msg_struct) do
     {msg_struct[:name],
-     message_template(
-       module: msg_struct[:name],
-       use_options: msg_struct[:options],
-       struct_fields: msg_struct[:structs],
-       typespec: msg_struct[:typespec],
-       oneofs: msg_struct[:oneofs],
-       fields: gen_fields(syntax, msg_struct[:fields]),
-       descriptor_fun_body: msg_struct[:descriptor_fun_body],
-       transform_module: msg_struct[:transform_module],
-       extensions: gen_extensions(msg_struct[:extensions])
+     Util.format(
+       message_template(
+         module: msg_struct[:name],
+         use_options: msg_struct[:options],
+         struct_fields: msg_struct[:structs],
+         typespec: msg_struct[:typespec],
+         oneofs: msg_struct[:oneofs],
+         fields: gen_fields(syntax, msg_struct[:fields]),
+         descriptor_fun_body: msg_struct[:descriptor_fun_body],
+         transform_module: msg_struct[:transform_module],
+         extensions: gen_extensions(msg_struct[:extensions])
+       )
      )}
   end
 

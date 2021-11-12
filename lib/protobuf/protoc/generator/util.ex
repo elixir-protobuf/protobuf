@@ -3,6 +3,8 @@ defmodule Protobuf.Protoc.Generator.Util do
 
   alias Protobuf.Protoc.Context
 
+  @locals_without_parens [field: 2, field: 3, oneof: 2, rpc: 3, extend: 4, extensions: 1]
+
   defguardp is_nil_or_nonempty_string(term) when is_nil(term) or (is_binary(term) and term != "")
 
   @spec mod_name(Context.t(), [String.t()]) :: String.t()
@@ -70,5 +72,12 @@ defmodule Protobuf.Protoc.Generator.Util do
     |> mod.encode()
     |> mod.decode()
     |> inspect(limit: :infinity)
+  end
+
+  @spec format(String.t()) :: String.t()
+  def format(code) when is_binary(code) do
+    code
+    |> Code.format_string!(locals_without_parens: @locals_without_parens)
+    |> IO.iodata_to_binary()
   end
 end

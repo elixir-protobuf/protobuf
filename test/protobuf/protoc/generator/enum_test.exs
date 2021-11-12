@@ -36,15 +36,10 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
 
     assert msg =~ """
              field :A, 0
-
              field :B, 1
-
              field :HAS_UNDERSCORES, 2
-
              field :HAS_UNDERSCORES_X, 3
-
              field :HAS_UNDERSCORES_, 4
-
            """
   end
 
@@ -80,15 +75,10 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
 
     assert msg =~ """
              field :A, 0
-
              field :B, 1
-
              field :HAS_UNDERSCORES, 2
-
              field :HAS_UNDERSCORES_X, 3
-
              field :HAS_UNDERSCORES_, 4
-
            """
 
     assert %Google.Protobuf.EnumDescriptorProto{} = desc = compiled_mod.descriptor

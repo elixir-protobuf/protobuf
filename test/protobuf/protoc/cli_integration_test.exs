@@ -1,5 +1,5 @@
 defmodule Protobuf.Protoc.CLIIntegrationTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   # TODO: Remove when we depend on Elixir 1.11+.
   import Protobuf.TestHelpers, only: [tmp_dir: 1], warn: false
