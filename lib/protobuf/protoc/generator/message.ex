@@ -12,8 +12,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     :defp,
     :message_template,
     Path.expand("./templates/message.ex.eex", :code.priv_dir(:protobuf)),
-    [:assigns],
-    trim: true
+    [:assigns]
   )
 
   @spec generate_list(Context.t(), [Google.Protobuf.DescriptorProto.t()]) ::

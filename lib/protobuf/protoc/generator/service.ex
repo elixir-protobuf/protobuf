@@ -10,8 +10,7 @@ defmodule Protobuf.Protoc.Generator.Service do
     :defp,
     :service_template,
     Path.expand("./templates/service.ex.eex", :code.priv_dir(:protobuf)),
-    [:assigns],
-    trim: true
+    [:assigns]
   )
 
   @spec generate(Context.t(), Google.Protobuf.ServiceDescriptorProto.t()) :: String.t()

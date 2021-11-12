@@ -11,8 +11,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
     :defp,
     :extension_template,
     Path.expand("./templates/extension.ex.eex", :code.priv_dir(:protobuf)),
-    [:assigns],
-    trim: true
+    [:assigns]
   )
 
   def generate(%{namespace: ns} = ctx, desc, nested_extensions) do
