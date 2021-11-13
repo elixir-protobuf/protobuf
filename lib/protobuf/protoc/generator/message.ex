@@ -47,7 +47,7 @@ defmodule Protobuf.Protoc.Generator.Message do
          message_template(
            module: msg_name,
            use_options: msg_opts_str(ctx, desc.options),
-           struct_fields: structs_str(desc, extensions),
+           struct_fields: struct_fields_with_defaults(ctx, desc, extensions),
            struct_field_typespecs: struct_field_typespecs(fields, desc.oneof_decl, extensions),
            oneofs: desc.oneof_decl,
            fields: gen_fields(ctx.syntax, fields),
@@ -90,17 +90,22 @@ defmodule Protobuf.Protoc.Generator.Message do
     if String.length(str) > 0, do: ", " <> str, else: ""
   end
 
-  defp structs_str(struct, extensions) do
-    fields = Enum.filter(struct.field, fn f -> !f.oneof_index end)
+  defp struct_fields_with_defaults(ctx, %Google.Protobuf.DescriptorProto{} = desc, extensions) do
+    oneof_fields = Enum.map(desc.oneof_decl, &{&1.name, nil})
 
     fields =
-      if Enum.empty?(extensions) do
-        fields
-      else
-        fields ++ [%{name: :__pb_extensions__}]
-      end
+      for f <- desc.field,
+          !f.oneof_index,
+          do: {f.name, struct_default_value(f, ctx.syntax)}
 
-    Enum.map_join(struct.oneof_decl ++ fields, ", ", fn f -> ":#{f.name}" end)
+    extensions_fields =
+      if Enum.empty?(extensions), do: [], else: [{:__pb_extensions__, _default = nil}]
+
+    oneof_fields ++ fields ++ extensions_fields
+  end
+
+  defp struct_default_value(_, _) do
+    nil
   end
 
   defp struct_field_typespecs(fields, oneofs, extensions) do

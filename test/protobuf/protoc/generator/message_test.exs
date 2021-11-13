@@ -79,7 +79,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "defstruct [:a, :b]\n"
+
+    assert msg =~ """
+             defstruct a: nil,
+                       b: nil
+           """
+
     assert msg =~ "a: integer"
     assert msg =~ "b: String.t()"
     assert msg =~ "field :a, 1, optional: true, type: :int32\n"
@@ -118,7 +123,13 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "defstruct [:a, :b, :c]\n"
+
+    assert msg =~ """
+             defstruct a: nil,
+                       b: nil,
+                       c: nil
+           """
+
     assert msg =~ "a: integer"
     assert msg =~ "b: String.t()"
     assert msg =~ "field :a, 1, type: :int32\n"
@@ -473,7 +484,13 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
            """
 
     refute msg =~ "a: integer,\n"
-    assert msg =~ "defstruct [:first, :second, :other]\n"
+
+    assert msg =~ """
+             defstruct first: nil,
+                       second: nil,
+                       other: nil
+           """
+
     assert msg =~ "oneof :first, 0\n"
     assert msg =~ "oneof :second, 1\n"
     assert msg =~ "field :a, 1, optional: true, type: :int32, oneof: 0\n"
@@ -509,7 +526,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         )
 
       {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-      assert msg =~ "defstruct [:simple, :the_field_name]\n"
+
+      assert msg =~ """
+               defstruct simple: nil,
+                         the_field_name: nil
+             """
+
       assert msg =~ "field :simple, 1, type: :int32\n"
       assert msg =~ "field :the_field_name, 2, type: :string, json_name: \"theFieldName\"\n"
     end
@@ -532,7 +554,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         )
 
       {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-      assert msg =~ "defstruct [:the_field_name]\n"
+
+      assert msg =~ "defstruct the_field_name: nil"
       assert msg =~ "field :the_field_name, 1, required: true, type: :string\n"
     end
   end
