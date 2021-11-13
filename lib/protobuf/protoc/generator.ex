@@ -84,5 +84,6 @@ defmodule Protobuf.Protoc.Generator do
   end
 
   defp syntax("proto3"), do: :proto3
-  defp syntax(_), do: :proto2
+  defp syntax("proto2"), do: :proto2
+  defp syntax(nil), do: :proto2
 end

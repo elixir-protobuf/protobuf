@@ -26,16 +26,8 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   @spec generate(Context.t(), Google.Protobuf.DescriptorProto.t()) :: {any(), any()}
   def generate(%Context{} = ctx, %Google.Protobuf.DescriptorProto{} = desc) do
-    msg_struct = parse_desc(ctx, desc)
-    ctx = %Context{ctx | namespace: msg_struct[:new_namespace]}
-    {nested_enums, nested_msgs} = Enum.unzip(gen_nested_msgs(ctx, desc))
-
-    {gen_nested_enums(ctx, desc) ++ nested_enums,
-     nested_msgs ++ [gen_msg(ctx.syntax, msg_struct)]}
-  end
-
-  defp parse_desc(%Context{namespace: ns} = ctx, desc) do
-    new_ns = ns ++ [Macro.camelize(desc.name)]
+    new_ns = ctx.namespace ++ [Macro.camelize(desc.name)]
+    msg_name = Util.mod_name(ctx, new_ns)
     fields = get_fields(ctx, desc)
     extensions = get_extensions(desc)
 
@@ -46,35 +38,26 @@ defmodule Protobuf.Protoc.Generator.Message do
         nil
       end
 
-    %{
-      new_namespace: new_ns,
-      name: Util.mod_name(ctx, new_ns),
-      options: msg_opts_str(ctx, desc.options),
-      structs: structs_str(desc, extensions),
-      typespec: typespec_str(fields, desc.oneof_decl, extensions),
-      fields: fields,
-      oneofs: oneofs_str(desc.oneof_decl),
-      descriptor_fun_body: descriptor_fun_body,
-      transform_module: ctx.transform_module,
-      extensions: extensions
-    }
-  end
+    ctx = %Context{ctx | namespace: new_ns}
+    {nested_enums, nested_msgs} = Enum.unzip(gen_nested_msgs(ctx, desc))
 
-  defp gen_msg(syntax, msg_struct) do
-    {msg_struct[:name],
-     Util.format(
-       message_template(
-         module: msg_struct[:name],
-         use_options: msg_struct[:options],
-         struct_fields: msg_struct[:structs],
-         typespec: msg_struct[:typespec],
-         oneofs: msg_struct[:oneofs],
-         fields: gen_fields(syntax, msg_struct[:fields]),
-         descriptor_fun_body: msg_struct[:descriptor_fun_body],
-         transform_module: msg_struct[:transform_module],
-         extensions: gen_extensions(msg_struct[:extensions])
-       )
-     )}
+    msg =
+      {msg_name,
+       Util.format(
+         message_template(
+           module: msg_name,
+           use_options: msg_opts_str(ctx, desc.options),
+           struct_fields: structs_str(desc, extensions),
+           struct_field_typespecs: struct_field_typespecs(fields, desc.oneof_decl, extensions),
+           oneofs: desc.oneof_decl,
+           fields: gen_fields(ctx.syntax, fields),
+           descriptor_fun_body: descriptor_fun_body,
+           transform_module: ctx.transform_module,
+           extensions: extensions
+         )
+       )}
+
+    {gen_nested_enums(ctx, desc) ++ nested_enums, nested_msgs ++ [msg]}
   end
 
   defp gen_nested_msgs(ctx, desc) do
@@ -92,14 +75,6 @@ defmodule Protobuf.Protoc.Generator.Message do
 
       ":#{f[:name]}, #{f[:number]}, #{label_str}type: #{f[:type]}#{opts_str}"
     end)
-  end
-
-  defp gen_extensions([]) do
-    nil
-  end
-
-  defp gen_extensions(exts) do
-    inspect(exts, limit: :infinity)
   end
 
   defp msg_opts_str(%{syntax: syntax}, opts) do
@@ -128,22 +103,14 @@ defmodule Protobuf.Protoc.Generator.Message do
     Enum.map_join(struct.oneof_decl ++ fields, ", ", fn f -> ":#{f.name}" end)
   end
 
-  defp typespec_str(fields, oneofs, extensions) do
+  defp struct_field_typespecs(fields, oneofs, extensions) do
     {oneof_fields, regular_fields} = Enum.split_with(fields, & &1[:oneof])
 
     oneof_types = oneof_types(oneofs, oneof_fields)
     regular_types = regular_types(regular_fields)
     extensions_types = extensions_types(extensions)
 
-    template = """
-    %__MODULE__{
-      <%= for {name, spec} <- types do %>
-      <%= to_string(name) %>: <%= spec %>,
-      <% end %>
-    }
-    """
-
-    EEx.eval_string(template, types: oneof_types ++ regular_types ++ extensions_types)
+    oneof_types ++ regular_types ++ extensions_types
   end
 
   defp oneof_types(oneofs, oneof_fields) do
@@ -167,14 +134,6 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   defp extensions_types(_extensions) do
     [{:__pb_extensions__, "map"}]
-  end
-
-  defp oneofs_str(oneofs) do
-    oneofs
-    |> Enum.with_index()
-    |> Enum.map(fn {oneof, index} ->
-      "oneof :#{oneof.name}, #{index}"
-    end)
   end
 
   defp fmt_type(%{opts: %{map: true}, map: {{k_type_enum, _k_type}, {v_type_enum, v_type}}}) do
