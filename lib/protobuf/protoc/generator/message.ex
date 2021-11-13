@@ -102,7 +102,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     inspect(exts, limit: :infinity)
   end
 
-  def msg_opts_str(%{syntax: syntax}, opts) do
+  defp msg_opts_str(%{syntax: syntax}, opts) do
     msg_options = opts
 
     opts = %{
@@ -115,7 +115,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     if String.length(str) > 0, do: ", " <> str, else: ""
   end
 
-  def structs_str(struct, extensions) do
+  defp structs_str(struct, extensions) do
     fields = Enum.filter(struct.field, fn f -> !f.oneof_index end)
 
     fields =
@@ -128,14 +128,6 @@ defmodule Protobuf.Protoc.Generator.Message do
     Enum.map_join(struct.oneof_decl ++ fields, ", ", fn f -> ":#{f.name}" end)
   end
 
-  defp typespec_str(_fields = [], _oneofs = [], _extensions = []) do
-    "%__MODULE__{}"
-  end
-
-  defp typespec_str(_fields = [], _oneofs = [], _extensions = [_ | _]) do
-    "%__MODULE__{__pb_extensions__: map}"
-  end
-
   defp typespec_str(fields, oneofs, extensions) do
     {oneof_fields, regular_fields} = Enum.split_with(fields, & &1[:oneof])
 
@@ -143,13 +135,15 @@ defmodule Protobuf.Protoc.Generator.Message do
     regular_types = regular_types(regular_fields)
     extensions_types = extensions_types(extensions)
 
-    types = oneof_types ++ regular_types ++ extensions_types
-
-    """
+    template = """
     %__MODULE__{
-      #{Enum.map_join(types, ",\n", fn {k, v} -> "    #{k} #{v}" end)}
+      <%= for {name, spec} <- types do %>
+      <%= to_string(name) %>: <%= spec %>,
+      <% end %>
     }
     """
+
+    EEx.eval_string(template, types: oneof_types ++ regular_types ++ extensions_types)
   end
 
   defp oneof_types(oneofs, oneof_fields) do
@@ -161,18 +155,18 @@ defmodule Protobuf.Protoc.Generator.Message do
         |> Enum.filter(&(&1.oneof == index))
         |> Enum.map_join(" | ", &"{:#{&1.name}, #{fmt_type(&1)}}")
 
-      {fmt_type_name(oneof.name), typespec}
+      {oneof.name, typespec}
     end)
   end
 
   defp regular_types(fields) do
-    for f <- fields, do: {fmt_type_name(f.name), fmt_type(f)}
+    for f <- fields, do: {f.name, fmt_type(f)}
   end
 
   defp extensions_types(_extensions = []), do: []
 
   defp extensions_types(_extensions) do
-    [{fmt_type_name(:__pb_extensions__), "map"}]
+    [{:__pb_extensions__, "map"}]
   end
 
   defp oneofs_str(oneofs) do
@@ -181,10 +175,6 @@ defmodule Protobuf.Protoc.Generator.Message do
     |> Enum.map(fn {oneof, index} ->
       "oneof :#{oneof.name}, #{index}"
     end)
-  end
-
-  defp fmt_type_name(name) do
-    "#{name}:"
   end
 
   defp fmt_type(%{opts: %{map: true}, map: {{k_type_enum, _k_type}, {v_type_enum, v_type}}}) do
