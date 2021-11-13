@@ -63,7 +63,7 @@ defmodule Protobuf.Protoc.CLI do
   end
 
   def main(_args) do
-    fail_and_halt("Invalid arguments. See protoc-gen-elixir --help.")
+    raise "invalid arguments. See protoc-gen-elixir --help."
   end
 
   # Made public for testing.
@@ -84,15 +84,13 @@ defmodule Protobuf.Protoc.CLI do
         %Context{ctx | gen_descriptors?: true}
 
       other ->
-        fail_and_halt(
-          "Invalid value for gen_descriptors option, expected \"true\", got: #{inspect(other)}"
-        )
+        raise "invalid value for gen_descriptors option, expected \"true\", got: #{inspect(other)}"
     end
   end
 
   defp parse_param("package_prefix=" <> package, ctx) do
     if package == "" do
-      fail_and_halt("package_prefix can't be empty")
+      raise "package_prefix can't be empty"
     else
       %Context{ctx | package_prefix: package}
     end
@@ -108,19 +106,12 @@ defmodule Protobuf.Protoc.CLI do
         %Context{ctx | one_file_per_module?: true}
 
       other ->
-        fail_and_halt(
-          "Invalid value for one_file_per_module option, expected \"true\", got: #{inspect(other)}"
-        )
+        raise "invalid value for one_file_per_module option, expected \"true\", got: #{inspect(other)}"
     end
   end
 
   defp parse_param(_unknown, ctx) do
     ctx
-  end
-
-  defp fail_and_halt(message) do
-    IO.puts(:stderr, message)
-    System.halt(1)
   end
 
   # Made public for testing.

@@ -23,6 +23,12 @@ defmodule Protobuf.Protoc.CLITest do
                end) =~ "`protoc` plugin for generating Elixir code"
       end
     end
+
+    test "raises an error with invalid arguments" do
+      assert_raise RuntimeError, ~r/invalid arguments/, fn ->
+        main(["invalid"])
+      end
+    end
   end
 
   describe "parse_params/2" do
@@ -51,6 +57,24 @@ defmodule Protobuf.Protoc.CLITest do
 
     test "ignores unknown parameters" do
       assert parse_params(%Context{}, "unknown=true") == %Context{}
+    end
+
+    test "raises an error with invalid arguments" do
+      assert_raise RuntimeError, ~r/invalid value for gen_descriptors option/, fn ->
+        parse_params(%Context{}, "gen_descriptors=false")
+      end
+
+      assert_raise RuntimeError, ~r/invalid value for one_file_per_module option/, fn ->
+        parse_params(%Context{}, "one_file_per_module=false")
+      end
+
+      assert_raise RuntimeError, ~r/package_prefix can't be empty/, fn ->
+        parse_params(%Context{}, "package_prefix=")
+      end
+
+      assert_raise RuntimeError, ~r/package_prefix can't be empty/, fn ->
+        parse_params(%Context{}, "package_prefix=,gen_descriptors=true")
+      end
     end
   end
 
