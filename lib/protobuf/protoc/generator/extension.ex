@@ -47,7 +47,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
 
   defp generate_extend(ctx, f, ns) do
     extendee = Util.type_from_type_name(ctx, f.extendee)
-    f = Protobuf.Protoc.Generator.Message.get_field(ctx, f, %{}, [])
+    f = Protobuf.Protoc.Generator.Message.get_field(ctx, f)
 
     name =
       if ns == "" do

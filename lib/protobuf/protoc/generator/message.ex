@@ -169,7 +169,13 @@ defmodule Protobuf.Protoc.Generator.Message do
     for field <- desc.field, do: get_field(ctx, field, nested_maps, oneofs)
   end
 
-  def get_field(ctx, f, nested_maps, oneofs) do
+  # Public and used by extensions.
+  @spec get_field(Context.t(), Google.Protobuf.FieldDescriptorProto.t()) :: map()
+  def get_field(%Context{} = ctx, %Google.Protobuf.FieldDescriptorProto{} = field) do
+    get_field(ctx, field, _nested_maps = %{}, _oneofs = [])
+  end
+
+  defp get_field(ctx, f, nested_maps, oneofs) do
     opts = field_options(f, ctx.syntax)
     map = nested_maps[f.type_name]
     opts = if map, do: Map.put(opts, :map, true), else: opts
