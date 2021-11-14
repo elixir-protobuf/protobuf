@@ -10,7 +10,7 @@ defmodule <%= @module %> do
 
   defstruct [
     <%= for {name, default_value} <- @struct_fields do %>
-    <%= name %>: <%= inspect(default_value) %>,
+    <%= name %>: <%= default_value %>,
     <% end %>
   ]
 

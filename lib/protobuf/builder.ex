@@ -35,6 +35,8 @@ defmodule Protobuf.Builder do
   def type_default(:double), do: 0.0
   def type_default(:bytes), do: <<>>
   def type_default(:string), do: ""
+  def type_default(:message), do: nil
+  def type_default(:group), do: nil
   def type_default(_), do: nil
 
   defp new_maybe_strict(mod, attrs, strict?) do
