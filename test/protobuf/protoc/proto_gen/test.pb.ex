@@ -7,6 +7,7 @@ defmodule My.Test.HatType do
   field :FEDORA, 1
   field :FEZ, 2
 end
+
 defmodule My.Test.Days do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -17,6 +18,7 @@ defmodule My.Test.Days do
   field :TUESDAY, 2
   field :LUNDI, 1
 end
+
 defmodule My.Test.Request.Color do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -27,6 +29,7 @@ defmodule My.Test.Request.Color do
   field :GREEN, 1
   field :BLUE, 2
 end
+
 defmodule My.Test.Reply.Entry.Game do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -36,6 +39,7 @@ defmodule My.Test.Reply.Entry.Game do
   field :FOOTBALL, 1
   field :TENNIS, 2
 end
+
 defmodule My.Test.Request.SomeGroup do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -50,6 +54,7 @@ defmodule My.Test.Request.SomeGroup do
 
   def transform_module(), do: nil
 end
+
 defmodule My.Test.Request.NameMappingEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -68,6 +73,7 @@ defmodule My.Test.Request.NameMappingEntry do
 
   def transform_module(), do: nil
 end
+
 defmodule My.Test.Request.MsgMappingEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -86,6 +92,7 @@ defmodule My.Test.Request.MsgMappingEntry do
 
   def transform_module(), do: nil
 end
+
 defmodule My.Test.Request do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -132,6 +139,7 @@ defmodule My.Test.Request do
 
   def transform_module(), do: nil
 end
+
 defmodule My.Test.Reply.Entry do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -154,6 +162,7 @@ defmodule My.Test.Reply.Entry do
 
   def transform_module(), do: nil
 end
+
 defmodule My.Test.Reply do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -176,6 +185,7 @@ defmodule My.Test.Reply do
 
   extensions [{100, 536_870_912}]
 end
+
 defmodule My.Test.OtherBase do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -194,6 +204,7 @@ defmodule My.Test.OtherBase do
 
   extensions [{100, 536_870_912}]
 end
+
 defmodule My.Test.ReplyExtensions do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -204,6 +215,7 @@ defmodule My.Test.ReplyExtensions do
 
   def transform_module(), do: nil
 end
+
 defmodule My.Test.OtherReplyExtensions do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -218,6 +230,7 @@ defmodule My.Test.OtherReplyExtensions do
 
   def transform_module(), do: nil
 end
+
 defmodule My.Test.OldReply do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -232,6 +245,7 @@ defmodule My.Test.OldReply do
 
   extensions [{100, 2_147_483_647}]
 end
+
 defmodule My.Test.Communique.SomeGroup do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -246,6 +260,7 @@ defmodule My.Test.Communique.SomeGroup do
 
   def transform_module(), do: nil
 end
+
 defmodule My.Test.Communique.Delta do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -256,6 +271,7 @@ defmodule My.Test.Communique.Delta do
 
   def transform_module(), do: nil
 end
+
 defmodule My.Test.Communique do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -304,6 +320,7 @@ defmodule My.Test.Communique do
 
   def transform_module(), do: nil
 end
+
 defmodule My.Test.Options do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -318,6 +335,7 @@ defmodule My.Test.Options do
 
   def transform_module(), do: nil
 end
+
 defmodule My.Test.PbExtension do
   @moduledoc false
   use Protobuf, syntax: :proto2

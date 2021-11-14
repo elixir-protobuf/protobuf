@@ -12,6 +12,7 @@ defmodule Elixirpb.FileOptions do
 
   def transform_module(), do: nil
 end
+
 defmodule Elixirpb.PbExtension do
   @moduledoc false
   use Protobuf, syntax: :proto2
