@@ -121,7 +121,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp struct_default_value(%{type_enum: type}, _syntax) do
-    case type |> TypeUtil.from_enum() do
+    case TypeUtil.from_enum(type) do
       :enum -> {:enum, 0}
       other -> other
     end
