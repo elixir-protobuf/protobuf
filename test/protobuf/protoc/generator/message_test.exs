@@ -79,11 +79,40 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "defstruct [:a, :b]\n"
+
+    assert msg =~ """
+             defstruct a: nil,
+                       b: ""
+           """
+
     assert msg =~ "a: integer"
     assert msg =~ "b: String.t()"
     assert msg =~ "field :a, 1, optional: true, type: :int32\n"
     assert msg =~ "field :b, 2, required: true, type: :string\n"
+  end
+
+  test "generate/2 has right fields with right defaults" do
+    ctx = %Context{}
+
+    desc =
+      Google.Protobuf.DescriptorProto.new(
+        name: "Foo",
+        field: [
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "a",
+            json_name: "a",
+            number: 1,
+            type: :TYPE_BOOL,
+            label: :LABEL_REQUIRED
+          )
+        ]
+      )
+
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
+
+    assert msg =~ """
+             defstruct a: false
+           """
   end
 
   test "generate/2 has right fields for proto3" do
@@ -118,7 +147,13 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "defstruct [:a, :b, :c]\n"
+
+    assert msg =~ """
+             defstruct a: 0,
+                       b: "",
+                       c: []
+           """
+
     assert msg =~ "a: integer"
     assert msg =~ "b: String.t()"
     assert msg =~ "field :a, 1, type: :int32\n"
@@ -147,6 +182,37 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "a: integer"
     assert msg =~ "field :a, 1, optional: true, type: :int32, default: 42\n"
+
+    assert msg =~ """
+             defstruct a: nil
+           """
+  end
+
+  test "generate/2 supports option :default and uses right default if field is required" do
+    ctx = %Context{}
+
+    desc =
+      Google.Protobuf.DescriptorProto.new(
+        name: "Foo",
+        field: [
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "a",
+            json_name: "a",
+            number: 1,
+            type: :TYPE_INT32,
+            label: :LABEL_REQUIRED,
+            default_value: "42"
+          )
+        ]
+      )
+
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
+    assert msg =~ "a: integer"
+    assert msg =~ "field :a, 1, required: true, type: :int32, default: 42\n"
+
+    assert msg =~ """
+             defstruct a: 42
+           """
   end
 
   test "generate/2 supports option :packed" do
@@ -308,6 +374,42 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "a: FooBar.AbCd.EnumFoo.t()"
     assert msg =~ "field :a, 1, optional: true, type: FooBar.AbCd.EnumFoo, enum: true\n"
+
+    assert msg =~ """
+             defstruct a: nil
+           """
+  end
+
+  test "generate/2 generate right enum struct defaults" do
+    ctx = %Context{
+      package: "foo_bar.ab_cd",
+      dep_type_mapping: %{
+        ".foo_bar.ab_cd.EnumFoo" => %{type_name: "FooBar.AbCd.EnumFoo"}
+      }
+    }
+
+    desc =
+      Google.Protobuf.DescriptorProto.new(
+        name: "Foo",
+        field: [
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "a",
+            json_name: "a",
+            number: 1,
+            type: :TYPE_ENUM,
+            label: :LABEL_REQUIRED,
+            type_name: ".foo_bar.ab_cd.EnumFoo"
+          )
+        ]
+      )
+
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
+    assert msg =~ "a: FooBar.AbCd.EnumFoo.t()"
+    assert msg =~ "field :a, 1, required: true, type: FooBar.AbCd.EnumFoo, enum: true\n"
+
+    assert msg =~ """
+             defstruct a: 0
+           """
   end
 
   test "generate/2 generate right enum type name with different package" do
@@ -333,6 +435,10 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: OtherPkg.EnumFoo, enum: true\n"
+
+    assert msg =~ """
+             defstruct a: nil
+           """
   end
 
   test "generate/2 generate right message type name with different package" do
@@ -359,6 +465,10 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "a: OtherPkg.MsgFoo.t()"
     assert msg =~ "field :a, 1, optional: true, type: OtherPkg.MsgFoo\n"
+
+    assert msg =~ """
+             defstruct a: nil
+           """
   end
 
   test "generate/2 supports nested messages" do
@@ -375,6 +485,49 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     {[[]], [[{_mod, msg}], _]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo.Nested do\n"
     assert msg =~ "defstruct []\n"
+  end
+
+  test "generate/2 supports nested messages with right defaults" do
+    ctx = %Context{
+      package: "my_pkg",
+      dep_type_mapping: %{".my_pkg.Nested" => %{type_name: "MyPkg.Foo.Nested"}}
+    }
+
+    desc =
+      Google.Protobuf.DescriptorProto.new(
+        name: "Foo",
+        field: [
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "a",
+            json_name: "a",
+            number: 1,
+            type: :TYPE_MESSAGE,
+            label: :LABEL_REQUIRED,
+            type_name: ".my_pkg.Nested"
+          )
+        ],
+        nested_type: [
+          Google.Protobuf.DescriptorProto.new(name: "Nested")
+        ]
+      )
+
+    {[[]], [[{_, nested_msg}], {_, main_msg}]} = Generator.generate(ctx, desc)
+    assert nested_msg =~ "defmodule MyPkg.Foo.Nested do\n"
+    assert nested_msg =~ "defstruct []\n"
+
+    assert main_msg =~ "defmodule MyPkg.Foo do"
+
+    assert main_msg =~ """
+             @type t :: %__MODULE__{
+                     a: MyPkg.Foo.Nested.t() | nil
+                   }
+           """
+
+    assert main_msg =~ """
+             defstruct a: nil
+           """
+
+    assert main_msg =~ "field :a, 1, required: true, type: MyPkg.Foo.Nested"
   end
 
   test "generate/2 supports nested enum messages" do
@@ -473,7 +626,13 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
            """
 
     refute msg =~ "a: integer,\n"
-    assert msg =~ "defstruct [:first, :second, :other]\n"
+
+    assert msg =~ """
+             defstruct first: nil,
+                       second: nil,
+                       other: nil
+           """
+
     assert msg =~ "oneof :first, 0\n"
     assert msg =~ "oneof :second, 1\n"
     assert msg =~ "field :a, 1, optional: true, type: :int32, oneof: 0\n"
@@ -509,7 +668,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         )
 
       {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-      assert msg =~ "defstruct [:simple, :the_field_name]\n"
+
+      assert msg =~ """
+               defstruct simple: 0,
+                         the_field_name: ""
+             """
+
       assert msg =~ "field :simple, 1, type: :int32\n"
       assert msg =~ "field :the_field_name, 2, type: :string, json_name: \"theFieldName\"\n"
     end
@@ -532,12 +696,13 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         )
 
       {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-      assert msg =~ "defstruct [:the_field_name]\n"
+
+      assert msg =~ "defstruct the_field_name: \"\""
       assert msg =~ "field :the_field_name, 1, required: true, type: :string\n"
     end
   end
 
-  test "generate/2 repeated enum field in typespec" do
+  test "generate/2 repeated enum field" do
     ctx = %Context{
       package: "foo_bar.ab_cd",
       dep_type_mapping: %{
@@ -562,5 +727,9 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "a: [FooBar.AbCd.EnumFoo.t()]"
+
+    assert msg =~ """
+             defstruct a: []
+           """
   end
 end

@@ -84,20 +84,23 @@ defmodule Protobuf.Mixfile do
         "escript.build",
         "cmd protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/extension.proto",
         "cmd protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --elixir_opt=package_prefix=my --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/test.proto",
-        "cmd protoc -I src --elixir_out=lib --plugin=./protoc-gen-elixir elixirpb.proto"
+        "cmd protoc -I src --elixir_out=lib --plugin=./protoc-gen-elixir elixirpb.proto",
+        "format"
       ],
       # $PROTO_LIB should be your local path to https://github.com/google/protobuf/tree/master/src/google/protobuf
       gen_google_protos: [
         "escript.build",
         require_env_variable("PROTO_LIB"),
         "cmd protoc -I $PROTO_LIB --elixir_out=lib/google --plugin=./protoc-gen-elixir descriptor.proto",
-        "cmd protoc -I $PROTO_LIB --elixir_out=lib/google --plugin=./protoc-gen-elixir compiler/plugin.proto"
+        "cmd protoc -I $PROTO_LIB --elixir_out=lib/google --plugin=./protoc-gen-elixir compiler/plugin.proto",
+        "format"
       ],
       # $PROTO_BENCH should be your local path to https://github.com/google/protobuf/tree/master/benchmarks
       gen_bench_protos: [
         "escript.build",
         require_env_variable("PROTO_BENCH"),
-        "cmd protoc -I $PROTO_BENCH --elixir_out=bench/lib --plugin=./protoc-gen-elixir #{Enum.join(benchmark_proto_files(), " ")}"
+        "cmd protoc -I $PROTO_BENCH --elixir_out=bench/lib --plugin=./protoc-gen-elixir #{Enum.join(benchmark_proto_files(), " ")}",
+        "format"
       ]
     ]
   end

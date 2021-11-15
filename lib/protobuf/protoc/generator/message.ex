@@ -47,7 +47,7 @@ defmodule Protobuf.Protoc.Generator.Message do
          message_template(
            module: msg_name,
            use_options: msg_opts_str(ctx, desc.options),
-           struct_fields: structs_str(desc, extensions),
+           struct_fields: struct_fields_with_defaults(ctx, desc, fields, extensions),
            struct_field_typespecs: struct_field_typespecs(fields, desc.oneof_decl, extensions),
            oneofs: desc.oneof_decl,
            fields: gen_fields(ctx.syntax, fields),
@@ -90,17 +90,43 @@ defmodule Protobuf.Protoc.Generator.Message do
     if String.length(str) > 0, do: ", " <> str, else: ""
   end
 
-  defp structs_str(struct, extensions) do
-    fields = Enum.filter(struct.field, fn f -> !f.oneof_index end)
+  defp struct_fields_with_defaults(ctx, desc, fields, extensions) do
+    oneof_fields = Enum.map(desc.oneof_decl, &{&1.name, _default = "nil"})
 
     fields =
-      if Enum.empty?(extensions) do
-        fields
-      else
-        fields ++ [%{name: :__pb_extensions__}]
-      end
+      for field <- fields,
+          is_nil(field.oneof),
+          do: {field.name, struct_default_value(field, ctx.syntax)}
 
-    Enum.map_join(struct.oneof_decl ++ fields, ", ", fn f -> ":#{f.name}" end)
+    extensions_fields =
+      if Enum.empty?(extensions), do: [], else: [{:__pb_extensions__, _default = "nil"}]
+
+    oneof_fields ++ fields ++ extensions_fields
+  end
+
+  defp struct_default_value(%{label: "optional"}, syntax) when syntax != :proto3 do
+    "nil"
+  end
+
+  defp struct_default_value(%{map: map}, _syntax) when not is_nil(map) do
+    "%{}"
+  end
+
+  defp struct_default_value(%{label: "repeated"}, _syntax) do
+    "[]"
+  end
+
+  defp struct_default_value(%{opts: %{default: default}}, _syntax) when is_binary(default) do
+    default
+  end
+
+  defp struct_default_value(%{type_enum: type}, _syntax) do
+    case TypeUtil.from_enum(type) do
+      :enum -> {:enum, 0}
+      other -> other
+    end
+    |> Protobuf.Builder.type_default()
+    |> inspect()
   end
 
   defp struct_field_typespecs(fields, oneofs, extensions) do
