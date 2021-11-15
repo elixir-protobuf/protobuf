@@ -16,7 +16,6 @@ jobs:
             integration: true
           - otp: 23.3
             elixir: 1.11.4
-            integration: true
           - otp: 23.3
             elixir: 1.10.4
           - otp: 22.3
@@ -56,11 +55,25 @@ jobs:
       - name: Run tests
         run: mix test --trace
 
-      - name: Compile .proto files to Elixir with protoc
+      - name: Clone Google's Protobuf schemas
+        uses: actions/checkout@master
+        with:
+          repository: google/protobuf
+          path: google_protobuf
+        if: ${{matrix.integration}}
+
+      - name: Compile .proto files to Elixir with protoc and make sure they did not change
         if: ${{matrix.integration}}
         run: |
           mix gen_test_protos
+          mix gen_google_protos
+          mix gen_bench_protos
 
       - name: Run integration tests
         if: ${{matrix.integration}}
         run: mix test --only integration
+
+      - name: Check that generated files did not change
+        if: ${{matrix.integration}}
+        run: |
+          git status
