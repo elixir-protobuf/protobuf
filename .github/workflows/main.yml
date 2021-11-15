@@ -79,4 +79,16 @@ jobs:
       - name: Check that generated files did not change
         if: ${{matrix.integration}}
         run: |
-          git status
+          rm -rf ./google_protobuf
+          if [[ -n "$(git status -uno --porcelain)" ]]; then
+            echo "Changes to the code seem to change the generated .pb.ex files."
+            echo "Make sure to run these tasks before merging:"
+            echo ""
+            echo "  mix gen_test_protos"
+            echo "  mix gen_google_protos"
+            echo "  mix gen_test_protos"
+            echo ""
+            echo "This is the git diff:"
+            git diff
+            exit 1
+          fi
