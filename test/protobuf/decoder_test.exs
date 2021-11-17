@@ -174,6 +174,9 @@ defmodule Protobuf.DecoderTest do
     assert TestMsg.ContainsTransformModule.decode(<<10, 2, 8, 42>>) ==
              %TestMsg.ContainsTransformModule{field: 42}
 
+    assert TestMsg.ContainsTransformModule.decode(<<10, 0>>) ==
+             %TestMsg.ContainsTransformModule{field: 0}
+
     assert TestMsg.ContainsTransformModule.decode(<<>>) ==
              %TestMsg.ContainsTransformModule{field: nil}
   end
