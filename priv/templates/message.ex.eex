@@ -29,7 +29,9 @@ defmodule <%= @module %> do
   field <%= f %>
   <% end %>
 
+  <%= if @transform_module do %>
   def transform_module(), do: <%= inspect(@transform_module) %>
+  <% end %>
 
   <%= if @extensions != [] do %>
   extensions <%= inspect(@extensions, limit: :infinity) %>

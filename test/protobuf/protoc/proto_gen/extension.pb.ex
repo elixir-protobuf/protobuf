@@ -9,6 +9,4 @@ defmodule Protobuf.Protoc.ExtTest.Foo do
   defstruct a: nil
 
   field :a, 1, optional: true, type: :string
-
-  def transform_module(), do: nil
 end

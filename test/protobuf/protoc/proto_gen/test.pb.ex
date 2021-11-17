@@ -51,8 +51,6 @@ defmodule My.Test.Request.SomeGroup do
   defstruct group_field: nil
 
   field :group_field, 9, optional: true, type: :int32
-
-  def transform_module(), do: nil
 end
 
 defmodule My.Test.Request.NameMappingEntry do
@@ -70,8 +68,6 @@ defmodule My.Test.Request.NameMappingEntry do
   field :key, 1, optional: true, type: :int32
 
   field :value, 2, optional: true, type: :string
-
-  def transform_module(), do: nil
 end
 
 defmodule My.Test.Request.MsgMappingEntry do
@@ -89,8 +85,6 @@ defmodule My.Test.Request.MsgMappingEntry do
   field :key, 1, optional: true, type: :sint64
 
   field :value, 2, optional: true, type: My.Test.Reply
-
-  def transform_module(), do: nil
 end
 
 defmodule My.Test.Request do
@@ -136,8 +130,6 @@ defmodule My.Test.Request do
   field :reset, 12, optional: true, type: :int32
 
   field :get_key, 16, optional: true, type: :string
-
-  def transform_module(), do: nil
 end
 
 defmodule My.Test.Reply.Entry do
@@ -159,8 +151,6 @@ defmodule My.Test.Reply.Entry do
   field :value, 2, optional: true, type: :int64, default: 7
 
   field :_my_field_name_2, 3, optional: true, type: :int64
-
-  def transform_module(), do: nil
 end
 
 defmodule My.Test.Reply do
@@ -181,8 +171,6 @@ defmodule My.Test.Reply do
 
   field :compact_keys, 2, repeated: true, type: :int32, packed: true
 
-  def transform_module(), do: nil
-
   extensions [{100, 536_870_912}]
 end
 
@@ -200,8 +188,6 @@ defmodule My.Test.OtherBase do
 
   field :name, 1, optional: true, type: :string
 
-  def transform_module(), do: nil
-
   extensions [{100, 536_870_912}]
 end
 
@@ -212,8 +198,6 @@ defmodule My.Test.ReplyExtensions do
   @type t :: %__MODULE__{}
 
   defstruct []
-
-  def transform_module(), do: nil
 end
 
 defmodule My.Test.OtherReplyExtensions do
@@ -227,8 +211,6 @@ defmodule My.Test.OtherReplyExtensions do
   defstruct key: nil
 
   field :key, 1, optional: true, type: :int32
-
-  def transform_module(), do: nil
 end
 
 defmodule My.Test.OldReply do
@@ -240,8 +222,6 @@ defmodule My.Test.OldReply do
         }
 
   defstruct __pb_extensions__: nil
-
-  def transform_module(), do: nil
 
   extensions [{100, 2_147_483_647}]
 end
@@ -257,8 +237,6 @@ defmodule My.Test.Communique.SomeGroup do
   defstruct member: nil
 
   field :member, 15, optional: true, type: :string
-
-  def transform_module(), do: nil
 end
 
 defmodule My.Test.Communique.Delta do
@@ -268,8 +246,6 @@ defmodule My.Test.Communique.Delta do
   @type t :: %__MODULE__{}
 
   defstruct []
-
-  def transform_module(), do: nil
 end
 
 defmodule My.Test.Communique do
@@ -317,8 +293,6 @@ defmodule My.Test.Communique do
   field :msg, 13, optional: true, type: My.Test.Reply, oneof: 0
 
   field :somegroup, 14, optional: true, type: :group, oneof: 0
-
-  def transform_module(), do: nil
 end
 
 defmodule My.Test.Options do
@@ -332,8 +306,6 @@ defmodule My.Test.Options do
   defstruct opt1: nil
 
   field :opt1, 1, optional: true, type: :string, deprecated: true
-
-  def transform_module(), do: nil
 end
 
 defmodule My.Test.PbExtension do

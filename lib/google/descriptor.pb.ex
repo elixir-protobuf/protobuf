@@ -109,8 +109,6 @@ defmodule Google.Protobuf.FileDescriptorSet do
   defstruct file: []
 
   field :file, 1, repeated: true, type: Google.Protobuf.FileDescriptorProto
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.FileDescriptorProto do
@@ -168,8 +166,6 @@ defmodule Google.Protobuf.FileDescriptorProto do
   field :source_code_info, 9, optional: true, type: Google.Protobuf.SourceCodeInfo
 
   field :syntax, 12, optional: true, type: :string
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.DescriptorProto.ExtensionRange do
@@ -191,8 +187,6 @@ defmodule Google.Protobuf.DescriptorProto.ExtensionRange do
   field :end, 2, optional: true, type: :int32
 
   field :options, 3, optional: true, type: Google.Protobuf.ExtensionRangeOptions
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.DescriptorProto.ReservedRange do
@@ -210,8 +204,6 @@ defmodule Google.Protobuf.DescriptorProto.ReservedRange do
   field :start, 1, optional: true, type: :int32
 
   field :end, 2, optional: true, type: :int32
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.DescriptorProto do
@@ -261,8 +253,6 @@ defmodule Google.Protobuf.DescriptorProto do
   field :reserved_range, 9, repeated: true, type: Google.Protobuf.DescriptorProto.ReservedRange
 
   field :reserved_name, 10, repeated: true, type: :string
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.ExtensionRangeOptions do
@@ -278,8 +268,6 @@ defmodule Google.Protobuf.ExtensionRangeOptions do
             __pb_extensions__: nil
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
-
-  def transform_module(), do: nil
 
   extensions [{1000, 536_870_912}]
 end
@@ -335,8 +323,6 @@ defmodule Google.Protobuf.FieldDescriptorProto do
   field :options, 8, optional: true, type: Google.Protobuf.FieldOptions
 
   field :proto3_optional, 17, optional: true, type: :bool
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.OneofDescriptorProto do
@@ -354,8 +340,6 @@ defmodule Google.Protobuf.OneofDescriptorProto do
   field :name, 1, optional: true, type: :string
 
   field :options, 2, optional: true, type: Google.Protobuf.OneofOptions
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.EnumDescriptorProto.EnumReservedRange do
@@ -373,8 +357,6 @@ defmodule Google.Protobuf.EnumDescriptorProto.EnumReservedRange do
   field :start, 1, optional: true, type: :int32
 
   field :end, 2, optional: true, type: :int32
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.EnumDescriptorProto do
@@ -406,8 +388,6 @@ defmodule Google.Protobuf.EnumDescriptorProto do
     type: Google.Protobuf.EnumDescriptorProto.EnumReservedRange
 
   field :reserved_name, 5, repeated: true, type: :string
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.EnumValueDescriptorProto do
@@ -429,8 +409,6 @@ defmodule Google.Protobuf.EnumValueDescriptorProto do
   field :number, 2, optional: true, type: :int32
 
   field :options, 3, optional: true, type: Google.Protobuf.EnumValueOptions
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.ServiceDescriptorProto do
@@ -452,8 +430,6 @@ defmodule Google.Protobuf.ServiceDescriptorProto do
   field :method, 2, repeated: true, type: Google.Protobuf.MethodDescriptorProto
 
   field :options, 3, optional: true, type: Google.Protobuf.ServiceOptions
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.MethodDescriptorProto do
@@ -487,8 +463,6 @@ defmodule Google.Protobuf.MethodDescriptorProto do
   field :client_streaming, 5, optional: true, type: :bool, default: false
 
   field :server_streaming, 6, optional: true, type: :bool, default: false
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.FileOptions do
@@ -589,8 +563,6 @@ defmodule Google.Protobuf.FileOptions do
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
-  def transform_module(), do: nil
-
   extensions [{1000, 536_870_912}]
 end
 
@@ -623,8 +595,6 @@ defmodule Google.Protobuf.MessageOptions do
   field :map_entry, 7, optional: true, type: :bool
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
-
-  def transform_module(), do: nil
 
   extensions [{1000, 536_870_912}]
 end
@@ -675,8 +645,6 @@ defmodule Google.Protobuf.FieldOptions do
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
-  def transform_module(), do: nil
-
   extensions [{1000, 536_870_912}]
 end
 
@@ -693,8 +661,6 @@ defmodule Google.Protobuf.OneofOptions do
             __pb_extensions__: nil
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
-
-  def transform_module(), do: nil
 
   extensions [{1000, 536_870_912}]
 end
@@ -721,8 +687,6 @@ defmodule Google.Protobuf.EnumOptions do
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
-  def transform_module(), do: nil
-
   extensions [{1000, 536_870_912}]
 end
 
@@ -744,8 +708,6 @@ defmodule Google.Protobuf.EnumValueOptions do
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
-  def transform_module(), do: nil
-
   extensions [{1000, 536_870_912}]
 end
 
@@ -766,8 +728,6 @@ defmodule Google.Protobuf.ServiceOptions do
   field :deprecated, 33, optional: true, type: :bool, default: false
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
-
-  def transform_module(), do: nil
 
   extensions [{1000, 536_870_912}]
 end
@@ -798,8 +758,6 @@ defmodule Google.Protobuf.MethodOptions do
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
-  def transform_module(), do: nil
-
   extensions [{1000, 536_870_912}]
 end
 
@@ -818,8 +776,6 @@ defmodule Google.Protobuf.UninterpretedOption.NamePart do
   field :name_part, 1, required: true, type: :string
 
   field :is_extension, 2, required: true, type: :bool
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.UninterpretedOption do
@@ -857,8 +813,6 @@ defmodule Google.Protobuf.UninterpretedOption do
   field :string_value, 7, optional: true, type: :bytes
 
   field :aggregate_value, 8, optional: true, type: :string
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.SourceCodeInfo.Location do
@@ -888,8 +842,6 @@ defmodule Google.Protobuf.SourceCodeInfo.Location do
   field :trailing_comments, 4, optional: true, type: :string
 
   field :leading_detached_comments, 6, repeated: true, type: :string
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.SourceCodeInfo do
@@ -903,8 +855,6 @@ defmodule Google.Protobuf.SourceCodeInfo do
   defstruct location: []
 
   field :location, 1, repeated: true, type: Google.Protobuf.SourceCodeInfo.Location
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.GeneratedCodeInfo.Annotation do
@@ -930,8 +880,6 @@ defmodule Google.Protobuf.GeneratedCodeInfo.Annotation do
   field :begin, 3, optional: true, type: :int32
 
   field :end, 4, optional: true, type: :int32
-
-  def transform_module(), do: nil
 end
 
 defmodule Google.Protobuf.GeneratedCodeInfo do
@@ -945,6 +893,4 @@ defmodule Google.Protobuf.GeneratedCodeInfo do
   defstruct annotation: []
 
   field :annotation, 1, repeated: true, type: Google.Protobuf.GeneratedCodeInfo.Annotation
-
-  def transform_module(), do: nil
 end

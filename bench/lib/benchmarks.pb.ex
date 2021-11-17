@@ -17,6 +17,4 @@ defmodule Benchmarks.BenchmarkDataset do
   field :message_name, 2, type: :string, json_name: "messageName"
 
   field :payload, 3, repeated: true, type: :bytes
-
-  def transform_module(), do: nil
 end

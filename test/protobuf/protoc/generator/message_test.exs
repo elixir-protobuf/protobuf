@@ -33,7 +33,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     ctx = %Context{}
     desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "def transform_module(), do: nil\n"
+    refute msg =~ "def transform_module()"
 
     ctx = %Context{transform_module: My.Transform.Module}
     desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
