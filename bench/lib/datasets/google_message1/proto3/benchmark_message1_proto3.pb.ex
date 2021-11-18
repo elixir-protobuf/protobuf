@@ -169,8 +169,6 @@ defmodule Benchmarks.Proto3.GoogleMessage1 do
   field :field129, 129, type: :string
 
   field :field131, 131, type: :int32
-
-  def transform_module(), do: nil
 end
 defmodule Benchmarks.Proto3.GoogleMessage1SubMessage do
   @moduledoc false
@@ -259,6 +257,4 @@ defmodule Benchmarks.Proto3.GoogleMessage1SubMessage do
   field :field207, 207, type: :uint64
 
   field :field300, 300, type: :uint64
-
-  def transform_module(), do: nil
 end

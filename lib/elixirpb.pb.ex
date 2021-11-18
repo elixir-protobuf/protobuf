@@ -9,8 +9,6 @@ defmodule Elixirpb.FileOptions do
   defstruct module_prefix: nil
 
   field :module_prefix, 1, optional: true, type: :string
-
-  def transform_module(), do: nil
 end
 
 defmodule Elixirpb.PbExtension do
