@@ -103,7 +103,7 @@ defmodule Protobuf.Encoder do
          syntax,
          %{encoded_fnum: fnum, type: type, repeated?: is_repeated} = prop
        ) do
-    if skip_field?(syntax, val, prop) || skip_enum?(syntax, val, prop) do
+    if skip_field?(syntax, val, prop) or skip_enum?(syntax, val, prop) do
       :error
     else
       iodata =
@@ -148,7 +148,7 @@ defmodule Protobuf.Encoder do
   end
 
   defp encode_field(:packed, val, syntax, %{type: type, encoded_fnum: fnum} = prop) do
-    if skip_field?(syntax, val, prop) || skip_enum?(syntax, val, prop) do
+    if skip_field?(syntax, val, prop) or skip_enum?(syntax, val, prop) do
       :error
     else
       encoded = Enum.map(val, fn v -> Wire.from_proto(type, v) end)
