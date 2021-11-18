@@ -70,7 +70,7 @@ defmodule Protobuf.Encoder do
     acc =
       case encode_field(class_field(prop), val, syntax, prop) do
         {:ok, iodata} -> [iodata | acc]
-        :error -> acc
+        :skip -> acc
       end
 
     encode_fields(tail, syntax, struct, oneofs, acc)
@@ -94,7 +94,7 @@ defmodule Protobuf.Encoder do
   def skip_field?(:proto3, false, %{oneof: nil}), do: true
   def skip_field?(_, _, _), do: false
 
-  @spec encode_field(atom, any, :proto2 | :proto3, FieldProps.t()) :: {:ok, iodata} | :error
+  @spec encode_field(atom, any, :proto2 | :proto3, FieldProps.t()) :: {:ok, iodata} | :skip
   defp encode_field(class_field, value, syntax, props)
 
   defp encode_field(
@@ -104,7 +104,7 @@ defmodule Protobuf.Encoder do
          %{encoded_fnum: fnum, type: type, repeated?: is_repeated} = prop
        ) do
     if skip_field?(syntax, val, prop) or skip_enum?(syntax, val, prop) do
-      :error
+      :skip
     else
       iodata =
         repeated_or_not(val, is_repeated, fn v ->
@@ -122,7 +122,7 @@ defmodule Protobuf.Encoder do
          %{encoded_fnum: fnum, repeated?: is_repeated, map?: is_map, type: type} = prop
        ) do
     if val == nil do
-      :error
+      :skip
     else
       repeated = is_repeated || is_map
 
@@ -149,7 +149,7 @@ defmodule Protobuf.Encoder do
 
   defp encode_field(:packed, val, syntax, %{type: type, encoded_fnum: fnum} = prop) do
     if skip_field?(syntax, val, prop) or skip_enum?(syntax, val, prop) do
-      :error
+      :skip
     else
       encoded = Enum.map(val, fn v -> Wire.from_proto(type, v) end)
       byte_size = IO.iodata_length(encoded)
@@ -260,7 +260,7 @@ defmodule Protobuf.Encoder do
         %{field_props: prop} ->
           case encode_field(class_field(prop), val, :proto2, prop) do
             {:ok, iodata} -> [iodata | acc]
-            :error -> acc
+            :skip -> acc
           end
 
         _ ->
