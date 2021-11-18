@@ -67,12 +67,13 @@ defmodule Protobuf.Encoder do
         end
       end
 
-    if skip_field?(syntax, val, prop) || skip_enum?(syntax, val, prop) do
-      encode_fields(tail, syntax, struct, oneofs, acc)
-    else
-      acc = [encode_field(class_field(prop), val, prop) | acc]
-      encode_fields(tail, syntax, struct, oneofs, acc)
-    end
+    acc =
+      case encode_field(class_field(prop), val, syntax, prop) do
+        {:ok, iodata} -> [iodata | acc]
+        :skip -> acc
+      end
+
+    encode_fields(tail, syntax, struct, oneofs, acc)
   rescue
     error ->
       msg =
@@ -93,34 +94,67 @@ defmodule Protobuf.Encoder do
   def skip_field?(:proto3, false, %{oneof: nil}), do: true
   def skip_field?(_, _, _), do: false
 
-  @spec encode_field(atom, any, FieldProps.t()) :: iodata
-  defp encode_field(:normal, val, %{encoded_fnum: fnum, type: type, repeated?: is_repeated}) do
-    repeated_or_not(val, is_repeated, fn v ->
-      [fnum | Wire.from_proto(type, v)]
-    end)
+  @spec encode_field(atom, any, :proto2 | :proto3, FieldProps.t()) :: {:ok, iodata} | :skip
+  defp encode_field(class_field, value, syntax, props)
+
+  defp encode_field(
+         :normal,
+         val,
+         syntax,
+         %{encoded_fnum: fnum, type: type, repeated?: is_repeated} = prop
+       ) do
+    if skip_field?(syntax, val, prop) or skip_enum?(syntax, val, prop) do
+      :skip
+    else
+      iodata =
+        repeated_or_not(val, is_repeated, fn v ->
+          [fnum | Wire.from_proto(type, v)]
+        end)
+
+      {:ok, iodata}
+    end
   end
 
   defp encode_field(
          :embedded,
          val,
+         syntax,
          %{encoded_fnum: fnum, repeated?: is_repeated, map?: is_map, type: type} = prop
        ) do
-    repeated = is_repeated || is_map
+    if val == nil do
+      :skip
+    else
+      repeated = is_repeated || is_map
 
-    repeated_or_not(val, repeated, fn v ->
-      v = if is_map, do: struct(prop.type, %{key: elem(v, 0), value: elem(v, 1)}), else: v
-      v = transform_module(v, prop.type)
-      # so that oneof {:atom, v} can be encoded
-      encoded = encode(type, v, iolist: true)
-      byte_size = IO.iodata_length(encoded)
-      [fnum | Varint.encode(byte_size)] ++ encoded
-    end)
+      result =
+        repeated_or_not(val, repeated, fn val ->
+          val = transform_module(val, type)
+
+          if skip_field?(syntax, val, prop) do
+            ""
+          else
+            val =
+              if is_map, do: struct(type, %{key: elem(val, 0), value: elem(val, 1)}), else: val
+
+            # so that oneof {:atom, val} can be encoded
+            encoded = encode(type, val, iolist: true)
+            byte_size = IO.iodata_length(encoded)
+            [fnum | Varint.encode(byte_size)] ++ encoded
+          end
+        end)
+
+      {:ok, result}
+    end
   end
 
-  defp encode_field(:packed, val, %{type: type, encoded_fnum: fnum}) do
-    encoded = Enum.map(val, fn v -> Wire.from_proto(type, v) end)
-    byte_size = IO.iodata_length(encoded)
-    [fnum | Varint.encode(byte_size)] ++ encoded
+  defp encode_field(:packed, val, syntax, %{type: type, encoded_fnum: fnum} = prop) do
+    if skip_field?(syntax, val, prop) or skip_enum?(syntax, val, prop) do
+      :skip
+    else
+      encoded = Enum.map(val, fn v -> Wire.from_proto(type, v) end)
+      byte_size = IO.iodata_length(encoded)
+      {:ok, [fnum | Varint.encode(byte_size)] ++ encoded}
+    end
   end
 
   defp transform_module(message, module) do
@@ -224,10 +258,9 @@ defmodule Protobuf.Encoder do
     Enum.reduce(pb_exts, encoded, fn {{ext_mod, key}, val}, acc ->
       case Protobuf.Extension.get_extension_props(mod, ext_mod, key) do
         %{field_props: prop} ->
-          if skip_field?(:proto2, val, prop) || skip_enum?(:proto2, val, prop) do
-            encoded
-          else
-            [encode_field(class_field(prop), val, prop) | acc]
+          case encode_field(class_field(prop), val, :proto2, prop) do
+            {:ok, iodata} -> [iodata | acc]
+            :skip -> acc
           end
 
         _ ->
