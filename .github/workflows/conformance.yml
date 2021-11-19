@@ -22,32 +22,36 @@ jobs:
         include:
           - otp: 24.0
             elixir: 1.12.1
-            protobuf_git: "ref/heads/master"
+    env:
+      MIX_ENV: conformance
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Update and install dependencies to build protoc locally
         # Dependencies from https://github.com/protocolbuffers/protobuf/blob/master/src/README.md
-        run: apt-get update && apt-get install -y autoconf automake libtool curl make g++ unzip jq
-
-      - name: Cache Protobuf
-        id: cache-protobuf
-        uses: actions/cache@v2
-        with:
-          path: protobuf
-          key: ${{ runner.os }}-${{ matrix.elixir}}-${{ matrix.otp }}-protobuf-${{ protobuf_git }}
+        run: sudo apt-get update && sudo apt-get install -y git autoconf automake libtool curl make g++ unzip jq
 
       - name: Checkout Protobuf repo
-        if: steps.cache-protobuf.outputs.cache-hit != 'true'
         uses: actions/checkout@v2
         with:
           repository: protocolbuffers/protobuf
-          ref: ${{ matrix.protobuf_git }}
           path: protobuf
 
+      - name: Set Protobuf SHA (for caching)
+        id: get-sha
+        run: |
+          echo ::set-output name=sha::$(git log -1 '--format=format:%H')
+
+      - name: Cache built Protobuf source
+        id: cache-protobuf-source
+        uses: actions/cache@v2
+        with:
+          path: protobuf
+          key: ${{ runner.os }}-protobuf-${{ steps.get-sha.outputs.sha }}
+
       - name: Build Protobuf and the conformance test runner
-        if: steps.cache-protobuf.outputs.cache-hit != 'true'
+        if: steps.cache-protobuf-source.outputs.cache-hit != 'true'
         working-directory: protobuf
         run: |
           ./autogen.sh
@@ -55,6 +59,18 @@ jobs:
           NUM_CPUS=$(getconf _NPROCESSORS_ONLN)
           make -C ./src -j "${NUM_CPUS}" protoc
           make -C ./conformance conformance-test-runner
+
+      - name: Install OTP and Elixir
+        uses: erlef/setup-elixir@v1
+        with:
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+
+      - name: Get and compile dependencies
+        run: mix deps.get && mix deps.compile
+
+      - name: Compile project
+        run: mix compile
 
       - name: Run mix protobuf.conformance
         run: mix protobuf.conformance --runner=./protobuf/conformance/conformance-test-runner --verbose
