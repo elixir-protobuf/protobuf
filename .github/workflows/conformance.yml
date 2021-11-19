@@ -54,4 +54,4 @@ jobs:
           make -C ./conformance conformance-test-runner
 
       - name: Run mix protobuf.conformance
-        run: mix protobuf.conformance
+        run: mix protobuf.conformance --runner=./protobuf/conformance/conformance-test-runner --verbose
