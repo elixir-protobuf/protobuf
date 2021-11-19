@@ -50,10 +50,13 @@ defmodule Protobuf.Mixfile do
     ]
   end
 
-  defp escript(:conformance),
-    do: [main_module: Conformance.Protobuf.Runner, name: "conformance_client"]
+  defp escript(:conformance) do
+    [main_module: Conformance.Protobuf.Runner, name: "conformance_client"]
+  end
 
-  defp escript(_), do: [main_module: Protobuf.Protoc.CLI, name: "protoc-gen-elixir"]
+  defp escript(_env) do
+    [main_module: Protobuf.Protoc.CLI, name: "protoc-gen-elixir"]
+  end
 
   defp package do
     [
