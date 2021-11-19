@@ -36,7 +36,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: protobuf
-          key: ${{ runner.os }}-${{ matrix.elixir}}-${{ matrix.otp }}-protobuf-${{ protobuf_git }}
+          key: ${{ runner.os }}-${{ matrix.elixir}}-${{ matrix.otp }}-protobuf-${{ matrix.protobuf_git }}
 
       - name: Checkout Protobuf repo
         if: steps.cache-protobuf.outputs.cache-hit != 'true'
