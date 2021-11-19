@@ -22,6 +22,8 @@ jobs:
         include:
           - otp: 24.0
             elixir: 1.12.1
+    env:
+      MIX_ENV: conformance
 
     steps:
       - uses: actions/checkout@v2
@@ -63,6 +65,12 @@ jobs:
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
+
+      - name: Get and compile dependencies
+        run: mix deps.get && mix deps.compile
+
+      - name: Compile project
+        run: mix compile
 
       - name: Run mix protobuf.conformance
         run: mix protobuf.conformance --runner=./protobuf/conformance/conformance-test-runner --verbose
