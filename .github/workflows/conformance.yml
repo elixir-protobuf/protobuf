@@ -10,6 +10,10 @@ on:
     # Every day at 9am.
     - cron: '0 9 * * *'
 
+  # This is needed to trigger the workflow manually from the "Actions" tab in the repo.
+  workflow_dispatch:
+    inputs: []
+
 jobs:
   test:
     name: Run conformance tests
