@@ -15,7 +15,11 @@ defmodule Protobuf.Mixfile do
       dialyzer: [plt_add_apps: [:mix, :jason]],
       elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test, "coveralls.html": :test],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.html": :test,
+        "protobuf.conformance": :conformance
+      ],
       deps: deps(),
       escript: escript(Mix.env()),
       description: @description,

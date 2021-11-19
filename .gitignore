@@ -32,4 +32,5 @@ protoc-gen-elixir
 
 # Generated artifacts for conformance testing.
 failing_tests.txt
+succeeding_tests.txt
 conformance_client
