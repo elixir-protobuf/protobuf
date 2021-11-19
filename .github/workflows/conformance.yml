@@ -8,6 +8,7 @@ name: Conformance
 on:
   # This is needed to trigger the workflow manually from the "Actions" tab in the repo.
   workflow_dispatch:
+    inputs: {}
   # Every day at 9am.
   schedule:
     - cron: '0 9 * * *'
@@ -21,7 +22,7 @@ jobs:
         include:
           - otp: 24.0
             elixir: 1.12.1
-            protobuf_git: ["ref/heads/master"]
+            protobuf_git: "ref/heads/master"
 
     steps:
       - uses: actions/checkout@v2
