@@ -13,79 +13,84 @@ defmodule Conformance.Protobuf.Runner do
         :ok
 
       {:error, reason} ->
-        raise reason
+        raise "failed to read 4-bytes header: #{inspect(reason)}"
 
       <<len::unsigned-little-32>> ->
-        IO.binread(:stdio, len)
-        |> decode(Conformance.ConformanceRequest)
-        |> handle_request()
-        |> cast_response()
-        |> encode(Conformance.ConformanceResponse)
-        |> reply()
+        case IO.binread(:stdio, len) do
+          :eof ->
+            raise "received unexpected EOF when expecting #{len} bytes"
 
-        loop()
-    end
-  end
+          {:error, reason} ->
+            raise "failed to read #{len} bytes from stdio: #{inspect(reason)}"
 
-  defp handle_request(
-         {:ok,
-          %Conformance.ConformanceRequest{
-            requested_output_format: :PROTOBUF,
-            message_type: message_type,
-            payload: {:protobuf_payload, msg}
-          }}
-       ) do
-    test_proto_type = to_test_proto_type(message_type)
+          encoded_request ->
+            result = handle_encoded_request(encoded_request)
+            response = Conformance.ConformanceResponse.new(result: result)
+            encoded_response = Conformance.ConformanceResponse.encode(response)
 
-    case decode(msg, test_proto_type) do
-      {:error, err} ->
-        {:parse_error, Exception.format_banner(:error, err)}
+            :ok =
+              IO.binwrite(
+                :stdio,
+                <<byte_size(encoded_response)::unsigned-little-32, encoded_response::binary>>
+              )
 
-      {:ok, decoded_msg} ->
-        case encode(decoded_msg, test_proto_type) do
-          {:error, err} ->
-            {:serialize_error, Exception.format_banner(:error, err)}
-
-          {:ok, encoded_msg} ->
-            {:protobuf_payload, encoded_msg}
+            loop()
         end
     end
   end
 
-  defp handle_request({:ok, _}), do: {:skipped, "unsupported conformance test"}
-  defp handle_request({:error, err}), do: {:runtime_error, Exception.format_banner(:error, err)}
+  defp handle_encoded_request(encoded_request) do
+    case safe_decode(encoded_request, Conformance.ConformanceRequest) do
+      {:ok, request} ->
+        handle_conformance_request(request)
 
-  defp cast_response(result), do: Conformance.ConformanceResponse.new(result: result)
-
-  defp reply({:ok, data}),
-    do: IO.binwrite(:stdio, <<byte_size(data)::unsigned-little-32, data::binary>>)
-
-  defp reply({:error, reason}), do: raise(reason)
-
-  defp to_test_proto_type(name) do
-    case name do
-      "protobuf_test_messages.proto3.TestAllTypesProto3" ->
-        ProtobufTestMessages.Proto3.TestAllTypesProto3
-
-      "protobuf_test_messages.proto2.TestAllTypesProto2" ->
-        ProtobufTestMessages.Proto2.TestAllTypesProto2
-
-      "conformance.FailureSet" ->
-        Conformance.FailureSet
-
-      "" ->
-        ProtobufTestMessages.Proto3.TestAllTypesProto3
+      {:error, exception, stacktrace} ->
+        message = Exception.format(:error, exception, stacktrace)
+        {:runtime_error, "failed to decode conformance request: #{message}"}
     end
   end
 
-  defp decode(msg, proto_type), do: apply_codec(msg, &proto_type.decode/1)
-  defp encode(msg, proto_type), do: apply_codec(msg, &proto_type.encode/1)
+  defp handle_conformance_request(%Conformance.ConformanceRequest{
+         requested_output_format: :PROTOBUF,
+         message_type: message_type,
+         payload: {:protobuf_payload, msg}
+       }) do
+    test_proto_type = to_test_proto_type(message_type)
 
-  defp apply_codec(msg, codec) do
-    try do
-      {:ok, codec.(msg)}
-    rescue
-      e in _ -> {:error, e}
+    with {:decode, {:ok, decoded_msg}} <- {:decode, safe_decode(msg, test_proto_type)},
+         {:encode, {:ok, encoded_msg}} <- {:encode, safe_encode(decoded_msg)} do
+      {:protobuf_payload, encoded_msg}
+    else
+      {:decode, {:error, exception, stacktrace}} ->
+        {:parse_error, Exception.format(:error, exception, stacktrace)}
+
+      {:encode, {:error, exception, stacktrace}} ->
+        {:serialize_error, Exception.format(:error, exception, stacktrace)}
     end
+  end
+
+  defp handle_conformance_request(_request) do
+    {:skipped, "unsupported conformance test"}
+  end
+
+  defp to_test_proto_type("protobuf_test_messages.proto3.TestAllTypesProto3"),
+    do: ProtobufTestMessages.Proto3.TestAllTypesProto3
+
+  defp to_test_proto_type("protobuf_test_messages.proto2.TestAllTypesProto2"),
+    do: ProtobufTestMessages.Proto2.TestAllTypesProto2
+
+  defp to_test_proto_type("conformance.FailureSet"), do: Conformance.FailureSet
+  defp to_test_proto_type(""), do: ProtobufTestMessages.Proto3.TestAllTypesProto3
+
+  defp safe_decode(binary, proto_type) do
+    {:ok, proto_type.decode(binary)}
+  rescue
+    exception -> {:error, exception, __STACKTRACE__}
+  end
+
+  defp safe_encode(%mod{} = struct) do
+    {:ok, mod.encode(struct)}
+  rescue
+    exception -> {:error, exception, __STACKTRACE__}
   end
 end
