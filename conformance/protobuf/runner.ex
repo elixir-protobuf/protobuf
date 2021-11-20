@@ -51,14 +51,28 @@ defmodule Conformance.Protobuf.Runner do
   end
 
   defp handle_conformance_request(%Conformance.ConformanceRequest{
-         requested_output_format: :PROTOBUF,
+         requested_output_format: requested_output_format,
          message_type: message_type,
-         payload: {:protobuf_payload, msg}
-       }) do
+         payload: {payload_kind, msg}
+       })
+       when requested_output_format in [:PROTOBUF, :JSON] and
+              payload_kind in [:protobuf_payload, :json_payload] do
     test_proto_type = to_test_proto_type(message_type)
 
-    with {:decode, {:ok, decoded_msg}} <- {:decode, safe_decode(msg, test_proto_type)},
-         {:encode, {:ok, encoded_msg}} <- {:encode, safe_encode(decoded_msg)} do
+    decode_fun =
+      case requested_output_format do
+        :PROTOBUF -> &safe_decode/2
+        :JSON -> &Protobuf.JSON.decode/2
+      end
+
+    encode_fun =
+      case payload_kind do
+        :protobuf_payload -> &safe_encode/1
+        :json_payload -> &Protobuf.JSON.encode/1
+      end
+
+    with {:decode, {:ok, decoded_msg}} <- {:decode, decode_fun.(msg, test_proto_type)},
+         {:encode, {:ok, encoded_msg}} <- {:encode, encode_fun.(decoded_msg)} do
       {:protobuf_payload, encoded_msg}
     else
       {:decode, {:error, exception, stacktrace}} ->
@@ -66,6 +80,12 @@ defmodule Conformance.Protobuf.Runner do
 
       {:encode, {:error, exception, stacktrace}} ->
         {:serialize_error, Exception.format(:error, exception, stacktrace)}
+
+      {:decode, {:error, exception}} ->
+        {:parse_error, Exception.format(:error, exception, [])}
+
+      {:encode, {:error, exception}} ->
+        {:serialize_error, Exception.format(:error, exception, [])}
     end
   end
 

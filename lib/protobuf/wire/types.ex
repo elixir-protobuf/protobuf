@@ -1,6 +1,7 @@
 defmodule Protobuf.Wire.Types do
   @moduledoc false
 
+  # From: https://developers.google.com/protocol-buffers/docs/encoding
   defmacro wire_varint, do: 0
   defmacro wire_64bits, do: 1
   defmacro wire_delimited, do: 2
