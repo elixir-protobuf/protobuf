@@ -60,20 +60,20 @@ defmodule Conformance.Protobuf.Runner do
     test_proto_type = to_test_proto_type(message_type)
 
     decode_fun =
-      case requested_output_format do
-        :PROTOBUF -> &safe_decode/2
-        :JSON -> &Protobuf.JSON.decode/2
+      case payload_kind do
+        :protobuf_payload -> &safe_decode/2
+        :json_payload -> &Protobuf.JSON.decode/2
       end
 
-    encode_fun =
-      case payload_kind do
-        :protobuf_payload -> &safe_encode/1
-        :json_payload -> &Protobuf.JSON.encode/1
+    {encode_fun, output_payload_kind} =
+      case requested_output_format do
+        :PROTOBUF -> {&safe_encode/1, :protobuf_payload}
+        :JSON -> {&Protobuf.JSON.encode/1, :json_payload}
       end
 
     with {:decode, {:ok, decoded_msg}} <- {:decode, decode_fun.(msg, test_proto_type)},
          {:encode, {:ok, encoded_msg}} <- {:encode, encode_fun.(decoded_msg)} do
-      {:protobuf_payload, encoded_msg}
+      {output_payload_kind, encoded_msg}
     else
       {:decode, {:error, exception, stacktrace}} ->
         {:parse_error, Exception.format(:error, exception, stacktrace)}
