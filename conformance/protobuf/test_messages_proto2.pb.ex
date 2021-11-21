@@ -8,7 +8,6 @@ defmodule ProtobufTestMessages.Proto2.ForeignEnumProto2 do
   field :FOREIGN_BAR, 1
   field :FOREIGN_BAZ, 2
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedEnum do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -20,7 +19,15 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedEnum do
   field :BAZ, 2
   field :NEG, -1
 end
+defmodule ProtobufTestMessages.Proto2.EnumOnlyProto2.Bool do
+  @moduledoc false
+  use Protobuf, enum: true, syntax: :proto2
 
+  @type t :: integer | :kFalse | :kTrue
+
+  field :kFalse, 0
+  field :kTrue, 1
+end
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedMessage do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -29,12 +36,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedMessage do
           a: integer,
           corecursive: ProtobufTestMessages.Proto2.TestAllTypesProto2.t() | nil
         }
-  defstruct [:a, :corecursive]
+
+  defstruct a: nil,
+            corecursive: nil
 
   field :a, 1, optional: true, type: :int32
   field :corecursive, 2, optional: true, type: ProtobufTestMessages.Proto2.TestAllTypesProto2
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapInt32Int32Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -43,12 +51,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapInt32Int32Entry do
           key: integer,
           value: integer
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :int32
   field :value, 2, optional: true, type: :int32
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapInt64Int64Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -57,12 +66,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapInt64Int64Entry do
           key: integer,
           value: integer
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :int64
   field :value, 2, optional: true, type: :int64
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapUint32Uint32Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -71,12 +81,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapUint32Uint32Entry do
           key: non_neg_integer,
           value: non_neg_integer
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :uint32
   field :value, 2, optional: true, type: :uint32
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapUint64Uint64Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -85,12 +96,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapUint64Uint64Entry do
           key: non_neg_integer,
           value: non_neg_integer
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :uint64
   field :value, 2, optional: true, type: :uint64
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapSint32Sint32Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -99,12 +111,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapSint32Sint32Entry do
           key: integer,
           value: integer
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :sint32
   field :value, 2, optional: true, type: :sint32
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapSint64Sint64Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -113,12 +126,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapSint64Sint64Entry do
           key: integer,
           value: integer
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :sint64
   field :value, 2, optional: true, type: :sint64
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapFixed32Fixed32Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -127,12 +141,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapFixed32Fixed32Entry 
           key: non_neg_integer,
           value: non_neg_integer
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :fixed32
   field :value, 2, optional: true, type: :fixed32
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapFixed64Fixed64Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -141,12 +156,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapFixed64Fixed64Entry 
           key: non_neg_integer,
           value: non_neg_integer
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :fixed64
   field :value, 2, optional: true, type: :fixed64
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapSfixed32Sfixed32Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -155,12 +171,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapSfixed32Sfixed32Entr
           key: integer,
           value: integer
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :sfixed32
   field :value, 2, optional: true, type: :sfixed32
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapSfixed64Sfixed64Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -169,12 +186,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapSfixed64Sfixed64Entr
           key: integer,
           value: integer
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :sfixed64
   field :value, 2, optional: true, type: :sfixed64
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapInt32FloatEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -183,12 +201,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapInt32FloatEntry do
           key: integer,
           value: float | :infinity | :negative_infinity | :nan
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :int32
   field :value, 2, optional: true, type: :float
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapInt32DoubleEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -197,12 +216,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapInt32DoubleEntry do
           key: integer,
           value: float | :infinity | :negative_infinity | :nan
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :int32
   field :value, 2, optional: true, type: :double
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapBoolBoolEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -211,12 +231,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapBoolBoolEntry do
           key: boolean,
           value: boolean
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :bool
   field :value, 2, optional: true, type: :bool
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapStringStringEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -225,12 +246,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapStringStringEntry do
           key: String.t(),
           value: String.t()
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :string
   field :value, 2, optional: true, type: :string
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapStringBytesEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -239,12 +261,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapStringBytesEntry do
           key: String.t(),
           value: binary
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :string
   field :value, 2, optional: true, type: :bytes
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapStringNestedMessageEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -253,7 +276,9 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapStringNestedMessageE
           key: String.t(),
           value: ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedMessage.t() | nil
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :string
 
@@ -261,7 +286,6 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapStringNestedMessageE
     optional: true,
     type: ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedMessage
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapStringForeignMessageEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -270,12 +294,13 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapStringForeignMessage
           key: String.t(),
           value: ProtobufTestMessages.Proto2.ForeignMessageProto2.t() | nil
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :string
   field :value, 2, optional: true, type: ProtobufTestMessages.Proto2.ForeignMessageProto2
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapStringNestedEnumEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -284,7 +309,9 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapStringNestedEnumEntr
           key: String.t(),
           value: ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedEnum.t()
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :string
 
@@ -293,7 +320,6 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapStringNestedEnumEntr
     type: ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedEnum,
     enum: true
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapStringForeignEnumEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -302,20 +328,40 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MapStringForeignEnumEnt
           key: String.t(),
           value: ProtobufTestMessages.Proto2.ForeignEnumProto2.t()
         }
-  defstruct [:key, :value]
+
+  defstruct key: nil,
+            value: nil
 
   field :key, 1, optional: true, type: :string
   field :value, 2, optional: true, type: ProtobufTestMessages.Proto2.ForeignEnumProto2, enum: true
 end
+defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.Data do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+          group_int32: integer,
+          group_uint32: non_neg_integer
+        }
+
+  defstruct group_int32: nil,
+            group_uint32: nil
+
+  field :group_int32, 202, optional: true, type: :int32
+  field :group_uint32, 203, optional: true, type: :uint32
+end
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MessageSetCorrect do
   @moduledoc false
   use Protobuf, syntax: :proto2
 
-  @type t :: %__MODULE__{}
-  defstruct []
-end
+  @type t :: %__MODULE__{
+          __pb_extensions__: map
+        }
 
+  defstruct __pb_extensions__: nil
+
+  extensions [{4, 2_147_483_647}]
+end
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MessageSetCorrectExtension1 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -323,11 +369,11 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MessageSetCorrectExtens
   @type t :: %__MODULE__{
           str: String.t()
         }
-  defstruct [:str]
+
+  defstruct str: nil
 
   field :str, 25, optional: true, type: :string
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MessageSetCorrectExtension2 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -335,17 +381,27 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2.MessageSetCorrectExtens
   @type t :: %__MODULE__{
           i: integer
         }
-  defstruct [:i]
+
+  defstruct i: nil
 
   field :i, 9, optional: true, type: :int32
 end
-
 defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2 do
   @moduledoc false
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
-          oneof_field: {atom, any},
+          oneof_field:
+            {:oneof_uint32, non_neg_integer}
+            | {:oneof_nested_message,
+               ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedMessage.t() | nil}
+            | {:oneof_string, String.t()}
+            | {:oneof_bytes, binary}
+            | {:oneof_bool, boolean}
+            | {:oneof_uint64, non_neg_integer}
+            | {:oneof_float, float | :infinity | :negative_infinity | :nan}
+            | {:oneof_double, float | :infinity | :negative_infinity | :nan}
+            | {:oneof_enum, ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedEnum.t()},
           optional_int32: integer,
           optional_int64: integer,
           optional_uint32: non_neg_integer,
@@ -388,8 +444,8 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2 do
             ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedMessage.t()
           ],
           repeated_foreign_message: [ProtobufTestMessages.Proto2.ForeignMessageProto2.t()],
-          repeated_nested_enum: [[ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedEnum.t()]],
-          repeated_foreign_enum: [[ProtobufTestMessages.Proto2.ForeignEnumProto2.t()]],
+          repeated_nested_enum: [ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedEnum.t()],
+          repeated_foreign_enum: [ProtobufTestMessages.Proto2.ForeignEnumProto2.t()],
           repeated_string_piece: [String.t()],
           repeated_cord: [String.t()],
           packed_int32: [integer],
@@ -405,7 +461,7 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2 do
           packed_float: [float | :infinity | :negative_infinity | :nan],
           packed_double: [float | :infinity | :negative_infinity | :nan],
           packed_bool: [boolean],
-          packed_nested_enum: [[ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedEnum.t()]],
+          packed_nested_enum: [ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedEnum.t()],
           unpacked_int32: [integer],
           unpacked_int64: [integer],
           unpacked_uint32: [non_neg_integer],
@@ -419,7 +475,7 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2 do
           unpacked_float: [float | :infinity | :negative_infinity | :nan],
           unpacked_double: [float | :infinity | :negative_infinity | :nan],
           unpacked_bool: [boolean],
-          unpacked_nested_enum: [[ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedEnum.t()]],
+          unpacked_nested_enum: [ProtobufTestMessages.Proto2.TestAllTypesProto2.NestedEnum.t()],
           map_int32_int32: %{integer => integer},
           map_int64_int64: %{integer => integer},
           map_uint32_uint32: %{non_neg_integer => non_neg_integer},
@@ -447,6 +503,21 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2 do
           map_string_foreign_enum: %{
             String.t() => ProtobufTestMessages.Proto2.ForeignEnumProto2.t()
           },
+          data: any,
+          default_int32: integer,
+          default_int64: integer,
+          default_uint32: non_neg_integer,
+          default_uint64: non_neg_integer,
+          default_sint32: integer,
+          default_sint64: integer,
+          default_fixed32: non_neg_integer,
+          default_fixed64: non_neg_integer,
+          default_sfixed32: integer,
+          default_sfixed64: integer,
+          default_float: float | :infinity | :negative_infinity | :nan,
+          default_double: float | :infinity | :negative_infinity | :nan,
+          default_bool: boolean,
+          default_string: String.t(),
           fieldname1: integer,
           field_name2: integer,
           _field_name3: integer,
@@ -464,121 +535,138 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2 do
           field__name15: integer,
           field__Name16: integer,
           field_name17__: integer,
-          Field_name18__: integer
+          Field_name18__: integer,
+          __pb_extensions__: map
         }
-  defstruct [
-    :oneof_field,
-    :optional_int32,
-    :optional_int64,
-    :optional_uint32,
-    :optional_uint64,
-    :optional_sint32,
-    :optional_sint64,
-    :optional_fixed32,
-    :optional_fixed64,
-    :optional_sfixed32,
-    :optional_sfixed64,
-    :optional_float,
-    :optional_double,
-    :optional_bool,
-    :optional_string,
-    :optional_bytes,
-    :optional_nested_message,
-    :optional_foreign_message,
-    :optional_nested_enum,
-    :optional_foreign_enum,
-    :optional_string_piece,
-    :optional_cord,
-    :recursive_message,
-    :repeated_int32,
-    :repeated_int64,
-    :repeated_uint32,
-    :repeated_uint64,
-    :repeated_sint32,
-    :repeated_sint64,
-    :repeated_fixed32,
-    :repeated_fixed64,
-    :repeated_sfixed32,
-    :repeated_sfixed64,
-    :repeated_float,
-    :repeated_double,
-    :repeated_bool,
-    :repeated_string,
-    :repeated_bytes,
-    :repeated_nested_message,
-    :repeated_foreign_message,
-    :repeated_nested_enum,
-    :repeated_foreign_enum,
-    :repeated_string_piece,
-    :repeated_cord,
-    :packed_int32,
-    :packed_int64,
-    :packed_uint32,
-    :packed_uint64,
-    :packed_sint32,
-    :packed_sint64,
-    :packed_fixed32,
-    :packed_fixed64,
-    :packed_sfixed32,
-    :packed_sfixed64,
-    :packed_float,
-    :packed_double,
-    :packed_bool,
-    :packed_nested_enum,
-    :unpacked_int32,
-    :unpacked_int64,
-    :unpacked_uint32,
-    :unpacked_uint64,
-    :unpacked_sint32,
-    :unpacked_sint64,
-    :unpacked_fixed32,
-    :unpacked_fixed64,
-    :unpacked_sfixed32,
-    :unpacked_sfixed64,
-    :unpacked_float,
-    :unpacked_double,
-    :unpacked_bool,
-    :unpacked_nested_enum,
-    :map_int32_int32,
-    :map_int64_int64,
-    :map_uint32_uint32,
-    :map_uint64_uint64,
-    :map_sint32_sint32,
-    :map_sint64_sint64,
-    :map_fixed32_fixed32,
-    :map_fixed64_fixed64,
-    :map_sfixed32_sfixed32,
-    :map_sfixed64_sfixed64,
-    :map_int32_float,
-    :map_int32_double,
-    :map_bool_bool,
-    :map_string_string,
-    :map_string_bytes,
-    :map_string_nested_message,
-    :map_string_foreign_message,
-    :map_string_nested_enum,
-    :map_string_foreign_enum,
-    :fieldname1,
-    :field_name2,
-    :_field_name3,
-    :field__name4_,
-    :field0name5,
-    :field_0_name6,
-    :fieldName7,
-    :FieldName8,
-    :field_Name9,
-    :Field_Name10,
-    :FIELD_NAME11,
-    :FIELD_name12,
-    :__field_name13,
-    :__Field_name14,
-    :field__name15,
-    :field__Name16,
-    :field_name17__,
-    :Field_name18__
-  ]
+
+  defstruct oneof_field: nil,
+            optional_int32: nil,
+            optional_int64: nil,
+            optional_uint32: nil,
+            optional_uint64: nil,
+            optional_sint32: nil,
+            optional_sint64: nil,
+            optional_fixed32: nil,
+            optional_fixed64: nil,
+            optional_sfixed32: nil,
+            optional_sfixed64: nil,
+            optional_float: nil,
+            optional_double: nil,
+            optional_bool: nil,
+            optional_string: nil,
+            optional_bytes: nil,
+            optional_nested_message: nil,
+            optional_foreign_message: nil,
+            optional_nested_enum: nil,
+            optional_foreign_enum: nil,
+            optional_string_piece: nil,
+            optional_cord: nil,
+            recursive_message: nil,
+            repeated_int32: [],
+            repeated_int64: [],
+            repeated_uint32: [],
+            repeated_uint64: [],
+            repeated_sint32: [],
+            repeated_sint64: [],
+            repeated_fixed32: [],
+            repeated_fixed64: [],
+            repeated_sfixed32: [],
+            repeated_sfixed64: [],
+            repeated_float: [],
+            repeated_double: [],
+            repeated_bool: [],
+            repeated_string: [],
+            repeated_bytes: [],
+            repeated_nested_message: [],
+            repeated_foreign_message: [],
+            repeated_nested_enum: [],
+            repeated_foreign_enum: [],
+            repeated_string_piece: [],
+            repeated_cord: [],
+            packed_int32: [],
+            packed_int64: [],
+            packed_uint32: [],
+            packed_uint64: [],
+            packed_sint32: [],
+            packed_sint64: [],
+            packed_fixed32: [],
+            packed_fixed64: [],
+            packed_sfixed32: [],
+            packed_sfixed64: [],
+            packed_float: [],
+            packed_double: [],
+            packed_bool: [],
+            packed_nested_enum: [],
+            unpacked_int32: [],
+            unpacked_int64: [],
+            unpacked_uint32: [],
+            unpacked_uint64: [],
+            unpacked_sint32: [],
+            unpacked_sint64: [],
+            unpacked_fixed32: [],
+            unpacked_fixed64: [],
+            unpacked_sfixed32: [],
+            unpacked_sfixed64: [],
+            unpacked_float: [],
+            unpacked_double: [],
+            unpacked_bool: [],
+            unpacked_nested_enum: [],
+            map_int32_int32: %{},
+            map_int64_int64: %{},
+            map_uint32_uint32: %{},
+            map_uint64_uint64: %{},
+            map_sint32_sint32: %{},
+            map_sint64_sint64: %{},
+            map_fixed32_fixed32: %{},
+            map_fixed64_fixed64: %{},
+            map_sfixed32_sfixed32: %{},
+            map_sfixed64_sfixed64: %{},
+            map_int32_float: %{},
+            map_int32_double: %{},
+            map_bool_bool: %{},
+            map_string_string: %{},
+            map_string_bytes: %{},
+            map_string_nested_message: %{},
+            map_string_foreign_message: %{},
+            map_string_nested_enum: %{},
+            map_string_foreign_enum: %{},
+            data: nil,
+            default_int32: nil,
+            default_int64: nil,
+            default_uint32: nil,
+            default_uint64: nil,
+            default_sint32: nil,
+            default_sint64: nil,
+            default_fixed32: nil,
+            default_fixed64: nil,
+            default_sfixed32: nil,
+            default_sfixed64: nil,
+            default_float: nil,
+            default_double: nil,
+            default_bool: nil,
+            default_string: nil,
+            fieldname1: nil,
+            field_name2: nil,
+            _field_name3: nil,
+            field__name4_: nil,
+            field0name5: nil,
+            field_0_name6: nil,
+            fieldName7: nil,
+            FieldName8: nil,
+            field_Name9: nil,
+            Field_Name10: nil,
+            FIELD_NAME11: nil,
+            FIELD_name12: nil,
+            __field_name13: nil,
+            __Field_name14: nil,
+            field__name15: nil,
+            field__Name16: nil,
+            field_name17__: nil,
+            Field_name18__: nil,
+            __pb_extensions__: nil
 
   oneof :oneof_field, 0
+
   field :optional_int32, 1, optional: true, type: :int32
   field :optional_int64, 2, optional: true, type: :int64
   field :optional_uint32, 3, optional: true, type: :uint32
@@ -810,6 +898,26 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2 do
     enum: true,
     oneof: 0
 
+  field :data, 201, optional: true, type: :group
+  field :default_int32, 241, optional: true, type: :int32, default: -123_456_789
+  field :default_int64, 242, optional: true, type: :int64, default: -9_123_456_789_123_456_789
+  field :default_uint32, 243, optional: true, type: :uint32, default: 2_123_456_789
+  field :default_uint64, 244, optional: true, type: :uint64, default: 10_123_456_789_123_456_789
+  field :default_sint32, 245, optional: true, type: :sint32, default: -123_456_789
+  field :default_sint64, 246, optional: true, type: :sint64, default: -9_123_456_789_123_456_789
+  field :default_fixed32, 247, optional: true, type: :fixed32, default: 2_123_456_789
+  field :default_fixed64, 248, optional: true, type: :fixed64, default: 10_123_456_789_123_456_789
+  field :default_sfixed32, 249, optional: true, type: :sfixed32, default: -123_456_789
+
+  field :default_sfixed64, 250,
+    optional: true,
+    type: :sfixed64,
+    default: -9_123_456_789_123_456_789
+
+  field :default_float, 251, optional: true, type: :float, default: 9.0e9
+  field :default_double, 252, optional: true, type: :double, default: 7.0e22
+  field :default_bool, 253, optional: true, type: :bool, default: true
+  field :default_string, 254, optional: true, type: :string, default: "Rosebud"
   field :fieldname1, 401, optional: true, type: :int32
   field :field_name2, 402, optional: true, type: :int32
   field :_field_name3, 403, optional: true, type: :int32
@@ -828,8 +936,9 @@ defmodule ProtobufTestMessages.Proto2.TestAllTypesProto2 do
   field :field__Name16, 416, optional: true, type: :int32
   field :field_name17__, 417, optional: true, type: :int32
   field :Field_name18__, 418, optional: true, type: :int32
-end
 
+  extensions [{120, 201}]
+end
 defmodule ProtobufTestMessages.Proto2.ForeignMessageProto2 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -837,11 +946,23 @@ defmodule ProtobufTestMessages.Proto2.ForeignMessageProto2 do
   @type t :: %__MODULE__{
           c: integer
         }
-  defstruct [:c]
+
+  defstruct c: nil
 
   field :c, 1, optional: true, type: :int32
 end
+defmodule ProtobufTestMessages.Proto2.UnknownToTestAllTypes.OptionalGroup do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
 
+  @type t :: %__MODULE__{
+          a: integer
+        }
+
+  defstruct a: nil
+
+  field :a, 1, optional: true, type: :int32
+end
 defmodule ProtobufTestMessages.Proto2.UnknownToTestAllTypes do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -850,10 +971,17 @@ defmodule ProtobufTestMessages.Proto2.UnknownToTestAllTypes do
           optional_int32: integer,
           optional_string: String.t(),
           nested_message: ProtobufTestMessages.Proto2.ForeignMessageProto2.t() | nil,
+          optionalgroup: any,
           optional_bool: boolean,
           repeated_int32: [integer]
         }
-  defstruct [:optional_int32, :optional_string, :nested_message, :optional_bool, :repeated_int32]
+
+  defstruct optional_int32: nil,
+            optional_string: nil,
+            nested_message: nil,
+            optionalgroup: nil,
+            optional_bool: nil,
+            repeated_int32: []
 
   field :optional_int32, 1001, optional: true, type: :int32
   field :optional_string, 1002, optional: true, type: :string
@@ -862,6 +990,31 @@ defmodule ProtobufTestMessages.Proto2.UnknownToTestAllTypes do
     optional: true,
     type: ProtobufTestMessages.Proto2.ForeignMessageProto2
 
+  field :optionalgroup, 1004, optional: true, type: :group
   field :optional_bool, 1006, optional: true, type: :bool
   field :repeated_int32, 1011, repeated: true, type: :int32
+end
+defmodule ProtobufTestMessages.Proto2.NullHypothesisProto2 do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{}
+
+  defstruct []
+end
+defmodule ProtobufTestMessages.Proto2.EnumOnlyProto2 do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{}
+
+  defstruct []
+end
+defmodule ProtobufTestMessages.Proto2.PbExtension do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  extend ProtobufTestMessages.Proto2.TestAllTypesProto2, :extension_int32, 120,
+    optional: true,
+    type: :int32
 end
