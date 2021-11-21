@@ -18,7 +18,7 @@ defmodule Protobuf.Mixfile do
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.html": :test,
-        "protobuf.conformance": :conformance
+        conformance_tests: :conformance
       ],
       deps: deps(),
       escript: escript(Mix.env()),
@@ -114,7 +114,8 @@ defmodule Protobuf.Mixfile do
         require_env_variable("PROTO_BENCH"),
         "cmd protoc -I $PROTO_BENCH --elixir_out=bench/lib --plugin=./protoc-gen-elixir #{Enum.join(benchmark_proto_files(), " ")}",
         "format"
-      ]
+      ],
+      conformance_tests: ["escript.build", &run_conformance_tests/1]
     ]
   end
 
@@ -144,5 +145,30 @@ defmodule Protobuf.Mixfile do
       "datasets/google_message4/benchmark_message4_2.proto",
       "datasets/google_message4/benchmark_message4_3.proto"
     ]
+  end
+
+  defp run_conformance_tests(args) do
+    {options, _args} = OptionParser.parse!(args, strict: [runner: :string, verbose: :boolean])
+
+    runner =
+      options
+      |> Keyword.get_lazy(:runner, fn -> Mix.raise("Missing required option --runner") end)
+      |> Path.expand()
+
+    verbose? = Keyword.get(options, :verbose, false)
+
+    args = [
+      "--enforce_recommended",
+      "--failure_list",
+      "conformance/protobuf/exemptions.txt",
+      "./conformance_client"
+    ]
+
+    args = if verbose?, do: ["--verbose"] ++ args, else: args
+
+    case Mix.shell().cmd("#{runner} #{Enum.join(args, " ")}", stderr_to_stdout: true) do
+      0 -> :ok
+      other -> Mix.raise("#{runner} exited with non-zero status: #{other}")
+    end
   end
 end
