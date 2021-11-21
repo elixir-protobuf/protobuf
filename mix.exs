@@ -89,11 +89,15 @@ defmodule Protobuf.Mixfile do
   defp aliases do
     [
       test: ["escript.build", "test"],
+      gen_extension_protos: [
+        "escript.build",
+        "cmd protoc -I src --elixir_out=lib --plugin=./protoc-gen-elixir elixirpb.proto",
+        "format"
+      ],
       gen_test_protos: [
         "escript.build",
         "cmd protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/extension.proto",
         "cmd protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --elixir_opt=package_prefix=my --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/test.proto",
-        "cmd protoc -I src --elixir_out=lib --plugin=./protoc-gen-elixir elixirpb.proto",
         "format"
       ],
       # $PROTO_LIB should be your local path to https://github.com/google/protobuf/tree/master/src/google/protobuf

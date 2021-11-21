@@ -68,6 +68,7 @@ jobs:
           PROTO_LIB: ./google_protobuf/src/google/protobuf
           PROTO_BENCH: ./google_protobuf/benchmarks
         run: |
+          mix gen_extension_protos
           mix gen_test_protos
           mix gen_google_protos
           mix gen_bench_protos
@@ -84,9 +85,10 @@ jobs:
             echo "Changes to the code seem to change the generated .pb.ex files."
             echo "Make sure to run these tasks before merging:"
             echo ""
+            echo "  mix gen_extension_protos"
             echo "  mix gen_test_protos"
             echo "  mix gen_google_protos"
-            echo "  mix gen_test_protos"
+            echo "  mix gen_bench_protos"
             echo ""
             echo "This is the git diff:"
             git diff
