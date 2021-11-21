@@ -8,6 +8,7 @@ defmodule ProtobufTestMessages.Proto3.ForeignEnum do
   field :FOREIGN_BAR, 1
   field :FOREIGN_BAZ, 2
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.NestedEnum do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto3
@@ -19,6 +20,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.NestedEnum do
   field :BAZ, 2
   field :NEG, -1
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.AliasedEnum do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto3
@@ -32,6 +34,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.AliasedEnum do
   field :qux, 2
   field :bAz, 2
 end
+
 defmodule ProtobufTestMessages.Proto3.EnumOnlyProto3.Bool do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto3
@@ -41,6 +44,7 @@ defmodule ProtobufTestMessages.Proto3.EnumOnlyProto3.Bool do
   field :kFalse, 0
   field :kTrue, 1
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.NestedMessage do
   @moduledoc false
   use Protobuf, syntax: :proto3
@@ -56,6 +60,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.NestedMessage do
   field :a, 1, type: :int32
   field :corecursive, 2, type: ProtobufTestMessages.Proto3.TestAllTypesProto3
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapInt32Int32Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -71,6 +76,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapInt32Int32Entry do
   field :key, 1, type: :int32
   field :value, 2, type: :int32
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapInt64Int64Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -86,6 +92,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapInt64Int64Entry do
   field :key, 1, type: :int64
   field :value, 2, type: :int64
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapUint32Uint32Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -101,6 +108,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapUint32Uint32Entry do
   field :key, 1, type: :uint32
   field :value, 2, type: :uint32
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapUint64Uint64Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -116,6 +124,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapUint64Uint64Entry do
   field :key, 1, type: :uint64
   field :value, 2, type: :uint64
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapSint32Sint32Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -131,6 +140,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapSint32Sint32Entry do
   field :key, 1, type: :sint32
   field :value, 2, type: :sint32
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapSint64Sint64Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -146,6 +156,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapSint64Sint64Entry do
   field :key, 1, type: :sint64
   field :value, 2, type: :sint64
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapFixed32Fixed32Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -161,6 +172,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapFixed32Fixed32Entry 
   field :key, 1, type: :fixed32
   field :value, 2, type: :fixed32
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapFixed64Fixed64Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -176,6 +188,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapFixed64Fixed64Entry 
   field :key, 1, type: :fixed64
   field :value, 2, type: :fixed64
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapSfixed32Sfixed32Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -191,6 +204,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapSfixed32Sfixed32Entr
   field :key, 1, type: :sfixed32
   field :value, 2, type: :sfixed32
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapSfixed64Sfixed64Entry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -206,6 +220,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapSfixed64Sfixed64Entr
   field :key, 1, type: :sfixed64
   field :value, 2, type: :sfixed64
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapInt32FloatEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -221,6 +236,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapInt32FloatEntry do
   field :key, 1, type: :int32
   field :value, 2, type: :float
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapInt32DoubleEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -236,6 +252,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapInt32DoubleEntry do
   field :key, 1, type: :int32
   field :value, 2, type: :double
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapBoolBoolEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -251,6 +268,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapBoolBoolEntry do
   field :key, 1, type: :bool
   field :value, 2, type: :bool
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapStringStringEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -266,6 +284,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapStringStringEntry do
   field :key, 1, type: :string
   field :value, 2, type: :string
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapStringBytesEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -281,6 +300,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapStringBytesEntry do
   field :key, 1, type: :string
   field :value, 2, type: :bytes
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapStringNestedMessageEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -296,6 +316,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapStringNestedMessageE
   field :key, 1, type: :string
   field :value, 2, type: ProtobufTestMessages.Proto3.TestAllTypesProto3.NestedMessage
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapStringForeignMessageEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -311,6 +332,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapStringForeignMessage
   field :key, 1, type: :string
   field :value, 2, type: ProtobufTestMessages.Proto3.ForeignMessage
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapStringNestedEnumEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -326,6 +348,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapStringNestedEnumEntr
   field :key, 1, type: :string
   field :value, 2, type: ProtobufTestMessages.Proto3.TestAllTypesProto3.NestedEnum, enum: true
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapStringForeignEnumEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3
@@ -341,6 +364,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3.MapStringForeignEnumEnt
   field :key, 1, type: :string
   field :value, 2, type: ProtobufTestMessages.Proto3.ForeignEnum, enum: true
 end
+
 defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3 do
   @moduledoc false
   use Protobuf, syntax: :proto3
@@ -1091,6 +1115,7 @@ defmodule ProtobufTestMessages.Proto3.TestAllTypesProto3 do
   field :field_name17__, 417, type: :int32, json_name: "fieldName17"
   field :Field_name18__, 418, type: :int32, json_name: "FieldName18"
 end
+
 defmodule ProtobufTestMessages.Proto3.ForeignMessage do
   @moduledoc false
   use Protobuf, syntax: :proto3
@@ -1103,6 +1128,7 @@ defmodule ProtobufTestMessages.Proto3.ForeignMessage do
 
   field :c, 1, type: :int32
 end
+
 defmodule ProtobufTestMessages.Proto3.NullHypothesisProto3 do
   @moduledoc false
   use Protobuf, syntax: :proto3
@@ -1111,6 +1137,7 @@ defmodule ProtobufTestMessages.Proto3.NullHypothesisProto3 do
 
   defstruct []
 end
+
 defmodule ProtobufTestMessages.Proto3.EnumOnlyProto3 do
   @moduledoc false
   use Protobuf, syntax: :proto3
