@@ -160,7 +160,7 @@ defmodule Protobuf.Mixfile do
     args = [
       "--enforce_recommended",
       "--failure_list",
-      "conformance/protobuf/exemptions.txt",
+      "conformance/exemptions.txt",
       "./conformance_client"
     ]
 

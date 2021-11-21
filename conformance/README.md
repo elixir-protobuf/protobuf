@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-You'll need to compile the Prrotobuf conformance test runner binary. The
+You'll need to compile the Protobuf conformance test runner binary. The
 instructions can be found [in the Protobuf
 repository][conformance-instructions].
 
@@ -12,7 +12,7 @@ Once you've successfully compiled the runner, you can run the tests with the
 following command:
 
 ```sh
-mix protobuf.conformance --runner=$PATH_TO_RUNNER
+mix conformance_tests --runner=$PATH_TO_RUNNER
 ```
 
 You should expect to see an output similar to this:
@@ -34,15 +34,37 @@ Add the `--verbose` flag to the above command to get detailed messages which can
 help aid in fixing conformance issues.
 
 ```sh
-mix protobuf.conformance --runner=$PATH_TO_RUNNER --verbose
+mix conformance_tests --runner=$PATH_TO_RUNNER --verbose
+```
+
+## Regenerating the Conformance Protobuf Test Schemas
+
+To regenerate the `.pb.ex` files for the Protobuf test schemas included (such as
+[this one][test-message-protobuf-schema-source]), run the following commands
+from the root of this repo:
+
+```sh
+# This is the path to the root of your clone of
+# https://github.com/protocolbuffers/protobuf.
+export PROTO_ROOT="/path/to/root/of/protobuf/clone"
+
+protoc \
+    --plugin="./protoc-gen-elixir" \
+    --elixir_out=./conformance \
+    -I "$PROTO_ROOT/src/google" \
+    "$PROTO_ROOT/src/google/protobuf/test_messages_proto2.proto" \
+    "$PROTO_ROOT/src/google/protobuf/test_messages_proto3.proto"
+
+mix format
 ```
 
 ## Exemptions
 
-[`conformance/protobuf/exemptions.txt`][exemptions-file] contains a list of
+[`conformance/exemptions.txt`][exemptions-file] contains a list of
 tests that are currently failing conformance tests. When fixing issues
 identified by the conformance test, remove the corresponding test lines from
 this file to ensure test regressions do not occur.
 
-[exemptions-file]: ./conformance/protobuf/exemptions.txt
+[exemptions-file]: ./conformance/exemptions.txt
 [conformance-instructions]: https://github.com/protocolbuffers/protobuf/blob/master/conformance/README.md
+[test-message-protobuf-schema-source]: https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/test_messages_proto2.proto
