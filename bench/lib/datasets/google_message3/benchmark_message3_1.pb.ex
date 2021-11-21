@@ -23,7 +23,6 @@ defmodule Benchmarks.GoogleMessage3.Message34624 do
             field34684: nil
 
   field :field34683, 1, optional: true, type: Benchmarks.GoogleMessage3.Message34621
-
   field :field34684, 2, optional: true, type: Benchmarks.GoogleMessage3.Message34621
 end
 defmodule Benchmarks.GoogleMessage3.Message34791.Message34792 do
@@ -39,7 +38,6 @@ defmodule Benchmarks.GoogleMessage3.Message34791.Message34792 do
             field34809: nil
 
   field :field34808, 3, required: true, type: :string
-
   field :field34809, 4, optional: true, type: :string
 end
 defmodule Benchmarks.GoogleMessage3.Message34791 do
@@ -79,31 +77,18 @@ defmodule Benchmarks.GoogleMessage3.Message34791 do
             field34806: []
 
   field :field34793, 1, optional: true, type: :fixed64
-
   field :message34792, 2, repeated: true, type: :group
-
   field :field34795, 5, optional: true, type: :int32
-
   field :field34796, 6, optional: true, type: :int32
-
   field :field34797, 7, optional: true, type: :int32
-
   field :field34798, 8, optional: true, type: :int32
-
   field :field34799, 9, optional: true, type: :int32
-
   field :field34800, 10, optional: true, type: :int32
-
   field :field34801, 11, optional: true, type: :bool
-
   field :field34802, 12, optional: true, type: :float
-
   field :field34803, 13, optional: true, type: :int32
-
   field :field34804, 14, optional: true, type: :string
-
   field :field34805, 15, optional: true, type: :int64
-
   field :field34806, 17, repeated: true, type: :fixed64, packed: true
 end
 defmodule Benchmarks.GoogleMessage3.Message35483 do
@@ -127,15 +112,10 @@ defmodule Benchmarks.GoogleMessage3.Message35483 do
             field35504: nil
 
   field :field35499, 1, optional: true, type: :int32
-
   field :field35500, 2, optional: true, type: :string
-
   field :field35501, 3, optional: true, type: :string
-
   field :field35502, 4, optional: true, type: :string
-
   field :field35503, 5, repeated: true, type: Benchmarks.GoogleMessage3.Message35476
-
   field :field35504, 6, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
 end
 defmodule Benchmarks.GoogleMessage3.Message35807 do
@@ -163,19 +143,12 @@ defmodule Benchmarks.GoogleMessage3.Message35807 do
             field35817: nil
 
   field :field35810, 1, optional: true, type: :int32
-
   field :field35811, 2, optional: true, type: :int32
-
   field :field35812, 3, optional: true, type: :int32
-
   field :field35813, 4, optional: true, type: :int32
-
   field :field35814, 5, optional: true, type: :int32
-
   field :field35815, 6, optional: true, type: :int32
-
   field :field35816, 7, optional: true, type: :int32
-
   field :field35817, 8, optional: true, type: :int32
 end
 defmodule Benchmarks.GoogleMessage3.Message37487 do
@@ -191,7 +164,6 @@ defmodule Benchmarks.GoogleMessage3.Message37487 do
             field37502: nil
 
   field :field37501, 2, optional: true, type: :bytes
-
   field :field37502, 3, optional: true, type: :bool
 end
 defmodule Benchmarks.GoogleMessage3.Message13062 do
@@ -213,13 +185,9 @@ defmodule Benchmarks.GoogleMessage3.Message13062 do
             field13079: nil
 
   field :field13075, 1, optional: true, type: :int64
-
   field :field13076, 2, optional: true, type: :string
-
   field :field13077, 3, optional: true, type: :int32
-
   field :field13078, 4, optional: true, type: :string
-
   field :field13079, 5, optional: true, type: :int32
 end
 defmodule Benchmarks.GoogleMessage3.Message952 do
@@ -253,13 +221,9 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36877 do
             field37048: nil
 
   field :field37044, 112, required: true, type: :string
-
   field :field37045, 113, optional: true, type: :int32
-
   field :field37046, 114, optional: true, type: :bytes
-
   field :field37047, 115, optional: true, type: :int32
-
   field :field37048, 157, optional: true, type: :int32
 end
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36878 do
@@ -283,7 +247,6 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36879 do
             field37051: nil
 
   field :field37050, 56, required: true, type: :string
-
   field :field37051, 69, optional: true, type: :int32
 end
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36880 do
@@ -371,15 +334,10 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36888 do
             field37094: nil
 
   field :field37089, 75, optional: true, type: :uint64
-
   field :field37090, 76, optional: true, type: :bool
-
   field :field37091, 165, optional: true, type: :uint64
-
   field :field37092, 166, optional: true, type: :double
-
   field :field37093, 109, optional: true, type: :uint64
-
   field :field37094, 122, optional: true, type: :bytes
 end
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36889 do
@@ -441,53 +399,29 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36889 do
             field37119: []
 
   field :field37095, 117, optional: true, type: :int64
-
   field :field37096, 145, optional: true, type: :string
-
   field :field37097, 123, optional: true, type: :int32
-
   field :field37098, 163, optional: true, type: :bool
-
   field :field37099, 164, optional: true, type: :int32
-
   field :field37100, 149, optional: true, type: :int32
-
   field :field37101, 129, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field37102, 124, optional: true, type: Benchmarks.GoogleMessage3.Message13174
-
   field :field37103, 128, optional: true, type: Benchmarks.GoogleMessage3.Message13169
-
   field :field37104, 132, optional: true, type: :uint64
-
   field :field37105, 131, repeated: true, type: Benchmarks.GoogleMessage3.Enum36890, enum: true
-
   field :field37106, 134, optional: true, type: :bool
-
   field :field37107, 140, optional: true, type: :bool
-
   field :field37108, 135, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field37109, 136, optional: true, type: :float
-
   field :field37110, 156, optional: true, type: :float
-
   field :field37111, 142, optional: true, type: :bool
-
   field :field37112, 167, optional: true, type: :int64
-
   field :field37113, 146, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field37114, 148, optional: true, type: :bool
-
   field :field37115, 154, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field37116, 158, optional: true, type: Benchmarks.GoogleMessage3.UnusedEnum, enum: true
-
   field :field37117, 159, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEnum, enum: true
-
   field :field37118, 160, optional: true, type: :int32
-
   field :field37119, 161, repeated: true, type: :string
 end
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36910 do
@@ -515,11 +449,8 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36911 do
             field37124: nil
 
   field :field37121, 127, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field37122, 130, optional: true, type: Benchmarks.GoogleMessage3.Message35538
-
   field :field37123, 144, optional: true, type: Benchmarks.GoogleMessage3.Message35540
-
   field :field37124, 150, optional: true, type: Benchmarks.GoogleMessage3.Message35542
 end
 defmodule Benchmarks.GoogleMessage3.Message36876.Message36912 do
@@ -535,7 +466,6 @@ defmodule Benchmarks.GoogleMessage3.Message36876.Message36912 do
             field37126: nil
 
   field :field37125, 153, optional: true, type: Benchmarks.GoogleMessage3.Message3901
-
   field :field37126, 162, optional: true, type: Benchmarks.GoogleMessage3.Message3901
 end
 defmodule Benchmarks.GoogleMessage3.Message36876 do
@@ -673,129 +603,67 @@ defmodule Benchmarks.GoogleMessage3.Message36876 do
             field37042: nil
 
   field :field36980, 1, optional: true, type: Benchmarks.GoogleMessage3.Message2356
-
   field :message36877, 111, repeated: true, type: :group
-
   field :message36878, 168, repeated: true, type: :group
-
   field :message36879, 55, repeated: true, type: :group
-
   field :field36984, 78, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :message36880, 137, optional: true, type: :group
-
   field :field36986, 59, optional: true, type: :uint64
-
   field :field36987, 121, optional: true, type: :bytes
-
   field :field36988, 2, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field36989, 118, optional: true, type: Benchmarks.GoogleMessage3.Message7029
-
   field :field36990, 11, optional: true, type: Benchmarks.GoogleMessage3.Message35573
-
   field :field36991, 21, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field36992, 22, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field36993, 13, optional: true, type: :float
-
   field :field36994, 20, optional: true, type: :int32
-
   field :field36995, 51, optional: true, type: :bool
-
   field :field36996, 57, optional: true, type: :bool
-
   field :field36997, 100, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field36998, 47, optional: true, type: :int32
-
   field :field36999, 48, optional: true, type: :int32
-
   field :field37000, 68, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :message36881, 23, repeated: true, type: :group
-
   field :field37002, 125, optional: true, type: Benchmarks.GoogleMessage3.Message4144
-
   field :message36882, 35, repeated: true, type: :group
-
   field :field37004, 49, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field37005, 52, optional: true, type: Benchmarks.GoogleMessage3.Message18921
-
   field :field37006, 46, optional: true, type: Benchmarks.GoogleMessage3.Message36858
-
   field :field37007, 54, optional: true, type: Benchmarks.GoogleMessage3.Message18831
-
   field :field37008, 58, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field37009, 10, optional: true, type: Benchmarks.GoogleMessage3.Message18283
-
   field :field37010, 44, optional: true, type: :string
-
   field :field37011, 103, optional: true, type: :string
-
   field :field37012, 43, optional: true, type: Benchmarks.GoogleMessage3.Message0
-
   field :field37013, 143, optional: true, type: Benchmarks.GoogleMessage3.Message0
-
   field :field37014, 53, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field37015, 15, optional: true, type: Benchmarks.GoogleMessage3.Message36869
-
   field :message36883, 3, optional: true, type: :group
-
   field :message36884, 16, repeated: true, type: :group
-
   field :message36885, 27, repeated: true, type: :group
-
   field :message36886, 32, optional: true, type: :group
-
   field :field37020, 71, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEnum, enum: true
-
   field :field37021, 70, repeated: true, type: :int32
-
   field :field37022, 66, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field37023, 67, optional: true, type: Benchmarks.GoogleMessage3.Message13090
-
   field :message36887, 62, optional: true, type: :group
-
   field :field37025, 50, repeated: true, type: Benchmarks.GoogleMessage3.Message10155
-
   field :field37026, 151, repeated: true, type: Benchmarks.GoogleMessage3.Message11874
-
   field :field37027, 12, optional: true, type: :string
-
   field :field37028, 72, optional: true, type: :int64
-
   field :field37029, 73, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field37030, 108, optional: true, type: Benchmarks.GoogleMessage3.Message35546
-
   field :message36888, 74, optional: true, type: :group
-
   field :field37032, 104, repeated: true, type: Benchmarks.GoogleMessage3.Message19255
-
   field :field37033, 105, optional: true, type: Benchmarks.GoogleMessage3.Message33968
-
   field :field37034, 106, optional: true, type: :bool
-
   field :field37035, 107, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field37036, 110, optional: true, type: Benchmarks.GoogleMessage3.Message6644
-
   field :field37037, 133, optional: true, type: :bytes
-
   field :message36889, 116, optional: true, type: :group
-
   field :message36910, 119, repeated: true, type: :group
-
   field :message36911, 126, optional: true, type: :group
-
   field :message36912, 152, optional: true, type: :group
-
   field :field37042, 155, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
 end
 defmodule Benchmarks.GoogleMessage3.Message1328 do
@@ -889,69 +757,37 @@ defmodule Benchmarks.GoogleMessage3.Message6863 do
             field6963: nil
 
   field :field6931, 1, optional: true, type: Benchmarks.GoogleMessage3.Enum6858, enum: true
-
   field :field6932, 2, optional: true, type: Benchmarks.GoogleMessage3.Enum6858, enum: true
-
   field :field6933, 36, optional: true, type: Benchmarks.GoogleMessage3.UnusedEnum, enum: true
-
   field :field6934, 27, optional: true, type: :bool
-
   field :field6935, 26, optional: true, type: Benchmarks.GoogleMessage3.Message6773
-
   field :field6936, 30, optional: true, type: :int32
-
   field :field6937, 37, optional: true, type: :int32
-
   field :field6938, 31, optional: true, type: Benchmarks.GoogleMessage3.Enum6815, enum: true
-
   field :field6939, 3, optional: true, type: :string
-
   field :field6940, 4, optional: true, type: :int32
-
   field :field6941, 15, optional: true, type: Benchmarks.GoogleMessage3.Enum6822, enum: true
-
   field :field6942, 10, optional: true, type: :bool
-
   field :field6943, 17, optional: true, type: :bool
-
   field :field6944, 18, optional: true, type: :float
-
   field :field6945, 19, optional: true, type: :float
-
   field :field6946, 5, optional: true, type: :int32
-
   field :field6947, 6, optional: true, type: :int32
-
   field :field6948, 7, optional: true, type: :bool
-
   field :field6949, 12, optional: true, type: :int32
-
   field :field6950, 8, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field6951, 9, optional: true, type: :uint64
-
   field :field6952, 11, optional: true, type: :string
-
   field :field6953, 13, optional: true, type: :bytes
-
   field :field6954, 14, optional: true, type: :int32
-
   field :field6955, 16, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field6956, 22, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field6957, 38, optional: true, type: Benchmarks.GoogleMessage3.Message3886
-
   field :field6958, 20, optional: true, type: :string
-
   field :field6959, 21, optional: true, type: :uint32
-
   field :field6960, 23, optional: true, type: Benchmarks.GoogleMessage3.Message6743
-
   field :field6961, 29, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field6962, 33, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field6963, 34, optional: true, type: :bool
 end
 defmodule Benchmarks.GoogleMessage3.Message6871 do
@@ -975,7 +811,6 @@ defmodule Benchmarks.GoogleMessage3.Message7547 do
             field7550: 0
 
   field :field7549, 1, required: true, type: :bytes
-
   field :field7550, 2, required: true, type: :int32
 end
 defmodule Benchmarks.GoogleMessage3.Message7648 do
@@ -1011,27 +846,16 @@ defmodule Benchmarks.GoogleMessage3.Message7648 do
             field7680: nil
 
   field :field7669, 1, optional: true, type: :string
-
   field :field7670, 2, optional: true, type: :int32
-
   field :field7671, 3, optional: true, type: :int32
-
   field :field7672, 4, optional: true, type: :int32
-
   field :field7673, 5, optional: true, type: :int32
-
   field :field7674, 6, optional: true, type: :int32
-
   field :field7675, 7, optional: true, type: :float
-
   field :field7676, 8, optional: true, type: :bool
-
   field :field7677, 9, optional: true, type: :bool
-
   field :field7678, 10, optional: true, type: :bool
-
   field :field7679, 11, optional: true, type: :bool
-
   field :field7680, 12, optional: true, type: :bool
 end
 defmodule Benchmarks.GoogleMessage3.Message7865 do
@@ -1055,7 +879,6 @@ defmodule Benchmarks.GoogleMessage3.Message7928 do
             field7941: nil
 
   field :field7940, 1, optional: true, type: :string
-
   field :field7941, 2, optional: true, type: :int64
 end
 defmodule Benchmarks.GoogleMessage3.Message7919 do
@@ -1073,9 +896,7 @@ defmodule Benchmarks.GoogleMessage3.Message7919 do
             field7933: nil
 
   field :field7931, 1, optional: true, type: :fixed64
-
   field :field7932, 2, optional: true, type: :int64
-
   field :field7933, 3, optional: true, type: :bytes
 end
 defmodule Benchmarks.GoogleMessage3.Message7920 do
@@ -1091,7 +912,6 @@ defmodule Benchmarks.GoogleMessage3.Message7920 do
             field7935: nil
 
   field :field7934, 1, optional: true, type: :int64
-
   field :field7935, 2, optional: true, type: :int64
 end
 defmodule Benchmarks.GoogleMessage3.Message7921 do
@@ -1111,11 +931,8 @@ defmodule Benchmarks.GoogleMessage3.Message7921 do
             field7939: nil
 
   field :field7936, 1, optional: true, type: :int32
-
   field :field7937, 2, optional: true, type: :int64
-
   field :field7938, 3, optional: true, type: :float
-
   field :field7939, 4, optional: true, type: Benchmarks.GoogleMessage3.UnusedEnum, enum: true
 end
 defmodule Benchmarks.GoogleMessage3.Message8511 do
@@ -1137,13 +954,9 @@ defmodule Benchmarks.GoogleMessage3.Message8511 do
             field8543: nil
 
   field :field8539, 1, optional: true, type: Benchmarks.GoogleMessage3.Message8224
-
   field :field8540, 2, optional: true, type: :string
-
   field :field8541, 3, optional: true, type: :bool
-
   field :field8542, 4, optional: true, type: :int64
-
   field :field8543, 5, optional: true, type: :string
 end
 defmodule Benchmarks.GoogleMessage3.Message8512 do
@@ -1167,15 +980,10 @@ defmodule Benchmarks.GoogleMessage3.Message8512 do
             field8549: nil
 
   field :field8544, 1, optional: true, type: Benchmarks.GoogleMessage3.Message8301
-
   field :field8545, 2, optional: true, type: Benchmarks.GoogleMessage3.Message8302
-
   field :field8546, 3, optional: true, type: :string
-
   field :field8547, 4, optional: true, type: :bool
-
   field :field8548, 5, optional: true, type: :int64
-
   field :field8549, 6, optional: true, type: :string
 end
 defmodule Benchmarks.GoogleMessage3.Message8513 do
@@ -1195,11 +1003,8 @@ defmodule Benchmarks.GoogleMessage3.Message8513 do
             field8553: nil
 
   field :field8550, 1, repeated: true, type: Benchmarks.GoogleMessage3.Message8392
-
   field :field8551, 2, optional: true, type: :string
-
   field :field8552, 3, optional: true, type: :bool
-
   field :field8553, 4, optional: true, type: :string
 end
 defmodule Benchmarks.GoogleMessage3.Message8514 do
@@ -1221,13 +1026,9 @@ defmodule Benchmarks.GoogleMessage3.Message8514 do
             field8558: nil
 
   field :field8554, 1, optional: true, type: :string
-
   field :field8555, 2, optional: true, type: :int64
-
   field :field8556, 3, optional: true, type: :bool
-
   field :field8557, 4, repeated: true, type: Benchmarks.GoogleMessage3.Message8130
-
   field :field8558, 5, optional: true, type: :string
 end
 defmodule Benchmarks.GoogleMessage3.Message8515 do
@@ -1245,9 +1046,7 @@ defmodule Benchmarks.GoogleMessage3.Message8515 do
             field8561: nil
 
   field :field8559, 1, optional: true, type: Benchmarks.GoogleMessage3.Message8479
-
   field :field8560, 2, optional: true, type: Benchmarks.GoogleMessage3.Message8478
-
   field :field8561, 3, optional: true, type: :string
 end
 defmodule Benchmarks.GoogleMessage3.Message10320 do
@@ -1273,17 +1072,11 @@ defmodule Benchmarks.GoogleMessage3.Message10320 do
             field10353: nil
 
   field :field10347, 1, optional: true, type: Benchmarks.GoogleMessage3.Enum10335, enum: true
-
   field :field10348, 2, repeated: true, type: Benchmarks.GoogleMessage3.Message10319
-
   field :field10349, 3, optional: true, type: :int32
-
   field :field10350, 4, optional: true, type: :int32
-
   field :field10351, 5, optional: true, type: :int32
-
   field :field10352, 6, optional: true, type: :int32
-
   field :field10353, 7, optional: true, type: Benchmarks.GoogleMessage3.Enum10337, enum: true
 end
 defmodule Benchmarks.GoogleMessage3.Message10321 do
@@ -1301,9 +1094,7 @@ defmodule Benchmarks.GoogleMessage3.Message10321 do
             field10356: nil
 
   field :field10354, 1, optional: true, type: :int32
-
   field :field10355, 2, optional: true, type: :int32
-
   field :field10356, 3, optional: true, type: :uint64
 end
 defmodule Benchmarks.GoogleMessage3.Message10322 do
@@ -1321,9 +1112,7 @@ defmodule Benchmarks.GoogleMessage3.Message10322 do
             field10359: nil
 
   field :field10357, 1, optional: true, type: Benchmarks.GoogleMessage3.Message4016
-
   field :field10358, 2, optional: true, type: :bool
-
   field :field10359, 3, optional: true, type: :bool
 end
 defmodule Benchmarks.GoogleMessage3.Message11988 do
@@ -1343,11 +1132,8 @@ defmodule Benchmarks.GoogleMessage3.Message11988 do
             field12024: nil
 
   field :field12021, 1, optional: true, type: :string
-
   field :field12022, 2, optional: true, type: :string
-
   field :field12023, 3, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field12024, 4, optional: true, type: Benchmarks.GoogleMessage3.Message10155
 end
 defmodule Benchmarks.GoogleMessage3.Message12668 do
@@ -1367,11 +1153,8 @@ defmodule Benchmarks.GoogleMessage3.Message12668 do
             field12680: nil
 
   field :field12677, 1, repeated: true, type: Benchmarks.GoogleMessage3.Message12669
-
   field :field12678, 2, optional: true, type: :int32
-
   field :field12679, 3, optional: true, type: :int32
-
   field :field12680, 4, optional: true, type: :int32
 end
 defmodule Benchmarks.GoogleMessage3.Message12825 do
@@ -1397,17 +1180,11 @@ defmodule Benchmarks.GoogleMessage3.Message12825 do
             field12868: []
 
   field :field12862, 1, repeated: true, type: Benchmarks.GoogleMessage3.Message12818
-
   field :field12863, 2, optional: true, type: :int32
-
   field :field12864, 3, optional: true, type: Benchmarks.GoogleMessage3.Message12819
-
   field :field12865, 4, optional: true, type: Benchmarks.GoogleMessage3.Message12820
-
   field :field12866, 5, optional: true, type: :int32
-
   field :field12867, 6, repeated: true, type: Benchmarks.GoogleMessage3.Message12821
-
   field :field12868, 7, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
 end
 defmodule Benchmarks.GoogleMessage3.Message16478 do
@@ -1425,9 +1202,7 @@ defmodule Benchmarks.GoogleMessage3.Message16478 do
             field16483: nil
 
   field :field16481, 1, repeated: true, type: Benchmarks.GoogleMessage3.Message16479
-
   field :field16482, 3, optional: true, type: :bool
-
   field :field16483, 2, optional: true, type: :int32
 end
 defmodule Benchmarks.GoogleMessage3.Message16552 do
@@ -1445,9 +1220,7 @@ defmodule Benchmarks.GoogleMessage3.Message16552 do
             field16567: nil
 
   field :field16565, 1, optional: true, type: :fixed64
-
   field :field16566, 2, optional: true, type: :int32
-
   field :field16567, 3, optional: true, type: Benchmarks.GoogleMessage3.Enum16553, enum: true
 end
 defmodule Benchmarks.GoogleMessage3.Message16660 do
@@ -1465,9 +1238,7 @@ defmodule Benchmarks.GoogleMessage3.Message16660 do
             field16670: nil
 
   field :field16668, 1, optional: true, type: :string
-
   field :field16669, 2, optional: true, type: :string
-
   field :field16670, 3, optional: true, type: :int32
 end
 defmodule Benchmarks.GoogleMessage3.Message16727 do
@@ -1529,51 +1300,28 @@ defmodule Benchmarks.GoogleMessage3.Message16727 do
             __pb_extensions__: nil
 
   field :field16782, 1, required: true, type: Benchmarks.GoogleMessage3.Enum16728, enum: true
-
   field :field16783, 2, required: true, type: :string
-
   field :field16784, 3, optional: true, type: :string
-
   field :field16785, 23, optional: true, type: :int32
-
   field :field16786, 4, required: true, type: :string
-
   field :field16787, 5, optional: true, type: :string
-
   field :field16788, 6, optional: true, type: :string
-
   field :field16789, 7, required: true, type: Benchmarks.GoogleMessage3.Enum16732, enum: true
-
   field :field16790, 8, optional: true, type: :string
-
   field :field16791, 9, optional: true, type: :string
-
   field :field16792, 10, optional: true, type: :string
-
   field :field16793, 11, optional: true, type: Benchmarks.GoogleMessage3.Enum16738, enum: true
-
   field :field16794, 12, optional: true, type: :int32
-
   field :field16795, 13, repeated: true, type: Benchmarks.GoogleMessage3.Message16722
-
   field :field16796, 19, optional: true, type: :bool
-
   field :field16797, 24, optional: true, type: :bool
-
   field :field16798, 14, optional: true, type: :string
-
   field :field16799, 15, optional: true, type: :int64
-
   field :field16800, 16, optional: true, type: :bool
-
   field :field16801, 17, optional: true, type: :string
-
   field :field16802, 18, optional: true, type: Benchmarks.GoogleMessage3.Enum16698, enum: true
-
   field :field16803, 20, optional: true, type: Benchmarks.GoogleMessage3.Message16724
-
   field :field16804, 22, optional: true, type: :bool
-
   field :field16805, 25, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
 
   extensions [{1000, 536_870_912}]
@@ -1591,7 +1339,6 @@ defmodule Benchmarks.GoogleMessage3.Message16725 do
             field16775: []
 
   field :field16774, 1, optional: true, type: Benchmarks.GoogleMessage3.Enum16728, enum: true
-
   field :field16775, 2, repeated: true, type: :string
 end
 defmodule Benchmarks.GoogleMessage3.Message17726 do
@@ -1647,47 +1394,26 @@ defmodule Benchmarks.GoogleMessage3.Message17726 do
             field17822: []
 
   field :field17801, 1, optional: true, type: :string
-
   field :field17802, 2, repeated: true, type: :string
-
   field :field17803, 3, optional: true, type: :string
-
   field :field17804, 4, repeated: true, type: :string
-
   field :field17805, 5, optional: true, type: :string
-
   field :field17806, 6, repeated: true, type: :string
-
   field :field17807, 7, optional: true, type: :string
-
   field :field17808, 8, optional: true, type: :string
-
   field :field17809, 15, repeated: true, type: :string
-
   field :field17810, 16, repeated: true, type: :string
-
   field :field17811, 17, repeated: true, type: :string
-
   field :field17812, 18, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field17813, 9, optional: true, type: :string
-
   field :field17814, 10, optional: true, type: :string
-
   field :field17815, 11, optional: true, type: :string
-
   field :field17816, 12, optional: true, type: :string
-
   field :field17817, 13, optional: true, type: :string
-
   field :field17818, 14, optional: true, type: :string
-
   field :field17819, 19, optional: true, type: :string
-
   field :field17820, 20, repeated: true, type: Benchmarks.GoogleMessage3.Message17728
-
   field :field17821, 21, repeated: true, type: Benchmarks.GoogleMessage3.Message17728
-
   field :field17822, 30, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
 end
 defmodule Benchmarks.GoogleMessage3.Message17782 do
@@ -1703,7 +1429,6 @@ defmodule Benchmarks.GoogleMessage3.Message17782 do
             field18154: nil
 
   field :field18153, 1, optional: true, type: :string
-
   field :field18154, 2, optional: true, type: :string
 end
 defmodule Benchmarks.GoogleMessage3.Message17783.Message17784 do
@@ -1727,15 +1452,10 @@ defmodule Benchmarks.GoogleMessage3.Message17783.Message17784 do
             field18167: nil
 
   field :field18162, 5, optional: true, type: :string
-
   field :field18163, 6, optional: true, type: :string
-
   field :field18164, 7, optional: true, type: :string
-
   field :field18165, 8, repeated: true, type: :string
-
   field :field18166, 17, optional: true, type: :string
-
   field :field18167, 18, optional: true, type: :string
 end
 defmodule Benchmarks.GoogleMessage3.Message17783.Message17785 do
@@ -1759,15 +1479,10 @@ defmodule Benchmarks.GoogleMessage3.Message17783.Message17785 do
             field18173: []
 
   field :field18168, 10, optional: true, type: :string
-
   field :field18169, 11, optional: true, type: :string
-
   field :field18170, 12, optional: true, type: Benchmarks.GoogleMessage3.Message17783
-
   field :field18171, 13, optional: true, type: :string
-
   field :field18172, 14, optional: true, type: :string
-
   field :field18173, 15, repeated: true, type: :string
 end
 defmodule Benchmarks.GoogleMessage3.Message17783 do
@@ -1791,15 +1506,10 @@ defmodule Benchmarks.GoogleMessage3.Message17783 do
             field18160: []
 
   field :field18155, 1, optional: true, type: :string
-
   field :field18156, 2, optional: true, type: :string
-
   field :field18157, 3, optional: true, type: :string
-
   field :message17784, 4, repeated: true, type: :group
-
   field :message17785, 9, repeated: true, type: :group
-
   field :field18160, 16, repeated: true, type: :string
 end
 defmodule Benchmarks.GoogleMessage3.Message16945 do
@@ -1971,161 +1681,83 @@ defmodule Benchmarks.GoogleMessage3.Message16945 do
             __pb_extensions__: nil
 
   field :field16946, 1, optional: true, type: :string
-
   field :field16947, 2, optional: true, type: :string
-
   field :field16948, 3, optional: true, type: :string
-
   field :field16949, 4, optional: true, type: :string
-
   field :field16950, 5, optional: true, type: :string
-
   field :field16951, 872, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16952, 16, repeated: true, type: Benchmarks.GoogleMessage3.Message0
-
   field :field16953, 54, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16954, 55, repeated: true, type: Benchmarks.GoogleMessage3.Message0
-
   field :field16955, 58, repeated: true, type: :string
-
   field :field16956, 59, repeated: true, type: :string
-
   field :field16957, 62, repeated: true, type: :string
-
   field :field16958, 37, repeated: true, type: :string
-
   field :field16959, 18, repeated: true, type: :string
-
   field :field16960, 38, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16961, 67, repeated: true, type: Benchmarks.GoogleMessage3.Message0
-
   field :field16962, 130, repeated: true, type: Benchmarks.GoogleMessage3.Message0
-
   field :field16963, 136, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16964, 138, repeated: true, type: :string
-
   field :field16965, 156, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16966, 139, repeated: true, type: :string
-
   field :field16967, 126, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16968, 152, repeated: true, type: :string
-
   field :field16969, 183, repeated: true, type: Benchmarks.GoogleMessage3.Message0
-
   field :field16970, 168, repeated: true, type: :string
-
   field :field16971, 212, repeated: true, type: :string
-
   field :field16972, 213, repeated: true, type: :string
-
   field :field16973, 189, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16974, 190, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16975, 191, repeated: true, type: :string
-
   field :field16976, 192, repeated: true, type: :string
-
   field :field16977, 193, repeated: true, type: Benchmarks.GoogleMessage3.Message0
-
   field :field16978, 194, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16979, 195, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16980, 196, repeated: true, type: :int32
-
   field :field16981, 95, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16982, 96, repeated: true, type: :string
-
   field :field16983, 97, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16984, 1086, repeated: true, type: :string
-
   field :field16985, 98, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16986, 99, repeated: true, type: :string
-
   field :field16987, 100, repeated: true, type: :string
-
   field :field16988, 48, repeated: true, type: :string
-
   field :field16989, 22, optional: true, type: :string
-
   field :field16990, 51, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16991, 81, repeated: true, type: :string
-
   field :field16992, 85, repeated: true, type: :string
-
   field :field16993, 169, repeated: true, type: :string
-
   field :field16994, 260, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field16995, 198, optional: true, type: :int32
-
   field :field16996, 204, optional: true, type: :int32
-
   field :field16997, 1087, optional: true, type: :string
-
   field :field16998, 197, repeated: true, type: :string
-
   field :field16999, 206, repeated: true, type: :string
-
   field :field17000, 211, optional: true, type: :string
-
   field :field17001, 205, repeated: true, type: :string
-
   field :field17002, 68, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field17003, 69, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field17004, 70, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field17005, 71, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field17006, 72, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field17007, 19, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field17008, 24, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field17009, 23, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field17010, 131, repeated: true, type: Benchmarks.GoogleMessage3.Message0
-
   field :field17011, 133, repeated: true, type: :string
-
   field :field17012, 142, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field17013, 143, repeated: true, type: :string
-
   field :field17014, 153, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
-
   field :field17015, 170, repeated: true, type: Benchmarks.GoogleMessage3.Message0
-
   field :field17016, 171, repeated: true, type: :string
-
   field :field17017, 172, repeated: true, type: :string
-
   field :field17018, 173, repeated: true, type: :string
-
   field :field17019, 174, repeated: true, type: :string
-
   field :field17020, 175, repeated: true, type: :string
-
   field :field17021, 186, repeated: true, type: :string
-
   field :field17022, 101, repeated: true, type: :string
-
   field :field17023, 102, repeated: true, type: Benchmarks.GoogleMessage3.Message0
-
   field :field17024, 274, repeated: true, type: :string
 
   extensions [

@@ -22,12 +22,10 @@ defmodule <%= @module %> do
   <% end %>
 
   <%= for {%Google.Protobuf.OneofDescriptorProto{name: name}, index} <- Enum.with_index(@oneofs) do %>
-  oneof :<%= name %>, <%= index %>
-  <% end %>
+  oneof :<%= name %>, <%= index %><% end %>
 
   <%= for f <- @fields do %>
-  field <%= f %>
-  <% end %>
+  field <%= f %><% end %>
 
   <%= if @transform_module do %>
   def transform_module(), do: <%= inspect(@transform_module) %>

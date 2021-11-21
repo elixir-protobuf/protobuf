@@ -144,27 +144,16 @@ defmodule Google.Protobuf.FileDescriptorProto do
             syntax: nil
 
   field :name, 1, optional: true, type: :string
-
   field :package, 2, optional: true, type: :string
-
   field :dependency, 3, repeated: true, type: :string
-
   field :public_dependency, 10, repeated: true, type: :int32
-
   field :weak_dependency, 11, repeated: true, type: :int32
-
   field :message_type, 4, repeated: true, type: Google.Protobuf.DescriptorProto
-
   field :enum_type, 5, repeated: true, type: Google.Protobuf.EnumDescriptorProto
-
   field :service, 6, repeated: true, type: Google.Protobuf.ServiceDescriptorProto
-
   field :extension, 7, repeated: true, type: Google.Protobuf.FieldDescriptorProto
-
   field :options, 8, optional: true, type: Google.Protobuf.FileOptions
-
   field :source_code_info, 9, optional: true, type: Google.Protobuf.SourceCodeInfo
-
   field :syntax, 12, optional: true, type: :string
 end
 
@@ -183,9 +172,7 @@ defmodule Google.Protobuf.DescriptorProto.ExtensionRange do
             options: nil
 
   field :start, 1, optional: true, type: :int32
-
   field :end, 2, optional: true, type: :int32
-
   field :options, 3, optional: true, type: Google.Protobuf.ExtensionRangeOptions
 end
 
@@ -202,7 +189,6 @@ defmodule Google.Protobuf.DescriptorProto.ReservedRange do
             end: nil
 
   field :start, 1, optional: true, type: :int32
-
   field :end, 2, optional: true, type: :int32
 end
 
@@ -235,23 +221,14 @@ defmodule Google.Protobuf.DescriptorProto do
             reserved_name: []
 
   field :name, 1, optional: true, type: :string
-
   field :field, 2, repeated: true, type: Google.Protobuf.FieldDescriptorProto
-
   field :extension, 6, repeated: true, type: Google.Protobuf.FieldDescriptorProto
-
   field :nested_type, 3, repeated: true, type: Google.Protobuf.DescriptorProto
-
   field :enum_type, 4, repeated: true, type: Google.Protobuf.EnumDescriptorProto
-
   field :extension_range, 5, repeated: true, type: Google.Protobuf.DescriptorProto.ExtensionRange
-
   field :oneof_decl, 8, repeated: true, type: Google.Protobuf.OneofDescriptorProto
-
   field :options, 7, optional: true, type: Google.Protobuf.MessageOptions
-
   field :reserved_range, 9, repeated: true, type: Google.Protobuf.DescriptorProto.ReservedRange
-
   field :reserved_name, 10, repeated: true, type: :string
 end
 
@@ -303,25 +280,15 @@ defmodule Google.Protobuf.FieldDescriptorProto do
             proto3_optional: nil
 
   field :name, 1, optional: true, type: :string
-
   field :number, 3, optional: true, type: :int32
-
   field :label, 4, optional: true, type: Google.Protobuf.FieldDescriptorProto.Label, enum: true
-
   field :type, 5, optional: true, type: Google.Protobuf.FieldDescriptorProto.Type, enum: true
-
   field :type_name, 6, optional: true, type: :string
-
   field :extendee, 2, optional: true, type: :string
-
   field :default_value, 7, optional: true, type: :string
-
   field :oneof_index, 9, optional: true, type: :int32
-
   field :json_name, 10, optional: true, type: :string
-
   field :options, 8, optional: true, type: Google.Protobuf.FieldOptions
-
   field :proto3_optional, 17, optional: true, type: :bool
 end
 
@@ -338,7 +305,6 @@ defmodule Google.Protobuf.OneofDescriptorProto do
             options: nil
 
   field :name, 1, optional: true, type: :string
-
   field :options, 2, optional: true, type: Google.Protobuf.OneofOptions
 end
 
@@ -355,7 +321,6 @@ defmodule Google.Protobuf.EnumDescriptorProto.EnumReservedRange do
             end: nil
 
   field :start, 1, optional: true, type: :int32
-
   field :end, 2, optional: true, type: :int32
 end
 
@@ -378,9 +343,7 @@ defmodule Google.Protobuf.EnumDescriptorProto do
             reserved_name: []
 
   field :name, 1, optional: true, type: :string
-
   field :value, 2, repeated: true, type: Google.Protobuf.EnumValueDescriptorProto
-
   field :options, 3, optional: true, type: Google.Protobuf.EnumOptions
 
   field :reserved_range, 4,
@@ -405,9 +368,7 @@ defmodule Google.Protobuf.EnumValueDescriptorProto do
             options: nil
 
   field :name, 1, optional: true, type: :string
-
   field :number, 2, optional: true, type: :int32
-
   field :options, 3, optional: true, type: Google.Protobuf.EnumValueOptions
 end
 
@@ -426,9 +387,7 @@ defmodule Google.Protobuf.ServiceDescriptorProto do
             options: nil
 
   field :name, 1, optional: true, type: :string
-
   field :method, 2, repeated: true, type: Google.Protobuf.MethodDescriptorProto
-
   field :options, 3, optional: true, type: Google.Protobuf.ServiceOptions
 end
 
@@ -453,15 +412,10 @@ defmodule Google.Protobuf.MethodDescriptorProto do
             server_streaming: nil
 
   field :name, 1, optional: true, type: :string
-
   field :input_type, 2, optional: true, type: :string
-
   field :output_type, 3, optional: true, type: :string
-
   field :options, 4, optional: true, type: Google.Protobuf.MethodOptions
-
   field :client_streaming, 5, optional: true, type: :bool, default: false
-
   field :server_streaming, 6, optional: true, type: :bool, default: false
 end
 
@@ -518,13 +472,9 @@ defmodule Google.Protobuf.FileOptions do
             __pb_extensions__: nil
 
   field :java_package, 1, optional: true, type: :string
-
   field :java_outer_classname, 8, optional: true, type: :string
-
   field :java_multiple_files, 10, optional: true, type: :bool, default: false
-
   field :java_generate_equals_and_hash, 20, optional: true, type: :bool, deprecated: true
-
   field :java_string_check_utf8, 27, optional: true, type: :bool, default: false
 
   field :optimize_for, 9,
@@ -534,33 +484,19 @@ defmodule Google.Protobuf.FileOptions do
     enum: true
 
   field :go_package, 11, optional: true, type: :string
-
   field :cc_generic_services, 16, optional: true, type: :bool, default: false
-
   field :java_generic_services, 17, optional: true, type: :bool, default: false
-
   field :py_generic_services, 18, optional: true, type: :bool, default: false
-
   field :php_generic_services, 42, optional: true, type: :bool, default: false
-
   field :deprecated, 23, optional: true, type: :bool, default: false
-
   field :cc_enable_arenas, 31, optional: true, type: :bool, default: true
-
   field :objc_class_prefix, 36, optional: true, type: :string
-
   field :csharp_namespace, 37, optional: true, type: :string
-
   field :swift_prefix, 39, optional: true, type: :string
-
   field :php_class_prefix, 40, optional: true, type: :string
-
   field :php_namespace, 41, optional: true, type: :string
-
   field :php_metadata_namespace, 44, optional: true, type: :string
-
   field :ruby_package, 45, optional: true, type: :string
-
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
   extensions [{1000, 536_870_912}]
@@ -587,13 +523,9 @@ defmodule Google.Protobuf.MessageOptions do
             __pb_extensions__: nil
 
   field :message_set_wire_format, 1, optional: true, type: :bool, default: false
-
   field :no_standard_descriptor_accessor, 2, optional: true, type: :bool, default: false
-
   field :deprecated, 3, optional: true, type: :bool, default: false
-
   field :map_entry, 7, optional: true, type: :bool
-
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
   extensions [{1000, 536_870_912}]
@@ -638,11 +570,8 @@ defmodule Google.Protobuf.FieldOptions do
     enum: true
 
   field :lazy, 5, optional: true, type: :bool, default: false
-
   field :deprecated, 3, optional: true, type: :bool, default: false
-
   field :weak, 10, optional: true, type: :bool, default: false
-
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
   extensions [{1000, 536_870_912}]
@@ -682,9 +611,7 @@ defmodule Google.Protobuf.EnumOptions do
             __pb_extensions__: nil
 
   field :allow_alias, 2, optional: true, type: :bool
-
   field :deprecated, 3, optional: true, type: :bool, default: false
-
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
   extensions [{1000, 536_870_912}]
@@ -705,7 +632,6 @@ defmodule Google.Protobuf.EnumValueOptions do
             __pb_extensions__: nil
 
   field :deprecated, 1, optional: true, type: :bool, default: false
-
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
   extensions [{1000, 536_870_912}]
@@ -726,7 +652,6 @@ defmodule Google.Protobuf.ServiceOptions do
             __pb_extensions__: nil
 
   field :deprecated, 33, optional: true, type: :bool, default: false
-
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
   extensions [{1000, 536_870_912}]
@@ -774,7 +699,6 @@ defmodule Google.Protobuf.UninterpretedOption.NamePart do
             is_extension: false
 
   field :name_part, 1, required: true, type: :string
-
   field :is_extension, 2, required: true, type: :bool
 end
 
@@ -801,17 +725,11 @@ defmodule Google.Protobuf.UninterpretedOption do
             aggregate_value: nil
 
   field :name, 2, repeated: true, type: Google.Protobuf.UninterpretedOption.NamePart
-
   field :identifier_value, 3, optional: true, type: :string
-
   field :positive_int_value, 4, optional: true, type: :uint64
-
   field :negative_int_value, 5, optional: true, type: :int64
-
   field :double_value, 6, optional: true, type: :double
-
   field :string_value, 7, optional: true, type: :bytes
-
   field :aggregate_value, 8, optional: true, type: :string
 end
 
@@ -834,13 +752,9 @@ defmodule Google.Protobuf.SourceCodeInfo.Location do
             leading_detached_comments: []
 
   field :path, 1, repeated: true, type: :int32, packed: true
-
   field :span, 2, repeated: true, type: :int32, packed: true
-
   field :leading_comments, 3, optional: true, type: :string
-
   field :trailing_comments, 4, optional: true, type: :string
-
   field :leading_detached_comments, 6, repeated: true, type: :string
 end
 
@@ -874,11 +788,8 @@ defmodule Google.Protobuf.GeneratedCodeInfo.Annotation do
             end: nil
 
   field :path, 1, repeated: true, type: :int32, packed: true
-
   field :source_file, 2, optional: true, type: :string
-
   field :begin, 3, optional: true, type: :int32
-
   field :end, 4, optional: true, type: :int32
 end
 

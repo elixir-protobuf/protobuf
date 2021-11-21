@@ -66,7 +66,6 @@ defmodule My.Test.Request.NameMappingEntry do
             value: nil
 
   field :key, 1, optional: true, type: :int32
-
   field :value, 2, optional: true, type: :string
 end
 
@@ -83,7 +82,6 @@ defmodule My.Test.Request.MsgMappingEntry do
             value: nil
 
   field :key, 1, optional: true, type: :sint64
-
   field :value, 2, optional: true, type: My.Test.Reply
 end
 
@@ -114,21 +112,13 @@ defmodule My.Test.Request do
             get_key: nil
 
   field :key, 1, repeated: true, type: :int64
-
   field :hue, 3, optional: true, type: My.Test.Request.Color, enum: true
-
   field :hat, 4, optional: true, type: My.Test.HatType, default: :FEDORA, enum: true
-
   field :deadline, 7, optional: true, type: :float, default: "inf"
-
   field :somegroup, 8, optional: true, type: :group
-
   field :name_mapping, 14, repeated: true, type: My.Test.Request.NameMappingEntry, map: true
-
   field :msg_mapping, 15, repeated: true, type: My.Test.Request.MsgMappingEntry, map: true
-
   field :reset, 12, optional: true, type: :int32
-
   field :get_key, 16, optional: true, type: :string
 end
 
@@ -147,9 +137,7 @@ defmodule My.Test.Reply.Entry do
             _my_field_name_2: nil
 
   field :key_that_needs_1234camel_CasIng, 1, required: true, type: :int64
-
   field :value, 2, optional: true, type: :int64, default: 7
-
   field :_my_field_name_2, 3, optional: true, type: :int64
 end
 
@@ -168,7 +156,6 @@ defmodule My.Test.Reply do
             __pb_extensions__: nil
 
   field :found, 1, repeated: true, type: My.Test.Reply.Entry
-
   field :compact_keys, 2, repeated: true, type: :int32, packed: true
 
   extensions [{100, 536_870_912}]
@@ -273,25 +260,15 @@ defmodule My.Test.Communique do
   oneof :union, 0
 
   field :make_me_cry, 1, optional: true, type: :bool
-
   field :number, 5, optional: true, type: :int32, oneof: 0
-
   field :name, 6, optional: true, type: :string, oneof: 0
-
   field :data, 7, optional: true, type: :bytes, oneof: 0
-
   field :temp_c, 8, optional: true, type: :double, oneof: 0
-
   field :height, 9, optional: true, type: :float, oneof: 0
-
   field :today, 10, optional: true, type: My.Test.Days, enum: true, oneof: 0
-
   field :maybe, 11, optional: true, type: :bool, oneof: 0
-
   field :delta, 12, optional: true, type: :sint32, oneof: 0
-
   field :msg, 13, optional: true, type: My.Test.Reply, oneof: 0
-
   field :somegroup, 14, optional: true, type: :group, oneof: 0
 end
 
