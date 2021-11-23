@@ -839,7 +839,7 @@ defmodule Benchmarks.GoogleMessage3.Message13145 do
           __pb_extensions__: map
         }
 
-  defstruct field13155: 0,
+  defstruct field13155: :ENUM_VALUE13147,
             field13156: nil,
             field13157: nil,
             __pb_extensions__: nil

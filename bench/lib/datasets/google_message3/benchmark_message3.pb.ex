@@ -84,7 +84,7 @@ defmodule Benchmarks.GoogleMessage3.Message3672.Message3673 do
           field3739: integer
         }
 
-  defstruct field3738: 0,
+  defstruct field3738: :ENUM_VALUE3477,
             field3739: 0
 
   field :field3738, 4, required: true, type: Benchmarks.GoogleMessage3.Enum3476, enum: true
@@ -100,7 +100,7 @@ defmodule Benchmarks.GoogleMessage3.Message3672.Message3674 do
           field3741: integer
         }
 
-  defstruct field3740: 0,
+  defstruct field3740: :ENUM_VALUE3477,
             field3741: 0
 
   field :field3740, 7, required: true, type: Benchmarks.GoogleMessage3.Enum3476, enum: true

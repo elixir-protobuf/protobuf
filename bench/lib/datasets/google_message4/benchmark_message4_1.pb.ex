@@ -177,7 +177,7 @@ defmodule Benchmarks.GoogleMessage4.Message3061.Message3064 do
           field3360: Benchmarks.GoogleMessage4.Enum2834.t()
         }
 
-  defstruct field3342: 0,
+  defstruct field3342: :ENUM_VALUE2603,
             field3343: nil,
             field3344: nil,
             field3345: nil,
@@ -1065,7 +1065,7 @@ defmodule Benchmarks.GoogleMessage4.Message3046 do
           field3223: integer
         }
 
-  defstruct field3222: 0,
+  defstruct field3222: :ENUM_VALUE2594,
             field3223: nil
 
   field :field3222, 1, required: true, type: Benchmarks.GoogleMessage4.Enum2593, enum: true
