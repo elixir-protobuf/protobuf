@@ -55,22 +55,13 @@ jobs:
       - name: Run tests
         run: mix test --trace
 
-      - name: Clone Google's Protobuf schemas
-        uses: actions/checkout@v2
-        with:
-          repository: google/protobuf
-          path: google_protobuf
-        if: ${{matrix.integration}}
-
       - name: Compile .proto files to Elixir with protoc and make sure they did not change
         if: ${{matrix.integration}}
         env:
-          PROTO_LIB: ./google_protobuf/src/google/protobuf
-          PROTO_BENCH: ./google_protobuf/benchmarks
+          PROTO_BENCH: ./deps/google_protobuf/benchmarks
         run: |
-          mix gen_extension_protos
           mix gen_test_protos
-          mix gen_google_protos
+          mix gen_bootstrap_protos
           mix gen_bench_protos
 
       - name: Run integration tests
@@ -85,9 +76,8 @@ jobs:
             echo "Changes to the code seem to change the generated .pb.ex files."
             echo "Make sure to run these tasks before merging:"
             echo ""
-            echo "  mix gen_extension_protos"
+            echo "  mix gen_bootstrap_protos"
             echo "  mix gen_test_protos"
-            echo "  mix gen_google_protos"
             echo "  mix gen_bench_protos"
             echo ""
             echo "This is the git diff:"
