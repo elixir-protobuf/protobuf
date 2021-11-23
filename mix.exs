@@ -18,7 +18,7 @@ defmodule Protobuf.Mixfile do
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.html": :test,
-        conformance_tests: :conformance
+        conformance_test: :conformance
       ],
       deps: deps(),
       escript: escript(Mix.env()),
@@ -35,8 +35,10 @@ defmodule Protobuf.Mixfile do
     ]
   end
 
-  defp elixirc_paths(:test), do: ["lib", "test/support", "test/protobuf/protoc/proto_gen"]
-  defp elixirc_paths(:conformance), do: ["lib", "conformance", "test/support"]
+  defp elixirc_paths(:test),
+    do: ["lib", "test/support", "test/protobuf/protoc/proto_gen", "generated"]
+
+  defp elixirc_paths(:conformance), do: ["lib", "conformance", "generated"]
   defp elixirc_paths(_), do: ["lib"]
 
   defp deps do
@@ -94,18 +96,16 @@ defmodule Protobuf.Mixfile do
 
   defp aliases do
     [
-      test: ["escript.build", "test"],
-      # This needs to be automated.
-      gen_test_protos: [
-        "escript.build",
-        "cmd protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/extension.proto",
-        "cmd protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --elixir_opt=package_prefix=my --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/test.proto",
-        "format"
-      ],
+      test: ["escript.build", "gen_test_protos", &gen_google_test_protos/1, "test"],
       gen_bootstrap_protos: ["escript.build", &gen_bootstrap_protos/1],
+      gen_test_protos: ["escript.build", &gen_test_protos/1],
       gen_bench_protos: ["escript.build", &gen_bench_protos/1],
-      gen_conformance_protos: [],
-      conformance_tests: ["escript.build", &run_conformance_tests/1]
+      conformance_test: [
+        "escript.build",
+        &gen_google_test_protos/1,
+        &gen_conformance_protos/1,
+        &run_conformance_tests/1
+      ]
     ]
   end
 
@@ -129,6 +129,18 @@ defmodule Protobuf.Mixfile do
     Mix.Task.rerun("format", ["lib/elixirpb.pb.ex", "lib/google/**/*.pb.ex"])
   end
 
+  defp gen_test_protos(_args) do
+    Mix.shell().cmd(
+      "protoc -I src -I test/protobuf/protoc/proto --elixir_out=generated --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/extension.proto"
+    )
+
+    Mix.shell().cmd(
+      "protoc -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --elixir_opt=package_prefix=my --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/test.proto"
+    )
+
+    Mix.Task.rerun("format", ["generated/**/*.pb.ex"])
+  end
+
   defp gen_bench_protos(_args) do
     proto_bench = path_in_protobuf_source(["benchmarks"])
 
@@ -137,6 +149,36 @@ defmodule Protobuf.Mixfile do
     )
 
     Mix.Task.rerun("format", ["bench/**/*.pb.ex"])
+  end
+
+  defp gen_google_test_protos(_args) do
+    __DIR__
+    |> Path.join("generated")
+    |> File.mkdir_p!()
+
+    proto_root = path_in_protobuf_source(["src"])
+
+    files_to_generate =
+      Enum.join(
+        ~w(google/protobuf/any.proto google/protobuf/duration.proto google/protobuf/struct.proto google/protobuf/test_messages_proto2.proto google/protobuf/test_messages_proto3.proto),
+        " "
+      )
+
+    Mix.shell().cmd(
+      "protoc --plugin=./protoc-gen-elixir --elixir_out=./generated -I \"#{proto_root}\" #{files_to_generate}"
+    )
+
+    Mix.Task.rerun("format", ["generated/**/*.pb.ex"])
+  end
+
+  defp gen_conformance_protos(_args) do
+    proto_src = path_in_protobuf_source(["conformance"])
+
+    Mix.shell().cmd(
+      "protoc --plugin=./protoc-gen-elixir --elixir_out=./generated -I \"#{proto_src}\" conformance.proto"
+    )
+
+    Mix.Task.rerun("format", ["generated/**/*.pb.ex"])
   end
 
   defp path_in_protobuf_source(path) do

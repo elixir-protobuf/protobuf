@@ -7,7 +7,6 @@ defmodule My.Test.HatType do
   field :FEDORA, 1
   field :FEZ, 2
 end
-
 defmodule My.Test.Days do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -18,7 +17,6 @@ defmodule My.Test.Days do
   field :TUESDAY, 2
   field :LUNDI, 1
 end
-
 defmodule My.Test.Request.Color do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -29,7 +27,6 @@ defmodule My.Test.Request.Color do
   field :GREEN, 1
   field :BLUE, 2
 end
-
 defmodule My.Test.Reply.Entry.Game do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -39,7 +36,6 @@ defmodule My.Test.Reply.Entry.Game do
   field :FOOTBALL, 1
   field :TENNIS, 2
 end
-
 defmodule My.Test.Request.SomeGroup do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -52,7 +48,6 @@ defmodule My.Test.Request.SomeGroup do
 
   field :group_field, 9, optional: true, type: :int32
 end
-
 defmodule My.Test.Request.NameMappingEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -68,7 +63,6 @@ defmodule My.Test.Request.NameMappingEntry do
   field :key, 1, optional: true, type: :int32
   field :value, 2, optional: true, type: :string
 end
-
 defmodule My.Test.Request.MsgMappingEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto2
@@ -84,7 +78,6 @@ defmodule My.Test.Request.MsgMappingEntry do
   field :key, 1, optional: true, type: :sint64
   field :value, 2, optional: true, type: My.Test.Reply
 end
-
 defmodule My.Test.Request do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -121,7 +114,6 @@ defmodule My.Test.Request do
   field :reset, 12, optional: true, type: :int32
   field :get_key, 16, optional: true, type: :string
 end
-
 defmodule My.Test.Reply.Entry do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -140,7 +132,6 @@ defmodule My.Test.Reply.Entry do
   field :value, 2, optional: true, type: :int64, default: 7
   field :_my_field_name_2, 3, optional: true, type: :int64
 end
-
 defmodule My.Test.Reply do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -160,7 +151,6 @@ defmodule My.Test.Reply do
 
   extensions [{100, 536_870_912}]
 end
-
 defmodule My.Test.OtherBase do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -177,7 +167,6 @@ defmodule My.Test.OtherBase do
 
   extensions [{100, 536_870_912}]
 end
-
 defmodule My.Test.ReplyExtensions do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -186,7 +175,6 @@ defmodule My.Test.ReplyExtensions do
 
   defstruct []
 end
-
 defmodule My.Test.OtherReplyExtensions do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -199,7 +187,6 @@ defmodule My.Test.OtherReplyExtensions do
 
   field :key, 1, optional: true, type: :int32
 end
-
 defmodule My.Test.OldReply do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -212,7 +199,6 @@ defmodule My.Test.OldReply do
 
   extensions [{100, 2_147_483_647}]
 end
-
 defmodule My.Test.Communique.SomeGroup do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -225,7 +211,6 @@ defmodule My.Test.Communique.SomeGroup do
 
   field :member, 15, optional: true, type: :string
 end
-
 defmodule My.Test.Communique.Delta do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -234,7 +219,6 @@ defmodule My.Test.Communique.Delta do
 
   defstruct []
 end
-
 defmodule My.Test.Communique do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -271,7 +255,6 @@ defmodule My.Test.Communique do
   field :msg, 13, optional: true, type: My.Test.Reply, oneof: 0
   field :somegroup, 14, optional: true, type: :group, oneof: 0
 end
-
 defmodule My.Test.Options do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -284,7 +267,6 @@ defmodule My.Test.Options do
 
   field :opt1, 1, optional: true, type: :string, deprecated: true
 end
-
 defmodule My.Test.PbExtension do
   @moduledoc false
   use Protobuf, syntax: :proto2
