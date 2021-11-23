@@ -37,11 +37,19 @@ jobs:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
 
+      - name: Cache dependencies
+        id: cache-deps
+        uses: actions/cache@v2
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+
       - name: Install dependencies
-        run: mix deps.get --only test
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: mix deps.get
 
       - name: Check for unused dependencies
-        run: mix deps.get && mix deps.unlock --check-unused
+        run: mix deps.unlock --check-unused
         if: ${{matrix.lint}}
 
       - name: Compile with --warnings-as-errors
@@ -55,7 +63,7 @@ jobs:
       - name: Run tests
         run: mix test --trace
 
-      - name: Compile .proto files to Elixir with protoc and make sure they did not change
+      - name: Compile .proto files to Elixir with protoc
         if: ${{matrix.integration}}
         env:
           PROTO_BENCH: ./deps/google_protobuf/benchmarks
@@ -83,4 +91,6 @@ jobs:
             echo "This is the git diff:"
             git diff
             exit 1
+          else
+            echo "Generated .pb.ex are up to date"
           fi
