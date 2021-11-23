@@ -73,4 +73,6 @@ jobs:
         run: mix compile
 
       - name: Run mix protobuf.conformance
-        run: mix protobuf.conformance --runner=./protobuf/conformance/conformance-test-runner --verbose
+        run: |
+          mix gen_conformance_protos
+          mix conformance_test --runner=./protobuf/conformance/conformance-test-runner --verbose

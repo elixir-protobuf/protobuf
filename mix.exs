@@ -45,14 +45,14 @@ defmodule Protobuf.Mixfile do
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:stream_data, "~> 0.5.0", only: [:dev, :test]},
+      {:stream_data, "~> 0.5.0", only: [:dev, :test, :conformance]},
       {:excoveralls, "~> 0.14.4", only: :test},
       {:google_protobuf,
        github: "protocolbuffers/protobuf",
        tag: "v3.19.1",
        app: false,
        compile: false,
-       only: [:dev, :test]}
+       only: [:dev, :test, :conformance]}
     ]
   end
 
@@ -104,12 +104,12 @@ defmodule Protobuf.Mixfile do
       gen_bootstrap_protos: ["escript.build", &gen_bootstrap_protos/1],
       gen_test_protos: ["escript.build", &gen_test_protos/1],
       gen_bench_protos: ["escript.build", &gen_bench_protos/1],
-      conformance_test: [
+      gen_conformance_protos: [
         "escript.build",
         &gen_google_test_protos/1,
-        &gen_conformance_protos/1,
-        &run_conformance_tests/1
-      ]
+        &gen_conformance_protos/1
+      ],
+      conformance_test: ["escript.build", &run_conformance_tests/1]
     ]
   end
 
