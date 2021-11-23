@@ -35,9 +35,7 @@ defmodule Protobuf.Mixfile do
     ]
   end
 
-  defp elixirc_paths(:test),
-    do: ["lib", "test/support", "test/protobuf/protoc/proto_gen", "generated"]
-
+  defp elixirc_paths(:test), do: ["lib", "test/support", "generated"]
   defp elixirc_paths(:conformance), do: ["lib", "conformance", "generated"]
   defp elixirc_paths(_), do: ["lib"]
 
@@ -96,7 +94,13 @@ defmodule Protobuf.Mixfile do
 
   defp aliases do
     [
-      test: ["escript.build", "gen_test_protos", &gen_google_test_protos/1, "test"],
+      test: [
+        "escript.build",
+        "gen_test_protos",
+        &gen_google_test_protos/1,
+        fn _ -> Mix.Task.rerun("compile.elixir") end,
+        "test"
+      ],
       gen_bootstrap_protos: ["escript.build", &gen_bootstrap_protos/1],
       gen_test_protos: ["escript.build", &gen_test_protos/1],
       gen_bench_protos: ["escript.build", &gen_bench_protos/1],
@@ -130,12 +134,16 @@ defmodule Protobuf.Mixfile do
   end
 
   defp gen_test_protos(_args) do
+    __DIR__
+    |> Path.join("generated")
+    |> File.mkdir_p!()
+
     Mix.shell().cmd(
       "protoc -I src -I test/protobuf/protoc/proto --elixir_out=generated --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/extension.proto"
     )
 
     Mix.shell().cmd(
-      "protoc -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --elixir_opt=package_prefix=my --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/test.proto"
+      "protoc -I test/protobuf/protoc/proto --elixir_out=generated --elixir_opt=package_prefix=my --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/test.proto"
     )
 
     Mix.Task.rerun("format", ["generated/**/*.pb.ex"])
