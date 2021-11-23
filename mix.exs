@@ -102,14 +102,8 @@ defmodule Protobuf.Mixfile do
         "cmd protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --elixir_opt=package_prefix=my --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/test.proto",
         "format"
       ],
-      gen_bootstrap_protos: &gen_bootstrap_protos/1,
-      # $PROTO_BENCH should be your local path to https://github.com/google/protobuf/tree/master/benchmarks
-      gen_bench_protos: [
-        "escript.build",
-        require_env_variable("PROTO_BENCH"),
-        "cmd protoc -I $PROTO_BENCH --elixir_out=bench/lib --plugin=./protoc-gen-elixir #{Enum.join(benchmark_proto_files(), " ")}",
-        "format"
-      ],
+      gen_bootstrap_protos: ["escript.build", &gen_bootstrap_protos/1],
+      gen_bench_protos: ["escript.build", &gen_bench_protos/1],
       gen_conformance_protos: [],
       conformance_tests: ["escript.build", &run_conformance_tests/1]
     ]
@@ -118,9 +112,7 @@ defmodule Protobuf.Mixfile do
   # These files are necessary to bootstrap the protoc-gen-elixir plugin that we generate. They
   # are committed to version control.
   defp gen_bootstrap_protos(_args) do
-    proto_src = Path.join([Mix.Project.deps_paths().google_protobuf, "src", "google", "protobuf"])
-
-    Mix.Task.run("escript.build")
+    proto_src = path_in_protobuf_source(["src", "google", "protobuf"])
 
     Mix.shell().cmd(
       "protoc -I \"#{proto_src}\" --elixir_out=./lib/google --plugin=./protoc-gen-elixir descriptor.proto"
@@ -137,10 +129,18 @@ defmodule Protobuf.Mixfile do
     Mix.Task.rerun("format", ["lib/elixirpb.pb.ex", "lib/google/**/*.pb.ex"])
   end
 
-  defp require_env_variable(var) do
-    fn _args ->
-      System.get_env("#{var}") || Mix.raise("$#{var} not set")
-    end
+  defp gen_bench_protos(_args) do
+    proto_bench = path_in_protobuf_source(["benchmarks"])
+
+    Mix.shell().cmd(
+      "protoc -I \"#{proto_bench}\" --elixir_out=./bench/lib --plugin=./protoc-gen-elixir #{Enum.join(benchmark_proto_files(), " ")}"
+    )
+
+    Mix.Task.rerun("format", ["bench/**/*.pb.ex"])
+  end
+
+  defp path_in_protobuf_source(path) do
+    Path.join([Mix.Project.deps_paths().google_protobuf | path])
   end
 
   defp benchmark_proto_files do

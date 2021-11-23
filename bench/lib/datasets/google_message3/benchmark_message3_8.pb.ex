@@ -7,6 +7,7 @@ defmodule Benchmarks.GoogleMessage3.Enum720 do
   field :ENUM_VALUE721, 1
   field :ENUM_VALUE722, 2
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum3476 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -383,6 +384,7 @@ defmodule Benchmarks.GoogleMessage3.Enum3476 do
   field :ENUM_VALUE3659, 182
   field :ENUM_VALUE3660, 183
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum3805 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -415,6 +417,7 @@ defmodule Benchmarks.GoogleMessage3.Enum3805 do
   field :ENUM_VALUE3816, 11
   field :ENUM_VALUE3817, 10
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum3783 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -463,6 +466,7 @@ defmodule Benchmarks.GoogleMessage3.Enum3783 do
   field :ENUM_VALUE3802, 21
   field :ENUM_VALUE3803, 50
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum3851 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -507,6 +511,7 @@ defmodule Benchmarks.GoogleMessage3.Enum3851 do
   field :ENUM_VALUE3868, 16
   field :ENUM_VALUE3869, 17
 end
+
 defmodule Benchmarks.GoogleMessage3.UnusedEnum do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -516,6 +521,7 @@ defmodule Benchmarks.GoogleMessage3.UnusedEnum do
   field :UNUSED_ENUM_VALUE1, 0
   field :UNUSED_ENUM_VALUE2, 1
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum4146 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -534,6 +540,7 @@ defmodule Benchmarks.GoogleMessage3.Enum4146 do
   field :ENUM_VALUE4150, 3
   field :ENUM_VALUE4151, 4
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum4160 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -543,6 +550,7 @@ defmodule Benchmarks.GoogleMessage3.Enum4160 do
   field :ENUM_VALUE4161, 0
   field :ENUM_VALUE4162, 1
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum4152 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -565,6 +573,7 @@ defmodule Benchmarks.GoogleMessage3.Enum4152 do
   field :ENUM_VALUE4158, 5
   field :ENUM_VALUE4159, 6
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum6025 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -617,6 +626,7 @@ defmodule Benchmarks.GoogleMessage3.Enum6025 do
   field :ENUM_VALUE6046, 20
   field :ENUM_VALUE6047, 21
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum6065 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -655,6 +665,7 @@ defmodule Benchmarks.GoogleMessage3.Enum6065 do
   field :ENUM_VALUE6079, 13
   field :ENUM_VALUE6080, 14
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum6579 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -679,6 +690,7 @@ defmodule Benchmarks.GoogleMessage3.Enum6579 do
   field :ENUM_VALUE6586, 25
   field :ENUM_VALUE6587, 30
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum6588 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -755,6 +767,7 @@ defmodule Benchmarks.GoogleMessage3.Enum6588 do
   field :ENUM_VALUE6621, 33
   field :ENUM_VALUE6622, 34
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum6769 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -765,6 +778,7 @@ defmodule Benchmarks.GoogleMessage3.Enum6769 do
   field :ENUM_VALUE6771, 1
   field :ENUM_VALUE6772, 2
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum6774 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -787,6 +801,7 @@ defmodule Benchmarks.GoogleMessage3.Enum6774 do
   field :ENUM_VALUE6780, 5
   field :ENUM_VALUE6781, 6
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum6782 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -807,6 +822,7 @@ defmodule Benchmarks.GoogleMessage3.Enum6782 do
   field :ENUM_VALUE6787, 4
   field :ENUM_VALUE6788, 5
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum6858 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -818,6 +834,7 @@ defmodule Benchmarks.GoogleMessage3.Enum6858 do
   field :ENUM_VALUE6861, 3
   field :ENUM_VALUE6862, 4
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum6815 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -838,6 +855,7 @@ defmodule Benchmarks.GoogleMessage3.Enum6815 do
   field :ENUM_VALUE6820, 4
   field :ENUM_VALUE6821, 5
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum6822 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -849,6 +867,7 @@ defmodule Benchmarks.GoogleMessage3.Enum6822 do
   field :ENUM_VALUE6825, 2
   field :ENUM_VALUE6826, 3
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum7654 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -859,6 +878,7 @@ defmodule Benchmarks.GoogleMessage3.Enum7654 do
   field :ENUM_VALUE7656, 2
   field :ENUM_VALUE7657, 3
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum8292 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -869,6 +889,7 @@ defmodule Benchmarks.GoogleMessage3.Enum8292 do
   field :ENUM_VALUE8294, 1
   field :ENUM_VALUE8295, 2
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum8450 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -879,6 +900,7 @@ defmodule Benchmarks.GoogleMessage3.Enum8450 do
   field :ENUM_VALUE8452, 1
   field :ENUM_VALUE8453, 2
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum8900 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -897,6 +919,7 @@ defmodule Benchmarks.GoogleMessage3.Enum8900 do
   field :ENUM_VALUE8904, 3
   field :ENUM_VALUE8905, 4
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum8945 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -915,6 +938,7 @@ defmodule Benchmarks.GoogleMessage3.Enum8945 do
   field :ENUM_VALUE8949, 3
   field :ENUM_VALUE8950, 4
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum8951 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -939,6 +963,7 @@ defmodule Benchmarks.GoogleMessage3.Enum8951 do
   field :ENUM_VALUE8958, 7
   field :ENUM_VALUE8959, 8
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum9243 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -1113,6 +1138,7 @@ defmodule Benchmarks.GoogleMessage3.Enum9243 do
   field :ENUM_VALUE9325, 1007
   field :ENUM_VALUE9326, 65
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum10157 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -1139,6 +1165,7 @@ defmodule Benchmarks.GoogleMessage3.Enum10157 do
   field :ENUM_VALUE10165, 7
   field :ENUM_VALUE10166, 8
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum10167 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -1165,6 +1192,7 @@ defmodule Benchmarks.GoogleMessage3.Enum10167 do
   field :ENUM_VALUE10175, 7
   field :ENUM_VALUE10176, 8
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum8862 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -1205,6 +1233,7 @@ defmodule Benchmarks.GoogleMessage3.Enum8862 do
   field :ENUM_VALUE8877, 12
   field :ENUM_VALUE8878, 15
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum10325 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -1231,6 +1260,7 @@ defmodule Benchmarks.GoogleMessage3.Enum10325 do
   field :ENUM_VALUE10333, 7
   field :ENUM_VALUE10334, 8
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum10335 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -1239,6 +1269,7 @@ defmodule Benchmarks.GoogleMessage3.Enum10335 do
 
   field :ENUM_VALUE10336, 0
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum10337 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -1248,6 +1279,7 @@ defmodule Benchmarks.GoogleMessage3.Enum10337 do
   field :ENUM_VALUE10338, 0
   field :ENUM_VALUE10339, 1
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum10392 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -1292,6 +1324,7 @@ defmodule Benchmarks.GoogleMessage3.Enum10392 do
   field :ENUM_VALUE10409, 101
   field :ENUM_VALUE10410, 102
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum11107 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -2020,6 +2053,7 @@ defmodule Benchmarks.GoogleMessage3.Enum11107 do
   field :ENUM_VALUE11466, 135_168
   field :ENUM_VALUE11467, 9_439_507
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum11541 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -2410,6 +2444,7 @@ defmodule Benchmarks.GoogleMessage3.Enum11541 do
   field :ENUM_VALUE11731, 188
   field :ENUM_VALUE11732, 16_777_215
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum11468 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -2466,6 +2501,7 @@ defmodule Benchmarks.GoogleMessage3.Enum11468 do
   field :ENUM_VALUE11491, 2292
   field :ENUM_VALUE11492, 44
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum11022 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -2642,6 +2678,7 @@ defmodule Benchmarks.GoogleMessage3.Enum11022 do
   field :ENUM_VALUE11105, 82
   field :ENUM_VALUE11106, 83
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum12670 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -2652,6 +2689,7 @@ defmodule Benchmarks.GoogleMessage3.Enum12670 do
   field :ENUM_VALUE12672, 1
   field :ENUM_VALUE12673, 2
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum12871 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -2672,6 +2710,7 @@ defmodule Benchmarks.GoogleMessage3.Enum12871 do
   field :ENUM_VALUE12876, 5
   field :ENUM_VALUE12877, 6
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum13092 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -2682,6 +2721,7 @@ defmodule Benchmarks.GoogleMessage3.Enum13092 do
   field :ENUM_VALUE13094, 2
   field :ENUM_VALUE13095, 3
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum13146 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -2693,6 +2733,7 @@ defmodule Benchmarks.GoogleMessage3.Enum13146 do
   field :ENUM_VALUE13149, 2
   field :ENUM_VALUE13150, 3
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum16042 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3425,6 +3466,7 @@ defmodule Benchmarks.GoogleMessage3.Enum16042 do
   field :ENUM_VALUE16403, 254
   field :ENUM_VALUE16404, 255
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum16553 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3453,6 +3495,7 @@ defmodule Benchmarks.GoogleMessage3.Enum16553 do
   field :ENUM_VALUE16562, 8
   field :ENUM_VALUE16563, 9
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum16728 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3463,6 +3506,7 @@ defmodule Benchmarks.GoogleMessage3.Enum16728 do
   field :ENUM_VALUE16730, 2
   field :ENUM_VALUE16731, 3
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum16732 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3481,6 +3525,7 @@ defmodule Benchmarks.GoogleMessage3.Enum16732 do
   field :ENUM_VALUE16736, 4
   field :ENUM_VALUE16737, 5
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum16738 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3503,6 +3548,7 @@ defmodule Benchmarks.GoogleMessage3.Enum16738 do
   field :ENUM_VALUE16744, 6
   field :ENUM_VALUE16745, 7
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum16698 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3557,6 +3603,7 @@ defmodule Benchmarks.GoogleMessage3.Enum16698 do
   field :ENUM_VALUE16720, 19
   field :ENUM_VALUE16721, 20
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum16819 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3577,6 +3624,7 @@ defmodule Benchmarks.GoogleMessage3.Enum16819 do
   field :ENUM_VALUE16824, 4
   field :ENUM_VALUE16825, 5
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum16925 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3613,6 +3661,7 @@ defmodule Benchmarks.GoogleMessage3.Enum16925 do
   field :ENUM_VALUE16938, 12
   field :ENUM_VALUE16939, 13
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum22854 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3622,6 +3671,7 @@ defmodule Benchmarks.GoogleMessage3.Enum22854 do
   field :ENUM_VALUE22855, 0
   field :ENUM_VALUE22856, 1
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum24361 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3633,6 +3683,7 @@ defmodule Benchmarks.GoogleMessage3.Enum24361 do
   field :ENUM_VALUE24364, 2
   field :ENUM_VALUE24365, 3
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum16891 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3705,6 +3756,7 @@ defmodule Benchmarks.GoogleMessage3.Enum16891 do
   field :ENUM_VALUE16922, 30
   field :ENUM_VALUE16923, 31
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum27361 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3723,6 +3775,7 @@ defmodule Benchmarks.GoogleMessage3.Enum27361 do
   field :ENUM_VALUE27365, 3
   field :ENUM_VALUE27366, 4
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum33960 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3745,6 +3798,7 @@ defmodule Benchmarks.GoogleMessage3.Enum33960 do
   field :ENUM_VALUE33966, 5
   field :ENUM_VALUE33967, 6
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum34388 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3753,6 +3807,7 @@ defmodule Benchmarks.GoogleMessage3.Enum34388 do
 
   field :ENUM_VALUE34389, 1
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum35477 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3771,6 +3826,7 @@ defmodule Benchmarks.GoogleMessage3.Enum35477 do
   field :ENUM_VALUE35481, 1
   field :ENUM_VALUE35482, 0
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum35507 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3799,6 +3855,7 @@ defmodule Benchmarks.GoogleMessage3.Enum35507 do
   field :ENUM_VALUE35516, 8
   field :ENUM_VALUE35517, 9
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum36860 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
@@ -3823,6 +3880,7 @@ defmodule Benchmarks.GoogleMessage3.Enum36860 do
   field :ENUM_VALUE36867, 6
   field :ENUM_VALUE36868, 7
 end
+
 defmodule Benchmarks.GoogleMessage3.Enum36890 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2

@@ -6,6 +6,7 @@ defmodule Benchmarks.GoogleMessage3.Message11018 do
 
   defstruct []
 end
+
 defmodule Benchmarks.GoogleMessage3.Message10800 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -27,6 +28,7 @@ defmodule Benchmarks.GoogleMessage3.Message10800 do
   field :field10810, 3, optional: true, type: :bool
   field :field10811, 4, optional: true, type: :float
 end
+
 defmodule Benchmarks.GoogleMessage3.Message10802 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -35,6 +37,7 @@ defmodule Benchmarks.GoogleMessage3.Message10802 do
 
   defstruct []
 end
+
 defmodule Benchmarks.GoogleMessage3.Message10748 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -56,6 +59,7 @@ defmodule Benchmarks.GoogleMessage3.Message10748 do
   field :field10752, 3, optional: true, type: :int32
   field :field10753, 4, optional: true, type: :int32
 end
+
 defmodule Benchmarks.GoogleMessage3.Message7966 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -71,6 +75,7 @@ defmodule Benchmarks.GoogleMessage3.Message7966 do
   field :field7969, 1, optional: true, type: :string
   field :field7970, 2, optional: true, type: :bool
 end
+
 defmodule Benchmarks.GoogleMessage3.Message708 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -98,6 +103,7 @@ defmodule Benchmarks.GoogleMessage3.Message708 do
   field :field827, 4, repeated: true, type: :string
   field :field828, 5, repeated: true, type: :string
 end
+
 defmodule Benchmarks.GoogleMessage3.Message8942 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -106,6 +112,7 @@ defmodule Benchmarks.GoogleMessage3.Message8942 do
 
   defstruct []
 end
+
 defmodule Benchmarks.GoogleMessage3.Message11011 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -121,6 +128,7 @@ defmodule Benchmarks.GoogleMessage3.Message11011 do
   field :field11752, 1, required: true, type: :bytes
   field :field11753, 2, required: true, type: :bytes
 end
+
 defmodule Benchmarks.GoogleMessage3.UnusedEmptyMessage do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -129,6 +137,7 @@ defmodule Benchmarks.GoogleMessage3.UnusedEmptyMessage do
 
   defstruct []
 end
+
 defmodule Benchmarks.GoogleMessage3.Message741 do
   @moduledoc false
   use Protobuf, syntax: :proto2

@@ -55,6 +55,7 @@ defmodule Benchmarks.Proto2.GoogleMessage2.Group1 do
   field :field24, 24, optional: true, type: :string
   field :field31, 31, optional: true, type: Benchmarks.Proto2.GoogleMessage2GroupedMessage
 end
+
 defmodule Benchmarks.Proto2.GoogleMessage2 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -154,6 +155,7 @@ defmodule Benchmarks.Proto2.GoogleMessage2 do
   field :field205, 205, optional: true, type: :bool, default: false
   field :field206, 206, optional: true, type: :bool, default: false
 end
+
 defmodule Benchmarks.Proto2.GoogleMessage2GroupedMessage do
   @moduledoc false
   use Protobuf, syntax: :proto2

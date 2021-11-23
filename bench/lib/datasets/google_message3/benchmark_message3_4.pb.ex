@@ -6,6 +6,7 @@ defmodule Benchmarks.GoogleMessage3.Message24346 do
 
   defstruct []
 end
+
 defmodule Benchmarks.GoogleMessage3.Message24401 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -18,6 +19,7 @@ defmodule Benchmarks.GoogleMessage3.Message24401 do
 
   field :field24679, 1, optional: true, type: Benchmarks.GoogleMessage3.Message24400
 end
+
 defmodule Benchmarks.GoogleMessage3.Message24402 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -30,6 +32,7 @@ defmodule Benchmarks.GoogleMessage3.Message24402 do
 
   field :field24680, 1, optional: true, type: Benchmarks.GoogleMessage3.Message24400
 end
+
 defmodule Benchmarks.GoogleMessage3.Message24379 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -93,6 +96,7 @@ defmodule Benchmarks.GoogleMessage3.Message24379 do
   field :field24619, 15, repeated: true, type: :string
   field :field24620, 18, repeated: true, type: :string
 end
+
 defmodule Benchmarks.GoogleMessage3.Message27358 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -108,6 +112,7 @@ defmodule Benchmarks.GoogleMessage3.Message27358 do
   field :field27415, 1, optional: true, type: :int32
   field :field27416, 2, optional: true, type: :int32
 end
+
 defmodule Benchmarks.GoogleMessage3.Message34381 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -147,6 +152,7 @@ defmodule Benchmarks.GoogleMessage3.Message34381 do
   field :field34406, 9, optional: true, type: :bool
   field :field34407, 10, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
 end
+
 defmodule Benchmarks.GoogleMessage3.Message34619 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -177,6 +183,7 @@ defmodule Benchmarks.GoogleMessage3.Message34619 do
   field :field34646, 5, optional: true, type: :double
   field :field34647, 100, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
 end
+
 defmodule Benchmarks.GoogleMessage3.Message730 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -289,6 +296,7 @@ defmodule Benchmarks.GoogleMessage3.Message730 do
 
   extensions [{25, 26}, {29, 30}, {34, 35}, {15, 16}]
 end
+
 defmodule Benchmarks.GoogleMessage3.Message33958.Message33959 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -316,6 +324,7 @@ defmodule Benchmarks.GoogleMessage3.Message33958.Message33959 do
   field :field33986, 10, optional: true, type: :bool
   field :field33987, 6, optional: true, type: Benchmarks.GoogleMessage3.Message0
 end
+
 defmodule Benchmarks.GoogleMessage3.Message33958 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -337,6 +346,7 @@ defmodule Benchmarks.GoogleMessage3.Message33958 do
   field :message33959, 2, repeated: true, type: :group
   field :field33980, 7, optional: true, type: Benchmarks.GoogleMessage3.Enum33960, enum: true
 end
+
 defmodule Benchmarks.GoogleMessage3.Message6637 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -361,6 +371,7 @@ defmodule Benchmarks.GoogleMessage3.Message6637 do
   field :field6673, 4, repeated: true, type: :string
   field :field6674, 5, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
 end
+
 defmodule Benchmarks.GoogleMessage3.Message6643 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -424,6 +435,7 @@ defmodule Benchmarks.GoogleMessage3.Message6643 do
   field :field6699, 20, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
   field :field6700, 21, optional: true, type: :int32
 end
+
 defmodule Benchmarks.GoogleMessage3.Message6126 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -490,6 +502,7 @@ defmodule Benchmarks.GoogleMessage3.Message6126 do
   field :field6169, 17, repeated: true, type: Benchmarks.GoogleMessage3.Message6054
   field :field6170, 19, optional: true, type: :int32
 end
+
 defmodule Benchmarks.GoogleMessage3.Message13083.Message13084 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -511,6 +524,7 @@ defmodule Benchmarks.GoogleMessage3.Message13083.Message13084 do
   field :field13109, 5, optional: true, type: :float
   field :field13110, 6, repeated: true, type: Benchmarks.GoogleMessage3.Enum13092, enum: true
 end
+
 defmodule Benchmarks.GoogleMessage3.Message13083.Message13085 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -519,6 +533,7 @@ defmodule Benchmarks.GoogleMessage3.Message13083.Message13085 do
 
   defstruct []
 end
+
 defmodule Benchmarks.GoogleMessage3.Message13083.Message13086 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -527,6 +542,7 @@ defmodule Benchmarks.GoogleMessage3.Message13083.Message13086 do
 
   defstruct []
 end
+
 defmodule Benchmarks.GoogleMessage3.Message13083.Message13087 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -535,6 +551,7 @@ defmodule Benchmarks.GoogleMessage3.Message13083.Message13087 do
 
   defstruct []
 end
+
 defmodule Benchmarks.GoogleMessage3.Message13083 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -574,6 +591,7 @@ defmodule Benchmarks.GoogleMessage3.Message13083 do
   field :message13087, 29, repeated: true, type: :group
   field :field13105, 43, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
 end
+
 defmodule Benchmarks.GoogleMessage3.Message13088.Message13089 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -589,6 +607,7 @@ defmodule Benchmarks.GoogleMessage3.Message13088.Message13089 do
   field :field13139, 2, required: true, type: :string
   field :field13140, 3, optional: true, type: :float
 end
+
 defmodule Benchmarks.GoogleMessage3.Message13088 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -607,6 +626,7 @@ defmodule Benchmarks.GoogleMessage3.Message13088 do
   field :field13136, 4, optional: true, type: :int64
   field :field13137, 5, optional: true, type: :bool
 end
+
 defmodule Benchmarks.GoogleMessage3.Message10391 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -643,6 +663,7 @@ defmodule Benchmarks.GoogleMessage3.Message10391 do
   field :field10418, 9, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
   field :field10419, 10, optional: true, type: :bool
 end
+
 defmodule Benchmarks.GoogleMessage3.Message11873 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -692,6 +713,7 @@ defmodule Benchmarks.GoogleMessage3.Message11873 do
 
   extensions [{9, 10}, {10, 11}]
 end
+
 defmodule Benchmarks.GoogleMessage3.Message35506 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -713,6 +735,7 @@ defmodule Benchmarks.GoogleMessage3.Message35506 do
   field :field35526, 3, optional: true, type: Benchmarks.GoogleMessage3.Enum35507, enum: true
   field :field35527, 4, repeated: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
 end
+
 defmodule Benchmarks.GoogleMessage3.Message13151 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -725,6 +748,7 @@ defmodule Benchmarks.GoogleMessage3.Message13151 do
 
   field :field13158, 1, repeated: true, type: Benchmarks.GoogleMessage3.Message13145
 end
+
 defmodule Benchmarks.GoogleMessage3.Message18253.Message18254 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -740,6 +764,7 @@ defmodule Benchmarks.GoogleMessage3.Message18253.Message18254 do
   field :field18362, 2, required: true, type: :fixed64
   field :field18363, 3, required: true, type: :double
 end
+
 defmodule Benchmarks.GoogleMessage3.Message18253 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -752,6 +777,7 @@ defmodule Benchmarks.GoogleMessage3.Message18253 do
 
   field :message18254, 1, repeated: true, type: :group
 end
+
 defmodule Benchmarks.GoogleMessage3.Message16685 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -764,6 +790,7 @@ defmodule Benchmarks.GoogleMessage3.Message16685 do
 
   field :field16694, 2, repeated: true, type: Benchmarks.GoogleMessage3.Message16686
 end
+
 defmodule Benchmarks.GoogleMessage3.Message16816.Message16817 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -772,6 +799,7 @@ defmodule Benchmarks.GoogleMessage3.Message16816.Message16817 do
 
   defstruct []
 end
+
 defmodule Benchmarks.GoogleMessage3.Message16816.Message16818 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -780,6 +808,7 @@ defmodule Benchmarks.GoogleMessage3.Message16816.Message16818 do
 
   defstruct []
 end
+
 defmodule Benchmarks.GoogleMessage3.Message16816 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -819,6 +848,7 @@ defmodule Benchmarks.GoogleMessage3.Message16816 do
   field :field16834, 13, optional: true, type: :bool
   field :field16835, 14, optional: true, type: :bool
 end
+
 defmodule Benchmarks.GoogleMessage3.Message13168 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -861,6 +891,7 @@ defmodule Benchmarks.GoogleMessage3.Message13168 do
   field :field13221, 5, required: true, type: :bool
   field :field13222, 6, optional: true, type: :int32
 end
+
 defmodule Benchmarks.GoogleMessage3.Message13167 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -909,6 +940,7 @@ defmodule Benchmarks.GoogleMessage3.Message13167 do
   field :field13210, 6, optional: true, type: :int32
   field :field13211, 7, optional: true, type: :int32
 end
+
 defmodule Benchmarks.GoogleMessage3.Message1374 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -924,6 +956,7 @@ defmodule Benchmarks.GoogleMessage3.Message1374 do
   field :field1375, 1, required: true, type: :string
   field :field1376, 2, optional: true, type: :string
 end
+
 defmodule Benchmarks.GoogleMessage3.Message18943 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -932,6 +965,7 @@ defmodule Benchmarks.GoogleMessage3.Message18943 do
 
   defstruct []
 end
+
 defmodule Benchmarks.GoogleMessage3.Message18944 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -940,6 +974,7 @@ defmodule Benchmarks.GoogleMessage3.Message18944 do
 
   defstruct []
 end
+
 defmodule Benchmarks.GoogleMessage3.Message18856 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1042,6 +1077,7 @@ defmodule Benchmarks.GoogleMessage3.Message18856 do
   field :field18886, 27, optional: true, type: :string
   field :field18887, 28, optional: true, type: :string
 end
+
 defmodule Benchmarks.GoogleMessage3.Message3850 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1069,6 +1105,7 @@ defmodule Benchmarks.GoogleMessage3.Message3850 do
   field :field3928, 13, optional: true, type: :bool
   field :field3929, 14, optional: true, type: :bool
 end
+
 defmodule Benchmarks.GoogleMessage3.Message6721 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1090,6 +1127,7 @@ defmodule Benchmarks.GoogleMessage3.Message6721 do
   field :field6746, 3, optional: true, type: :bool
   field :field6747, 4, optional: true, type: :bool
 end
+
 defmodule Benchmarks.GoogleMessage3.Message6742 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1102,6 +1140,7 @@ defmodule Benchmarks.GoogleMessage3.Message6742 do
 
   field :field6758, 1, optional: true, type: :bool
 end
+
 defmodule Benchmarks.GoogleMessage3.Message6726 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1117,6 +1156,7 @@ defmodule Benchmarks.GoogleMessage3.Message6726 do
   field :field6752, 1, optional: true, type: :int64
   field :field6753, 2, repeated: true, type: Benchmarks.GoogleMessage3.Message6727
 end
+
 defmodule Benchmarks.GoogleMessage3.Message6733 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1135,6 +1175,7 @@ defmodule Benchmarks.GoogleMessage3.Message6733 do
   field :field6755, 2, optional: true, type: :int64
   field :field6756, 3, optional: true, type: :bool
 end
+
 defmodule Benchmarks.GoogleMessage3.Message6723 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1150,6 +1191,7 @@ defmodule Benchmarks.GoogleMessage3.Message6723 do
   field :field6748, 1, optional: true, type: :int64
   field :field6749, 2, repeated: true, type: Benchmarks.GoogleMessage3.Message6724
 end
+
 defmodule Benchmarks.GoogleMessage3.Message6725 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1165,6 +1207,7 @@ defmodule Benchmarks.GoogleMessage3.Message6725 do
   field :field6750, 1, optional: true, type: :int32
   field :field6751, 2, optional: true, type: :int32
 end
+
 defmodule Benchmarks.GoogleMessage3.Message6734 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1177,6 +1220,7 @@ defmodule Benchmarks.GoogleMessage3.Message6734 do
 
   field :field6757, 1, repeated: true, type: Benchmarks.GoogleMessage3.Message6735
 end
+
 defmodule Benchmarks.GoogleMessage3.Message8184 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1195,6 +1239,7 @@ defmodule Benchmarks.GoogleMessage3.Message8184 do
   field :field8229, 2, optional: true, type: :bool
   field :field8230, 3, repeated: true, type: Benchmarks.GoogleMessage3.Message8183
 end
+
 defmodule Benchmarks.GoogleMessage3.Message8477 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1213,6 +1258,7 @@ defmodule Benchmarks.GoogleMessage3.Message8477 do
   field :field8487, 2, optional: true, type: :int64
   field :field8488, 3, optional: true, type: :string
 end
+
 defmodule Benchmarks.GoogleMessage3.Message8454 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1234,6 +1280,7 @@ defmodule Benchmarks.GoogleMessage3.Message8454 do
   field :field8467, 4, optional: true, type: :int32
   field :field8468, 5, optional: true, type: :bool
 end
+
 defmodule Benchmarks.GoogleMessage3.Message8476 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1252,6 +1299,7 @@ defmodule Benchmarks.GoogleMessage3.Message8476 do
   field :field8484, 2, optional: true, type: :string
   field :field8485, 3, optional: true, type: :string
 end
+
 defmodule Benchmarks.GoogleMessage3.Message8455 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1273,6 +1321,7 @@ defmodule Benchmarks.GoogleMessage3.Message8455 do
   field :field8472, 5, optional: true, type: Benchmarks.GoogleMessage3.Message8457
   field :field8473, 6, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
 end
+
 defmodule Benchmarks.GoogleMessage3.Message8475 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1288,6 +1337,7 @@ defmodule Benchmarks.GoogleMessage3.Message8475 do
   field :field8481, 1, optional: true, type: :string
   field :field8482, 2, optional: true, type: :int64
 end
+
 defmodule Benchmarks.GoogleMessage3.Message12559 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1296,6 +1346,7 @@ defmodule Benchmarks.GoogleMessage3.Message12559 do
 
   defstruct []
 end
+
 defmodule Benchmarks.GoogleMessage3.Message12817 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1314,6 +1365,7 @@ defmodule Benchmarks.GoogleMessage3.Message12817 do
   field :field12827, 2, optional: true, type: :int32
   field :field12828, 3, optional: true, type: :int32
 end
+
 defmodule Benchmarks.GoogleMessage3.Message16480 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1350,6 +1402,7 @@ defmodule Benchmarks.GoogleMessage3.Message16480 do
   field :field16497, 8, optional: true, type: Benchmarks.GoogleMessage3.Message13358
   field :field16498, 9, optional: true, type: :fixed32
 end
+
 defmodule Benchmarks.GoogleMessage3.Message24317 do
   @moduledoc false
   use Protobuf, syntax: :proto2
@@ -1446,6 +1499,7 @@ defmodule Benchmarks.GoogleMessage3.Message24317 do
   field :field24473, 27, repeated: true, type: :string
   field :field24474, 40, optional: true, type: :bool
 end
+
 defmodule Benchmarks.GoogleMessage3.PbExtension do
   @moduledoc false
   use Protobuf, syntax: :proto2

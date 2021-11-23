@@ -130,6 +130,7 @@ defmodule Benchmarks.Proto2.GoogleMessage1 do
   field :field129, 129, optional: true, type: :string, default: "xxxxxxxxxxxxxxxxxxxxx"
   field :field131, 131, optional: true, type: :int32, default: 0
 end
+
 defmodule Benchmarks.Proto2.GoogleMessage1SubMessage do
   @moduledoc false
   use Protobuf, syntax: :proto2

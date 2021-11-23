@@ -130,6 +130,7 @@ defmodule Benchmarks.Proto3.GoogleMessage1 do
   field :field129, 129, type: :string
   field :field131, 131, type: :int32
 end
+
 defmodule Benchmarks.Proto3.GoogleMessage1SubMessage do
   @moduledoc false
   use Protobuf, syntax: :proto3
