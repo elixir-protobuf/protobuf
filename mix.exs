@@ -46,7 +46,13 @@ defmodule Protobuf.Mixfile do
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:stream_data, "~> 0.5.0", only: [:dev, :test]},
-      {:excoveralls, "~> 0.14.4", only: :test}
+      {:excoveralls, "~> 0.14.4", only: :test},
+      {:google_protobuf,
+       github: "protocolbuffers/protobuf",
+       tag: "v3.19.1",
+       app: false,
+       compile: false,
+       only: [:dev, :test]}
     ]
   end
 
@@ -89,25 +95,14 @@ defmodule Protobuf.Mixfile do
   defp aliases do
     [
       test: ["escript.build", "test"],
-      gen_extension_protos: [
-        "escript.build",
-        "cmd protoc -I src --elixir_out=lib --plugin=./protoc-gen-elixir elixirpb.proto",
-        "format"
-      ],
+      # This needs to be automated.
       gen_test_protos: [
         "escript.build",
         "cmd protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/extension.proto",
         "cmd protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --elixir_opt=package_prefix=my --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/test.proto",
         "format"
       ],
-      # $PROTO_LIB should be your local path to https://github.com/google/protobuf/tree/master/src/google/protobuf
-      gen_google_protos: [
-        "escript.build",
-        require_env_variable("PROTO_LIB"),
-        "cmd protoc -I $PROTO_LIB --elixir_out=lib/google --plugin=./protoc-gen-elixir descriptor.proto",
-        "cmd protoc -I $PROTO_LIB --elixir_out=lib/google --plugin=./protoc-gen-elixir compiler/plugin.proto",
-        "format"
-      ],
+      gen_bootstrap_protos: &gen_bootstrap_protos/1,
       # $PROTO_BENCH should be your local path to https://github.com/google/protobuf/tree/master/benchmarks
       gen_bench_protos: [
         "escript.build",
@@ -115,8 +110,31 @@ defmodule Protobuf.Mixfile do
         "cmd protoc -I $PROTO_BENCH --elixir_out=bench/lib --plugin=./protoc-gen-elixir #{Enum.join(benchmark_proto_files(), " ")}",
         "format"
       ],
+      gen_conformance_protos: [],
       conformance_tests: ["escript.build", &run_conformance_tests/1]
     ]
+  end
+
+  # These files are necessary to bootstrap the protoc-gen-elixir plugin that we generate. They
+  # are committed to version control.
+  defp gen_bootstrap_protos(_args) do
+    proto_src = Path.join([Mix.Project.deps_paths().google_protobuf, "src", "google", "protobuf"])
+
+    Mix.Task.run("escript.build")
+
+    Mix.shell().cmd(
+      "protoc -I \"#{proto_src}\" --elixir_out=./lib/google --plugin=./protoc-gen-elixir descriptor.proto"
+    )
+
+    Mix.shell().cmd(
+      "protoc -I \"#{proto_src}\" --elixir_out=./lib/google --plugin=./protoc-gen-elixir compiler/plugin.proto"
+    )
+
+    Mix.shell().cmd(
+      "protoc -I src --elixir_out=./lib --plugin=./protoc-gen-elixir elixirpb.proto"
+    )
+
+    Mix.Task.rerun("format", ["lib/elixirpb.pb.ex", "lib/google/**/*.pb.ex"])
   end
 
   defp require_env_variable(var) do
