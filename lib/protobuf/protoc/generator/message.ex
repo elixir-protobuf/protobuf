@@ -96,7 +96,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     fields =
       for field <- fields,
           is_nil(field.oneof),
-          do: {field.name, struct_default_value(field, ctx.syntax)}
+          do: {field.name, struct_default_value(field, ctx)}
 
     extensions_fields =
       if Enum.empty?(extensions), do: [], else: [{:__pb_extensions__, _default = "nil"}]
@@ -104,27 +104,32 @@ defmodule Protobuf.Protoc.Generator.Message do
     oneof_fields ++ fields ++ extensions_fields
   end
 
-  defp struct_default_value(%{label: "optional"}, syntax) when syntax != :proto3 do
+  defp struct_default_value(%{label: "optional"}, %{syntax: syntax}) when syntax != :proto3 do
     "nil"
   end
 
-  defp struct_default_value(%{map: map}, _syntax) when not is_nil(map) do
+  defp struct_default_value(%{map: map}, _ctx) when not is_nil(map) do
     "%{}"
   end
 
-  defp struct_default_value(%{label: "repeated"}, _syntax) do
+  defp struct_default_value(%{label: "repeated"}, _ctx) do
     "[]"
   end
 
-  defp struct_default_value(%{opts: %{default: default}}, _syntax) when is_binary(default) do
+  defp struct_default_value(%{opts: %{default: default}}, _ctx) when is_binary(default) do
     default
   end
 
-  defp struct_default_value(%{type_enum: type}, _syntax) do
-    case TypeUtil.from_enum(type) do
-      :enum -> {:enum, 0}
-      other -> other
+  defp struct_default_value(%{type_enum: :TYPE_ENUM, type: type}, %{enums: enums}) do
+    case Map.fetch(enums, type) do
+      {:ok, default} -> ":#{default}"
+      :error -> "0"
     end
+  end
+
+  defp struct_default_value(%{type_enum: type}, _ctx) do
+    type
+    |> TypeUtil.from_enum()
     |> Protobuf.Builder.type_default()
     |> inspect()
   end

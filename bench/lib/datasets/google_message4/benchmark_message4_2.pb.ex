@@ -342,7 +342,7 @@ defmodule Benchmarks.GoogleMessage4.Message6129 do
           field6172: String.t()
         }
 
-  defstruct field6171: 0,
+  defstruct field6171: :ENUM_VALUE6131,
             field6172: ""
 
   field :field6171, 1, required: true, type: Benchmarks.GoogleMessage4.Enum6130, enum: true

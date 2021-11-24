@@ -23,6 +23,9 @@ defmodule Protobuf.Protoc.Context do
             # %{".example.FooMsg" => %{type_name: "Example.FooMsg"}}
             dep_type_mapping: %{},
 
+            # Enum metadata used to generate default values when declaring enum fields
+            enums: %{},
+
             # For a message
             # Nested namespace when generating nested messages. It should be joined to get the full namespace
             namespace: [],

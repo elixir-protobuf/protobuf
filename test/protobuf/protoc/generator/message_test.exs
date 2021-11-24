@@ -385,7 +385,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       package: "foo_bar.ab_cd",
       dep_type_mapping: %{
         ".foo_bar.ab_cd.EnumFoo" => %{type_name: "FooBar.AbCd.EnumFoo"}
-      }
+      },
+      enums: %{"FooBar.AbCd.EnumFoo" => "foo"}
     }
 
     desc =
@@ -408,7 +409,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "field :a, 1, required: true, type: FooBar.AbCd.EnumFoo, enum: true\n"
 
     assert msg =~ """
-             defstruct a: 0
+             defstruct a: :foo
            """
   end
 

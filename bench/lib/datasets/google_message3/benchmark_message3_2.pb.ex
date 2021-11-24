@@ -669,7 +669,7 @@ defmodule Benchmarks.GoogleMessage3.Message4144.Message4145 do
           field4170: String.t()
         }
 
-  defstruct field4165: 0,
+  defstruct field4165: :ENUM_VALUE4147,
             field4166: 0,
             field4167: nil,
             field4168: nil,
@@ -967,7 +967,7 @@ defmodule Benchmarks.GoogleMessage3.Message36858.Message36859 do
           field36969: float | :infinity | :negative_infinity | :nan
         }
 
-  defstruct field36968: 0,
+  defstruct field36968: :ENUM_VALUE36861,
             field36969: nil
 
   field :field36968, 9, required: true, type: Benchmarks.GoogleMessage3.Enum36860, enum: true

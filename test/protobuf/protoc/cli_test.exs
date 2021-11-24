@@ -5,9 +5,13 @@ defmodule Protobuf.Protoc.CLITest do
   import ExUnit.CaptureIO
 
   alias Protobuf.Protoc.Context
-  alias Google.Protobuf.FileDescriptorProto
-  alias Google.Protobuf.DescriptorProto
-  alias Google.Protobuf.EnumDescriptorProto
+
+  alias Google.Protobuf.{
+    DescriptorProto,
+    EnumDescriptorProto,
+    EnumValueDescriptorProto,
+    FileDescriptorProto
+  }
 
   describe "main/1" do
     test "--version" do
@@ -75,6 +79,115 @@ defmodule Protobuf.Protoc.CLITest do
       assert_raise RuntimeError, ~r/package_prefix can't be empty/, fn ->
         parse_params(%Context{}, "package_prefix=,gen_descriptors=true")
       end
+    end
+  end
+
+  describe "find_enum_defaults/2" do
+    test "finds enum in file" do
+      descs = [
+        FileDescriptorProto.new(
+          enum_type: [
+            EnumDescriptorProto.new(
+              name: "Enum",
+              value: [
+                EnumValueDescriptorProto.new(name: "field2", number: 2),
+                EnumValueDescriptorProto.new(name: "field0", number: 0),
+                EnumValueDescriptorProto.new(name: "field1", number: 1)
+              ]
+            )
+          ]
+        )
+      ]
+
+      assert %Context{enums: %{"Enum" => "field0"}} = find_enum_defaults(%Context{}, descs)
+    end
+
+    test "finds enum in message" do
+      descs = [
+        FileDescriptorProto.new(
+          message_type: [
+            DescriptorProto.new(
+              name: "Message",
+              enum_type: [
+                EnumDescriptorProto.new(
+                  name: "Enum",
+                  value: [
+                    EnumValueDescriptorProto.new(name: "field0", number: 0)
+                  ]
+                )
+              ]
+            )
+          ]
+        )
+      ]
+
+      assert %Context{enums: %{"Message.Enum" => "field0"}} =
+               find_enum_defaults(%Context{}, descs)
+    end
+
+    test "finds enum in nested message" do
+      descs = [
+        FileDescriptorProto.new(
+          message_type: [
+            DescriptorProto.new(
+              name: "Message1",
+              nested_type: [
+                DescriptorProto.new(
+                  name: "Message2",
+                  enum_type: [
+                    EnumDescriptorProto.new(
+                      name: "Enum",
+                      value: [
+                        EnumValueDescriptorProto.new(name: "field0", number: 0)
+                      ]
+                    )
+                  ]
+                )
+              ]
+            )
+          ]
+        )
+      ]
+
+      assert %Context{enums: %{"Message1.Message2.Enum" => "field0"}} =
+               find_enum_defaults(%Context{}, descs)
+    end
+
+    test "skip non-zero enum" do
+      descs = [
+        FileDescriptorProto.new(
+          enum_type: [
+            EnumDescriptorProto.new(
+              name: "Enum",
+              value: [
+                EnumValueDescriptorProto.new(name: "field1", number: 1)
+              ]
+            )
+          ]
+        )
+      ]
+
+      assert %Context{enums: enums} = find_enum_defaults(%Context{}, descs)
+      assert enums == %{}
+    end
+
+    test "uses package" do
+      descs = [
+        FileDescriptorProto.new(
+          package: "package",
+          enum_type: [
+            EnumDescriptorProto.new(
+              name: "Enum",
+              value: [
+                EnumValueDescriptorProto.new(name: "field0", number: 0)
+              ]
+            )
+          ]
+        )
+      ]
+
+      assert %Context{enums: %{"Prefix.Package.Enum" => "field0"}} =
+               find_enum_defaults(%Context{package_prefix: "prefix"}, descs)
     end
   end
 

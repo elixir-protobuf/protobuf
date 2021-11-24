@@ -19,6 +19,7 @@ defmodule Protobuf.Protoc.CLI do
   """
 
   alias Protobuf.Protoc.Context
+  alias Protobuf.Protoc.Generator.Util
 
   # Entrypoint for the escript (protoc-gen-elixir).
   @doc false
@@ -50,6 +51,7 @@ defmodule Protobuf.Protoc.CLI do
       %Context{}
       |> parse_params(request.parameter || "")
       |> find_types(request.proto_file)
+      |> find_enum_defaults(request.proto_file)
 
     files =
       Enum.flat_map(request.file_to_generate, fn file ->
@@ -112,6 +114,44 @@ defmodule Protobuf.Protoc.CLI do
 
   defp parse_param(_unknown, ctx) do
     ctx
+  end
+
+  # Made public for testing.
+  @doc false
+  def find_enum_defaults(ctx, protos) do
+    %{ctx | enums: Map.new(find_enum_defaults(protos, ctx, []))}
+  end
+
+  defp find_enum_defaults(list, ctx, namespace) when is_list(list) do
+    Enum.flat_map(list, &find_enum_defaults(&1, ctx, namespace))
+  end
+
+  defp find_enum_defaults(%Google.Protobuf.FileDescriptorProto{} = proto, ctx, namespace) do
+    ctx = %Context{ctx | package: proto.package}
+
+    find_enum_defaults(proto.message_type, ctx, namespace) ++
+      find_enum_defaults(proto.enum_type, ctx, namespace)
+  end
+
+  defp find_enum_defaults(%Google.Protobuf.DescriptorProto{} = proto, ctx, namespace) do
+    namespace = [proto.name | namespace]
+
+    find_enum_defaults(proto.nested_type, ctx, namespace) ++
+      find_enum_defaults(proto.enum_type, ctx, namespace)
+  end
+
+  defp find_enum_defaults(%Google.Protobuf.EnumDescriptorProto{} = enum, ctx, namespace) do
+    field_name =
+      Enum.find_value(enum.value, fn value ->
+        if value.number == 0, do: value.name
+      end)
+
+    if field_name do
+      enum_name = Util.mod_name(ctx, Enum.reverse([enum.name | namespace]))
+      [{enum_name, field_name}]
+    else
+      []
+    end
   end
 
   # Made public for testing.
