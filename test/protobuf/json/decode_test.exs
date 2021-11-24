@@ -182,12 +182,35 @@ defmodule Protobuf.JSON.DecodeTest do
       assert decode(%{"uint64" => -1}, Scalars) == error(msg)
     end
 
-    # TODO: Jason decodes integers in E notation as floats, e.g. 1e2 becomes
-    # 100.0 rather than 100. We need to figure out how to make them integers.
-    # We could try to guess with Float.ratio matching to {_, 1} or maybe with
-    # to_string matching ~r|\.0$| but this might be a bad idea in the end.
-    @tag :skip
-    test "values in E notation are valid"
+    test "values in E notation are valid" do
+      int_types = [
+        :int32,
+        :sint32,
+        :fixed32,
+        :sfixed32,
+        :uint32,
+        :int32,
+        :sint32,
+        :fixed32,
+        :sfixed32,
+        :uint32,
+        :int64,
+        :sint64,
+        :fixed64,
+        :sfixed64,
+        :uint64,
+        :int64,
+        :sint64,
+        :fixed64,
+        :sfixed64,
+        :uint64
+      ]
+
+      for int_type <- int_types do
+        decoded = Scalars.new!([{int_type, 100_000}])
+        assert decode(%{Atom.to_string(int_type) => 1.0e5}, Scalars) == {:ok, decoded}
+      end
+    end
   end
 
   describe "floating point" do
@@ -253,10 +276,13 @@ defmodule Protobuf.JSON.DecodeTest do
       assert decode(data, Scalars) == error(msg)
     end
 
-    # TODO: `double` values out of bounds will already get caught by Jason, `float`
-    # values however will need to be range-limited.
-    @tag :skip
-    test "values outside upper and lower limits are invalid"
+    # Can't really test out of bound doubles since they're out of bound for Erlang too :).
+    test "values outside upper and lower limits are invalid" do
+      data = %{"float" => 1.0e39}
+
+      assert decode(data, Scalars) ==
+               error("Field 'float' has an invalid floating point (1.0e39)")
+    end
   end
 
   describe "bytes" do
