@@ -74,22 +74,24 @@ defmodule Protobuf.JSON.Decode do
     mod.new!()
   end
 
-  def from_json_data(int, mod)
-      when mod in [
-             Google.Protobuf.Int32Value,
-             Google.Protobuf.UInt32Value,
-             Google.Protobuf.UInt64Value,
-             Google.Protobuf.Int64Value
-           ] and is_integer(int) do
-    mod.new!(value: int)
-  end
+  def from_json_data(int, Google.Protobuf.Int32Value = mod),
+    do: mod.new!(value: decode_singular(%{type: :int32}, int))
+
+  def from_json_data(int, Google.Protobuf.UInt32Value = mod),
+    do: mod.new!(value: decode_singular(%{type: :uint32}, int))
+
+  def from_json_data(int, Google.Protobuf.UInt64Value = mod),
+    do: mod.new!(value: decode_singular(%{type: :uint64}, int))
+
+  def from_json_data(int, Google.Protobuf.Int64Value = mod),
+    do: mod.new!(value: decode_singular(%{type: :int64}, int))
 
   def from_json_data(number, mod)
       when mod in [
              Google.Protobuf.FloatValue,
              Google.Protobuf.DoubleValue
-           ] and is_float(number) do
-    mod.new!(value: number)
+           ] and (is_float(number) or is_integer(number)) do
+    mod.new!(value: number * 1.0)
   end
 
   def from_json_data(bool, Google.Protobuf.BoolValue = mod) when is_boolean(bool) do

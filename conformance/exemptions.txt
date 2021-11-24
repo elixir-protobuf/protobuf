@@ -614,16 +614,6 @@ Required.Proto3.JsonInput.EnumFieldWithAliasUseAlias.JsonOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasUseAlias.ProtobufOutput
 Required.Proto3.JsonInput.FieldMask.JsonOutput
 Required.Proto3.JsonInput.FieldMask.ProtobufOutput
-Required.Proto3.JsonInput.OptionalDoubleWrapper.JsonOutput
-Required.Proto3.JsonInput.OptionalDoubleWrapper.ProtobufOutput
-Required.Proto3.JsonInput.OptionalFloatWrapper.JsonOutput
-Required.Proto3.JsonInput.OptionalFloatWrapper.ProtobufOutput
-Required.Proto3.JsonInput.OptionalWrapperTypesWithNonDefaultValue.JsonOutput
-Required.Proto3.JsonInput.OptionalWrapperTypesWithNonDefaultValue.ProtobufOutput
-Required.Proto3.JsonInput.RepeatedDoubleWrapper.JsonOutput
-Required.Proto3.JsonInput.RepeatedDoubleWrapper.ProtobufOutput
-Required.Proto3.JsonInput.RepeatedFloatWrapper.JsonOutput
-Required.Proto3.JsonInput.RepeatedFloatWrapper.ProtobufOutput
 Required.Proto3.JsonInput.RepeatedValue.ProtobufOutput
 Required.Proto3.JsonInput.Struct.ProtobufOutput
 Required.Proto3.JsonInput.StructWithEmptyListValue.ProtobufOutput
