@@ -116,6 +116,8 @@ defmodule Protobuf.Protoc.CLI do
     ctx
   end
 
+  # Made public for testing.
+  @doc false
   def find_enum_defaults(ctx, protos) do
     %{ctx | enums: Map.new(find_enum_defaults(protos, ctx, []))}
   end
