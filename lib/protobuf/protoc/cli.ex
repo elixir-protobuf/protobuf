@@ -127,7 +127,7 @@ defmodule Protobuf.Protoc.CLI do
   end
 
   defp find_enum_defaults(%Google.Protobuf.FileDescriptorProto{} = proto, ctx, namespace) do
-    ctx = %{ctx | package: proto.package}
+    ctx = %Context{ctx | package: proto.package}
 
     find_enum_defaults(proto.message_type, ctx, namespace) ++
       find_enum_defaults(proto.enum_type, ctx, namespace)
