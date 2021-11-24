@@ -52,6 +52,7 @@ defmodule Protobuf.ConformanceRegressionsTest do
     assert payload |> message_type.decode() |> message_type.encode() == 1
   end
 
+  @tag :skip
   test "foo" do
     message_type = to_test_proto_type("protobuf_test_messages.proto3.TestAllTypesProto3")
 
@@ -70,6 +71,16 @@ defmodule Protobuf.ConformanceRegressionsTest do
     |> Protobuf.JSON.decode!(message_type)
     |> IO.inspect(limit: :infinity)
     |> Protobuf.JSON.encode!()
+    |> IO.inspect()
+  end
+
+  test "baz" do
+    message_type = to_test_proto_type("protobuf_test_messages.proto3.TestAllTypesProto3")
+
+    "{\n        \"repeatedValue\": [[\"a\"]]\n      }"
+    |> Protobuf.JSON.decode!(message_type)
+    |> IO.inspect(limit: :infinity)
+    |> Protobuf.encode()
     |> IO.inspect()
   end
 

@@ -604,19 +604,13 @@ Required.Proto3.JsonInput.DurationJsonInputTooLarge
 Required.Proto3.JsonInput.DurationJsonInputTooSmall
 Required.Proto3.JsonInput.DurationMinValue.ProtobufOutput
 Required.Proto3.JsonInput.DurationRepeatedValue.ProtobufOutput
-Required.Proto3.JsonInput.EmptyFieldMask.JsonOutput
-Required.Proto3.JsonInput.EmptyFieldMask.ProtobufOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasDifferentCase.JsonOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasDifferentCase.ProtobufOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasLowerCase.JsonOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasLowerCase.ProtobufOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasUseAlias.JsonOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasUseAlias.ProtobufOutput
-Required.Proto3.JsonInput.FieldMask.JsonOutput
 Required.Proto3.JsonInput.FieldMask.ProtobufOutput
-Required.Proto3.JsonInput.RepeatedValue.ProtobufOutput
-Required.Proto3.JsonInput.Struct.ProtobufOutput
-Required.Proto3.JsonInput.StructWithEmptyListValue.ProtobufOutput
 Required.Proto3.JsonInput.TimestampJsonInputMissingT
 Required.Proto3.JsonInput.TimestampJsonInputMissingT
 Required.Proto3.JsonInput.TimestampJsonInputTooSmall
@@ -625,7 +619,6 @@ Required.Proto3.JsonInput.TimestampMaxValue.JsonOutput
 Required.Proto3.JsonInput.TimestampMaxValue.ProtobufOutput
 Required.Proto3.JsonInput.TimestampRepeatedValue.JsonOutput
 Required.Proto3.JsonInput.TimestampRepeatedValue.ProtobufOutput
-Required.Proto3.JsonInput.ValueAcceptList.ProtobufOutput
 Required.Proto3.ProtobufInput.IllegalZeroFieldNum_Case_0
 Required.Proto3.ProtobufInput.IllegalZeroFieldNum_Case_1
 Required.Proto3.ProtobufInput.IllegalZeroFieldNum_Case_2

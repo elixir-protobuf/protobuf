@@ -187,6 +187,7 @@ defmodule Protobuf.Mixfile do
       google/protobuf/any.proto
       google/protobuf/duration.proto
       google/protobuf/empty.proto
+      google/protobuf/field_mask.proto
       google/protobuf/struct.proto
       google/protobuf/timestamp.proto
       google/protobuf/wrappers.proto

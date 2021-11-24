@@ -26,6 +26,10 @@ defmodule Protobuf.JSON.DecodeError do
     }
   end
 
+  def new({:bad_field_mask, string}) do
+    %__MODULE__{message: "invalid characters in field mask: #{inspect(string)}"}
+  end
+
   def new({:bad_string, field, value}) do
     %__MODULE__{message: "Field '#{field}' has an invalid string (#{inspect(value)})"}
   end

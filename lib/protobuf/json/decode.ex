@@ -135,13 +135,24 @@ defmodule Protobuf.JSON.Decode do
         mod.new!(kind: {:bool_value, term})
 
       is_list(term) ->
-        mod.new!(kind: {:list_value, Enum.map(term, &from_json_data(&1, Google.Protobuf.Value))})
+        mod.new!(kind: {:list_value, from_json_data(term, Google.Protobuf.ListValue)})
 
       is_map(term) ->
         mod.new!(kind: {:struct_value, from_json_data(term, Google.Protobuf.Struct)})
 
       true ->
         throw({:bad_message, term, mod})
+    end
+  end
+
+  def from_json_data(data, Google.Protobuf.FieldMask = mod) when is_binary(data) do
+    regex = ~r/^[a-zA-Z0-9]+$/
+    paths = String.split(data, ",")
+
+    cond do
+      data == "" -> mod.new!(paths: [])
+      Enum.all?(paths, &Regex.match?(regex, &1)) -> mod.new!(paths: paths)
+      true -> throw({:bad_field_mask, data})
     end
   end
 
@@ -158,13 +169,8 @@ defmodule Protobuf.JSON.Decode do
   def from_json_data(data, module) when is_atom(module), do: throw({:bad_message, data, module})
 
   defp decode_regular_fields(data, %{field_props: field_props}) do
-    # for {_field_num, %Protobuf.FieldProps{oneof: nil} = prop} <- field_props,
-    #     not is_nil(value = field_value(prop, data)) do
-    #   {prop.name_atom, decode_value(prop, value)}
-    # end
-
     Enum.flat_map(field_props, fn
-      {_field_num, %Protobuf.FieldProps{oneof: nil, type: type, repeated?: repeated?} = prop} ->
+      {_field_num, %Protobuf.FieldProps{oneof: nil} = prop} ->
         present? = Map.has_key?(data, prop.name) or Map.has_key?(data, prop.json_name)
 
         case field_value(prop, data) do

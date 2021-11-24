@@ -42,7 +42,7 @@ defmodule Protobuf.JSON.Encode do
       {:number_value, number} -> number
       {:bool_value, bool} -> bool
       {:null_value, :NULL_VALUE} -> nil
-      {:list_value, list} -> Enum.map(list, &to_encodable(&1, opts))
+      {:list_value, list} -> to_encodable(list, opts)
       {:struct_value, struct} -> to_encodable(struct, opts)
       _other -> throw({:bad_encoding, kind})
     end
@@ -72,6 +72,10 @@ defmodule Protobuf.JSON.Encode do
 
   def to_encodable(%mod{value: value}, _opts) when mod == Google.Protobuf.BytesValue do
     Base.encode64(value)
+  end
+
+  def to_encodable(%mod{paths: paths}, _opts) when mod == Google.Protobuf.FieldMask do
+    Enum.join(paths, ",")
   end
 
   def to_encodable(struct, opts) do
