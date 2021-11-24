@@ -13,6 +13,67 @@ defmodule Protobuf.JSON.Encode do
 
   @doc false
   @spec to_encodable(struct, keyword) :: map | {:error, EncodeError.t()}
+  def to_encodable(struct, opts)
+
+  def to_encodable(%mod{} = struct, _opts) when mod == Google.Protobuf.Duration do
+    case struct do
+      %{seconds: seconds, nanos: 0} -> Integer.to_string(seconds)
+      %{seconds: seconds, nanos: nanos} -> "#{seconds}.#{nanos}s"
+    end
+  end
+
+  def to_encodable(%mod{} = struct, _opts) when mod == Google.Protobuf.Timestamp do
+    %{seconds: seconds, nanos: nanos} = struct
+    unix_nano = seconds * 1_000_000_000 + nanos
+
+    case DateTime.from_unix(unix_nano, :nanosecond) do
+      {:ok, datetime} -> DateTime.to_iso8601(datetime)
+      {:error, reason} -> throw({:invalid_timestamp, struct, reason})
+    end
+  end
+
+  def to_encodable(%mod{}, _opts) when mod == Google.Protobuf.Empty do
+    %{}
+  end
+
+  def to_encodable(%mod{kind: kind}, opts) when mod == Google.Protobuf.Value do
+    case kind do
+      {:string_value, string} -> string
+      {:number_value, number} -> number
+      {:bool_value, bool} -> bool
+      {:null_value, :NULL_VALUE} -> nil
+      {:list_value, list} -> Enum.map(list, &to_encodable(&1, opts))
+      {:struct_value, struct} -> to_encodable(struct, opts)
+      _other -> throw({:bad_encoding, kind})
+    end
+  end
+
+  def to_encodable(%mod{values: values}, opts) when mod == Google.Protobuf.ListValue do
+    Enum.map(values, &to_encodable(&1, opts))
+  end
+
+  def to_encodable(%mod{fields: fields}, opts) when mod == Google.Protobuf.Struct do
+    Map.new(fields, fn {key, val} -> {key, to_encodable(val, opts)} end)
+  end
+
+  def to_encodable(%mod{value: value}, _opts)
+      when mod in [
+             Google.Protobuf.Int32Value,
+             Google.Protobuf.UInt32Value,
+             Google.Protobuf.UInt64Value,
+             Google.Protobuf.Int64Value,
+             Google.Protobuf.FloatValue,
+             Google.Protobuf.DoubleValue,
+             Google.Protobuf.BoolValue,
+             Google.Protobuf.StringValue
+           ] do
+    value
+  end
+
+  def to_encodable(%mod{value: value}, _opts) when mod == Google.Protobuf.BytesValue do
+    Base.encode64(value)
+  end
+
   def to_encodable(struct, opts) do
     message_props = Utils.message_props(struct)
     regular = encode_regular_fields(struct, message_props, opts)

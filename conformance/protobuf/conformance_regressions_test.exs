@@ -52,6 +52,14 @@ defmodule Protobuf.ConformanceRegressionsTest do
     assert payload |> message_type.decode() |> message_type.encode() == 1
   end
 
+  test "foo" do
+    message_type = to_test_proto_type("protobuf_test_messages.proto3.TestAllTypesProto3")
+
+    "{\"optionalValue\": false}"
+    |> Protobuf.JSON.decode!(message_type)
+    |> Protobuf.JSON.encode!()
+  end
+
   defp to_test_proto_type("protobuf_test_messages.proto3.TestAllTypesProto3"),
     do: ProtobufTestMessages.Proto3.TestAllTypesProto3
 

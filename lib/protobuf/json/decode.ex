@@ -41,6 +41,108 @@ defmodule Protobuf.JSON.Decode do
 
   @float_types [:float, :double]
 
+  def from_json_data(string, Google.Protobuf.Duration = mod) when is_binary(string) do
+    case Integer.parse(string) do
+      {seconds, "s"} ->
+        mod.new!(seconds: seconds)
+
+      {seconds, "." <> nanos_with_s} when (byte_size(nanos_with_s) - 1) in 1..9 ->
+        case Integer.parse(nanos_with_s) do
+          {nanos, "s"} -> mod.new!(seconds: seconds, nanos: nanos)
+          other -> throw({:bad_duration, string, other})
+        end
+
+      other ->
+        throw({:bad_duration, string, other})
+    end
+  end
+
+  def from_json_data(string, Google.Protobuf.Timestamp = mod) when is_binary(string) do
+    case DateTime.from_iso8601(string) do
+      {:ok, datetime, _offset} ->
+        unix_nano = DateTime.to_unix(datetime, :nanosecond)
+        seconds = div(unix_nano, 1_000_000_000)
+        nanos = unix_nano - seconds * 1_000_000_000
+        mod.new!(seconds: seconds, nanos: nanos)
+
+      {:error, reason} ->
+        throw({:bad_timestamp, string, reason})
+    end
+  end
+
+  def from_json_data(map, Google.Protobuf.Empty = mod) when map == %{} do
+    mod.new!()
+  end
+
+  def from_json_data(int, mod)
+      when mod in [
+             Google.Protobuf.Int32Value,
+             Google.Protobuf.UInt32Value,
+             Google.Protobuf.UInt64Value,
+             Google.Protobuf.Int64Value
+           ] and is_integer(int) do
+    mod.new!(value: int)
+  end
+
+  def from_json_data(number, mod)
+      when mod in [
+             Google.Protobuf.FloatValue,
+             Google.Protobuf.DoubleValue
+           ] and is_float(number) do
+    mod.new!(value: number)
+  end
+
+  def from_json_data(bool, Google.Protobuf.BoolValue = mod) when is_boolean(bool) do
+    mod.new!(value: bool)
+  end
+
+  def from_json_data(string, Google.Protobuf.StringValue = mod) when is_binary(string) do
+    mod.new!(value: string)
+  end
+
+  def from_json_data(bytes, Google.Protobuf.BytesValue = mod) when is_binary(bytes) do
+    mod.new!(value: decode_singular(%{type: :bytes}, bytes))
+  end
+
+  def from_json_data(list, Google.Protobuf.ListValue = mod) when is_list(list) do
+    mod.new!(values: Enum.map(list, &from_json_data(&1, Google.Protobuf.Value)))
+  end
+
+  def from_json_data(struct, Google.Protobuf.Struct = mod) when is_map(struct) do
+    fields =
+      Map.new(struct, fn {key, val} -> {key, from_json_data(val, Google.Protobuf.Value)} end)
+
+    mod.new!(fields: fields)
+  end
+
+  def from_json_data(term, Google.Protobuf.Value = mod) do
+    cond do
+      is_nil(term) ->
+        mod.new!(kind: {:null_value, :NULL_VALUE})
+
+      is_binary(term) ->
+        mod.new!(kind: {:string_value, term})
+
+      is_integer(term) ->
+        mod.new!(kind: {:number_value, term * 1.0})
+
+      is_float(term) ->
+        mod.new!(kind: {:number_value, term})
+
+      is_boolean(term) ->
+        mod.new!(kind: {:bool_value, term})
+
+      is_list(term) ->
+        mod.new!(kind: {:list_value, Enum.map(term, &from_json_data(&1, Google.Protobuf.Value))})
+
+      is_map(term) ->
+        mod.new!(kind: {:struct_value, from_json_data(term, Google.Protobuf.Struct)})
+
+      true ->
+        throw({:bad_message, term, mod})
+    end
+  end
+
   def from_json_data(data, module) when is_map(data) and is_atom(module) do
     message_props = Utils.message_props(module)
     regular = decode_regular_fields(data, message_props)
@@ -51,11 +153,11 @@ defmodule Protobuf.JSON.Decode do
     |> struct(oneofs)
   end
 
-  def from_json_data(data, module) when is_atom(module), do: throw({:bad_message, data})
+  def from_json_data(data, module) when is_atom(module), do: throw({:bad_message, data, module})
 
   defp decode_regular_fields(data, %{field_props: field_props}) do
-    for {_field_num, %{oneof: nil} = prop} <- field_props,
-        value = field_value(prop, data) do
+    for {_field_num, %Protobuf.FieldProps{oneof: nil} = prop} <- field_props,
+        not is_nil(value = field_value(prop, data)) do
       {prop.name_atom, decode_value(prop, value)}
     end
   end
