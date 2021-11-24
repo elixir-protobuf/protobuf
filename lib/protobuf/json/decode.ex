@@ -36,6 +36,9 @@ defmodule Protobuf.JSON.Decode do
 
   @int_types Map.keys(@int_ranges)
 
+  max_float = 3.402823466e38
+  @float_range {-max_float, max_float}
+
   @float_types [:float, :double]
 
   def from_json_data(data, module) when is_map(data) and is_atom(module) do
@@ -141,9 +144,21 @@ defmodule Protobuf.JSON.Decode do
   end
 
   defp decode_singular(%{type: type} = prop, value) when type in @float_types do
+    {float_min, float_max} = @float_range
+
+    # If the type is float, we check that it's in range. If the type is double, we don't need to
+    # do that cause the BEAM would throw an error for an out of bounds double anyways.
     case decode_float(value) do
-      {:ok, float} -> float
-      _ -> throw({:bad_float, prop.name_atom, value})
+      {:ok, float}
+      when type == :float and is_float(float) and (float < float_min or float > float_max) ->
+        # Float is out of range.
+        throw({:bad_float, prop.name_atom, value})
+
+      {:ok, value} ->
+        value
+
+      :error ->
+        throw({:bad_float, prop.name_atom, value})
     end
   end
 
@@ -170,12 +185,23 @@ defmodule Protobuf.JSON.Decode do
 
   defp decode_integer(integer) when is_integer(integer), do: {:ok, integer}
   defp decode_integer(string) when is_binary(string), do: parse_int(string)
+  defp decode_integer(float) when is_float(float), do: parse_float_as_int(float)
   defp decode_integer(_bad), do: :error
 
   defp parse_int(string) do
     case Integer.parse(string) do
       {int, ""} -> {:ok, int}
       _ -> :error
+    end
+  end
+
+  defp parse_float_as_int(float) do
+    truncated = trunc(float)
+
+    if float - truncated == 0.0 do
+      {:ok, truncated}
+    else
+      :error
     end
   end
 

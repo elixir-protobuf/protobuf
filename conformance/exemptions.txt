@@ -617,16 +617,6 @@ Required.Proto3.JsonInput.EnumFieldWithAliasUseAlias.JsonOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasUseAlias.ProtobufOutput
 Required.Proto3.JsonInput.FieldMask.JsonOutput
 Required.Proto3.JsonInput.FieldMask.ProtobufOutput
-Required.Proto3.JsonInput.FloatFieldTooLarge
-Required.Proto3.JsonInput.FloatFieldTooSmall
-Required.Proto3.JsonInput.Int32FieldExponentialFormat.JsonOutput
-Required.Proto3.JsonInput.Int32FieldExponentialFormat.ProtobufOutput
-Required.Proto3.JsonInput.Int32FieldFloatTrailingZero.JsonOutput
-Required.Proto3.JsonInput.Int32FieldFloatTrailingZero.ProtobufOutput
-Required.Proto3.JsonInput.Int32FieldMaxFloatValue.JsonOutput
-Required.Proto3.JsonInput.Int32FieldMaxFloatValue.ProtobufOutput
-Required.Proto3.JsonInput.Int32FieldMinFloatValue.JsonOutput
-Required.Proto3.JsonInput.Int32FieldMinFloatValue.ProtobufOutput
 Required.Proto3.JsonInput.OptionalBoolWrapper.JsonOutput
 Required.Proto3.JsonInput.OptionalBoolWrapper.ProtobufOutput
 Required.Proto3.JsonInput.OptionalBytesWrapper.JsonOutput
@@ -685,8 +675,6 @@ Required.Proto3.JsonInput.TimestampWithNegativeOffset.JsonOutput
 Required.Proto3.JsonInput.TimestampWithNegativeOffset.ProtobufOutput
 Required.Proto3.JsonInput.TimestampWithPositiveOffset.JsonOutput
 Required.Proto3.JsonInput.TimestampWithPositiveOffset.ProtobufOutput
-Required.Proto3.JsonInput.Uint32FieldMaxFloatValue.JsonOutput
-Required.Proto3.JsonInput.Uint32FieldMaxFloatValue.ProtobufOutput
 Required.Proto3.JsonInput.ValueAcceptBool.JsonOutput
 Required.Proto3.JsonInput.ValueAcceptBool.ProtobufOutput
 Required.Proto3.JsonInput.ValueAcceptFloat.JsonOutput
