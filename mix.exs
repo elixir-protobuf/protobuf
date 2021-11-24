@@ -18,7 +18,7 @@ defmodule Protobuf.Mixfile do
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.html": :test,
-        conformance_tests: :conformance
+        conformance_test: :conformance
       ],
       deps: deps(),
       escript: escript(Mix.env()),
@@ -35,8 +35,8 @@ defmodule Protobuf.Mixfile do
     ]
   end
 
-  defp elixirc_paths(:test), do: ["lib", "test/support", "test/protobuf/protoc/proto_gen"]
-  defp elixirc_paths(:conformance), do: ["lib", "conformance", "test/support"]
+  defp elixirc_paths(:test), do: ["lib", "test/support", "generated"]
+  defp elixirc_paths(:conformance), do: ["lib", "conformance", "generated"]
   defp elixirc_paths(_), do: ["lib"]
 
   defp deps do
@@ -45,14 +45,14 @@ defmodule Protobuf.Mixfile do
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:stream_data, "~> 0.5.0", only: [:dev, :test]},
+      {:stream_data, "~> 0.5.0", only: [:dev, :test, :conformance]},
       {:excoveralls, "~> 0.14.4", only: :test},
       {:google_protobuf,
        github: "protocolbuffers/protobuf",
        tag: "v3.19.1",
        app: false,
        compile: false,
-       only: [:dev, :test]}
+       only: [:dev, :test, :conformance]}
     ]
   end
 
@@ -94,19 +94,48 @@ defmodule Protobuf.Mixfile do
 
   defp aliases do
     [
-      test: ["escript.build", "test"],
-      # This needs to be automated.
-      gen_test_protos: [
-        "escript.build",
-        "cmd protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/extension.proto",
-        "cmd protoc -I src -I test/protobuf/protoc/proto --elixir_out=test/protobuf/protoc/proto_gen --elixir_opt=package_prefix=my --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/test.proto",
-        "format"
+      gen_bootstrap_protos: [&build_escript/1, &gen_bootstrap_protos/1],
+      gen_test_protos: [&build_escript/1, &create_generated_dir/1, &gen_test_protos/1],
+      test: [
+        &build_escript/1,
+        &create_generated_dir/1,
+        &gen_test_protos/1,
+        &gen_google_test_protos/1,
+        "test"
       ],
-      gen_bootstrap_protos: ["escript.build", &gen_bootstrap_protos/1],
-      gen_bench_protos: ["escript.build", &gen_bench_protos/1],
-      gen_conformance_protos: [],
-      conformance_tests: ["escript.build", &run_conformance_tests/1]
+      conformance_test: [
+        fn _ ->
+          Mix.shell().cmd("mix escript.build", env: %{"MIX_ENV" => "test"})
+        end,
+        &create_generated_dir/1,
+        &gen_google_test_protos/1,
+        &gen_conformance_protos/1,
+        "escript.build",
+        &run_conformance_tests/1
+      ],
+      gen_bench_protos: [&build_escript/1, &gen_bench_protos/1]
     ]
+  end
+
+  # We need to do this in a separate shell because we want to compile "from scratch" when we do
+  # things like running tests, since we usually generated some .pb.ex files on the fly and stick
+  # them in a directory. That directory is in the elixirc_paths, but no files are there *before*
+  # we compile the project the first time to run escript.build. It's a chicken and egg problem.
+  # This way, we compile the project first to generate the escript and we do so in a subshell.
+  # Then, we generate the .pb.ex files. Then we actually run stuff (like "mix test"), so that
+  # compilation happens again "from scratch" and it picks up the generated files. This fixes at
+  # least one problem related to extensions, because extensions are discovered by looking at
+  # :application.get_key(app, :modules), and if modules are added after the first compilation and
+  # loading pass, then they don't get picked up in there.
+  # There is very likely a better way to do this, but this works for now.
+  defp build_escript(_args) do
+    # We wanna pass down MIX_ENV here because we want escript.build to happen in the same Mix
+    # environment of whoever is calling this function.
+    Mix.shell().cmd("mix escript.build", env: %{"MIX_ENV" => Atom.to_string(Mix.env())})
+  end
+
+  defp create_generated_dir(_args) do
+    File.mkdir_p!("generated")
   end
 
   # These files are necessary to bootstrap the protoc-gen-elixir plugin that we generate. They
@@ -129,6 +158,18 @@ defmodule Protobuf.Mixfile do
     Mix.Task.rerun("format", ["lib/elixirpb.pb.ex", "lib/google/**/*.pb.ex"])
   end
 
+  defp gen_test_protos(_args) do
+    Mix.shell().cmd(
+      "protoc -I src -I test/protobuf/protoc/proto --elixir_out=generated --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/extension.proto"
+    )
+
+    Mix.shell().cmd(
+      "protoc -I test/protobuf/protoc/proto --elixir_out=generated --elixir_opt=package_prefix=my --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/test.proto"
+    )
+
+    Mix.Task.rerun("format", ["generated/**/*.pb.ex"])
+  end
+
   defp gen_bench_protos(_args) do
     proto_bench = path_in_protobuf_source(["benchmarks"])
 
@@ -137,6 +178,32 @@ defmodule Protobuf.Mixfile do
     )
 
     Mix.Task.rerun("format", ["bench/**/*.pb.ex"])
+  end
+
+  defp gen_google_test_protos(_args) do
+    proto_root = path_in_protobuf_source(["src"])
+
+    files_to_generate =
+      Enum.join(
+        ~w(google/protobuf/any.proto google/protobuf/duration.proto google/protobuf/struct.proto google/protobuf/test_messages_proto2.proto google/protobuf/test_messages_proto3.proto),
+        " "
+      )
+
+    Mix.shell().cmd(
+      "protoc --plugin=./protoc-gen-elixir --elixir_out=./generated -I \"#{proto_root}\" #{files_to_generate}"
+    )
+
+    Mix.Task.rerun("format", ["generated/**/*.pb.ex"])
+  end
+
+  defp gen_conformance_protos(_args) do
+    proto_src = path_in_protobuf_source(["conformance"])
+
+    Mix.shell().cmd(
+      "protoc --plugin=./protoc-gen-elixir --elixir_out=./generated -I \"#{proto_src}\" conformance.proto"
+    )
+
+    Mix.Task.rerun("format", ["generated/**/*.pb.ex"])
   end
 
   defp path_in_protobuf_source(path) do

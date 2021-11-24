@@ -3,9 +3,6 @@ syntax = "proto2";
 // This package holds interesting messages.
 package test;  // dotted package name
 
-// import "imp.proto";
-import "multi/multi1.proto"; // unused import
-
 enum HatType {
   // deliberately skipping 0
   FEDORA = 1;

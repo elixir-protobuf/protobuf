@@ -24,9 +24,10 @@ defmodule Conformance.Protobuf.Runner do
             raise "failed to read #{len} bytes from stdio: #{inspect(reason)}"
 
           encoded_request ->
+            mod = Conformance.ConformanceResponse
             result = handle_encoded_request(encoded_request)
-            response = Conformance.ConformanceResponse.new(result: result)
-            encoded_response = Conformance.ConformanceResponse.encode(response)
+            response = mod.new(result: result)
+            encoded_response = mod.encode(response)
 
             :ok =
               IO.binwrite(
@@ -50,12 +51,15 @@ defmodule Conformance.Protobuf.Runner do
     end
   end
 
-  defp handle_conformance_request(%Conformance.ConformanceRequest{
+  # We need to keep "mod" dynamic here because we generate the .pb.ex files for
+  # Conformance.ConformanceRequest after compiling this file.
+  defp handle_conformance_request(%mod{
          requested_output_format: requested_output_format,
          message_type: message_type,
          payload: {payload_kind, msg}
        })
-       when requested_output_format in [:PROTOBUF, :JSON] and
+       when mod == Conformance.ConformanceRequest and
+              requested_output_format in [:PROTOBUF, :JSON] and
               payload_kind in [:protobuf_payload, :json_payload] do
     test_proto_type = to_test_proto_type(message_type)
 
