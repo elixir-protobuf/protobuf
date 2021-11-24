@@ -103,12 +103,16 @@ defmodule Protobuf.Mixfile do
         &gen_google_test_protos/1,
         "test"
       ],
-      gen_conformance_protos: [
-        &build_escript/1,
+      conformance_test: [
+        fn _ ->
+          Mix.shell().cmd("mix escript.build", env: %{"MIX_ENV" => "test"})
+        end,
+        &create_generated_dir/1,
         &gen_google_test_protos/1,
-        &gen_conformance_protos/1
+        &gen_conformance_protos/1,
+        "escript.build",
+        &run_conformance_tests/1
       ],
-      conformance_test: [&build_escript/1, &run_conformance_tests/1],
       gen_bench_protos: [&build_escript/1, &gen_bench_protos/1]
     ]
   end
