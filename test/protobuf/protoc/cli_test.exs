@@ -186,8 +186,8 @@ defmodule Protobuf.Protoc.CLITest do
         )
       ]
 
-      assert %Context{enums: %{"Package.Enum" => "field0"}} =
-               find_enum_defaults(%Context{}, descs)
+      assert %Context{enums: %{"Prefix.Package.Enum" => "field0"}} =
+               find_enum_defaults(%Context{package_prefix: "prefix"}, descs)
     end
   end
 
