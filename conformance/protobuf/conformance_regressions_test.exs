@@ -55,9 +55,22 @@ defmodule Protobuf.ConformanceRegressionsTest do
   test "foo" do
     message_type = to_test_proto_type("protobuf_test_messages.proto3.TestAllTypesProto3")
 
-    "{\"optionalValue\": false}"
+    "{\"optionalValue\": null}"
     |> Protobuf.JSON.decode!(message_type)
+    |> IO.inspect(limit: :infinity)
     |> Protobuf.JSON.encode!()
+    |> IO.inspect()
+  end
+
+  @tag :skip
+  test "bar" do
+    message_type = to_test_proto_type("protobuf_test_messages.proto3.TestAllTypesProto3")
+
+    "{\"optionalNullValue\": null}"
+    |> Protobuf.JSON.decode!(message_type)
+    |> IO.inspect(limit: :infinity)
+    |> Protobuf.JSON.encode!()
+    |> IO.inspect()
   end
 
   defp to_test_proto_type("protobuf_test_messages.proto3.TestAllTypesProto3"),

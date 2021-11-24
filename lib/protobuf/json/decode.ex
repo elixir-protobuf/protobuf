@@ -156,10 +156,26 @@ defmodule Protobuf.JSON.Decode do
   def from_json_data(data, module) when is_atom(module), do: throw({:bad_message, data, module})
 
   defp decode_regular_fields(data, %{field_props: field_props}) do
-    for {_field_num, %Protobuf.FieldProps{oneof: nil} = prop} <- field_props,
-        not is_nil(value = field_value(prop, data)) do
-      {prop.name_atom, decode_value(prop, value)}
-    end
+    # for {_field_num, %Protobuf.FieldProps{oneof: nil} = prop} <- field_props,
+    #     not is_nil(value = field_value(prop, data)) do
+    #   {prop.name_atom, decode_value(prop, value)}
+    # end
+
+    Enum.flat_map(field_props, fn
+      {_field_num, %Protobuf.FieldProps{oneof: nil, type: type, repeated?: repeated?} = prop} ->
+        present? = Map.has_key?(data, prop.name) or Map.has_key?(data, prop.json_name)
+
+        case field_value(prop, data) do
+          value when present? ->
+            [{prop.name_atom, decode_value(prop, value)}]
+
+          nil ->
+            []
+        end
+
+      {_field_num, _prop} ->
+        []
+    end)
   end
 
   defp decode_oneof_fields(data, %{field_props: field_props, oneof: oneofs}) do
@@ -182,6 +198,9 @@ defmodule Protobuf.JSON.Decode do
       _ -> nil
     end
   end
+
+  defp decode_value(%{optional?: true, type: type}, nil) when type != Google.Protobuf.Value,
+    do: nil
 
   defp decode_value(%{map?: true} = prop, map), do: decode_map(prop, map)
   defp decode_value(%{repeated?: true} = prop, list), do: decode_repeated(prop, list)
@@ -275,9 +294,11 @@ defmodule Protobuf.JSON.Decode do
 
   defp decode_singular(%{type: {:enum, enum}} = prop, value) do
     Map.get_lazy(enum.__reverse_mapping__(), value, fn ->
-      if is_integer(value) && value in @int32_range,
-        do: value,
-        else: throw({:bad_enum, prop.name_atom, value})
+      cond do
+        is_integer(value) and value in @int32_range -> value
+        is_nil(value) and enum == Google.Protobuf.NullValue -> :NULL_VALUE
+        true -> throw({:bad_enum, prop.name_atom, value})
+      end
     end)
   end
 
