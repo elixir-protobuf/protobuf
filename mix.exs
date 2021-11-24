@@ -94,23 +94,44 @@ defmodule Protobuf.Mixfile do
 
   defp aliases do
     [
+      gen_bootstrap_protos: [&build_escript/1, &gen_bootstrap_protos/1],
+      gen_test_protos: [&build_escript/1, &create_generated_dir/1, &gen_test_protos/1],
       test: [
-        "escript.build",
-        "gen_test_protos",
+        &build_escript/1,
+        &create_generated_dir/1,
+        &gen_test_protos/1,
         &gen_google_test_protos/1,
-        fn _ -> Mix.Task.rerun("compile.elixir") end,
         "test"
       ],
-      gen_bootstrap_protos: ["escript.build", &gen_bootstrap_protos/1],
-      gen_test_protos: ["escript.build", &gen_test_protos/1],
-      gen_bench_protos: ["escript.build", &gen_bench_protos/1],
       gen_conformance_protos: [
-        "escript.build",
+        &build_escript/1,
         &gen_google_test_protos/1,
         &gen_conformance_protos/1
       ],
-      conformance_test: ["escript.build", &run_conformance_tests/1]
+      conformance_test: [&build_escript/1, &run_conformance_tests/1],
+      gen_bench_protos: [&build_escript/1, &gen_bench_protos/1]
     ]
+  end
+
+  # We need to do this in a separate shell because we want to compile "from scratch" when we do
+  # things like running tests, since we usually generated some .pb.ex files on the fly and stick
+  # them in a directory. That directory is in the elixirc_paths, but no files are there *before*
+  # we compile the project the first time to run escript.build. It's a chicken and egg problem.
+  # This way, we compile the project first to generate the escript and we do so in a subshell.
+  # Then, we generate the .pb.ex files. Then we actually run stuff (like "mix test"), so that
+  # compilation happens again "from scratch" and it picks up the generated files. This fixes at
+  # least one problem related to extensions, because extensions are discovered by looking at
+  # :application.get_key(app, :modules), and if modules are added after the first compilation and
+  # loading pass, then they don't get picked up in there.
+  # There is very likely a better way to do this, but this works for now.
+  defp build_escript(_args) do
+    # We wanna pass down MIX_ENV here because we want escript.build to happen in the same Mix
+    # environment of whoever is calling this function.
+    Mix.shell().cmd("mix escript.build", env: %{"MIX_ENV" => Atom.to_string(Mix.env())})
+  end
+
+  defp create_generated_dir(_args) do
+    File.mkdir_p!("generated")
   end
 
   # These files are necessary to bootstrap the protoc-gen-elixir plugin that we generate. They
@@ -134,10 +155,6 @@ defmodule Protobuf.Mixfile do
   end
 
   defp gen_test_protos(_args) do
-    __DIR__
-    |> Path.join("generated")
-    |> File.mkdir_p!()
-
     Mix.shell().cmd(
       "protoc -I src -I test/protobuf/protoc/proto --elixir_out=generated --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/extension.proto"
     )
@@ -160,10 +177,6 @@ defmodule Protobuf.Mixfile do
   end
 
   defp gen_google_test_protos(_args) do
-    __DIR__
-    |> Path.join("generated")
-    |> File.mkdir_p!()
-
     proto_root = path_in_protobuf_source(["src"])
 
     files_to_generate =
