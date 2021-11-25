@@ -6,7 +6,7 @@ defmodule Protobuf.JSON.Decode do
   alias Protobuf.JSON.Utils
 
   @compile {:inline,
-            field_value: 2,
+            fetch_field_value: 2,
             decode_map: 2,
             decode_repeated: 2,
             decode_integer: 1,
@@ -40,6 +40,14 @@ defmodule Protobuf.JSON.Decode do
   @float_range {-max_float, max_float}
 
   @float_types [:float, :double]
+
+  @spec from_json_data(term(), module()) :: struct()
+  def from_json_data(term, module)
+
+  # We start with all the Google built-in types that have specially-defined JSON decoding rules.
+  # These rules are listed here: https://developers.google.com/protocol-buffers/docs/proto3#json
+  # Note that we always have to keep the module names for the built-in types dynamic because
+  # these built-in types **do not ship with our library**.
 
   def from_json_data(string, Google.Protobuf.Duration = mod) when is_binary(string) do
     case Integer.parse(string) do
@@ -75,16 +83,16 @@ defmodule Protobuf.JSON.Decode do
   end
 
   def from_json_data(int, Google.Protobuf.Int32Value = mod),
-    do: mod.new!(value: decode_singular(%{type: :int32}, int))
+    do: mod.new!(value: decode_scalar(:int32, :unknown_name, int))
 
   def from_json_data(int, Google.Protobuf.UInt32Value = mod),
-    do: mod.new!(value: decode_singular(%{type: :uint32}, int))
+    do: mod.new!(value: decode_scalar(:uint32, :unknown_name, int))
 
   def from_json_data(int, Google.Protobuf.UInt64Value = mod),
-    do: mod.new!(value: decode_singular(%{type: :uint64}, int))
+    do: mod.new!(value: decode_scalar(:uint64, :unknown_name, int))
 
   def from_json_data(int, Google.Protobuf.Int64Value = mod),
-    do: mod.new!(value: decode_singular(%{type: :int64}, int))
+    do: mod.new!(value: decode_scalar(:int64, :unknown_name, int))
 
   def from_json_data(number, mod)
       when mod in [
@@ -95,15 +103,15 @@ defmodule Protobuf.JSON.Decode do
   end
 
   def from_json_data(bool, Google.Protobuf.BoolValue = mod) when is_boolean(bool) do
-    mod.new!(value: bool)
+    mod.new!(value: decode_scalar(:bool, :unknown_field, bool))
   end
 
   def from_json_data(string, Google.Protobuf.StringValue = mod) when is_binary(string) do
-    mod.new!(value: string)
+    mod.new!(value: decode_scalar(:string, :unknown_field, string))
   end
 
   def from_json_data(bytes, Google.Protobuf.BytesValue = mod) when is_binary(bytes) do
-    mod.new!(value: decode_singular(%{type: :bytes}, bytes))
+    mod.new!(value: decode_scalar(:bytes, :unknown_field, bytes))
   end
 
   def from_json_data(list, Google.Protobuf.ListValue = mod) when is_list(list) do
@@ -178,14 +186,9 @@ defmodule Protobuf.JSON.Decode do
   defp decode_regular_fields(data, %{field_props: field_props}) do
     Enum.flat_map(field_props, fn
       {_field_num, %Protobuf.FieldProps{oneof: nil} = prop} ->
-        present? = Map.has_key?(data, prop.name) or Map.has_key?(data, prop.json_name)
-
-        case field_value(prop, data) do
-          value when present? ->
-            [{prop.name_atom, decode_value(prop, value)}]
-
-          nil ->
-            []
+        case fetch_field_value(prop, data) do
+          {:ok, value} -> [{prop.name_atom, decode_value(prop, value)}]
+          :error -> []
         end
 
       {_field_num, _prop} ->
@@ -196,7 +199,9 @@ defmodule Protobuf.JSON.Decode do
   defp decode_oneof_fields(data, %{field_props: field_props, oneof: oneofs}) do
     for {oneof, index} <- oneofs,
         {_field_num, %{oneof: ^index} = prop} <- field_props,
-        not is_nil(value = field_value(prop, data)) do
+        result = fetch_field_value(prop, data),
+        match?({:ok, value} when not is_nil(value), result) do
+      {:ok, value} = result
       {oneof, prop, value}
     end
     |> Enum.reduce(%{}, fn {oneof, prop, value}, acc ->
@@ -206,11 +211,11 @@ defmodule Protobuf.JSON.Decode do
     end)
   end
 
-  defp field_value(%{json_name: json_key, name: name_key}, data) do
+  defp fetch_field_value(%Protobuf.FieldProps{name: name_key, json_name: json_key}, data) do
     case data do
-      %{^json_key => value} -> value
-      %{^name_key => value} -> value
-      _ -> nil
+      %{^json_key => value} -> {:ok, value}
+      %{^name_key => value} -> {:ok, value}
+      _ -> :error
     end
   end
 
@@ -258,53 +263,9 @@ defmodule Protobuf.JSON.Decode do
     throw({:bad_repeated, prop.name_atom, value})
   end
 
-  defp decode_singular(%{type: :string} = prop, value) do
-    if is_binary(value),
-      do: value,
-      else: throw({:bad_string, prop.name_atom, value})
-  end
-
-  defp decode_singular(%{type: :bool} = prop, value) do
-    if is_boolean(value),
-      do: value,
-      else: throw({:bad_bool, prop.name_atom, value})
-  end
-
-  defp decode_singular(%{type: type} = prop, value) when type in @int_types do
-    with {:ok, integer} <- decode_integer(value),
-         true <- integer in @int_ranges[type] do
-      integer
-    else
-      _ -> throw({:bad_int, prop.name_atom, value})
-    end
-  end
-
-  defp decode_singular(%{type: type} = prop, value) when type in @float_types do
-    {float_min, float_max} = @float_range
-
-    # If the type is float, we check that it's in range. If the type is double, we don't need to
-    # do that cause the BEAM would throw an error for an out of bounds double anyways.
-    case decode_float(value) do
-      {:ok, float}
-      when type == :float and is_float(float) and (float < float_min or float > float_max) ->
-        # Float is out of range.
-        throw({:bad_float, prop.name_atom, value})
-
-      {:ok, value} ->
-        value
-
-      :error ->
-        throw({:bad_float, prop.name_atom, value})
-    end
-  end
-
-  defp decode_singular(%{type: :bytes} = prop, value) do
-    with true <- is_binary(value),
-         {:ok, bytes} <- decode_bytes(value) do
-      bytes
-    else
-      _ -> throw({:bad_bytes, prop.name_atom})
-    end
+  defp decode_singular(%{type: type} = prop, value)
+       when type in [:string, :bool, :bytes] or type in @int_types or type in @float_types do
+    decode_scalar(type, prop.name_atom, value)
   end
 
   defp decode_singular(%{type: {:enum, enum}} = prop, value) do
@@ -319,6 +280,51 @@ defmodule Protobuf.JSON.Decode do
 
   defp decode_singular(%{type: module, embedded?: true}, value) do
     from_json_data(value, module)
+  end
+
+  defp decode_scalar(:string, name, value) do
+    if is_binary(value), do: value, else: throw({:bad_string, name, value})
+  end
+
+  defp decode_scalar(:bool, name, value) do
+    if is_boolean(value), do: value, else: throw({:bad_bool, name, value})
+  end
+
+  defp decode_scalar(type, name, value) when type in @int_types do
+    with {:ok, integer} <- decode_integer(value),
+         true <- integer in @int_ranges[type] do
+      integer
+    else
+      _ -> throw({:bad_int, name, value})
+    end
+  end
+
+  defp decode_scalar(type, name, value) when type in @float_types do
+    {float_min, float_max} = @float_range
+
+    # If the type is float, we check that it's in range. If the type is double, we don't need to
+    # do that cause the BEAM would throw an error for an out of bounds double anyways.
+    case decode_float(value) do
+      {:ok, float}
+      when type == :float and is_float(float) and (float < float_min or float > float_max) ->
+        # Float is out of range.
+        throw({:bad_float, name, value})
+
+      {:ok, value} ->
+        value
+
+      :error ->
+        throw({:bad_float, name, value})
+    end
+  end
+
+  defp decode_scalar(:bytes, name, value) do
+    with true <- is_binary(value),
+         {:ok, bytes} <- decode_bytes(value) do
+      bytes
+    else
+      _ -> throw({:bad_bytes, name})
+    end
   end
 
   defp decode_integer(integer) when is_integer(integer), do: {:ok, integer}
