@@ -656,5 +656,41 @@ defmodule Protobuf.JSON.DecodeTest do
                   optional_uint32_wrapper: Google.Protobuf.UInt32Value.new!(value: 100)
                 )}
     end
+
+    test "Google.Protobuf.Int64Value" do
+      data = %{
+        "optionalInt64Wrapper" => 100
+      }
+
+      assert decode(data, TestAllTypesProto3) ==
+               {:ok,
+                TestAllTypesProto3.new(
+                  optional_int64_wrapper: Google.Protobuf.Int64Value.new!(value: 100)
+                )}
+    end
+
+    test "Google.Protobuf.UInt64Value" do
+      data = %{
+        "optionalUint64Wrapper" => 100
+      }
+
+      assert decode(data, TestAllTypesProto3) ==
+               {:ok,
+                TestAllTypesProto3.new(
+                  optional_uint64_wrapper: Google.Protobuf.UInt64Value.new!(value: 100)
+                )}
+    end
+
+    test "Google.Protobuf.StringValue" do
+      data = %{
+        "optionalStringWrapper" => "my string"
+      }
+
+      assert decode(data, TestAllTypesProto3) ==
+               {:ok,
+                TestAllTypesProto3.new(
+                  optional_string_wrapper: Google.Protobuf.UInt64Value.new!(value: "my string")
+                )}
+    end
   end
 end
