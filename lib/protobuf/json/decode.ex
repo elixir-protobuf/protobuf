@@ -187,8 +187,14 @@ defmodule Protobuf.JSON.Decode do
     Enum.flat_map(field_props, fn
       {_field_num, %Protobuf.FieldProps{oneof: nil} = prop} ->
         case fetch_field_value(prop, data) do
-          {:ok, value} -> [{prop.name_atom, decode_value(prop, value)}]
-          :error -> []
+          {:ok, value} ->
+            case decode_value(prop, value) do
+              nil -> []
+              value -> [{prop.name_atom, value}]
+            end
+
+          :error ->
+            []
         end
 
       {_field_num, _prop} ->
