@@ -173,10 +173,7 @@ defmodule Protobuf.Wire.Varint do
         end
 
       quote do
-        case unquote(kind) do
-          :def -> def unquote(head), do: unquote(body)
-          :defp -> defp unquote(head), do: unquote(body)
-        end
+        Kernel.unquote(kind)(unquote(head), do: unquote(body))
       end
     end
   end

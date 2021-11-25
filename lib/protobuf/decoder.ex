@@ -190,7 +190,17 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  defp value_for_packed(bin, current, %FieldProps{type: type, wire_type: wire_type}) do
+  # The "packed" flag is, essentially, a suggestion. If a field says it's packed, it could be
+  # packed but it could also _not_ be. For this reason, here we're only decoding fields as packed
+  # if we get a binary. Otherwise, we already decoded the field, so we pass this down to
+  # value_for_field/3.
+  # Reference in the docs:
+  # https://developers.google.com/protocol-buffers/docs/encoding#packed
+  # Reference comment from @britto:
+  # https://github.com/elixir-protobuf/protobuf/pull/207#discussion_r758480828
+
+  defp value_for_packed(bin, current, %FieldProps{type: type, wire_type: wire_type})
+       when is_binary(bin) do
     # List.wrap/1 wraps nil into [].
     current = List.wrap(current)
 
@@ -199,6 +209,10 @@ defmodule Protobuf.Decoder do
       wire_32bits() -> decode_fixed32(bin, type, current)
       wire_64bits() -> decode_fixed64(bin, type, current)
     end
+  end
+
+  defp value_for_packed(value, current, prop) do
+    value_for_field(value, current, prop)
   end
 
   defp decode_varints(<<>>, _type, acc), do: acc
