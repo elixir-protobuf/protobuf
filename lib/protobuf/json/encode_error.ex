@@ -18,6 +18,10 @@ defmodule Protobuf.JSON.EncodeError do
     }
   end
 
+  def new({:bad_field_mask, mask}) do
+    %__MODULE__{message: "unencodable field mask: #{inspect(mask)}"}
+  end
+
   def new({:bad_encoding, term}) do
     %__MODULE__{message: "bad encoding: #{inspect(term)}"}
   end

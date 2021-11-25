@@ -1,6 +1,3 @@
-Recommended.FieldMaskNumbersDontRoundTrip.JsonOutput
-Recommended.FieldMaskPathsDontRoundTrip.JsonOutput
-Recommended.FieldMaskTooManyUnderscore.JsonOutput
 Recommended.Proto2.JsonInput.FieldNameExtension.Validator
 Recommended.Proto2.ProtobufInput.OneofZeroBool.ProtobufOutput
 Recommended.Proto2.ProtobufInput.OneofZeroBytes.ProtobufOutput
@@ -610,7 +607,6 @@ Required.Proto3.JsonInput.EnumFieldWithAliasLowerCase.JsonOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasLowerCase.ProtobufOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasUseAlias.JsonOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasUseAlias.ProtobufOutput
-Required.Proto3.JsonInput.FieldMask.ProtobufOutput
 Required.Proto3.JsonInput.TimestampJsonInputMissingT
 Required.Proto3.JsonInput.TimestampJsonInputMissingT
 Required.Proto3.JsonInput.TimestampJsonInputTooSmall

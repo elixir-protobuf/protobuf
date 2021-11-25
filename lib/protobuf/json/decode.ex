@@ -146,12 +146,11 @@ defmodule Protobuf.JSON.Decode do
   end
 
   def from_json_data(data, Google.Protobuf.FieldMask = mod) when is_binary(data) do
-    regex = ~r/^[a-zA-Z0-9]+$/
     paths = String.split(data, ",")
 
     cond do
       data == "" -> mod.new!(paths: [])
-      Enum.all?(paths, &Regex.match?(regex, &1)) -> mod.new!(paths: paths)
+      paths = Enum.map(paths, &convert_field_mask_to_underscore/1) -> mod.new!(paths: paths)
       true -> throw({:bad_field_mask, data})
     end
   end
@@ -167,6 +166,14 @@ defmodule Protobuf.JSON.Decode do
   end
 
   def from_json_data(data, module) when is_atom(module), do: throw({:bad_message, data, module})
+
+  defp convert_field_mask_to_underscore(mask) do
+    if mask =~ ~r/^[a-zA-Z0-9]+$/ do
+      Macro.underscore(mask)
+    else
+      throw({:bad_field_mask, mask})
+    end
+  end
 
   defp decode_regular_fields(data, %{field_props: field_props}) do
     Enum.flat_map(field_props, fn

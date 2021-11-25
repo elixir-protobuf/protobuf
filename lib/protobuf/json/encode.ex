@@ -75,6 +75,20 @@ defmodule Protobuf.JSON.Encode do
   end
 
   def to_encodable(%mod{paths: paths}, _opts) when mod == Google.Protobuf.FieldMask do
+    Enum.each(paths, fn path ->
+      cond do
+        String.contains?(path, "__") ->
+          throw({:bad_field_mask, paths})
+
+        path =~ ~r/[A-Z0-9]/ ->
+          throw({:bad_field_mask, path})
+
+        true ->
+          {first, rest} = path |> Macro.camelize() |> String.next_codepoint()
+          String.downcase(first) <> rest
+      end
+    end)
+
     Enum.join(paths, ",")
   end
 
