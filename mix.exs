@@ -183,11 +183,19 @@ defmodule Protobuf.Mixfile do
   defp gen_google_test_protos(_args) do
     proto_root = path_in_protobuf_source(["src"])
 
-    files_to_generate =
-      Enum.join(
-        ~w(google/protobuf/any.proto google/protobuf/duration.proto google/protobuf/struct.proto google/protobuf/test_messages_proto2.proto google/protobuf/test_messages_proto3.proto),
-        " "
-      )
+    files = ~w(
+      google/protobuf/any.proto
+      google/protobuf/duration.proto
+      google/protobuf/empty.proto
+      google/protobuf/field_mask.proto
+      google/protobuf/struct.proto
+      google/protobuf/timestamp.proto
+      google/protobuf/wrappers.proto
+      google/protobuf/test_messages_proto2.proto
+      google/protobuf/test_messages_proto3.proto
+    )
+
+    files_to_generate = Enum.join(files, " ")
 
     Mix.shell().cmd(
       "protoc --plugin=./protoc-gen-elixir --elixir_out=./generated -I \"#{proto_root}\" #{files_to_generate}"

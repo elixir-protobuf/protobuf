@@ -6,7 +6,7 @@ defmodule Protobuf.JSON.Decode do
   alias Protobuf.JSON.Utils
 
   @compile {:inline,
-            field_value: 2,
+            fetch_field_value: 2,
             decode_map: 2,
             decode_repeated: 2,
             decode_integer: 1,
@@ -41,6 +41,128 @@ defmodule Protobuf.JSON.Decode do
 
   @float_types [:float, :double]
 
+  @spec from_json_data(term(), module()) :: struct()
+  def from_json_data(term, module)
+
+  # We start with all the Google built-in types that have specially-defined JSON decoding rules.
+  # These rules are listed here: https://developers.google.com/protocol-buffers/docs/proto3#json
+  # Note that we always have to keep the module names for the built-in types dynamic because
+  # these built-in types **do not ship with our library**.
+
+  def from_json_data(string, Google.Protobuf.Duration = mod) when is_binary(string) do
+    case Integer.parse(string) do
+      {seconds, "s"} ->
+        mod.new!(seconds: seconds)
+
+      {seconds, "." <> nanos_with_s} when (byte_size(nanos_with_s) - 1) in 1..9 ->
+        case Integer.parse(nanos_with_s) do
+          {nanos, "s"} -> mod.new!(seconds: seconds, nanos: nanos)
+          other -> throw({:bad_duration, string, other})
+        end
+
+      other ->
+        throw({:bad_duration, string, other})
+    end
+  end
+
+  def from_json_data(string, Google.Protobuf.Timestamp = mod) when is_binary(string) do
+    case DateTime.from_iso8601(string) do
+      {:ok, datetime, _offset} ->
+        unix_nano = DateTime.to_unix(datetime, :nanosecond)
+        seconds = div(unix_nano, 1_000_000_000)
+        nanos = unix_nano - seconds * 1_000_000_000
+        mod.new!(seconds: seconds, nanos: nanos)
+
+      {:error, reason} ->
+        throw({:bad_timestamp, string, reason})
+    end
+  end
+
+  def from_json_data(map, Google.Protobuf.Empty = mod) when map == %{} do
+    mod.new!()
+  end
+
+  def from_json_data(int, Google.Protobuf.Int32Value = mod),
+    do: mod.new!(value: decode_scalar(:int32, :unknown_name, int))
+
+  def from_json_data(int, Google.Protobuf.UInt32Value = mod),
+    do: mod.new!(value: decode_scalar(:uint32, :unknown_name, int))
+
+  def from_json_data(int, Google.Protobuf.UInt64Value = mod),
+    do: mod.new!(value: decode_scalar(:uint64, :unknown_name, int))
+
+  def from_json_data(int, Google.Protobuf.Int64Value = mod),
+    do: mod.new!(value: decode_scalar(:int64, :unknown_name, int))
+
+  def from_json_data(number, mod)
+      when mod in [
+             Google.Protobuf.FloatValue,
+             Google.Protobuf.DoubleValue
+           ] and (is_float(number) or is_integer(number)) do
+    mod.new!(value: number * 1.0)
+  end
+
+  def from_json_data(bool, Google.Protobuf.BoolValue = mod) when is_boolean(bool) do
+    mod.new!(value: decode_scalar(:bool, :unknown_field, bool))
+  end
+
+  def from_json_data(string, Google.Protobuf.StringValue = mod) when is_binary(string) do
+    mod.new!(value: decode_scalar(:string, :unknown_field, string))
+  end
+
+  def from_json_data(bytes, Google.Protobuf.BytesValue = mod) when is_binary(bytes) do
+    mod.new!(value: decode_scalar(:bytes, :unknown_field, bytes))
+  end
+
+  def from_json_data(list, Google.Protobuf.ListValue = mod) when is_list(list) do
+    mod.new!(values: Enum.map(list, &from_json_data(&1, Google.Protobuf.Value)))
+  end
+
+  def from_json_data(struct, Google.Protobuf.Struct = mod) when is_map(struct) do
+    fields =
+      Map.new(struct, fn {key, val} -> {key, from_json_data(val, Google.Protobuf.Value)} end)
+
+    mod.new!(fields: fields)
+  end
+
+  def from_json_data(term, Google.Protobuf.Value = mod) do
+    cond do
+      is_nil(term) ->
+        mod.new!(kind: {:null_value, :NULL_VALUE})
+
+      is_binary(term) ->
+        mod.new!(kind: {:string_value, term})
+
+      is_integer(term) ->
+        mod.new!(kind: {:number_value, term * 1.0})
+
+      is_float(term) ->
+        mod.new!(kind: {:number_value, term})
+
+      is_boolean(term) ->
+        mod.new!(kind: {:bool_value, term})
+
+      is_list(term) ->
+        mod.new!(kind: {:list_value, from_json_data(term, Google.Protobuf.ListValue)})
+
+      is_map(term) ->
+        mod.new!(kind: {:struct_value, from_json_data(term, Google.Protobuf.Struct)})
+
+      true ->
+        throw({:bad_message, term, mod})
+    end
+  end
+
+  def from_json_data(data, Google.Protobuf.FieldMask = mod) when is_binary(data) do
+    paths = String.split(data, ",")
+
+    cond do
+      data == "" -> mod.new!(paths: [])
+      paths = Enum.map(paths, &convert_field_mask_to_underscore/1) -> mod.new!(paths: paths)
+      true -> throw({:bad_field_mask, data})
+    end
+  end
+
   def from_json_data(data, module) when is_map(data) and is_atom(module) do
     message_props = Utils.message_props(module)
     regular = decode_regular_fields(data, message_props)
@@ -51,19 +173,41 @@ defmodule Protobuf.JSON.Decode do
     |> struct(oneofs)
   end
 
-  def from_json_data(data, module) when is_atom(module), do: throw({:bad_message, data})
+  def from_json_data(data, module) when is_atom(module), do: throw({:bad_message, data, module})
+
+  defp convert_field_mask_to_underscore(mask) do
+    if mask =~ ~r/^[a-zA-Z0-9]+$/ do
+      Macro.underscore(mask)
+    else
+      throw({:bad_field_mask, mask})
+    end
+  end
 
   defp decode_regular_fields(data, %{field_props: field_props}) do
-    for {_field_num, %{oneof: nil} = prop} <- field_props,
-        value = field_value(prop, data) do
-      {prop.name_atom, decode_value(prop, value)}
-    end
+    Enum.flat_map(field_props, fn
+      {_field_num, %Protobuf.FieldProps{oneof: nil} = prop} ->
+        case fetch_field_value(prop, data) do
+          {:ok, value} ->
+            case decode_value(prop, value) do
+              nil -> []
+              value -> [{prop.name_atom, value}]
+            end
+
+          :error ->
+            []
+        end
+
+      {_field_num, _prop} ->
+        []
+    end)
   end
 
   defp decode_oneof_fields(data, %{field_props: field_props, oneof: oneofs}) do
     for {oneof, index} <- oneofs,
         {_field_num, %{oneof: ^index} = prop} <- field_props,
-        not is_nil(value = field_value(prop, data)) do
+        result = fetch_field_value(prop, data),
+        match?({:ok, value} when not is_nil(value), result) do
+      {:ok, value} = result
       {oneof, prop, value}
     end
     |> Enum.reduce(%{}, fn {oneof, prop, value}, acc ->
@@ -73,13 +217,16 @@ defmodule Protobuf.JSON.Decode do
     end)
   end
 
-  defp field_value(%{json_name: json_key, name: name_key}, data) do
+  defp fetch_field_value(%Protobuf.FieldProps{name: name_key, json_name: json_key}, data) do
     case data do
-      %{^json_key => value} -> value
-      %{^name_key => value} -> value
-      _ -> nil
+      %{^json_key => value} -> {:ok, value}
+      %{^name_key => value} -> {:ok, value}
+      _ -> :error
     end
   end
+
+  defp decode_value(%{optional?: true, type: type}, nil) when type != Google.Protobuf.Value,
+    do: nil
 
   defp decode_value(%{map?: true} = prop, map), do: decode_map(prop, map)
   defp decode_value(%{repeated?: true} = prop, list), do: decode_repeated(prop, list)
@@ -122,28 +269,43 @@ defmodule Protobuf.JSON.Decode do
     throw({:bad_repeated, prop.name_atom, value})
   end
 
-  defp decode_singular(%{type: :string} = prop, value) do
-    if is_binary(value),
-      do: value,
-      else: throw({:bad_string, prop.name_atom, value})
+  defp decode_singular(%{type: type} = prop, value)
+       when type in [:string, :bool, :bytes] or type in @int_types or type in @float_types do
+    decode_scalar(type, prop.name_atom, value)
   end
 
-  defp decode_singular(%{type: :bool} = prop, value) do
-    if is_boolean(value),
-      do: value,
-      else: throw({:bad_bool, prop.name_atom, value})
+  defp decode_singular(%{type: {:enum, enum}} = prop, value) do
+    Map.get_lazy(enum.__reverse_mapping__(), value, fn ->
+      cond do
+        is_integer(value) and value in @int32_range -> value
+        is_nil(value) and enum == Google.Protobuf.NullValue -> :NULL_VALUE
+        true -> throw({:bad_enum, prop.name_atom, value})
+      end
+    end)
   end
 
-  defp decode_singular(%{type: type} = prop, value) when type in @int_types do
+  defp decode_singular(%{type: module, embedded?: true}, value) do
+    from_json_data(value, module)
+  end
+
+  defp decode_scalar(:string, name, value) do
+    if is_binary(value), do: value, else: throw({:bad_string, name, value})
+  end
+
+  defp decode_scalar(:bool, name, value) do
+    if is_boolean(value), do: value, else: throw({:bad_bool, name, value})
+  end
+
+  defp decode_scalar(type, name, value) when type in @int_types do
     with {:ok, integer} <- decode_integer(value),
          true <- integer in @int_ranges[type] do
       integer
     else
-      _ -> throw({:bad_int, prop.name_atom, value})
+      _ -> throw({:bad_int, name, value})
     end
   end
 
-  defp decode_singular(%{type: type} = prop, value) when type in @float_types do
+  defp decode_scalar(type, name, value) when type in @float_types do
     {float_min, float_max} = @float_range
 
     # If the type is float, we check that it's in range. If the type is double, we don't need to
@@ -152,35 +314,23 @@ defmodule Protobuf.JSON.Decode do
       {:ok, float}
       when type == :float and is_float(float) and (float < float_min or float > float_max) ->
         # Float is out of range.
-        throw({:bad_float, prop.name_atom, value})
+        throw({:bad_float, name, value})
 
       {:ok, value} ->
         value
 
       :error ->
-        throw({:bad_float, prop.name_atom, value})
+        throw({:bad_float, name, value})
     end
   end
 
-  defp decode_singular(%{type: :bytes} = prop, value) do
+  defp decode_scalar(:bytes, name, value) do
     with true <- is_binary(value),
          {:ok, bytes} <- decode_bytes(value) do
       bytes
     else
-      _ -> throw({:bad_bytes, prop.name_atom})
+      _ -> throw({:bad_bytes, name})
     end
-  end
-
-  defp decode_singular(%{type: {:enum, enum}} = prop, value) do
-    Map.get_lazy(enum.__reverse_mapping__(), value, fn ->
-      if is_integer(value) && value in @int32_range,
-        do: value,
-        else: throw({:bad_enum, prop.name_atom, value})
-    end)
-  end
-
-  defp decode_singular(%{type: module, embedded?: true}, value) do
-    from_json_data(value, module)
   end
 
   defp decode_integer(integer) when is_integer(integer), do: {:ok, integer}

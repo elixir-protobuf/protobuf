@@ -11,8 +11,23 @@ defmodule Protobuf.JSON.DecodeError do
     %__MODULE__{message: "JSON library not loaded, make sure to add :jason to your mix.exs file"}
   end
 
-  def new({:bad_message, data}) do
-    %__MODULE__{message: "JSON map expected, got: #{inspect(data)}"}
+  def new({:bad_message, data, module}) do
+    %__MODULE__{message: "JSON map expected for module #{inspect(module)}, got: #{inspect(data)}"}
+  end
+
+  def new({:bad_duration, string, error}) do
+    %__MODULE__{message: "bad JSON value for duration #{inspect(string)}, got: #{inspect(error)}"}
+  end
+
+  def new({:bad_timestamp, string, reason}) do
+    %__MODULE__{
+      message:
+        "bad JSON value for timestamp #{inspect(string)}, failed to parse: #{inspect(reason)}"
+    }
+  end
+
+  def new({:bad_field_mask, string}) do
+    %__MODULE__{message: "invalid characters in field mask: #{inspect(string)}"}
   end
 
   def new({:bad_string, field, value}) do

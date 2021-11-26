@@ -1,6 +1,7 @@
 defmodule Protobuf.JSON.DecodeTest do
   use ExUnit.Case, async: true
 
+  alias ProtobufTestMessages.Proto3.TestAllTypesProto3
   alias TestMsg.{Foo, Foo.Bar, Maps, OneofProto3, Parent, Parent.Child, Scalars}
 
   def decode(data, module) do
@@ -467,19 +468,19 @@ defmodule Protobuf.JSON.DecodeTest do
 
     test "other types are invalid" do
       data = %{"child" => "invalid"}
-      msg = "JSON map expected, got: \"invalid\""
+      msg = "JSON map expected for module TestMsg.Parent.Child, got: \"invalid\""
       assert decode(data, Parent) == error(msg)
 
       data = %{"child" => 2}
-      msg = "JSON map expected, got: 2"
+      msg = "JSON map expected for module TestMsg.Parent.Child, got: 2"
       assert decode(data, Parent) == error(msg)
 
       data = %{"child" => true}
-      msg = "JSON map expected, got: true"
+      msg = "JSON map expected for module TestMsg.Parent.Child, got: true"
       assert decode(data, Parent) == error(msg)
 
       data = %{"child" => []}
-      msg = "JSON map expected, got: []"
+      msg = "JSON map expected for module TestMsg.Parent.Child, got: []"
       assert decode(data, Parent) == error(msg)
     end
   end
@@ -554,7 +555,7 @@ defmodule Protobuf.JSON.DecodeTest do
       assert decode(data, Foo) == error(msg)
 
       data = %{"h" => [%{}, "not an embed"]}
-      msg = "JSON map expected, got: \"not an embed\""
+      msg = "JSON map expected for module TestMsg.Foo.Bar, got: \"not an embed\""
       assert decode(data, Foo) == error(msg)
     end
 
@@ -617,5 +618,79 @@ defmodule Protobuf.JSON.DecodeTest do
     }
 
     assert decode(data, Foo) == {:ok, Foo.new(e: Bar.new())}
+  end
+
+  describe "Google types" do
+    test "Google.Protobuf.BoolValue" do
+      data = %{
+        "optionalBoolWrapper" => true
+      }
+
+      assert decode(data, TestAllTypesProto3) ==
+               {:ok,
+                TestAllTypesProto3.new(
+                  optional_bool_wrapper: Google.Protobuf.BoolValue.new!(value: true)
+                )}
+    end
+
+    test "Google.Protobuf.Int32Value" do
+      data = %{
+        "optionalInt32Wrapper" => 100
+      }
+
+      assert decode(data, TestAllTypesProto3) ==
+               {:ok,
+                TestAllTypesProto3.new(
+                  optional_int32_wrapper: Google.Protobuf.Int32Value.new!(value: 100)
+                )}
+    end
+
+    test "Google.Protobuf.UInt32Value" do
+      data = %{
+        "optionalUint32Wrapper" => 100
+      }
+
+      assert decode(data, TestAllTypesProto3) ==
+               {:ok,
+                TestAllTypesProto3.new(
+                  optional_uint32_wrapper: Google.Protobuf.UInt32Value.new!(value: 100)
+                )}
+    end
+
+    test "Google.Protobuf.Int64Value" do
+      data = %{
+        "optionalInt64Wrapper" => 100
+      }
+
+      assert decode(data, TestAllTypesProto3) ==
+               {:ok,
+                TestAllTypesProto3.new(
+                  optional_int64_wrapper: Google.Protobuf.Int64Value.new!(value: 100)
+                )}
+    end
+
+    test "Google.Protobuf.UInt64Value" do
+      data = %{
+        "optionalUint64Wrapper" => 100
+      }
+
+      assert decode(data, TestAllTypesProto3) ==
+               {:ok,
+                TestAllTypesProto3.new(
+                  optional_uint64_wrapper: Google.Protobuf.UInt64Value.new!(value: 100)
+                )}
+    end
+
+    test "Google.Protobuf.StringValue" do
+      data = %{
+        "optionalStringWrapper" => "my string"
+      }
+
+      assert decode(data, TestAllTypesProto3) ==
+               {:ok,
+                TestAllTypesProto3.new(
+                  optional_string_wrapper: Google.Protobuf.UInt64Value.new!(value: "my string")
+                )}
+    end
   end
 end
