@@ -167,6 +167,10 @@ defmodule Protobuf.Mixfile do
       "protoc -I test/protobuf/protoc/proto --elixir_out=generated --elixir_opt=package_prefix=my --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/test.proto"
     )
 
+    Mix.shell().cmd(
+      "protoc -I test/protobuf/protoc/proto -I #{path_in_protobuf_source("src")} --elixir_out=generated --elixir_opt=gen_descriptors=true --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/custom_options.proto"
+    )
+
     Mix.Task.rerun("format", ["generated/**/*.pb.ex"])
   end
 
@@ -215,7 +219,7 @@ defmodule Protobuf.Mixfile do
   end
 
   defp path_in_protobuf_source(path) do
-    Path.join([Mix.Project.deps_paths().google_protobuf | path])
+    Path.join([Mix.Project.deps_paths().google_protobuf | List.wrap(path)])
   end
 
   defp benchmark_proto_files do

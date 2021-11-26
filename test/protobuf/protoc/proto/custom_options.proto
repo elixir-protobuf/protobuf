@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package test;
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.EnumValueOptions {
+  optional string my_custom_option = 50005;
+}
+
+extend google.protobuf.MessageOptions {
+  string lowercase_name = 51300;
+}
+
+enum EnumWithCustomOptions {
+  MY_ENUM_NOT_SET = 0;
+  MY_ENUM_FOO = 1 [(my_custom_option) = "hello"];
+  MY_ENUM_BAR = 2;
+}
+
+message MessageWithCustomOptions {
+  option (lowercase_name) = "message_with_custom_options";
+}
