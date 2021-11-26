@@ -66,15 +66,9 @@ defmodule Protobuf.JSON.Decode do
   end
 
   def from_json_data(string, Google.Protobuf.Timestamp = mod) when is_binary(string) do
-    case DateTime.from_iso8601(string) do
-      {:ok, datetime, _offset} ->
-        unix_nano = DateTime.to_unix(datetime, :nanosecond)
-        seconds = div(unix_nano, 1_000_000_000)
-        nanos = unix_nano - seconds * 1_000_000_000
-        mod.new!(seconds: seconds, nanos: nanos)
-
-      {:error, reason} ->
-        throw({:bad_timestamp, string, reason})
+    case Protobuf.JSON.RFC3339.decode(string) do
+      {:ok, seconds, nanos} -> mod.new!(seconds: seconds, nanos: nanos)
+      {:error, reason} -> throw({:bad_timestamp, string, reason})
     end
   end
 
