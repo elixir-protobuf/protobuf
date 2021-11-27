@@ -24,10 +24,9 @@ defmodule Protobuf.JSON.Encode do
 
   def to_encodable(%mod{} = struct, _opts) when mod == Google.Protobuf.Timestamp do
     %{seconds: seconds, nanos: nanos} = struct
-    unix_nano = seconds * 1_000_000_000 + nanos
 
-    case DateTime.from_unix(unix_nano, :nanosecond) do
-      {:ok, datetime} -> DateTime.to_iso8601(datetime)
+    case Protobuf.JSON.RFC3339.encode(seconds, nanos) do
+      {:ok, string} -> string
       {:error, reason} -> throw({:invalid_timestamp, struct, reason})
     end
   end
