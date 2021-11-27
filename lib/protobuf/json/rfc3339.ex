@@ -12,7 +12,6 @@ defmodule Protobuf.JSON.RFC3339 do
   # of them. Then, we use the ISO8601-based Elixir functions to actually parse the datetimes with
   # calendar awareness, we throw away anything after the seconds, and replace them with the
   # nanoseconds we parsed. It seems to work very well, as proved by the conformance tests!
-  #
   # For encoding, we have to use a "dirtier" trick. We encode using Elixir's ISO8601 without
   # anything after the seconds, then we split the string and shove the nanoseconds in it. It works
   # because the DD-MM-YYYYTHH:MM:SS part has always the same size so we always know where to
