@@ -63,7 +63,9 @@ jobs:
           NUM_CPUS=$(getconf _NPROCESSORS_ONLN)
           make -C ./src -j "${NUM_CPUS}" protoc
           make -C ./conformance conformance-test-runner
-          echo "$PWD/src" >> $GITHUB_PATH
+
+      - name: Add protoc to $GITHUB_PATH
+        run: echo "$PWD/protobuf/src" >> $GITHUB_PATH
 
       - name: Install OTP and Elixir
         uses: erlef/setup-elixir@v1
