@@ -1,9 +1,9 @@
 name: Conformance
 
 # This workflow *only* tries to run the conformance checks. It is triggered periodically on a cron
-# to catch when new conformance tests are added and they don't pass.
+# to catch when new conformance tests are added and they don't pass as well as in PRs and pushes.
 #
-# Without this workflow the new tests wouldn't be noticed until a PR was made.
+# Without the scheduled run, the new tests wouldn't be noticed until a PR was made.
 
 on:
   # This is needed to trigger the workflow manually from the "Actions" tab in the repo.
@@ -12,6 +12,8 @@ on:
   # Every day at 9am.
   schedule:
     - cron: '0 9 * * *'
+  push:
+  pull_request:
 
 jobs:
   test:
@@ -26,29 +28,31 @@ jobs:
       MIX_ENV: conformance
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout this repo
+        uses: actions/checkout@v2
 
       - name: Update and install dependencies to build protoc locally
         # Dependencies from https://github.com/protocolbuffers/protobuf/blob/master/src/README.md
         run: sudo apt-get update && sudo apt-get install -y git autoconf automake libtool curl make g++ unzip jq
 
+      - name: Get SHA of Protobuf repo's master branch
+        id: get-protobuf-sha
+        run: |
+          echo ::set-output name=sha::$( curl -u "u:${{github.token}}" https://api.github.com/repos/protocolbuffers/protobuf/git/ref/heads/master | jq .object.sha | tr -d '"' )
+
       - name: Checkout Protobuf repo
         uses: actions/checkout@v2
         with:
+          ref: ${{ steps.get-protobuf-sha.outputs.sha }}
           repository: protocolbuffers/protobuf
           path: protobuf
-
-      - name: Set Protobuf SHA (for caching)
-        id: get-sha
-        run: |
-          echo ::set-output name=sha::$(git log -1 '--format=format:%H')
 
       - name: Cache built Protobuf source
         id: cache-protobuf-source
         uses: actions/cache@v2
         with:
           path: protobuf
-          key: ${{ runner.os }}-protobuf-${{ steps.get-sha.outputs.sha }}
+          key: ${{ runner.os }}-protobuf-${{ steps.get-protobuf-sha.outputs.sha }}
 
       - name: Build Protobuf and the conformance test runner
         if: steps.cache-protobuf-source.outputs.cache-hit != 'true'
@@ -59,6 +63,7 @@ jobs:
           NUM_CPUS=$(getconf _NPROCESSORS_ONLN)
           make -C ./src -j "${NUM_CPUS}" protoc
           make -C ./conformance conformance-test-runner
+          echo "$PWD/src" >> $GITHUB_PATH
 
       - name: Install OTP and Elixir
         uses: erlef/setup-elixir@v1

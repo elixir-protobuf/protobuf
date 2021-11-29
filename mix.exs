@@ -143,32 +143,27 @@ defmodule Protobuf.Mixfile do
   defp gen_bootstrap_protos(_args) do
     proto_src = path_in_protobuf_source(["src", "google", "protobuf"])
 
-    Mix.shell().cmd(
-      "protoc -I \"#{proto_src}\" --elixir_out=./lib/google --plugin=./protoc-gen-elixir descriptor.proto"
-    )
-
-    Mix.shell().cmd(
-      "protoc -I \"#{proto_src}\" --elixir_out=./lib/google --plugin=./protoc-gen-elixir compiler/plugin.proto"
-    )
-
-    Mix.shell().cmd(
-      "protoc -I src --elixir_out=./lib --plugin=./protoc-gen-elixir elixirpb.proto"
-    )
+    protoc!("-I \"#{proto_src}\" --elixir_out=lib/google", ["descriptor.proto"])
+    protoc!("-I \"#{proto_src}\" --elixir_out=lib/google", ["compiler/plugin.proto"])
+    protoc!("-I src --elixir_out=lib", ["elixirpb.proto"])
 
     Mix.Task.rerun("format", ["lib/elixirpb.pb.ex", "lib/google/**/*.pb.ex"])
   end
 
   defp gen_test_protos(_args) do
-    Mix.shell().cmd(
-      "protoc -I src -I test/protobuf/protoc/proto --elixir_out=generated --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/extension.proto"
+    protoc!(
+      "-I src -I test/protobuf/protoc/proto --elixir_out=generated",
+      ["test/protobuf/protoc/proto/extension.proto"]
     )
 
-    Mix.shell().cmd(
-      "protoc -I test/protobuf/protoc/proto --elixir_out=generated --elixir_opt=package_prefix=my --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/test.proto"
+    protoc!(
+      "-I test/protobuf/protoc/proto --elixir_opt=package_prefix=my --elixir_out=generated",
+      ["test/protobuf/protoc/proto/test.proto"]
     )
 
-    Mix.shell().cmd(
-      "protoc -I test/protobuf/protoc/proto -I #{path_in_protobuf_source("src")} --elixir_out=generated --elixir_opt=gen_descriptors=true --plugin=./protoc-gen-elixir test/protobuf/protoc/proto/custom_options.proto"
+    protoc!(
+      "-I test/protobuf/protoc/proto -I #{path_in_protobuf_source("src")} --elixir_out=generated --elixir_opt=gen_descriptors=true",
+      ["test/protobuf/protoc/proto/custom_options.proto"]
     )
 
     Mix.Task.rerun("format", ["generated/**/*.pb.ex"])
@@ -176,11 +171,7 @@ defmodule Protobuf.Mixfile do
 
   defp gen_bench_protos(_args) do
     proto_bench = path_in_protobuf_source(["benchmarks"])
-
-    Mix.shell().cmd(
-      "protoc -I \"#{proto_bench}\" --elixir_out=./bench/lib --plugin=./protoc-gen-elixir #{Enum.join(benchmark_proto_files(), " ")}"
-    )
-
+    protoc!("-I \"#{proto_bench}\" --elixir_out=./bench/lib", benchmark_proto_files())
     Mix.Task.rerun("format", ["bench/**/*.pb.ex"])
   end
 
@@ -199,22 +190,14 @@ defmodule Protobuf.Mixfile do
       google/protobuf/test_messages_proto3.proto
     )
 
-    files_to_generate = Enum.join(files, " ")
-
-    Mix.shell().cmd(
-      "protoc --plugin=./protoc-gen-elixir --elixir_out=./generated -I \"#{proto_root}\" #{files_to_generate}"
-    )
+    protoc!("--elixir_out=./generated -I \"#{proto_root}\"", files)
 
     Mix.Task.rerun("format", ["generated/**/*.pb.ex"])
   end
 
   defp gen_conformance_protos(_args) do
     proto_src = path_in_protobuf_source(["conformance"])
-
-    Mix.shell().cmd(
-      "protoc --plugin=./protoc-gen-elixir --elixir_out=./generated -I \"#{proto_src}\" conformance.proto"
-    )
-
+    protoc!("--elixir_out=./generated -I \"#{proto_src}\"", ["conformance.proto"])
     Mix.Task.rerun("format", ["generated/**/*.pb.ex"])
   end
 
@@ -242,6 +225,17 @@ defmodule Protobuf.Mixfile do
       "datasets/google_message4/benchmark_message4_2.proto",
       "datasets/google_message4/benchmark_message4_3.proto"
     ]
+  end
+
+  defp protoc!(args, files_to_generate) when is_binary(args) and is_list(files_to_generate) do
+    cmd = "protoc --plugin=./protoc-gen-elixir #{args} #{Enum.join(files_to_generate, " ")}"
+
+    Mix.shell().info([:cyan, "Running: ", :reset, cmd])
+
+    case Mix.shell().cmd(cmd) do
+      0 -> :ok
+      other -> Mix.raise("protoc exited with non-zero status: #{other}")
+    end
   end
 
   defp run_conformance_tests(args) do
