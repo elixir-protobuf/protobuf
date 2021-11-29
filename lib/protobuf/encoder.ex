@@ -27,11 +27,10 @@ defmodule Protobuf.Encoder do
   end
 
   @spec encode!(struct, MessageProps.t()) :: iodata
-  def encode!(struct, %{field_props: field_props} = props) do
-    syntax = props.syntax
+  def encode!(struct, %MessageProps{field_props: field_props, syntax: syntax} = props) do
     oneofs = oneof_actual_vals(props, struct)
 
-    encoded = encode_fields(Map.values(field_props), syntax, struct, oneofs, [])
+    encoded = encode_fields(Map.values(field_props), syntax, struct, oneofs, _acc = [])
 
     encoded =
       if syntax == :proto2 do
@@ -40,31 +39,28 @@ defmodule Protobuf.Encoder do
         encoded
       end
 
-    encoded
-    |> Enum.reverse()
+    Enum.reverse(encoded)
   catch
     {e, msg, st} ->
       reraise e, msg, st
   end
 
-  defp encode_fields([], _, _, _, acc) do
+  defp encode_fields(_fields = [], _syntax, _struct, _oneofs, acc) do
     acc
   end
 
-  defp encode_fields([prop | tail], syntax, struct, oneofs, acc) do
-    %{name_atom: name, oneof: oneof} = prop
-
+  defp encode_fields(
+         [%FieldProps{name_atom: name, oneof: oneof} = prop | rest],
+         syntax,
+         struct,
+         oneofs,
+         acc
+       ) do
     val =
       if oneof do
         oneofs[name]
       else
-        case struct do
-          %{^name => v} ->
-            v
-
-          _ ->
-            nil
-        end
+        Map.get(struct, name, nil)
       end
 
     acc =
@@ -73,7 +69,7 @@ defmodule Protobuf.Encoder do
         :skip -> acc
       end
 
-    encode_fields(tail, syntax, struct, oneofs, acc)
+    encode_fields(rest, syntax, struct, oneofs, acc)
   rescue
     error ->
       msg =
@@ -82,19 +78,16 @@ defmodule Protobuf.Encoder do
       throw({Protobuf.EncodeError, [message: msg], __STACKTRACE__})
   end
 
-  @doc false
-  def skip_field?(syntax, val, prop)
-  def skip_field?(_, [], _), do: true
-  def skip_field?(_, v, _) when map_size(v) == 0, do: true
-  def skip_field?(:proto2, nil, %{optional?: true}), do: true
-  def skip_field?(:proto3, nil, _), do: true
-  def skip_field?(:proto3, 0, %{oneof: nil}), do: true
-  def skip_field?(:proto3, 0.0, %{oneof: nil}), do: true
-  def skip_field?(:proto3, "", %{oneof: nil}), do: true
-  def skip_field?(:proto3, false, %{oneof: nil}), do: true
-  def skip_field?(_, _, _), do: false
+  defp skip_field?(_syntax, [], _prop), do: true
+  defp skip_field?(_syntax, val, _prop) when is_map(val), do: map_size(val) == 0
+  defp skip_field?(:proto2, nil, %FieldProps{optional?: optional?}), do: optional?
+  defp skip_field?(:proto3, nil, _prop), do: true
+  defp skip_field?(:proto3, 0, %FieldProps{oneof: nil}), do: true
+  defp skip_field?(:proto3, 0.0, %FieldProps{oneof: nil}), do: true
+  defp skip_field?(:proto3, "", %FieldProps{oneof: nil}), do: true
+  defp skip_field?(:proto3, false, %FieldProps{oneof: nil}), do: true
+  defp skip_field?(_syntax, _val, _prop), do: false
 
-  @spec encode_field(atom, any, :proto2 | :proto3, FieldProps.t()) :: {:ok, iodata} | :skip
   defp encode_field(class_field, value, syntax, props)
 
   defp encode_field(
@@ -165,18 +158,9 @@ defmodule Protobuf.Encoder do
     end
   end
 
-  @spec class_field(map) :: atom
-  defp class_field(%{wire_type: wire_delimited(), embedded?: true}) do
-    :embedded
-  end
-
-  defp class_field(%{repeated?: true, packed?: true}) do
-    :packed
-  end
-
-  defp class_field(_) do
-    :normal
-  end
+  defp class_field(%FieldProps{wire_type: wire_delimited(), embedded?: true}), do: :embedded
+  defp class_field(%FieldProps{repeated?: true, packed?: true}), do: :packed
+  defp class_field(_prop), do: :normal
 
   @doc false
   @spec encode_fnum(integer, integer) :: binary
