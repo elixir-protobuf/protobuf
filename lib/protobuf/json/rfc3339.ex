@@ -46,6 +46,8 @@ defmodule Protobuf.JSON.RFC3339 do
   # don't return them. They are just used for "skipping ahead". The "parse_*" functions are the
   # only ones that return data.
 
+  alias Protobuf.JSON.Utils
+
   @spec decode(String.t()) ::
           {:ok, seconds :: integer(), nanos :: non_neg_integer()} | {:error, String.t()}
   def decode(string) when is_binary(string) do
@@ -84,16 +86,9 @@ defmodule Protobuf.JSON.RFC3339 do
         string = DateTime.to_iso8601(datetime)
 
         if nanos > 0 do
-          nanos_str =
-            nanos
-            |> Integer.to_string()
-            |> String.pad_leading(9, "0")
-            |> String.trim_trailing("000")
-            |> String.trim_trailing("000")
-
           bytes_before_time_secfrac = unquote(byte_size("1970-01-01T00:00:00"))
           {before_secfrac, after_secfrac} = String.split_at(string, bytes_before_time_secfrac)
-          {:ok, before_secfrac <> "." <> nanos_str <> after_secfrac}
+          {:ok, before_secfrac <> "." <> Utils.format_nanoseconds(nanos) <> after_secfrac}
         else
           {:ok, string}
         end
@@ -139,26 +134,13 @@ defmodule Protobuf.JSON.RFC3339 do
   # Grammar:
   # time-secfrac    = "." 1*DIGIT
   defp parse_time_secfrac("." <> rest) do
-    case parse_nanosec(rest, _acc = 0, _power = 100_000_000) do
-      {_, ^rest} -> throw("bad time secfrac after \".\", got: #{inspect(rest)}")
+    case Utils.parse_nanoseconds(rest) do
       {secfrac_nano, rest} -> {secfrac_nano, rest}
+      :error -> throw("bad time secfrac after \".\", got: #{inspect(rest)}")
     end
   end
 
   defp parse_time_secfrac(rest), do: {0, rest}
-
-  defp parse_nanosec(<<digit, _rest::binary>>, _acc, _power = 0) when digit in ?0..?9 do
-    throw("expected a max of 9 digits for the second fraction")
-  end
-
-  defp parse_nanosec(<<digit, rest::binary>>, acc, power) when digit in ?0..?9 do
-    digit = digit - ?0
-    parse_nanosec(rest, acc + digit * power, div(power, 10))
-  end
-
-  defp parse_nanosec(rest, acc, _power) do
-    {acc, rest}
-  end
 
   defp eat_literal(string, literal) do
     literal_size = byte_size(literal)
