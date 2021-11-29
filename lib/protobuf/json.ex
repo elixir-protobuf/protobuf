@@ -25,15 +25,15 @@ defmodule Protobuf.JSON do
   | `int64, fixed64, uint64` | `string`              | Yes       |
   | `float, double`          | `number`              | Yes       |
   | `Any`                    | `object`              | No        |
-  | `Timestamp`              | `string`              | No        |
-  | `Duration`               | `string`              | No        |
-  | `Struct`                 | `object`              | No        |
-  | `Wrapper types`          | `various types`       | No        |
-  | `FieldMask`              | `string`              | No        |
-  | `ListValue`              | `array [foo, bar, …]` | No        |
-  | `Value`                  | `value`               | No        |
-  | `NullValue`              | `null`                | No        |
-  | `Empty`                  | `object`              | No        |
+  | `Timestamp`              | `string`              | Yes       |
+  | `Duration`               | `string`              | Yes       |
+  | `Struct`                 | `object`              | Yes       |
+  | `Wrapper types`          | `various types`       | Yes       |
+  | `FieldMask`              | `string`              | Yes       |
+  | `ListValue`              | `array [foo, bar, …]` | Yes       |
+  | `Value`                  | `value`               | Yes       |
+  | `NullValue`              | `null`                | Yes       |
+  | `Empty`                  | `object`              | Yes       |
 
   ## Usage
 
