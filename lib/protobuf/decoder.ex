@@ -4,18 +4,18 @@ defmodule Protobuf.Decoder do
   import Protobuf.{Wire.Types, Wire.Varint}
   import Bitwise, only: [bsr: 2, band: 2]
 
-  alias Protobuf.{DecodeError, Wire}
+  alias Protobuf.{DecodeError, FieldProps, MessageProps, Wire}
 
   @compile {:inline,
             decode_field: 3, skip_varint: 4, skip_delimited: 4, reverse_repeated: 2, field_key: 2}
 
-  @spec decode(binary, atom) :: any
-  def decode(bin, module) do
-    props = module.__message_props__()
+  @spec decode(binary(), module()) :: term()
+  def decode(bin, module) when is_binary(bin) and is_atom(module) do
+    %MessageProps{repeated_fields: repeated_fields} = props = module.__message_props__()
 
     bin
     |> build_message(module.new(), props)
-    |> reverse_repeated(props.repeated_fields)
+    |> reverse_repeated(repeated_fields)
     |> transform_module(module)
   end
 
@@ -66,8 +66,9 @@ defmodule Protobuf.Decoder do
     handle_value(rest, field_number, wire_64bits(), value, message, props)
   end
 
-  defp handle_field(_bin, _field_number, _wire_type, _message, _props) do
-    raise Protobuf.DecodeError, message: "cannot decode binary data"
+  defp handle_field(_bin, _field_number, wire_type, _message, _props) do
+    raise Protobuf.DecodeError,
+      message: "cannot decode binary data, unknonw wire type: #{inspect(wire_type)}"
   end
 
   decoder :defp, :skip_field, [:message, :props, :groups] do
@@ -128,22 +129,21 @@ defmodule Protobuf.Decoder do
 
   defp handle_value(<<bin::bits>>, field_number, wire_type, value, message, props) do
     case props.field_props do
-      %{^field_number => %{packed?: true} = prop} ->
-        key = prop.name_atom
-        current_value = Map.get(message, key)
+      %{^field_number => %FieldProps{packed?: true, name_atom: name_atom} = prop} ->
+        current_value = Map.get(message, name_atom)
         new_value = value_for_packed(value, current_value, prop)
-        new_message = Map.put(message, key, new_value)
+        new_message = Map.put(message, name_atom, new_value)
         build_message(bin, new_message, props)
 
-      %{^field_number => %{wire_type: ^wire_type} = prop} ->
+      %{^field_number => %FieldProps{wire_type: ^wire_type} = prop} ->
         key = field_key(prop, props)
         current_value = Map.get(message, key)
         new_value = value_for_field(value, current_value, prop)
         new_message = Map.put(message, key, new_value)
         build_message(bin, new_message, props)
 
-      %{^field_number => %{wire_type: wanted, name: field}} ->
-        message = "wrong wire_type for #{field}: got #{wire_type}, want #{wanted}"
+      %{^field_number => %FieldProps{wire_type: expected, name: field}} ->
+        message = "wrong wire_type for field #{field}: got #{wire_type}, expected #{expected}"
         raise DecodeError, message: message
 
       %{} ->
@@ -164,14 +164,17 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  defp value_for_field(value, current, %{embedded?: false} = prop) do
-    val = Wire.to_proto(prop.type, value)
-    val = if prop.oneof, do: {prop.name_atom, val}, else: val
+  defp value_for_field(value, current, %FieldProps{embedded?: false} = prop) do
+    %FieldProps{type: type, name_atom: name_atom, oneof: oneof, repeated?: repeated?} = prop
 
-    case {current, prop.repeated?} do
-      {nil, true} -> [val]
-      {current, true} -> [val | current]
-      _ -> val
+    val = Wire.to_proto(type, value)
+    val = if oneof, do: {name_atom, val}, else: val
+
+    if repeated? do
+      # List.wrap/1 wraps nil into [].
+      [val | List.wrap(current)]
+    else
+      val
     end
   end
 
@@ -188,17 +191,18 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  defp value_for_packed(bin, current, prop) do
-    acc = current || []
+  defp value_for_packed(bin, current, %FieldProps{type: type, wire_type: wire_type}) do
+    # List.wrap/1 wraps nil into [].
+    current = List.wrap(current)
 
-    case prop.wire_type do
-      wire_varint() -> decode_varints(bin, prop.type, acc)
-      wire_32bits() -> decode_fixed32(bin, prop.type, acc)
-      wire_64bits() -> decode_fixed64(bin, prop.type, acc)
+    case wire_type do
+      wire_varint() -> decode_varints(bin, type, current)
+      wire_32bits() -> decode_fixed32(bin, type, current)
+      wire_64bits() -> decode_fixed64(bin, type, current)
     end
   end
 
-  defp decode_varints(<<>>, _, acc), do: acc
+  defp decode_varints(<<>>, _type, acc), do: acc
 
   decoder :defp, :decode_varints, [:type, :acc] do
     decode_varints(rest, type, [Wire.to_proto(type, value) | acc])
@@ -208,30 +212,30 @@ defmodule Protobuf.Decoder do
     decode_fixed32(bin, type, [Wire.to_proto(type, n) | acc])
   end
 
-  defp decode_fixed32(<<>>, _, acc), do: acc
+  defp decode_fixed32(<<>>, _type, acc), do: acc
 
   defp decode_fixed64(<<n::bits-64, bin::bits>>, type, acc) do
     decode_fixed64(bin, type, [Wire.to_proto(type, n) | acc])
   end
 
-  defp decode_fixed64(<<>>, _, acc), do: acc
+  defp decode_fixed64(<<>>, _type, acc), do: acc
 
-  defp reverse_repeated(msg, [h | t]) do
-    case msg do
-      %{^h => val} when is_list(val) ->
-        reverse_repeated(Map.put(msg, h, Enum.reverse(val)), t)
+  defp reverse_repeated(message, repeated_fields) do
+    Enum.reduce(repeated_fields, message, fn repeated_field, message_acc ->
+      case message_acc do
+        %{^repeated_field => values} when is_list(values) ->
+          %{message_acc | repeated_field => Enum.reverse(values)}
 
-      _ ->
-        reverse_repeated(msg, t)
-    end
+        _other ->
+          message_acc
+      end
+    end)
   end
 
-  defp reverse_repeated(msg, []), do: msg
+  defp field_key(%FieldProps{oneof: nil, name_atom: key}, _message_props), do: key
 
-  defp field_key(%{oneof: nil, name_atom: field_key}, _message_props), do: field_key
-
-  defp field_key(%{oneof: oneof_number}, %{oneof: oneofs}) do
-    {field_key, ^oneof_number} = Enum.at(oneofs, oneof_number)
-    field_key
+  defp field_key(%FieldProps{oneof: oneof_number}, %MessageProps{oneof: oneofs}) do
+    {key, ^oneof_number} = Enum.at(oneofs, oneof_number)
+    key
   end
 end

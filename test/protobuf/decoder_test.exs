@@ -21,7 +21,7 @@ defmodule Protobuf.DecoderTest do
   end
 
   test "raises for wrong wire type" do
-    assert_raise(Protobuf.DecodeError, ~r{wrong wire_type for a: got 1, want 0}, fn ->
+    assert_raise(Protobuf.DecodeError, ~r{wrong wire_type for field a: got 1, expected 0}, fn ->
       Decoder.decode(<<9, 42, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo)
     end)
   end

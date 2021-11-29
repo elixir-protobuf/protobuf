@@ -364,25 +364,25 @@ defmodule Protobuf.WireTest do
     end
 
     test "mismatching fixed-length sizes" do
-      msg = "can't decode <<0, 0, 0>> into type fixed32"
+      msg = "can't decode <<0, 0, 0>> into type :fixed32"
 
       assert_raise Protobuf.DecodeError, msg, fn ->
         Wire.to_proto(:fixed32, <<0, 0, 0>>)
       end
 
-      msg = "can't decode <<0, 0, 0, 0, 0>> into type fixed32"
+      msg = "can't decode <<0, 0, 0, 0, 0>> into type :fixed32"
 
       assert_raise Protobuf.DecodeError, msg, fn ->
         Wire.to_proto(:fixed32, <<0, 0, 0, 0, 0>>)
       end
 
-      msg = "can't decode <<0, 0, 0, 0, 0, 0, 0>> into type fixed64"
+      msg = "can't decode <<0, 0, 0, 0, 0, 0, 0>> into type :fixed64"
 
       assert_raise Protobuf.DecodeError, msg, fn ->
         Wire.to_proto(:fixed64, <<0, 0, 0, 0, 0, 0, 0>>)
       end
 
-      msg = "can't decode <<0, 0, 0, 0, 0, 0, 0, 0, 0>> into type fixed64"
+      msg = "can't decode <<0, 0, 0, 0, 0, 0, 0, 0, 0>> into type :fixed64"
 
       assert_raise Protobuf.DecodeError, msg, fn ->
         Wire.to_proto(:fixed64, <<0, 0, 0, 0, 0, 0, 0, 0, 0>>)
