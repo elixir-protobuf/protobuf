@@ -88,63 +88,54 @@ defmodule Protobuf.Encoder do
   defp skip_field?(:proto3, false, %FieldProps{oneof: nil}), do: true
   defp skip_field?(_syntax, _val, _prop), do: false
 
-  defp encode_field(class_field, value, syntax, props)
-
   defp encode_field(
          :normal,
          val,
          syntax,
-         %{encoded_fnum: fnum, type: type, repeated?: is_repeated} = prop
+         %FieldProps{encoded_fnum: fnum, type: type, repeated?: repeated?} = prop
        ) do
     if skip_field?(syntax, val, prop) or skip_enum?(syntax, val, prop) do
       :skip
     else
-      iodata =
-        repeated_or_not(val, is_repeated, fn v ->
-          [fnum | Wire.from_proto(type, v)]
-        end)
-
+      iodata = apply_or_map(val, repeated?, &[fnum | Wire.from_proto(type, &1)])
       {:ok, iodata}
     end
+  end
+
+  defp encode_field(:embedded, _val = nil, _syntax, _prop) do
+    :skip
   end
 
   defp encode_field(
          :embedded,
          val,
          syntax,
-         %{encoded_fnum: fnum, repeated?: is_repeated, map?: is_map, type: type} = prop
+         %{encoded_fnum: fnum, repeated?: repeated?, map?: map?, type: type} = prop
        ) do
-    if val == nil do
-      :skip
-    else
-      repeated = is_repeated || is_map
+    result =
+      apply_or_map(val, repeated? || map?, fn val ->
+        val = transform_module(val, type)
 
-      result =
-        repeated_or_not(val, repeated, fn val ->
-          val = transform_module(val, type)
+        if skip_field?(syntax, val, prop) do
+          ""
+        else
+          val = if map?, do: struct(type, %{key: elem(val, 0), value: elem(val, 1)}), else: val
 
-          if skip_field?(syntax, val, prop) do
-            ""
-          else
-            val =
-              if is_map, do: struct(type, %{key: elem(val, 0), value: elem(val, 1)}), else: val
+          # so that oneof {:atom, val} can be encoded
+          encoded = encode(type, val, iolist: true)
+          byte_size = IO.iodata_length(encoded)
+          [fnum | Varint.encode(byte_size)] ++ encoded
+        end
+      end)
 
-            # so that oneof {:atom, val} can be encoded
-            encoded = encode(type, val, iolist: true)
-            byte_size = IO.iodata_length(encoded)
-            [fnum | Varint.encode(byte_size)] ++ encoded
-          end
-        end)
-
-      {:ok, result}
-    end
+    {:ok, result}
   end
 
-  defp encode_field(:packed, val, syntax, %{type: type, encoded_fnum: fnum} = prop) do
+  defp encode_field(:packed, val, syntax, %FieldProps{type: type, encoded_fnum: fnum} = prop) do
     if skip_field?(syntax, val, prop) or skip_enum?(syntax, val, prop) do
       :skip
     else
-      encoded = Enum.map(val, fn v -> Wire.from_proto(type, v) end)
+      encoded = Enum.map(val, &Wire.from_proto(type, &1))
       byte_size = IO.iodata_length(encoded)
       {:ok, [fnum | Varint.encode(byte_size)] ++ encoded}
     end
@@ -193,24 +184,21 @@ defmodule Protobuf.Encoder do
   def wire_type(:float), do: wire_32bits()
   def wire_type(mod) when is_atom(mod), do: wire_delimited()
 
-  defp repeated_or_not(val, repeated, func) do
-    if repeated do
-      Enum.map(val, func)
-    else
-      func.(val)
-    end
-  end
+  defp apply_or_map(val, _repeated? = true, func), do: Enum.map(val, func)
+  defp apply_or_map(val, _repeated? = false, func), do: func.(val)
 
-  defp skip_enum?(syntax, value, prop)
-  defp skip_enum?(:proto2, _, _), do: false
-  defp skip_enum?(_, _, %{enum?: false}), do: false
-  defp skip_enum?(_, _, %{enum?: true, oneof: oneof}) when not is_nil(oneof), do: false
-  defp skip_enum?(_, _, %{required?: true}), do: false
-  defp skip_enum?(_, value, %{type: type}), do: is_enum_default?(type, value)
+  defp skip_enum?(:proto2, _value, _prop), do: false
+  defp skip_enum?(_syntax, _value, %FieldProps{enum?: false}), do: false
 
-  defp is_enum_default?({_, type}, v) when is_atom(v), do: type.value(v) == 0
-  defp is_enum_default?({_, _}, v) when is_integer(v), do: v == 0
-  defp is_enum_default?({_, _}, _), do: false
+  defp skip_enum?(_syntax, _value, %FieldProps{enum?: true, oneof: oneof}) when not is_nil(oneof),
+    do: false
+
+  defp skip_enum?(_syntax, _value, %FieldProps{required?: true}), do: false
+  defp skip_enum?(_syntax, value, %FieldProps{type: type}), do: enum_default?(type, value)
+
+  defp enum_default?({:enum, enum_mod}, val) when is_atom(val), do: enum_mod.value(val) == 0
+  defp enum_default?({:enum, _enum_mod}, val) when is_integer(val), do: val == 0
+  defp enum_default?({:enum, _enum_mod}, list) when is_list(list), do: false
 
   defp oneof_actual_vals(
          %{field_tags: field_tags, field_props: field_props, oneof: oneof},
