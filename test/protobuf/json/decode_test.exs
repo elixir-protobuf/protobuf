@@ -692,5 +692,44 @@ defmodule Protobuf.JSON.DecodeTest do
                   optional_string_wrapper: Google.Protobuf.UInt64Value.new!(value: "my string")
                 )}
     end
+
+    test "Google.Protobuf.Duration" do
+      cases = [
+        %{string: "123s", seconds: 123, nanos: 0},
+        %{string: "123.001s", seconds: 123, nanos: 1_000_000},
+        %{string: "123.000s", seconds: 123, nanos: 0},
+        %{string: "0.000000001s", seconds: 0, nanos: 1},
+        %{string: "-1s", seconds: -1, nanos: 0},
+        %{string: "-1.1s", seconds: -1, nanos: -100_000_000}
+      ]
+
+      for %{string: string, seconds: expected_seconds, nanos: expected_nanos} <- cases do
+        data = %{"optionalDuration" => string}
+
+        expected_duration =
+          TestAllTypesProto3.new(
+            optional_duration:
+              Google.Protobuf.Duration.new!(seconds: expected_seconds, nanos: expected_nanos)
+          )
+
+        assert decode(data, TestAllTypesProto3) == {:ok, expected_duration}
+      end
+
+      # Errors
+
+      max_duration = 315_576_000_000
+
+      data = %{"optionalDuration" => "#{max_duration + 1}s"}
+
+      assert decode(data, TestAllTypesProto3) ==
+               error("bad JSON value for duration \"315576000001s\", got: {315576000001, \"s\"}")
+
+      data = %{"optionalDuration" => "#{-max_duration - 1}s"}
+
+      assert decode(data, TestAllTypesProto3) ==
+               error(
+                 "bad JSON value for duration \"-315576000001s\", got: {-315576000001, \"s\"}"
+               )
+    end
   end
 end

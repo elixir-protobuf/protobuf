@@ -41,6 +41,8 @@ defmodule Protobuf.JSON.Decode do
 
   @float_types [:float, :double]
 
+  @duration_seconds_range -315_576_000_000..315_576_000_000
+
   @spec from_json_data(term(), module()) :: struct()
   def from_json_data(term, module)
 
@@ -51,13 +53,15 @@ defmodule Protobuf.JSON.Decode do
 
   def from_json_data(string, Google.Protobuf.Duration = mod) when is_binary(string) do
     case Integer.parse(string) do
-      {seconds, "s"} ->
+      {seconds, "s"} when seconds in @duration_seconds_range ->
         mod.new!(seconds: seconds)
 
-      {seconds, "." <> nanos_with_s} when (byte_size(nanos_with_s) - 1) in 1..9 ->
-        case Integer.parse(nanos_with_s) do
-          {nanos, "s"} -> mod.new!(seconds: seconds, nanos: nanos)
-          other -> throw({:bad_duration, string, other})
+      {seconds, "." <> nanos_with_s} when seconds in @duration_seconds_range ->
+        sign = if seconds < 0, do: -1, else: 1
+
+        case Utils.parse_nanoseconds(nanos_with_s) do
+          {nanos, "s"} -> mod.new!(seconds: seconds, nanos: nanos * sign)
+          :error -> throw({:bad_duration, string, nanos_with_s})
         end
 
       other ->
