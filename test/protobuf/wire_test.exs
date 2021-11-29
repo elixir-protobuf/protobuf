@@ -54,6 +54,16 @@ defmodule Protobuf.WireTest do
       assert encode({:enum, TestMsg.EnumFoo}, 5) == <<5>>
     end
 
+    test "wrong enum" do
+      assert_raise Protobuf.TypeEncodeError, fn ->
+        encode({:enum, TestMsg.EnumFoo}, "invalid")
+      end
+
+      assert_raise Protobuf.TypeEncodeError, fn ->
+        encode({:enum, TestMsg.EnumFoo}, 0.1)
+      end
+    end
+
     test "a fixed64" do
       assert encode(:fixed64, 8_446_744_073_709_551_615) ==
                <<255, 255, 23, 118, 251, 220, 56, 117>>
@@ -376,6 +386,14 @@ defmodule Protobuf.WireTest do
 
       assert_raise Protobuf.DecodeError, msg, fn ->
         Wire.to_proto(:fixed64, <<0, 0, 0, 0, 0, 0, 0, 0, 0>>)
+      end
+    end
+
+    test "Protobuf.DecodeError when unknown or mismatched type" do
+      msg = "can't decode <<0>> into type {:enum, \"invalid\"}"
+
+      assert_raise Protobuf.DecodeError, msg, fn ->
+        Wire.to_proto({:enum, "invalid"}, <<0>>)
       end
     end
   end

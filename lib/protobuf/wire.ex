@@ -1,7 +1,5 @@
 defmodule Protobuf.Wire do
-  @moduledoc """
-  Utilities to convert data from wire format to protobuf and back.
-  """
+  @moduledoc false
 
   alias Protobuf.Wire.{Varint, Zigzag}
 
@@ -23,22 +21,23 @@ defmodule Protobuf.Wire do
           | :bool
           | :string
           | :bytes
-          | {:enum, any}
+          | {:enum, module() | integer()}
 
-  @type proto_float :: :infinity | :negative_infinity | :nan | float
+  @type proto_float() :: :infinity | :negative_infinity | :nan | float()
 
-  @type proto_value :: binary | integer | boolean | proto_float | atom
+  @type proto_value() :: binary() | integer() | boolean() | proto_float() | atom()
 
   @sint32_range -0x80000000..0x7FFFFFFF
   @sint64_range -0x8000000000000000..0x7FFFFFFFFFFFFFFF
   @uint32_range 0..0xFFFFFFFF
   @uint64_range 0..0xFFFFFFFFFFFFFFFF
 
-  @spec from_proto(proto_type, proto_value) :: iodata
+  @spec from_proto(proto_type(), proto_value()) :: iodata()
+  def from_proto(type, value)
+
   # Returns improper list, but still valid iodata.
-  def from_proto(type, binary) when type in [:string, :bytes] do
-    len = binary |> IO.iodata_length() |> Varint.encode()
-    len ++ binary
+  def from_proto(type, binary) when is_binary(binary) and type in [:string, :bytes] do
+    Varint.encode(byte_size(binary)) ++ binary
   end
 
   def from_proto(:int32, n) when n in @sint32_range, do: Varint.encode(n)
@@ -49,8 +48,11 @@ defmodule Protobuf.Wire do
   def from_proto(:bool, true), do: Varint.encode(1)
   def from_proto(:bool, false), do: Varint.encode(0)
 
-  def from_proto({:enum, enum}, key) when is_atom(key), do: Varint.encode(enum.value(key))
-  def from_proto({:enum, _}, n) when is_integer(n), do: Varint.encode(n)
+  def from_proto({:enum, enum_mod}, key) when is_atom(enum_mod) and is_atom(key),
+    do: Varint.encode(enum_mod.value(key))
+
+  def from_proto({:enum, enum_mod}, n) when is_atom(enum_mod) and is_integer(n),
+    do: Varint.encode(n)
 
   def from_proto(:float, :infinity), do: [0, 0, 128, 127]
   def from_proto(:float, :negative_infinity), do: [0, 0, 128, 255]
@@ -69,11 +71,14 @@ defmodule Protobuf.Wire do
   def from_proto(:sfixed32, n) when n in @sint32_range, do: <<n::32-signed-little>>
   def from_proto(:sfixed64, n) when n in @sint64_range, do: <<n::64-signed-little>>
 
-  def from_proto(type, n) do
-    raise Protobuf.TypeEncodeError, message: "#{inspect(n)} is invalid for type #{type}"
+  def from_proto(type, value) do
+    raise Protobuf.TypeEncodeError,
+      message: "#{inspect(value)} is invalid for type #{inspect(type)}"
   end
 
-  @spec to_proto(proto_type, binary | integer) :: proto_value
+  @spec to_proto(proto_type(), binary() | integer()) :: proto_value()
+  def to_proto(type, value)
+
   def to_proto(type, val) when type in [:string, :bytes], do: val
 
   def to_proto(:int32, val) do
@@ -98,11 +103,11 @@ defmodule Protobuf.Wire do
 
   def to_proto(:bool, val), do: val != 0
 
-  def to_proto({:enum, enum}, val) do
-    enum.key(val)
+  def to_proto({:enum, enum_mod}, val) when is_atom(enum_mod) and is_integer(val) do
+    enum_mod.key(val)
   rescue
     FunctionClauseError ->
-      Logger.warn("unknown enum value #{val} when decoding for #{inspect(enum)}")
+      Logger.warn("unknown enum value #{val} when decoding for #{inspect(enum_mod)}")
       val
   end
 
@@ -131,6 +136,6 @@ defmodule Protobuf.Wire do
   def to_proto(:sfixed64, <<n::little-signed-64>>), do: n
 
   def to_proto(type, val) do
-    raise Protobuf.DecodeError, message: "can't decode #{inspect(val)} into type #{type}"
+    raise Protobuf.DecodeError, message: "can't decode #{inspect(val)} into type #{inspect(type)}"
   end
 end
