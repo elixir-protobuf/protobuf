@@ -593,8 +593,6 @@ Required.Proto3.JsonInput.EnumFieldWithAliasLowerCase.JsonOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasLowerCase.ProtobufOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasUseAlias.JsonOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasUseAlias.ProtobufOutput
-Required.Proto3.JsonInput.TimestampJsonInputTooSmall
-Required.Proto3.JsonInput.TimestampJsonInputTooSmall
 Required.Proto3.ProtobufInput.IllegalZeroFieldNum_Case_0
 Required.Proto3.ProtobufInput.IllegalZeroFieldNum_Case_1
 Required.Proto3.ProtobufInput.IllegalZeroFieldNum_Case_2
@@ -637,4 +635,3 @@ Required.Proto3.ProtobufInput.ValidDataScalar.ENUM[4].JsonOutput
 Required.Proto3.ProtobufInput.ValidDataScalar.ENUM[5].JsonOutput
 Required.Proto3.ProtobufInput.ValidDataScalar.SINT32[4].JsonOutput
 Required.Proto3.ProtobufInput.ValidDataScalar.SINT32[4].ProtobufOutput
-  Required.TimestampProtoInputTooSmall.JsonOutput

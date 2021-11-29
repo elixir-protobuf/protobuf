@@ -731,5 +731,16 @@ defmodule Protobuf.JSON.DecodeTest do
                  "bad JSON value for duration \"-315576000001s\", got: {-315576000001, \"s\"}"
                )
     end
+
+    test "Google.Protobuf.Timestamp" do
+      # Errors
+
+      data = %{"optionalTimestamp" => "0000-01-01T00:00:00Z"}
+
+      assert decode(data, TestAllTypesProto3) ==
+               error(
+                 "bad JSON value for timestamp \"0000-01-01T00:00:00Z\", failed to parse: \"timestamp is outside of allowed range\""
+               )
+    end
   end
 end

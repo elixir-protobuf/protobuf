@@ -58,12 +58,16 @@ defmodule Protobuf.JSON.RFC3339 do
 
     case DateTime.from_iso8601(string) do
       {:ok, datetime, _offset_in_seconds} ->
-        seconds =
-          datetime
-          |> DateTime.truncate(:second)
-          |> DateTime.to_unix(:second)
+        if datetime_in_allowed_range?(datetime) do
+          seconds =
+            datetime
+            |> DateTime.truncate(:second)
+            |> DateTime.to_unix(:second)
 
-        {:ok, seconds, time_secfrac_nano}
+          {:ok, seconds, time_secfrac_nano}
+        else
+          {:error, "timestamp is outside of allowed range"}
+        end
 
       {:error, reason} ->
         {:error, Atom.to_string(reason)}
@@ -83,14 +87,18 @@ defmodule Protobuf.JSON.RFC3339 do
   def encode(seconds, nanos) when is_integer(seconds) and is_integer(nanos) and nanos >= 0 do
     case DateTime.from_unix(seconds, :second) do
       {:ok, datetime} ->
-        string = DateTime.to_iso8601(datetime)
+        if datetime_in_allowed_range?(datetime) do
+          string = DateTime.to_iso8601(datetime)
 
-        if nanos > 0 do
-          bytes_before_time_secfrac = unquote(byte_size("1970-01-01T00:00:00"))
-          {before_secfrac, after_secfrac} = String.split_at(string, bytes_before_time_secfrac)
-          {:ok, before_secfrac <> "." <> Utils.format_nanoseconds(nanos) <> after_secfrac}
+          if nanos > 0 do
+            bytes_before_time_secfrac = unquote(byte_size("1970-01-01T00:00:00"))
+            {before_secfrac, after_secfrac} = String.split_at(string, bytes_before_time_secfrac)
+            {:ok, before_secfrac <> "." <> Utils.format_nanoseconds(nanos) <> after_secfrac}
+          else
+            {:ok, string}
+          end
         else
-          {:ok, string}
+          {:error, "timestamp is outside of allowed range"}
         end
 
       {:error, reason} ->
@@ -183,5 +191,15 @@ defmodule Protobuf.JSON.RFC3339 do
       _other ->
         throw("expected #{count} digits, got: #{inspect(string)}")
     end
+  end
+
+  {:ok, min_datetime, 0} = DateTime.from_iso8601("0001-01-01T00:00:00Z")
+  {:ok, max_datetime, 0} = DateTime.from_iso8601("9999-12-31T23:59:59Z")
+
+  defp datetime_in_allowed_range?(datetime) do
+    truncated = DateTime.truncate(datetime, :second)
+
+    DateTime.compare(truncated, unquote(Macro.escape(min_datetime))) in [:gt, :eq] and
+      DateTime.compare(truncated, unquote(Macro.escape(max_datetime))) in [:lt, :eq]
   end
 end

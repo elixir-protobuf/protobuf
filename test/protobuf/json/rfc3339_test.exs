@@ -14,6 +14,15 @@ defmodule Protobuf.JSON.RFC3339Test do
       assert nanos == 310_017_000
     end
 
+    test "returns {:error, reason} if the timestamp is outside of the allowed range" do
+      assert {:error, reason} = RFC3339.decode("0000-01-01T00:00:00Z")
+      assert reason == "timestamp is outside of allowed range"
+    end
+
+    test "returns {:ok, seconds, nanos} for the latest possible timestamp" do
+      assert {:ok, _seconds, 999_999_999} = RFC3339.decode("9999-12-31T23:59:59.999999999Z")
+    end
+
     property "returns the right nanoseconds regardless of how many digits" do
       check all digits_count <- member_of([3, 6, 9]),
                 max_range = String.to_integer(String.duplicate("9", digits_count)),

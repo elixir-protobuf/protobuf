@@ -282,4 +282,17 @@ defmodule Protobuf.JSON.EncodeTest do
                {:bad_duration, :seconds_outside_of_range, -max_duration - 1}
     end
   end
+
+  describe "Google.Protobuf.Timestamp" do
+    test "returns an error if the timestamp is outside of the allowed range" do
+      {:ok, datetime, _offset = 0} = DateTime.from_iso8601("0000-01-01T00:00:00Z")
+      unix_seconds = DateTime.to_unix(datetime, :second)
+
+      timestamp = Google.Protobuf.Timestamp.new!(seconds: unix_seconds, nanos: 0)
+      message = TestAllTypesProto3.new!(optional_timestamp: timestamp)
+
+      assert catch_throw(encode(message)) ==
+               {:invalid_timestamp, timestamp, "timestamp is outside of allowed range"}
+    end
+  end
 end
