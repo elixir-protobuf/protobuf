@@ -60,6 +60,7 @@ jobs:
           ./configure
           NUM_CPUS=$(getconf _NPROCESSORS_ONLN)
           make -C ./src -j "${NUM_CPUS}" protoc
+          echo "$PWD/src" >> $GITHUB_PATH
           make -C ./conformance conformance-test-runner
 
       - name: Install OTP and Elixir
