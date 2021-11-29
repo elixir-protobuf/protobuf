@@ -27,7 +27,7 @@ defmodule Protobuf.DecoderTest do
   end
 
   test "raises for bad binaries" do
-    assert_raise(Protobuf.DecodeError, ~r{cannot decode binary data}, fn ->
+    assert_raise(Protobuf.DecodeError, ~r{invalid field number 0 when decoding binary data}, fn ->
       Decoder.decode(<<0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo)
     end)
   end
