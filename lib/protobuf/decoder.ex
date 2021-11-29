@@ -36,7 +36,12 @@ defmodule Protobuf.Decoder do
   decoder :defp, :decode_field, [:message, :props] do
     field_number = bsr(value, 3)
     wire_type = band(value, 7)
-    handle_field(rest, field_number, wire_type, message, props)
+
+    if field_number != 0 do
+      handle_field(rest, field_number, wire_type, message, props)
+    else
+      raise Protobuf.DecodeError, message: "invalid field number 0 when decoding binary data"
+    end
   end
 
   defp handle_field(<<bin::bits>>, field_number, wire_start_group(), message, props) do

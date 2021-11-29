@@ -260,10 +260,6 @@ Recommended.Proto3.ProtobufInput.ValidDataScalarBinary.ENUM[4].ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataScalarBinary.ENUM[5].ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataScalarBinary.SINT32[4].ProtobufOutput
 Required.Proto2.JsonInput.StoresDefaultPrimitive.Validator
-Required.Proto2.ProtobufInput.IllegalZeroFieldNum_Case_0
-Required.Proto2.ProtobufInput.IllegalZeroFieldNum_Case_1
-Required.Proto2.ProtobufInput.IllegalZeroFieldNum_Case_2
-Required.Proto2.ProtobufInput.IllegalZeroFieldNum_Case_3
 Required.Proto2.ProtobufInput.RepeatedScalarMessageMerge.ProtobufOutput
 Required.Proto2.ProtobufInput.RepeatedScalarSelectsLast.BOOL.ProtobufOutput
 Required.Proto2.ProtobufInput.RepeatedScalarSelectsLast.BYTES.ProtobufOutput
@@ -575,10 +571,6 @@ Required.Proto3.JsonInput.AnyWithValueForInteger.JsonOutput
 Required.Proto3.JsonInput.AnyWithValueForInteger.ProtobufOutput
 Required.Proto3.JsonInput.AnyWithValueForJsonObject.JsonOutput
 Required.Proto3.JsonInput.AnyWithValueForJsonObject.ProtobufOutput
-Required.Proto3.ProtobufInput.IllegalZeroFieldNum_Case_0
-Required.Proto3.ProtobufInput.IllegalZeroFieldNum_Case_1
-Required.Proto3.ProtobufInput.IllegalZeroFieldNum_Case_2
-Required.Proto3.ProtobufInput.IllegalZeroFieldNum_Case_3
 Required.Proto3.ProtobufInput.RepeatedScalarMessageMerge.JsonOutput
 Required.Proto3.ProtobufInput.RepeatedScalarMessageMerge.ProtobufOutput
 Required.Proto3.ProtobufInput.RepeatedScalarSelectsLast.ENUM.JsonOutput
