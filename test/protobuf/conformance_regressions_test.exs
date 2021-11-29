@@ -7,7 +7,7 @@ defmodule Protobuf.ConformanceRegressionsTest do
   describe "proto3" do
     @describetag message_type: "protobuf_test_messages.proto3.TestAllTypesProto3"
 
-    @tag :skip
+    @tag skip: "Issue #218"
     @tag conformance_input: ~S(\250\037\001)
     test "Required.Proto3.ProtobufInput.UnknownVarint.ProtobufOutput",
          %{proto_input: proto_input, message_mod: message_mod} do

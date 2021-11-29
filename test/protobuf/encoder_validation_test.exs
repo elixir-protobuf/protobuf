@@ -111,7 +111,7 @@ defmodule Protobuf.EncoderTest.Validation do
   test "oneof field doesn't match" do
     msg = TestMsg.Oneof.new(first: {:c, 42})
 
-    assert_raise Protobuf.EncodeError, ~r/:c doesn't belongs to TestMsg.Oneof#first/, fn ->
+    assert_raise Protobuf.EncodeError, ~r/:c doesn't belong to TestMsg.Oneof#first/, fn ->
       Protobuf.Encoder.encode(msg)
     end
   end

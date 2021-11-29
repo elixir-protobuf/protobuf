@@ -32,14 +32,11 @@ defmodule Protobuf.Encoder do
 
     encoded = encode_fields(Map.values(field_props), syntax, struct, oneofs, _acc = [])
 
-    encoded =
-      if syntax == :proto2 do
-        encode_extensions(struct, encoded)
-      else
-        encoded
-      end
-
-    Enum.reverse(encoded)
+    if syntax == :proto2 do
+      [encoded | encode_extensions(struct)]
+    else
+      encoded
+    end
   catch
     {e, msg, st} ->
       reraise e, msg, st
@@ -65,7 +62,7 @@ defmodule Protobuf.Encoder do
 
     acc =
       case encode_field(class_field(prop), val, syntax, prop) do
-        {:ok, iodata} -> [iodata | acc]
+        {:ok, iodata} -> [acc | iodata]
         :skip -> acc
       end
 
@@ -200,38 +197,49 @@ defmodule Protobuf.Encoder do
   defp enum_default?({:enum, _enum_mod}, val) when is_integer(val), do: val == 0
   defp enum_default?({:enum, _enum_mod}, list) when is_list(list), do: false
 
+  # Returns a map of %{field_name => field_value} from oneofs. For example, if you have:
+  # oneof body {
+  #   string a = 1;
+  #   string b = 2
+  # }
+  # Then this could return: %{a: "some value"}
   defp oneof_actual_vals(
-         %{field_tags: field_tags, field_props: field_props, oneof: oneof},
+         %MessageProps{field_tags: field_tags, field_props: field_props, oneof: oneof},
          struct
        ) do
     Enum.reduce(oneof, %{}, fn {field, index}, acc ->
-      case Map.get(struct, field, nil) do
-        {f, val} ->
-          %{oneof: oneof} = field_props[field_tags[f]]
+      case Map.fetch(struct, field) do
+        {:ok, {field_name, value}} when is_atom(field_name) ->
+          %FieldProps{oneof: oneof} = field_props[field_tags[field_name]]
 
           if oneof != index do
             raise Protobuf.EncodeError,
-              message: ":#{f} doesn't belongs to #{inspect(struct.__struct__)}##{field}"
+              message:
+                "#{inspect(field_name)} doesn't belong to #{inspect(struct.__struct__)}##{field}"
           else
-            Map.put(acc, f, val)
+            Map.put(acc, field_name, value)
           end
 
-        nil ->
+        {:ok, nil} ->
           acc
 
-        _ ->
+        :error ->
+          acc
+
+        other ->
           raise Protobuf.EncodeError,
-            message: "#{inspect(struct.__struct__)}##{field} should be {key, val} or nil"
+            message:
+              "#{inspect(struct.__struct__)}##{field} should be {key, val}, got: #{inspect(other)}"
       end
     end)
   end
 
-  defp encode_extensions(%mod{__pb_extensions__: pb_exts}, encoded) when is_map(pb_exts) do
-    Enum.reduce(pb_exts, encoded, fn {{ext_mod, key}, val}, acc ->
+  defp encode_extensions(%mod{__pb_extensions__: pb_exts}) when is_map(pb_exts) do
+    Enum.reduce(pb_exts, [], fn {{ext_mod, key}, val}, acc ->
       case Protobuf.Extension.get_extension_props(mod, ext_mod, key) do
         %{field_props: prop} ->
           case encode_field(class_field(prop), val, :proto2, prop) do
-            {:ok, iodata} -> [iodata | acc]
+            {:ok, iodata} -> [acc | iodata]
             :skip -> acc
           end
 
@@ -241,7 +249,7 @@ defmodule Protobuf.Encoder do
     end)
   end
 
-  defp encode_extensions(_, encoded) do
-    encoded
+  defp encode_extensions(_) do
+    []
   end
 end

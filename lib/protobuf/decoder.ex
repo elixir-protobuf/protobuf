@@ -73,7 +73,7 @@ defmodule Protobuf.Decoder do
 
   defp handle_field(_bin, _field_number, wire_type, _message, _props) do
     raise Protobuf.DecodeError,
-      message: "cannot decode binary data, unknonw wire type: #{inspect(wire_type)}"
+      message: "cannot decode binary data, unknown wire type: #{inspect(wire_type)}"
   end
 
   decoder :defp, :skip_field, [:message, :props, :groups] do
