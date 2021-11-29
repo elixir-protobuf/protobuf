@@ -130,28 +130,24 @@ defmodule Protobuf.Decoder do
   defp handle_value(<<bin::bits>>, field_number, wire_type, value, message, props) do
     case props.field_props do
       %{^field_number => %FieldProps{packed?: true, name_atom: name_atom} = prop} ->
-        current_value = Map.get(message, name_atom)
-        new_value = value_for_packed(value, current_value, prop)
-        new_message = Map.put(message, name_atom, new_value)
+        new_message = update_in_message(message, name_atom, &value_for_packed(value, &1, prop))
         build_message(bin, new_message, props)
 
       %{^field_number => %FieldProps{wire_type: ^wire_type} = prop} ->
         key = field_key(prop, props)
-        current_value = Map.get(message, key)
-        new_value = value_for_field(value, current_value, prop)
-        new_message = Map.put(message, key, new_value)
+        new_message = update_in_message(message, key, &value_for_field(value, &1, prop))
         build_message(bin, new_message, props)
 
       %{^field_number => %FieldProps{wire_type: expected, name: field}} ->
-        message = "wrong wire_type for field #{field}: got #{wire_type}, expected #{expected}"
-        raise DecodeError, message: message
+        raise DecodeError,
+          message: "wrong wire_type for field #{field}: got #{wire_type}, expected #{expected}"
 
       %{} ->
         %mod{} = message
 
         new_message =
           case Protobuf.Extension.get_extension_props_by_tag(mod, field_number) do
-            {ext_mod, %{field_props: prop}} ->
+            {ext_mod, %{field_props: %FieldProps{} = prop}} ->
               current_value = Protobuf.Extension.get(message, ext_mod, prop.name_atom, nil)
               new_value = value_for_field(value, current_value, prop)
               Protobuf.Extension.put(mod, message, ext_mod, prop.name_atom, new_value)
@@ -178,16 +174,19 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  defp value_for_field(bin, current, %{embedded?: true} = prop) do
-    embedded_msg = decode(bin, prop.type)
-    val = if prop.map?, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
-    val = if prop.oneof, do: {prop.name_atom, val}, else: val
+  defp value_for_field(bin, current, %FieldProps{embedded?: true} = prop) do
+    %FieldProps{type: type, map?: map?, oneof: oneof, name_atom: name_atom, repeated?: repeated?} =
+      prop
 
-    case {current, prop.repeated?} do
-      {nil, true} -> [val]
-      {nil, false} -> val
-      {current, true} -> [val | current]
-      {current, false} -> Map.merge(current, val)
+    embedded_msg = decode(bin, type)
+    val = if map?, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
+    val = if oneof, do: {name_atom, val}, else: val
+
+    cond do
+      is_nil(current) and repeated? -> [val]
+      is_nil(current) and not repeated? -> val
+      repeated? -> [val | current]
+      not repeated? -> Map.merge(current, val)
     end
   end
 
@@ -237,5 +236,15 @@ defmodule Protobuf.Decoder do
   defp field_key(%FieldProps{oneof: oneof_number}, %MessageProps{oneof: oneofs}) do
     {key, ^oneof_number} = Enum.at(oneofs, oneof_number)
     key
+  end
+
+  defp update_in_message(message, key, update_fun) do
+    current =
+      case message do
+        %_{^key => value} -> value
+        %_{} -> nil
+      end
+
+    Map.put(message, key, update_fun.(current))
   end
 end
