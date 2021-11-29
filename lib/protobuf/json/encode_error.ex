@@ -11,6 +11,12 @@ defmodule Protobuf.JSON.EncodeError do
     %__MODULE__{message: "JSON library not loaded, make sure to add :jason to your mix.exs file"}
   end
 
+  def new({:bad_duration, :seconds_outside_of_range, seconds}) do
+    %__MODULE__{
+      message: "invalid Google.Protobuf.Duration, seconds are outside of range: #{seconds}"
+    }
+  end
+
   def new({:invalid_timestamp, timestamp, reason}) do
     %__MODULE__{
       message:

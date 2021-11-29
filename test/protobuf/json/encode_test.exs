@@ -1,6 +1,7 @@
 defmodule Protobuf.JSON.EncodeTest do
   use ExUnit.Case, async: true
 
+  alias ProtobufTestMessages.Proto3.TestAllTypesProto3
   alias TestMsg.{Foo, Foo.Bar, Maps, OneofProto3, Parent, Parent.Child, Scalars}
 
   def encode(struct, opts \\ []) do
@@ -235,5 +236,50 @@ defmodule Protobuf.JSON.EncodeTest do
 
     message = Foo.new(h: [Bar.new(), Bar.new()])
     assert encode(message, emit_unpopulated: true) == %{decoded | "h" => [bar, bar]}
+  end
+
+  describe "Google.Protobuf.Duration" do
+    test "encodes as a string" do
+      cases = [
+        %{string: "123s", seconds: 123, nanos: 0},
+        %{string: "123.001s", seconds: 123, nanos: 1_000_000},
+        %{string: "0.000000001s", seconds: 0, nanos: 1},
+        %{string: "-1s", seconds: -1, nanos: 0},
+        %{string: "-1.100s", seconds: -1, nanos: -100_000_000}
+      ]
+
+      for %{string: expected_string, seconds: seconds, nanos: nanos} <- cases do
+        message =
+          TestAllTypesProto3.new!(
+            optional_duration: Google.Protobuf.Duration.new!(seconds: seconds, nanos: nanos)
+          )
+
+        assert encode(message) == %{"optionalDuration" => expected_string}
+      end
+    end
+
+    test "returns an error if the seconds of the duration are too big" do
+      max_duration = 315_576_000_000
+
+      message =
+        TestAllTypesProto3.new!(
+          optional_duration: Google.Protobuf.Duration.new!(seconds: max_duration + 1, nanos: 0)
+        )
+
+      assert catch_throw(encode(message)) ==
+               {:bad_duration, :seconds_outside_of_range, max_duration + 1}
+    end
+
+    test "returns an error if the seconds of the duration are too small" do
+      max_duration = 315_576_000_000
+
+      message =
+        TestAllTypesProto3.new!(
+          optional_duration: Google.Protobuf.Duration.new!(seconds: -max_duration - 1, nanos: 0)
+        )
+
+      assert catch_throw(encode(message)) ==
+               {:bad_duration, :seconds_outside_of_range, -max_duration - 1}
+    end
   end
 end

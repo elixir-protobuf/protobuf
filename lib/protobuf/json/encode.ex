@@ -11,14 +11,22 @@ defmodule Protobuf.JSON.Encode do
             encode_enum: 3,
             safe_enum_key: 2}
 
+  @duration_seconds_range -315_576_000_000..315_576_000_000
+
   @doc false
   @spec to_encodable(struct, keyword) :: map | {:error, EncodeError.t()}
   def to_encodable(struct, opts)
 
   def to_encodable(%mod{} = struct, _opts) when mod == Google.Protobuf.Duration do
     case struct do
-      %{seconds: seconds, nanos: 0} -> Integer.to_string(seconds)
-      %{seconds: seconds, nanos: nanos} -> "#{seconds}.#{nanos}s"
+      %{seconds: seconds} when seconds not in @duration_seconds_range ->
+        throw({:bad_duration, :seconds_outside_of_range, seconds})
+
+      %{seconds: seconds, nanos: 0} ->
+        Integer.to_string(seconds) <> "s"
+
+      %{seconds: seconds, nanos: nanos} ->
+        "#{seconds}.#{Utils.format_nanoseconds(nanos)}s"
     end
   end
 

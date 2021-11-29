@@ -215,10 +215,6 @@ Recommended.Proto2.ProtobufInput.ValidDataScalarBinary.UINT32[9].ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataScalarBinary.UINT64[0].ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataScalarBinary.UINT64[1].ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataScalarBinary.UINT64[2].ProtobufOutput
-Recommended.Proto3.JsonInput.DurationHas3FractionalDigits.Validator
-Recommended.Proto3.JsonInput.DurationHas6FractionalDigits.Validator
-Recommended.Proto3.JsonInput.DurationHas9FractionalDigits.Validator
-Recommended.Proto3.JsonInput.DurationHasZeroFractionalDigit.Validator
 Recommended.Proto3.JsonInput.NullValueInOtherOneofNewFormat.Validator
 Recommended.Proto3.JsonInput.NullValueInOtherOneofOldFormat.Validator
 Recommended.Proto3.ProtobufInput.ValidDataOneofBinary.MESSAGE.Merge.ProtobufOutput
@@ -275,8 +271,6 @@ Recommended.Proto3.ProtobufInput.ValidDataRepeated.UINT64.UnpackedInput.Unpacked
 Recommended.Proto3.ProtobufInput.ValidDataScalarBinary.ENUM[4].ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataScalarBinary.ENUM[5].ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataScalarBinary.SINT32[4].ProtobufOutput
-Required.DurationProtoInputTooLarge.JsonOutput
-Required.DurationProtoInputTooSmall.JsonOutput
 Required.Proto2.JsonInput.StoresDefaultPrimitive.Validator
 Required.Proto2.ProtobufInput.IllegalZeroFieldNum_Case_0
 Required.Proto2.ProtobufInput.IllegalZeroFieldNum_Case_1
@@ -593,10 +587,6 @@ Required.Proto3.JsonInput.AnyWithValueForInteger.JsonOutput
 Required.Proto3.JsonInput.AnyWithValueForInteger.ProtobufOutput
 Required.Proto3.JsonInput.AnyWithValueForJsonObject.JsonOutput
 Required.Proto3.JsonInput.AnyWithValueForJsonObject.ProtobufOutput
-Required.Proto3.JsonInput.DurationJsonInputTooLarge
-Required.Proto3.JsonInput.DurationJsonInputTooSmall
-Required.Proto3.JsonInput.DurationMinValue.ProtobufOutput
-Required.Proto3.JsonInput.DurationRepeatedValue.ProtobufOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasDifferentCase.JsonOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasDifferentCase.ProtobufOutput
 Required.Proto3.JsonInput.EnumFieldWithAliasLowerCase.JsonOutput
