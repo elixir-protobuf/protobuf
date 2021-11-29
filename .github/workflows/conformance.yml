@@ -15,10 +15,6 @@ on:
   push:
   pull_request:
 
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ steps.get-sha.outputs.sha }}
-
 jobs:
   test:
     name: Run conformance tests
