@@ -162,7 +162,9 @@ defmodule Protobuf.DSLTest do
              "A" => :A,
              "B" => :B,
              "C" => :C,
-             "UNKNOWN" => :UNKNOWN
+             "UNKNOWN" => :UNKNOWN,
+             "D" => :D,
+             "E" => :E
            }
 
     assert %FieldProps{fnum: 11, type: {:enum, TestMsg.EnumFoo}, wire_type: 0} =
