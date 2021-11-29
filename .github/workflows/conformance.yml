@@ -1,9 +1,9 @@
 name: Conformance
 
 # This workflow *only* tries to run the conformance checks. It is triggered periodically on a cron
-# to catch when new conformance tests are added and they don't pass.
+# to catch when new conformance tests are added and they don't pass as well as in PRs and pushes.
 #
-# Without this workflow the new tests wouldn't be noticed until a PR was made.
+# Without the scheduled run, the new tests wouldn't be noticed until a PR was made.
 
 on:
   # This is needed to trigger the workflow manually from the "Actions" tab in the repo.
@@ -12,6 +12,8 @@ on:
   # Every day at 9am.
   schedule:
     - cron: '0 9 * * *'
+  push:
+  pull_request:
 
 jobs:
   test:
