@@ -35,6 +35,7 @@ defmodule Protobuf.DSL do
     end
   end
 
+  # Registered as the @before_compile callback for modules that call "use Protobuf".
   defmacro __before_compile__(env) do
     fields = Module.get_attribute(env.module, :fields)
     options = Module.get_attribute(env.module, :options)
@@ -100,11 +101,11 @@ defmodule Protobuf.DSL do
     num_to_atom = for {fnum, %{name_atom: name_atom}} <- props, do: {fnum, name_atom}
     atom_to_num = for {name_atom, fnum, _opts} <- fields, do: {name_atom, fnum}, into: %{}
 
-    string_or_num_to_atom =
-      for {fnum, %{name: name, name_atom: name_atom}} <- props,
-          key <- [fnum, name],
-          do: {key, name_atom},
-          into: %{}
+    reverse_mapping =
+      for {name_atom, field_number, _opts} <- fields,
+          key <- [field_number, Atom.to_string(name_atom)],
+          into: %{},
+          do: {key, name_atom}
 
     Enum.map(atom_to_num, fn {name_atom, fnum} ->
       quote do
@@ -126,7 +127,7 @@ defmodule Protobuf.DSL do
           def mapping(), do: unquote(Macro.escape(atom_to_num))
         end,
         quote do
-          def __reverse_mapping__(), do: unquote(Macro.escape(string_or_num_to_atom))
+          def __reverse_mapping__(), do: unquote(Macro.escape(reverse_mapping))
         end
       ]
   end
