@@ -73,37 +73,43 @@ defmodule Protobuf do
   end
 
   @doc """
-  Build a blank struct with default values. This and other "new" functions are
+  Builds a blank struct with default values. This and other "new" functions are
   preferred than raw building struct method like `%Foo{}`.
 
   In proto3, the zero values are the default values.
   """
-  @callback new() :: struct
+  @callback new() :: struct()
 
   @doc """
-  Build and update the struct with passed fields.
+  Builds and updates the struct with passed fields.
+
+  ## Examples
+
+      MyMessage.new(field1: "foo")
+      #=> %MyMessage{field1: "foo", ...}
+
   """
   @callback new(Enum.t()) :: struct
 
   @doc """
-  Similar to `new/1`, but use `struct!/2` to build the struct, so
+  Similar to `c:new/1`, but use `struct!/2` to build the struct, so
   errors will be raised if unknown keys are passed.
   """
-  @callback new!(Enum.t()) :: struct
+  @callback new!(Enum.t()) :: struct()
 
   @doc """
-  Encode the struct to a protobuf binary.
+  Encodes the given struct into to a Protobuf binary.
 
   Errors may be raised if there's something wrong in the struct.
   """
-  @callback encode(struct) :: binary
+  @callback encode(struct()) :: binary()
 
   @doc """
-  Decode a protobuf binary to a struct.
+  Decodes a Protobuf binary into a struct.
 
   Errors may be raised if there's something wrong in the binary.
   """
-  @callback decode(binary) :: struct
+  @callback decode(binary()) :: struct()
 
   @doc """
   Returns `nil` or a transformer module that implements the `Protobuf.TransformModule`
@@ -111,29 +117,46 @@ defmodule Protobuf do
 
   This function is overridable in your module.
   """
-  @callback transform_module() :: module | nil
+  @callback transform_module() :: module() | nil
 
   @doc """
-  It's preferable to use message's `decode` function, like:
+  Decodes the given binary data interpreting it as the Protobuf message `module`.
 
-      Foo.decode(bin)
+  It's preferrable to use the message's `c:decode/1` function. For a message `MyMessage`:
+
+      MyMessage.decode(<<...>>)
+      #=> %MyMessage{...}
+
+  This function raises an error if anything goes wrong with decoding.
+
+  ## Examples
+
+      Protobuf.decode(<<...>>, MyMessage)
+      #=> %MyMessage{...}
+
+      Protobuf.decode(<<"bad data">>, MyMessage)
+      #=> ** (Protobuf.DecodeError) ...
 
   """
-  @spec decode(binary, module) :: struct
-  def decode(data, mod) do
-    Protobuf.Decoder.decode(data, mod)
-  end
+  @spec decode(binary(), message) :: %{required(:__struct__) => message} when message: module()
+  defdelegate decode(data, module), to: Protobuf.Decoder
 
   @doc """
-  It's preferable to use message's `encode` function, like:
+  Encodes the given Protobuf struct into a binary.
 
-      Foo.encode(foo)
+  It's preferrable to use the message's `c:encode/1` function. For a message `MyMessage`:
+
+      MyMessage.encode(MyMessage.new())
+
+  ## Examples
+
+      struct = MyMessage.new()
+      Protobuf.encode(struct)
+      #=> <<...>>
 
   """
-  @spec encode(struct) :: binary
-  def encode(struct) do
-    Protobuf.Encoder.encode(struct)
-  end
+  @spec encode(struct()) :: binary()
+  defdelegate encode(struct), to: Protobuf.Encoder
 
   @doc """
   Loads extensions modules.
