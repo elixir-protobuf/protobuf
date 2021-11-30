@@ -41,7 +41,6 @@ Recommended.Proto2.ProtobufInput.ValidDataRepeated.UINT64.PackedInput.UnpackedOu
 Recommended.Proto2.ProtobufInput.ValidDataScalarBinary.ENUM[4].ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataScalarBinary.ENUM[5].ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataScalarBinary.SINT32[4].ProtobufOutput
-Recommended.Proto3.JsonInput.NullValueInOtherOneofOldFormat.Validator
 Recommended.Proto3.ProtobufInput.ValidDataOneofBinary.MESSAGE.Merge.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataOneofBinary.MESSAGE.MultipleValuesForDifferentField.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataOneofBinary.MESSAGE.MultipleValuesForSameField.ProtobufOutput

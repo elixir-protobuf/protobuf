@@ -35,6 +35,16 @@ defmodule Protobuf.ConformanceRegressionsTest do
              |> Protobuf.JSON.encode!()
              |> Jason.decode!() == Jason.decode!(json)
     end
+
+    test "Recommended.Proto3.JsonInput.NullValueInOtherOneofOldFormat.Validator",
+         %{message_mod: message_mod} do
+      json = "{\"oneofNullValue\": \"NULL_VALUE\"}"
+
+      assert json
+             |> Protobuf.JSON.decode!(message_mod)
+             |> Protobuf.JSON.encode!()
+             |> Jason.decode!() == %{"oneofNullValue" => nil}
+    end
   end
 
   defp url_to_message(%{message_type: type_url}) do

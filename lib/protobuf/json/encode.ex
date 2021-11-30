@@ -191,6 +191,10 @@ defmodule Protobuf.JSON.Encode do
   defp encode_float(:nan), do: "NaN"
 
   # TODO: maybe define a helper for all enums messages, with strict validation.
+  defp encode_enum(Google.Protobuf.NullValue, key, _opts) when key in [0, :NULL_VALUE] do
+    nil
+  end
+
   defp encode_enum(enum, key, opts) when is_atom(key) do
     if opts[:use_enum_numbers], do: enum.value(key), else: key
   end
