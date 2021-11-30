@@ -204,16 +204,22 @@ defmodule Protobuf.JSON.Decode do
     for {oneof, index} <- oneofs,
         {_field_num, %{oneof: ^index} = prop} <- field_props,
         result = fetch_field_value(prop, data),
-        match?({:ok, value} when not is_nil(value), result) do
-      {:ok, value} = result
-      {oneof, prop, value}
+        match?({:ok, _value}, result),
+        {:ok, value} = result,
+        not null_value?(value, prop) do
+      {oneof, prop.name_atom, decode_value(prop, value)}
     end
-    |> Enum.reduce(%{}, fn {oneof, prop, value}, acc ->
-      Map.update(acc, oneof, {prop.name_atom, decode_value(prop, value)}, fn _ ->
+    |> Enum.reduce(%{}, fn {oneof, name, decoded_value}, acc ->
+      if Map.has_key?(acc, oneof) do
         throw({:duplicated_oneof, oneof})
-      end)
+      else
+        Map.put(acc, oneof, {name, decoded_value})
+      end
     end)
   end
+
+  defp null_value?(nil, %Protobuf.FieldProps{type: {:enum, Google.Protobuf.NullValue}}), do: false
+  defp null_value?(value, _props), do: is_nil(value)
 
   defp fetch_field_value(%Protobuf.FieldProps{name: name_key, json_name: json_key}, data) do
     case data do

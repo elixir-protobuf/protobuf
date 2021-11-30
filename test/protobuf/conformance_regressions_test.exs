@@ -23,6 +23,20 @@ defmodule Protobuf.ConformanceRegressionsTest do
     end
   end
 
+  describe "JSON" do
+    @describetag message_type: "protobuf_test_messages.proto3.TestAllTypesProto3"
+
+    test "Recommended.Proto3.JsonInput.NullValueInOtherOneofNewFormat.Validator",
+         %{message_mod: message_mod} do
+      json = "{\"oneofNullValue\": null}"
+
+      assert json
+             |> Protobuf.JSON.decode!(message_mod)
+             |> Protobuf.JSON.encode!()
+             |> Jason.decode!() == Jason.decode!(json)
+    end
+  end
+
   defp url_to_message(%{message_type: type_url}) do
     case type_url do
       "protobuf_test_messages.proto3.TestAllTypesProto3" ->
@@ -35,6 +49,10 @@ defmodule Protobuf.ConformanceRegressionsTest do
 
   defp decode_conformance_input(%{conformance_input: conformance_input}) do
     %{proto_input: conformance_input_to_binary(conformance_input)}
+  end
+
+  defp decode_conformance_input(context) do
+    context
   end
 
   defp conformance_input_to_binary(<<?\\, d1, d2, d3, rest::binary>>)
