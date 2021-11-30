@@ -14,6 +14,19 @@ defmodule Protobuf.ProtobufTest do
     end
   end
 
+  describe "encode/2" do
+    test "encodes a struct as iodata with iolist: true" do
+      iodata = Protobuf.encode(TestMsg.Foo.new(a: 42), iolist: true)
+      assert IO.iodata_to_binary(iodata) == <<8, 42>>
+    end
+
+    test "raises an ArgumentError if the :iolist option is invalid" do
+      assert_raise ArgumentError, ~r/expected bool/, fn ->
+        Protobuf.encode(TestMsg.Foo.new(), iolist: :not_a_boolean)
+      end
+    end
+  end
+
   describe "decode/2" do
     test "decodes a struct" do
       struct = Protobuf.decode(<<8, 42>>, TestMsg.Foo)
