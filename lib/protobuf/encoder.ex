@@ -1,33 +1,32 @@
 defmodule Protobuf.Encoder do
   @moduledoc false
+
   import Protobuf.Wire.Types
   import Bitwise, only: [bsl: 2, bor: 2]
 
   alias Protobuf.{FieldProps, MessageProps, Wire, Wire.Varint}
 
-  @spec encode(atom, map | struct, keyword) :: iodata
-  def encode(mod, msg, opts) do
+  @spec encode(struct(), keyword()) :: iodata()
+  def encode(%mod{} = struct, opts \\ []) when is_list(opts) do
+    iolist? = Keyword.get(opts, :iolist, false)
+
+    case encode_with_message_props(struct, mod.__message_props__()) do
+      result when iolist? -> result
+      result -> IO.iodata_to_binary(result)
+    end
+  end
+
+  defp encode(mod, msg, opts) do
     case msg do
-      %{__struct__: ^mod} ->
-        encode(msg, opts)
-
-      _ ->
-        encode(mod.new(msg), opts)
+      %{__struct__: ^mod} -> encode(msg, opts)
+      _ -> encode(mod.new(msg), opts)
     end
   end
 
-  @spec encode(struct, keyword) :: iodata
-  def encode(%mod{} = struct, opts \\ []) do
-    res = encode!(struct, mod.__message_props__())
-
-    case Keyword.fetch(opts, :iolist) do
-      {:ok, true} -> res
-      _ -> IO.iodata_to_binary(res)
-    end
-  end
-
-  @spec encode!(struct, MessageProps.t()) :: iodata
-  def encode!(struct, %MessageProps{field_props: field_props, syntax: syntax} = props) do
+  defp encode_with_message_props(
+         struct,
+         %MessageProps{syntax: syntax, field_props: field_props} = props
+       ) do
     oneofs = oneof_actual_vals(props, struct)
 
     encoded = encode_fields(Map.values(field_props), syntax, struct, oneofs, _acc = [])
@@ -37,9 +36,6 @@ defmodule Protobuf.Encoder do
     else
       encoded
     end
-  catch
-    {e, msg, st} ->
-      reraise e, msg, st
   end
 
   defp encode_fields(_fields = [], _syntax, _struct, _oneofs, acc) do
@@ -69,10 +65,9 @@ defmodule Protobuf.Encoder do
     encode_fields(rest, syntax, struct, oneofs, acc)
   rescue
     error ->
-      msg =
-        "Got error when encoding #{inspect(struct.__struct__)}##{prop.name_atom}: #{Exception.format(:error, error)}"
-
-      throw({Protobuf.EncodeError, [message: msg], __STACKTRACE__})
+      raise Protobuf.EncodeError,
+        message:
+          "Got error when encoding #{inspect(struct.__struct__)}##{prop.name_atom}: #{Exception.format(:error, error)}"
   end
 
   defp skip_field?(_syntax, [], _prop), do: true
@@ -108,7 +103,7 @@ defmodule Protobuf.Encoder do
          :embedded,
          val,
          syntax,
-         %{encoded_fnum: fnum, repeated?: repeated?, map?: map?, type: type} = prop
+         %FieldProps{encoded_fnum: fnum, repeated?: repeated?, map?: map?, type: type} = prop
        ) do
     result =
       apply_or_map(val, repeated? || map?, fn val ->
