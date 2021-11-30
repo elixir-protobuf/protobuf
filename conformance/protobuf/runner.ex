@@ -27,7 +27,7 @@ defmodule Conformance.Protobuf.Runner do
             mod = Conformance.ConformanceResponse
             result = handle_encoded_request(encoded_request)
             response = mod.new(result: result)
-            encoded_response = mod.encode(response, iolist: true)
+            encoded_response = Protobuf.encode(response)
 
             :ok =
               IO.binwrite(

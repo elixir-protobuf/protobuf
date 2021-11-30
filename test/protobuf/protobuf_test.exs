@@ -14,16 +14,10 @@ defmodule Protobuf.ProtobufTest do
     end
   end
 
-  describe "encode/2" do
-    test "encodes a struct as iodata with iolist: true" do
-      iodata = Protobuf.encode(TestMsg.Foo.new(a: 42), iolist: true)
+  describe "encode_to_iodata/1" do
+    test "encodes a struct as iodata" do
+      iodata = Protobuf.encode_to_iodata(TestMsg.Foo.new(a: 42))
       assert IO.iodata_to_binary(iodata) == <<8, 42>>
-    end
-
-    test "raises an ArgumentError if the :iolist option is invalid" do
-      assert_raise ArgumentError, ~r/expected bool/, fn ->
-        Protobuf.encode(TestMsg.Foo.new(), iolist: :not_a_boolean)
-      end
     end
   end
 

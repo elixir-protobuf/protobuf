@@ -6,25 +6,16 @@ defmodule Protobuf.Encoder do
 
   alias Protobuf.{FieldProps, MessageProps, Wire, Wire.Varint}
 
-  @spec encode(struct(), keyword()) :: iodata()
-  def encode(%mod{} = struct, opts) when is_list(opts) do
-    iolist? =
-      case Keyword.get(opts, :iolist, false) do
-        value when is_boolean(value) -> value
-        other -> raise ArgumentError, "expected bool for :iolist option, got: #{inspect(other)}"
-      end
-
-    case encode_with_message_props(struct, mod.__message_props__()) do
-      result when iolist? -> result
-      result -> IO.iodata_to_binary(result)
-    end
+  @spec encode_to_iodata(struct()) :: iodata()
+  def encode_to_iodata(%mod{} = struct) do
+    encode_with_message_props(struct, mod.__message_props__())
   end
 
-  defp encode(mod, msg, opts) do
-    case msg do
-      %{__struct__: ^mod} -> encode(msg, opts)
-      _ -> encode(mod.new(msg), opts)
-    end
+  @spec encode(struct()) :: binary()
+  def encode(%mod{} = struct) do
+    struct
+    |> encode_with_message_props(mod.__message_props__())
+    |> IO.iodata_to_binary()
   end
 
   defp encode_with_message_props(
@@ -119,7 +110,7 @@ defmodule Protobuf.Encoder do
           val = if map?, do: struct(type, %{key: elem(val, 0), value: elem(val, 1)}), else: val
 
           # so that oneof {:atom, val} can be encoded
-          encoded = encode(type, val, iolist: true)
+          encoded = encode_from_type(type, val)
           byte_size = IO.iodata_length(encoded)
           [fnum | Varint.encode(byte_size)] ++ encoded
         end
@@ -135,6 +126,13 @@ defmodule Protobuf.Encoder do
       encoded = Enum.map(val, &Wire.from_proto(type, &1))
       byte_size = IO.iodata_length(encoded)
       {:ok, [fnum | Varint.encode(byte_size)] ++ encoded}
+    end
+  end
+
+  defp encode_from_type(mod, msg) do
+    case msg do
+      %{__struct__: ^mod} -> encode_to_iodata(msg)
+      _ -> encode_to_iodata(mod.new(msg))
     end
   end
 

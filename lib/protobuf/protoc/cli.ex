@@ -60,7 +60,7 @@ defmodule Protobuf.Protoc.CLI do
       end)
 
     Google.Protobuf.Compiler.CodeGeneratorResponse.new(file: files)
-    |> Protobuf.encode(iolist: true)
+    |> Protobuf.encode_to_iodata()
     |> IO.binwrite()
   end
 

@@ -8,7 +8,7 @@ defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
   def encode(type, val) do
     [{type, val}]
     |> TestMsg.Scalars.new!()
-    |> Protobuf.encode(iolist: false)
+    |> Protobuf.encode()
   end
 
   defmacro make_properties(gen_func, field_type) do
