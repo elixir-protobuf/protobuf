@@ -68,7 +68,10 @@ defmodule Protobuf do
       def decode(data), do: Protobuf.Decoder.decode(data, __MODULE__)
 
       @impl unquote(__MODULE__)
-      def encode(struct), do: Protobuf.Encoder.encode(struct)
+      def encode(struct), do: Protobuf.Encoder.encode(struct, _options = [])
+
+      @impl unquote(__MODULE__)
+      def encode(struct, options), do: Protobuf.Encoder.encode(struct, options)
     end
   end
 
@@ -98,11 +101,23 @@ defmodule Protobuf do
   @callback new!(Enum.t()) :: struct()
 
   @doc """
+  Same as `c:encode/2` but with empty options.
+  """
+  @callback encode(struct()) :: iodata()
+
+  @doc """
   Encodes the given struct into to a Protobuf binary.
 
   Errors may be raised if there's something wrong in the struct.
+
+  ## Options
+
+    * `:iolist` - Boolean. If `true`, the returned value is iodata. If `false`, it's a binary.
+      Defaults to `false`.
+
   """
-  @callback encode(struct()) :: binary()
+  @callback encode(struct(), options :: [encode_option]) :: iodata()
+            when encode_option: {:iolist, boolean()}
 
   @doc """
   Decodes a Protobuf binary into a struct.
@@ -144,9 +159,12 @@ defmodule Protobuf do
   @doc """
   Encodes the given Protobuf struct into a binary.
 
-  It's preferrable to use the message's `c:encode/1` function. For a message `MyMessage`:
+  It's preferrable to use the message's `c:encode/1` or `c:encode/2` functions. For a message
+  `MyMessage`:
 
       MyMessage.encode(MyMessage.new())
+
+  See `c:encode/2` for the supported options.
 
   ## Examples
 
@@ -156,7 +174,9 @@ defmodule Protobuf do
 
   """
   @spec encode(struct()) :: binary()
-  defdelegate encode(struct), to: Protobuf.Encoder
+  def encode(%_{} = struct, options \\ []) when is_list(options) do
+    Protobuf.Encoder.encode(struct, options)
+  end
 
   @doc """
   Loads extensions modules.

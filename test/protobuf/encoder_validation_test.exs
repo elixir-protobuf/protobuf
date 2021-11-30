@@ -82,7 +82,7 @@ defmodule Protobuf.EncoderTest.Validation do
     msg = TestMsg.Foo.new(a: "abc")
 
     assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#a.*Protobuf.TypeEncodeError/, fn ->
-      Protobuf.Encoder.encode(msg)
+      Protobuf.Encoder.encode(msg, [])
     end
   end
 
@@ -90,21 +90,21 @@ defmodule Protobuf.EncoderTest.Validation do
     msg = TestMsg.Foo2.new(a: nil)
 
     assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo2#a.*Protobuf.TypeEncodeError/, fn ->
-      Protobuf.Encoder.encode(msg)
+      Protobuf.Encoder.encode(msg, [])
     end
   end
 
   test "proto2 valid optional field is nil" do
     msg = TestMsg.Foo2.new(a: 1, c: nil)
 
-    assert Protobuf.Encoder.encode(msg)
+    assert Protobuf.Encoder.encode(msg, [])
   end
 
   test "oneof invalid format" do
     msg = TestMsg.Oneof.new(first: 1)
 
     assert_raise Protobuf.EncodeError, ~r/TestMsg.Oneof#first should be {key, val}/, fn ->
-      Protobuf.Encoder.encode(msg)
+      Protobuf.Encoder.encode(msg, [])
     end
   end
 
@@ -112,7 +112,7 @@ defmodule Protobuf.EncoderTest.Validation do
     msg = TestMsg.Oneof.new(first: {:c, 42})
 
     assert_raise Protobuf.EncodeError, ~r/:c doesn't belong to TestMsg.Oneof#first/, fn ->
-      Protobuf.Encoder.encode(msg)
+      Protobuf.Encoder.encode(msg, [])
     end
   end
 
@@ -120,7 +120,7 @@ defmodule Protobuf.EncoderTest.Validation do
     msg = TestMsg.Oneof.new(first: {:a, "abc"})
 
     assert_raise Protobuf.EncodeError, ~r/TestMsg.Oneof#a.*Protobuf.TypeEncodeError/, fn ->
-      Protobuf.Encoder.encode(msg)
+      Protobuf.Encoder.encode(msg, [])
     end
   end
 
@@ -128,14 +128,14 @@ defmodule Protobuf.EncoderTest.Validation do
     msg = TestMsg.Foo.new(g: 1)
 
     assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#g.*Protocol.UndefinedError/, fn ->
-      Protobuf.Encoder.encode(msg)
+      Protobuf.Encoder.encode(msg, [])
     end
 
     msg = TestMsg.Foo.new()
     msg = %{msg | h: TestMsg.Foo.Bar.new()}
 
     assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#h.*Protocol.UndefinedError/, fn ->
-      Protobuf.Encoder.encode(msg)
+      Protobuf.Encoder.encode(msg, [])
     end
   end
 
@@ -144,6 +144,6 @@ defmodule Protobuf.EncoderTest.Validation do
     msg = %{msg | e: %{a: 1}}
     msg1 = TestMsg.Foo.new(e: %{a: 1})
 
-    assert Protobuf.Encoder.encode(msg) == Protobuf.Encoder.encode(msg1)
+    assert Protobuf.Encoder.encode(msg, []) == Protobuf.Encoder.encode(msg1, [])
   end
 end

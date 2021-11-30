@@ -59,9 +59,9 @@ defmodule Protobuf.Protoc.CLI do
         Protobuf.Protoc.Generator.generate(ctx, desc)
       end)
 
-    response = Google.Protobuf.Compiler.CodeGeneratorResponse.new(file: files)
-
-    IO.binwrite(Protobuf.Encoder.encode(response))
+    Google.Protobuf.Compiler.CodeGeneratorResponse.new(file: files)
+    |> Protobuf.encode(iolist: true)
+    |> IO.binwrite()
   end
 
   def main(_args) do

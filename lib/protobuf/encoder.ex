@@ -7,8 +7,12 @@ defmodule Protobuf.Encoder do
   alias Protobuf.{FieldProps, MessageProps, Wire, Wire.Varint}
 
   @spec encode(struct(), keyword()) :: iodata()
-  def encode(%mod{} = struct, opts \\ []) when is_list(opts) do
-    iolist? = Keyword.get(opts, :iolist, false)
+  def encode(%mod{} = struct, opts) when is_list(opts) do
+    iolist? =
+      case Keyword.get(opts, :iolist, false) do
+        value when is_boolean(value) -> value
+        other -> raise ArgumentError, "expected bool for :iolist option, got: #{inspect(other)}"
+      end
 
     case encode_with_message_props(struct, mod.__message_props__()) do
       result when iolist? -> result
