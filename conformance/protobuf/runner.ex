@@ -27,12 +27,12 @@ defmodule Conformance.Protobuf.Runner do
             mod = Conformance.ConformanceResponse
             result = handle_encoded_request(encoded_request)
             response = mod.new(result: result)
-            encoded_response = mod.encode(response)
+            encoded_response = mod.encode(response, iolist: true)
 
             :ok =
               IO.binwrite(
                 :stdio,
-                <<byte_size(encoded_response)::unsigned-little-32, encoded_response::binary>>
+                [<<IO.iodata_length(encoded_response)::unsigned-little-32>>, encoded_response]
               )
 
             loop()
