@@ -87,12 +87,12 @@ defmodule Protobuf.JSON do
 
   alias Protobuf.JSON.{Encode, EncodeError, Decode, DecodeError}
 
-  @type encode_opt ::
-          {:use_proto_names, boolean}
-          | {:use_enum_numbers, boolean}
-          | {:emit_unpopulated, boolean}
+  @type encode_opt() ::
+          {:use_proto_names, boolean()}
+          | {:use_enum_numbers, boolean()}
+          | {:emit_unpopulated, boolean()}
 
-  @type json_data :: %{optional(binary) => any}
+  @type json_data() :: %{optional(binary) => any}
 
   @doc """
   Generates a JSON representation of the given protobuf `struct`.
@@ -156,7 +156,7 @@ defmodule Protobuf.JSON do
   """
   @spec encode(struct, [encode_opt]) ::
           {:ok, String.t()} | {:error, EncodeError.t() | Exception.t()}
-  def encode(struct, opts \\ []) do
+  def encode(%_{} = struct, opts \\ []) when is_list(opts) do
     if jason = load_jason() do
       with {:ok, map} <- to_encodable(struct, opts), do: jason.encode(map)
     else
@@ -181,7 +181,7 @@ defmodule Protobuf.JSON do
       {:ok, %{"color" => :GREEN, "topSpeed" => 0.0}}
   """
   @spec to_encodable(struct, [encode_opt]) :: {:ok, json_data} | {:error, EncodeError.t()}
-  def to_encodable(struct, opts \\ []) do
+  def to_encodable(%_{} = struct, opts \\ []) when is_list(opts) do
     {:ok, Encode.to_encodable(struct, opts)}
   catch
     error -> {:error, EncodeError.new(error)}
@@ -243,7 +243,7 @@ defmodule Protobuf.JSON do
       {:ok, %Car{color: :GREEN, top_speed: 80.0}}
   """
   @spec decode(iodata, module) :: {:ok, struct} | {:error, DecodeError.t() | Exception.t()}
-  def decode(iodata, module) do
+  def decode(iodata, module) when is_atom(module) do
     if jason = load_jason() do
       with {:ok, json_data} <- jason.decode(iodata),
            do: from_decoded(json_data, module)
@@ -269,8 +269,8 @@ defmodule Protobuf.JSON do
       {:ok, %Car{color: :GREEN, top_speed: 80.0}}
 
   """
-  @spec from_decoded(json_data, module) :: {:ok, struct} | {:error, DecodeError.t()}
-  def from_decoded(json_data, module) do
+  @spec from_decoded(json_data(), module()) :: {:ok, struct()} | {:error, DecodeError.t()}
+  def from_decoded(json_data, module) when is_map(json_data) and is_atom(module) do
     {:ok, Decode.from_json_data(json_data, module)}
   catch
     error -> {:error, DecodeError.new(error)}
