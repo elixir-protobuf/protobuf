@@ -270,7 +270,7 @@ defmodule Protobuf.JSON do
 
   """
   @spec from_decoded(json_data(), module()) :: {:ok, struct()} | {:error, DecodeError.t()}
-  def from_decoded(json_data, module) when is_map(json_data) and is_atom(module) do
+  def from_decoded(json_data, module) when is_atom(module) do
     {:ok, Decode.from_json_data(json_data, module)}
   catch
     error -> {:error, DecodeError.new(error)}
