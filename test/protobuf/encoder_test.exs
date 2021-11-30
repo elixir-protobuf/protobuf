@@ -111,15 +111,15 @@ defmodule Protobuf.EncoderTest do
   end
 
   test "encodes 0 for proto2" do
-    assert Encoder.encode(TestMsg.Foo2.new(a: 0)) == <<8, 0, 17, 5, 0, 0, 0, 0, 0, 0, 0>>
+    assert Encoder.encode(TestMsg.Foo2.new(a: 0)) == <<8, 0>>
   end
 
   test "encodes [] for proto2" do
-    assert Encoder.encode(TestMsg.Foo2.new(a: 0, g: [])) == <<8, 0, 17, 5, 0, 0, 0, 0, 0, 0, 0>>
+    assert Encoder.encode(TestMsg.Foo2.new(a: 0, g: [])) == <<8, 0>>
   end
 
   test "encodes %{} for proto2" do
-    assert Encoder.encode(TestMsg.Foo2.new(a: 0, l: %{})) == <<8, 0, 17, 5, 0, 0, 0, 0, 0, 0, 0>>
+    assert Encoder.encode(TestMsg.Foo2.new(a: 0, l: %{})) == <<8, 0>>
   end
 
   test "encodes custom default message for proto2" do
@@ -211,13 +211,13 @@ defmodule Protobuf.EncoderTest do
 
     # Proto2 enums that are not zero-based default to their first value declared.
     msg = My.Test.Request.new(deadline: nil)
-    assert Encoder.encode(msg) == <<32, 1>>
+    assert Encoder.encode(msg) == <<>>
 
     msg = My.Test.Request.new(deadline: nil, hat: 1)
     assert Encoder.encode(msg) == <<32, 1>>
 
     msg = My.Test.Request.new(deadline: nil, hat: :FEDORA)
-    assert Encoder.encode(msg) == <<32, 1>>
+    assert Encoder.encode(msg) == <<>>
   end
 
   test "encodes with transformer module" do
