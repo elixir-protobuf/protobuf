@@ -274,6 +274,10 @@ defmodule Protobuf.WireTest do
       assert 2_147_483_647 == Wire.to_proto(:sint32, 4_294_967_294)
     end
 
+    test "overflowing sint32" do
+      assert Wire.to_proto(:sint32, Wire.Zigzag.encode(2_147_483_647 + 2)) == 1
+    end
+
     test "min sint64" do
       assert -9_223_372_036_854_775_808 == Wire.to_proto(:sint64, 18_446_744_073_709_551_615)
     end
