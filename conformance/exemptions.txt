@@ -27,11 +27,7 @@ Recommended.Proto2.ProtobufInput.ValidDataRepeated.SFIXED32.PackedInput.Unpacked
 Recommended.Proto2.ProtobufInput.ValidDataRepeated.SFIXED64.PackedInput.DefaultOutput.ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataRepeated.SFIXED64.PackedInput.UnpackedOutput.ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataRepeated.SINT32.PackedInput.DefaultOutput.ProtobufOutput
-Recommended.Proto2.ProtobufInput.ValidDataRepeated.SINT32.PackedInput.PackedOutput.ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataRepeated.SINT32.PackedInput.UnpackedOutput.ProtobufOutput
-Recommended.Proto2.ProtobufInput.ValidDataRepeated.SINT32.UnpackedInput.DefaultOutput.ProtobufOutput
-Recommended.Proto2.ProtobufInput.ValidDataRepeated.SINT32.UnpackedInput.PackedOutput.ProtobufOutput
-Recommended.Proto2.ProtobufInput.ValidDataRepeated.SINT32.UnpackedInput.UnpackedOutput.ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataRepeated.SINT64.PackedInput.DefaultOutput.ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataRepeated.SINT64.PackedInput.UnpackedOutput.ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataRepeated.UINT32.PackedInput.DefaultOutput.ProtobufOutput
@@ -40,7 +36,6 @@ Recommended.Proto2.ProtobufInput.ValidDataRepeated.UINT64.PackedInput.DefaultOut
 Recommended.Proto2.ProtobufInput.ValidDataRepeated.UINT64.PackedInput.UnpackedOutput.ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataScalarBinary.ENUM[4].ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataScalarBinary.ENUM[5].ProtobufOutput
-Recommended.Proto2.ProtobufInput.ValidDataScalarBinary.SINT32[4].ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataOneofBinary.MESSAGE.Merge.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataOneofBinary.MESSAGE.MultipleValuesForDifferentField.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataOneofBinary.MESSAGE.MultipleValuesForSameField.ProtobufOutput
@@ -68,11 +63,7 @@ Recommended.Proto3.ProtobufInput.ValidDataRepeated.SFIXED32.PackedInput.Unpacked
 Recommended.Proto3.ProtobufInput.ValidDataRepeated.SFIXED32.UnpackedInput.UnpackedOutput.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataRepeated.SFIXED64.PackedInput.UnpackedOutput.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataRepeated.SFIXED64.UnpackedInput.UnpackedOutput.ProtobufOutput
-Recommended.Proto3.ProtobufInput.ValidDataRepeated.SINT32.PackedInput.DefaultOutput.ProtobufOutput
-Recommended.Proto3.ProtobufInput.ValidDataRepeated.SINT32.PackedInput.PackedOutput.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataRepeated.SINT32.PackedInput.UnpackedOutput.ProtobufOutput
-Recommended.Proto3.ProtobufInput.ValidDataRepeated.SINT32.UnpackedInput.DefaultOutput.ProtobufOutput
-Recommended.Proto3.ProtobufInput.ValidDataRepeated.SINT32.UnpackedInput.PackedOutput.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataRepeated.SINT32.UnpackedInput.UnpackedOutput.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataRepeated.SINT64.PackedInput.UnpackedOutput.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataRepeated.SINT64.UnpackedInput.UnpackedOutput.ProtobufOutput
@@ -82,10 +73,8 @@ Recommended.Proto3.ProtobufInput.ValidDataRepeated.UINT64.PackedInput.UnpackedOu
 Recommended.Proto3.ProtobufInput.ValidDataRepeated.UINT64.UnpackedInput.UnpackedOutput.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataScalarBinary.ENUM[4].ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataScalarBinary.ENUM[5].ProtobufOutput
-Recommended.Proto3.ProtobufInput.ValidDataScalarBinary.SINT32[4].ProtobufOutput
 Required.Proto2.JsonInput.StoresDefaultPrimitive.Validator
 Required.Proto2.ProtobufInput.RepeatedScalarMessageMerge.ProtobufOutput
-Required.Proto2.ProtobufInput.RepeatedScalarSelectsLast.SINT32.ProtobufOutput
 Required.Proto2.ProtobufInput.UnknownVarint.ProtobufOutput
 Required.Proto2.ProtobufInput.ValidDataOneof.MESSAGE.Merge.ProtobufOutput
 Required.Proto2.ProtobufInput.ValidDataOneof.MESSAGE.MultipleValuesForDifferentField.ProtobufOutput
@@ -101,11 +90,9 @@ Required.Proto2.ProtobufInput.ValidDataRepeated.INT64.PackedInput.ProtobufOutput
 Required.Proto2.ProtobufInput.ValidDataRepeated.SFIXED32.PackedInput.ProtobufOutput
 Required.Proto2.ProtobufInput.ValidDataRepeated.SFIXED64.PackedInput.ProtobufOutput
 Required.Proto2.ProtobufInput.ValidDataRepeated.SINT32.PackedInput.ProtobufOutput
-Required.Proto2.ProtobufInput.ValidDataRepeated.SINT32.UnpackedInput.ProtobufOutput
 Required.Proto2.ProtobufInput.ValidDataRepeated.SINT64.PackedInput.ProtobufOutput
 Required.Proto2.ProtobufInput.ValidDataRepeated.UINT32.PackedInput.ProtobufOutput
 Required.Proto2.ProtobufInput.ValidDataRepeated.UINT64.PackedInput.ProtobufOutput
-Required.Proto2.ProtobufInput.ValidDataScalar.SINT32[4].ProtobufOutput
 Required.Proto3.JsonInput.Any.JsonOutput
 Required.Proto3.JsonInput.Any.ProtobufOutput
 Required.Proto3.JsonInput.AnyNested.JsonOutput
@@ -129,8 +116,6 @@ Required.Proto3.JsonInput.AnyWithValueForJsonObject.ProtobufOutput
 Required.Proto3.ProtobufInput.RepeatedScalarMessageMerge.JsonOutput
 Required.Proto3.ProtobufInput.RepeatedScalarMessageMerge.ProtobufOutput
 Required.Proto3.ProtobufInput.RepeatedScalarSelectsLast.ENUM.JsonOutput
-Required.Proto3.ProtobufInput.RepeatedScalarSelectsLast.SINT32.JsonOutput
-Required.Proto3.ProtobufInput.RepeatedScalarSelectsLast.SINT32.ProtobufOutput
 Required.Proto3.ProtobufInput.UnknownVarint.ProtobufOutput
 Required.Proto3.ProtobufInput.ValidDataOneof.MESSAGE.Merge.JsonOutput
 Required.Proto3.ProtobufInput.ValidDataOneof.MESSAGE.Merge.ProtobufOutput
@@ -140,12 +125,6 @@ Required.Proto3.ProtobufInput.ValidDataOneof.MESSAGE.MultipleValuesForSameField.
 Required.Proto3.ProtobufInput.ValidDataOneof.MESSAGE.MultipleValuesForSameField.ProtobufOutput
 Required.Proto3.ProtobufInput.ValidDataRepeated.ENUM.PackedInput.JsonOutput
 Required.Proto3.ProtobufInput.ValidDataRepeated.ENUM.UnpackedInput.JsonOutput
-Required.Proto3.ProtobufInput.ValidDataRepeated.SINT32.PackedInput.JsonOutput
-Required.Proto3.ProtobufInput.ValidDataRepeated.SINT32.PackedInput.ProtobufOutput
-Required.Proto3.ProtobufInput.ValidDataRepeated.SINT32.UnpackedInput.JsonOutput
-Required.Proto3.ProtobufInput.ValidDataRepeated.SINT32.UnpackedInput.ProtobufOutput
 Required.Proto3.ProtobufInput.ValidDataScalar.ENUM[3].JsonOutput
 Required.Proto3.ProtobufInput.ValidDataScalar.ENUM[4].JsonOutput
 Required.Proto3.ProtobufInput.ValidDataScalar.ENUM[5].JsonOutput
-Required.Proto3.ProtobufInput.ValidDataScalar.SINT32[4].JsonOutput
-Required.Proto3.ProtobufInput.ValidDataScalar.SINT32[4].ProtobufOutput

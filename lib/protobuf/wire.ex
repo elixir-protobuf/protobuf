@@ -129,7 +129,13 @@ defmodule Protobuf.Wire do
   def to_proto(:double, <<a::48, 0b1111::4, b::4, _::1, 0b1111111::7>>) when a != 0 or b != 0,
     do: :nan
 
-  def to_proto(type, val) when type in [:sint32, :sint64], do: Zigzag.decode(val)
+  # For sint32 and sint64, we cast to their respective uint first and only then use zigzag
+  # decoding. This ensures that if, for example, a 32 bit integer overflows because it was encoded
+  # as a 64 bit integer (which is allowed for forward and backward compatibility), we first cast
+  # it to a 32 bit integer and then zigzag-decode it.
+  def to_proto(:sint32, val), do: Zigzag.decode(to_proto(:uint32, val))
+  def to_proto(:sint64, val), do: Zigzag.decode(to_proto(:uint64, val))
+
   def to_proto(:fixed32, <<n::little-32>>), do: n
   def to_proto(:fixed64, <<n::little-64>>), do: n
   def to_proto(:sfixed32, <<n::little-signed-32>>), do: n

@@ -21,6 +21,13 @@ defmodule Protobuf.ConformanceRegressionsTest do
         message_mod.decode(proto_input)
       end
     end
+
+    @tag conformance_input: ~S{(\202\200\200\200\020}
+    test "Required.Proto3.ProtobufInput.ValidDataScalar.SINT32[4].JsonOutput",
+         %{proto_input: proto_input, message_mod: message_mod} do
+      # Value gets "cast" back to an int32.
+      assert message_mod.decode(proto_input).optional_sint32 == 1
+    end
   end
 
   describe "JSON" do
