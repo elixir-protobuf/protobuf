@@ -33,7 +33,7 @@ defmodule Protobuf.Decoder do
     decode_field(bin, message, props)
   end
 
-  decoder :defp, :decode_field, [:message, :props] do
+  defdecoderp decode_field(message, props) do
     field_number = bsr(value, 3)
     wire_type = band(value, 7)
 
@@ -76,7 +76,7 @@ defmodule Protobuf.Decoder do
       message: "cannot decode binary data, unknown wire type: #{inspect(wire_type)}"
   end
 
-  decoder :defp, :skip_field, [:message, :props, :groups] do
+  defdecoderp skip_field(message, props, groups) do
     field_number = bsr(value, 3)
     wire_type = band(value, 7)
 
@@ -113,21 +113,21 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  decoder :defp, :skip_varint, [:message, :props, :groups] do
+  defdecoderp skip_varint(message, props, groups) do
     _ = value
     skip_field(rest, message, props, groups)
   end
 
-  decoder :defp, :skip_delimited, [:message, :props, :groups] do
+  defdecoderp skip_delimited(message, props, groups) do
     <<_skip::bytes-size(value), rest::bits>> = rest
     skip_field(rest, message, props, groups)
   end
 
-  decoder :defp, :decode_varint, [:field_number, :message, :props] do
+  defdecoderp decode_varint(field_number, message, props) do
     handle_value(rest, field_number, wire_varint(), value, message, props)
   end
 
-  decoder :defp, :decode_delimited, [:field_number, :message, :props] do
+  defdecoderp decode_delimited(field_number, message, props) do
     <<bytes::bytes-size(value), rest::bits>> = rest
     handle_value(rest, field_number, wire_delimited(), bytes, message, props)
   end
@@ -222,7 +222,7 @@ defmodule Protobuf.Decoder do
 
   defp decode_varints(<<>>, _type, acc), do: acc
 
-  decoder :defp, :decode_varints, [:type, :acc] do
+  defdecoderp decode_varints(type, acc) do
     decode_varints(rest, type, [Wire.to_proto(type, value) | acc])
   end
 

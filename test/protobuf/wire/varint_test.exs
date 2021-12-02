@@ -56,9 +56,9 @@ defmodule Protobuf.Wire.VarintTest do
   end
 
   describe "decode/1" do
-    require Varint
+    import Varint
 
-    Varint.decoder(:defp, :decode, do: {value, rest})
+    defdecoderp(decode(), do: {value, rest})
 
     test "300" do
       assert {300, ""} == decode(<<0b1010110000000010::16>>)

@@ -4,7 +4,7 @@ defmodule Protobuf.EncodeDecodeVarintTest do
 
   import Protobuf.Wire.Varint
 
-  decoder :defp, :decode do
+  defdecoderp decode() do
     "" = rest
     value
   end

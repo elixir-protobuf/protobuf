@@ -21,7 +21,11 @@ end
 defmodule VarintDecoders do
   import Protobuf.Wire.Varint
 
-  decoder :def, :decode_and_sum, [:plus] do
+  def decode_and_sum(bin, plus) do
+    decoder_decode_and_sum(bin, plus)
+  end
+
+  defdecoderp decoder_decode_and_sum(plus) do
     {:ok, value + plus, rest}
   end
 
@@ -29,7 +33,7 @@ defmodule VarintDecoders do
 
   defp decode_all(<<>>, acc), do: acc
 
-  decoder :defp, :decode_all, [:acc] do
+  defdecoderp decode_all(acc) do
     decode_all(rest, [value | acc])
   end
 end

@@ -20,7 +20,7 @@ defmodule Protobuf.Wire.Varint do
 
         defp decode_all(<<>>, acc), do: acc
 
-        decoder :defp, :decode_all, [:acc] do
+        defdecoderp decode_all(acc) do
           decode_all(rest, [value | acc])
         end
       end
@@ -155,38 +155,34 @@ defmodule Protobuf.Wire.Varint do
     }
   ]
 
-  defmacro decoder(kind, name, args \\ [], do: block) do
-    def_success(kind, name, args, block) ++ [def_failure(kind, name, args)]
+  defmacro defdecoderp(name_and_args, do: body) do
+    {name, args} = Macro.decompose_call(name_and_args)
+
+    def_decoder_success_clauses(name, args, body) ++ [def_decoder_failure_clause(name, args)]
   end
 
-  defp def_success(kind, name, args, block) do
-    args = Enum.map(args, fn arg -> {arg, [line: 1], nil} end)
-
+  defp def_decoder_success_clauses(name, args, body) do
     for {pattern, expression} <- @varints do
-      head = quote(do: unquote(name)(<<unquote(pattern), rest::bits>>, unquote_splicing(args)))
-
-      body =
-        quote do
+      quote do
+        defp unquote(name)(<<unquote(pattern), rest::bits>>, unquote_splicing(args)) do
           var!(value) = unquote(expression)
           var!(rest) = rest
-          unquote(block)
+          unquote(body)
         end
-
-      quote do
-        Kernel.unquote(kind)(unquote(head), do: unquote(body))
       end
     end
   end
 
-  defp def_failure(kind, name, args) do
-    args = Enum.map(args, fn _ -> {:_, [line: 1], nil} end)
-    head = quote(do: unquote(name)(<<_::bits>>, unquote_splicing(args)))
-    body = quote(do: raise(Protobuf.DecodeError, message: "cannot decode binary data"))
+  defp def_decoder_failure_clause(name, args) do
+    args =
+      Enum.map(args, fn
+        {name, meta, ctxt} when is_atom(name) and is_atom(ctxt) -> {:"_#{name}", meta, ctxt}
+        other -> other
+      end)
 
     quote do
-      case unquote(kind) do
-        :def -> def unquote(head), do: unquote(body)
-        :defp -> defp unquote(head), do: unquote(body)
+      defp unquote(name)(<<_::bits>>, unquote_splicing(args)) do
+        raise Protobuf.DecodeError, message: "cannot decode binary data"
       end
     end
   end
