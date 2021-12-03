@@ -1,11 +1,13 @@
 defmodule Protobuf.Wire do
   @moduledoc false
 
+  import Protobuf.Wire.Types
+
   alias Protobuf.Wire.{Varint, Zigzag}
 
   require Logger
 
-  @type proto_type ::
+  @type proto_type() ::
           :int32
           | :int64
           | :fixed32
@@ -31,6 +33,25 @@ defmodule Protobuf.Wire do
   @sint64_range -0x8000000000000000..0x7FFFFFFFFFFFFFFF
   @uint32_range 0..0xFFFFFFFF
   @uint64_range 0..0xFFFFFFFFFFFFFFFF
+
+  @spec wire_type(proto_type() | module()) :: Protobuf.Wire.Types.wire_type()
+  def wire_type(:int32), do: wire_varint()
+  def wire_type(:int64), do: wire_varint()
+  def wire_type(:uint32), do: wire_varint()
+  def wire_type(:uint64), do: wire_varint()
+  def wire_type(:sint32), do: wire_varint()
+  def wire_type(:sint64), do: wire_varint()
+  def wire_type(:bool), do: wire_varint()
+  def wire_type({:enum, _enum_module}), do: wire_varint()
+  def wire_type(:fixed64), do: wire_64bits()
+  def wire_type(:sfixed64), do: wire_64bits()
+  def wire_type(:double), do: wire_64bits()
+  def wire_type(:string), do: wire_delimited()
+  def wire_type(:bytes), do: wire_delimited()
+  def wire_type(:fixed32), do: wire_32bits()
+  def wire_type(:sfixed32), do: wire_32bits()
+  def wire_type(:float), do: wire_32bits()
+  def wire_type(mod) when is_atom(mod), do: wire_delimited()
 
   @spec from_proto(proto_type(), proto_value()) :: iodata()
   def from_proto(type, value)

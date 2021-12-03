@@ -35,6 +35,8 @@ defmodule Protobuf.DSL do
     end
   end
 
+  alias Protobuf.Wire
+
   # Registered as the @before_compile callback for modules that call "use Protobuf".
   defmacro __before_compile__(env) do
     fields = Module.get_attribute(env.module, :fields)
@@ -298,11 +300,11 @@ defmodule Protobuf.DSL do
   defp cal_label(props, _), do: props
 
   defp cal_type(%{enum?: true, type: type} = props) do
-    Map.merge(props, %{type: {:enum, type}, wire_type: Protobuf.Encoder.wire_type(:enum)})
+    Map.merge(props, %{type: {:enum, type}, wire_type: Wire.wire_type({:enum, type})})
   end
 
   defp cal_type(%{type: type} = props) do
-    Map.merge(props, %{type: type, wire_type: Protobuf.Encoder.wire_type(type)})
+    Map.merge(props, %{type: type, wire_type: Wire.wire_type(type)})
   end
 
   defp cal_type(props), do: props
@@ -363,7 +365,7 @@ defmodule Protobuf.DSL do
   defp cal_deprecated(props), do: props
 
   defp cal_encoded_fnum(%{fnum: fnum, packed?: true} = props) do
-    encoded_fnum = Protobuf.Encoder.encode_fnum(fnum, Protobuf.Encoder.wire_type(:bytes))
+    encoded_fnum = Protobuf.Encoder.encode_fnum(fnum, Wire.wire_type(:bytes))
     Map.put(props, :encoded_fnum, encoded_fnum)
   end
 

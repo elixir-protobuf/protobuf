@@ -158,27 +158,6 @@ defmodule Protobuf.Encoder do
     |> IO.iodata_to_binary()
   end
 
-  @doc false
-  @spec wire_type(atom) :: integer
-  def wire_type(:int32), do: wire_varint()
-  def wire_type(:int64), do: wire_varint()
-  def wire_type(:uint32), do: wire_varint()
-  def wire_type(:uint64), do: wire_varint()
-  def wire_type(:sint32), do: wire_varint()
-  def wire_type(:sint64), do: wire_varint()
-  def wire_type(:bool), do: wire_varint()
-  def wire_type({:enum, _}), do: wire_varint()
-  def wire_type(:enum), do: wire_varint()
-  def wire_type(:fixed64), do: wire_64bits()
-  def wire_type(:sfixed64), do: wire_64bits()
-  def wire_type(:double), do: wire_64bits()
-  def wire_type(:string), do: wire_delimited()
-  def wire_type(:bytes), do: wire_delimited()
-  def wire_type(:fixed32), do: wire_32bits()
-  def wire_type(:sfixed32), do: wire_32bits()
-  def wire_type(:float), do: wire_32bits()
-  def wire_type(mod) when is_atom(mod), do: wire_delimited()
-
   defp apply_or_map(val, _repeated? = true, func), do: Enum.map(val, func)
   defp apply_or_map(val, _repeated? = false, func), do: func.(val)
 
