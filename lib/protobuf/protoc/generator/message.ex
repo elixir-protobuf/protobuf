@@ -1,6 +1,8 @@
 defmodule Protobuf.Protoc.Generator.Message do
   @moduledoc false
 
+  alias Google.Protobuf.FieldDescriptorProto
+
   alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator.Util
   alias Protobuf.TypeUtil
@@ -116,8 +118,8 @@ defmodule Protobuf.Protoc.Generator.Message do
     "[]"
   end
 
-  defp struct_default_value(%{opts: %{default: default}}, _ctx) when is_binary(default) do
-    default
+  defp struct_default_value(%{opts: %{default: default}}, _ctx) when not is_nil(default) do
+    inspect(default)
   end
 
   defp struct_default_value(%{type_enum: :TYPE_ENUM, type: type}, %{enums: enums}) do
@@ -201,39 +203,66 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   # Public and used by extensions.
-  @spec get_field(Context.t(), Google.Protobuf.FieldDescriptorProto.t()) :: map()
-  def get_field(%Context{} = ctx, %Google.Protobuf.FieldDescriptorProto{} = field) do
+  @spec get_field(Context.t(), FieldDescriptorProto.t()) :: map()
+  def get_field(%Context{} = ctx, %FieldDescriptorProto{} = field) do
     get_field(ctx, field, _nested_maps = %{}, _oneofs = [])
   end
 
-  defp get_field(ctx, f, nested_maps, oneofs) do
-    opts = field_options(f, ctx.syntax)
-    map = nested_maps[f.type_name]
-    opts = if map, do: Map.put(opts, :map, true), else: opts
+  defp get_field(ctx, %FieldDescriptorProto{} = field_desc, nested_maps, oneofs) do
+    opts = field_options(field_desc, ctx.syntax)
+
+    # Check if the field is a map.
+    map = nested_maps[field_desc.type_name]
+    opts = if map, do: Keyword.put(opts, :map, true), else: opts
 
     opts =
-      if oneofs != [] && f.oneof_index do
-        Map.put(opts, :oneof, f.oneof_index)
-      else
-        opts
+      case field_desc.oneof_index do
+        _ when oneofs == [] -> opts
+        nil -> opts
+        index -> Keyword.put(opts, :oneof, index)
       end
 
-    opts_str = Util.options_to_str(opts)
+    opts_str =
+      opts
+      |> sort_field_opts_to_reduce_changes()
+      |> Enum.map_join(", ", fn {key, val} -> "#{key}: #{inspect(val)}" end)
+
     opts_str = if opts_str == "", do: "", else: ", " <> opts_str
 
-    type = field_type_name(ctx, f)
+    type = field_type_name(ctx, field_desc)
 
     %{
-      name: f.name,
-      number: f.number,
-      label: label_name(f.label),
+      name: field_desc.name,
+      number: field_desc.number,
+      label: label_name(field_desc.label),
       type: type,
-      type_enum: f.type,
-      opts: opts,
+      type_enum: field_desc.type,
+      opts: Map.new(opts),
       opts_str: opts_str,
       map: map,
-      oneof: f.oneof_index
+      oneof: field_desc.oneof_index
     }
+  end
+
+  # To avoid unnecessarily changing the files that users of this library generated with previous
+  # versions, we try to guarantee an order of field options in the generated files.
+  ordered_opts = [
+    :json_name,
+    :optional,
+    :repeated,
+    :map,
+    :type,
+    :default,
+    :enum,
+    :oneof,
+    :packed,
+    :deprecated
+  ]
+
+  weights = Map.new(Enum.with_index(ordered_opts))
+
+  defp sort_field_opts_to_reduce_changes(opts) do
+    Enum.sort_by(opts, fn {key, _val} -> Map.fetch!(unquote(Macro.escape(weights)), key) end)
   end
 
   defp get_extensions(desc) do
@@ -270,74 +299,108 @@ defmodule Protobuf.Protoc.Generator.Message do
     end)
   end
 
-  defp field_options(f, syntax) do
-    enum? = f.type == :TYPE_ENUM
-    default = default_value(f.type, f.default_value)
+  defp field_options(field_desc, syntax) do
+    (_starting_opts = [])
+    |> add_default_value_to_opts(field_desc)
+    |> add_enum_to_opts(field_desc)
+    |> add_json_name_to_opts(syntax, field_desc)
+    |> add_field_opts_if_present(field_desc)
+  end
 
-    %{enum: enum?, default: default}
-    |> put_json_name(syntax, f)
-    |> merge_field_options(f)
+  defp add_field_opts_if_present(opts, %FieldDescriptorProto{options: field_opts}) do
+    opts =
+      if field_opts && is_boolean(field_opts.packed) do
+        Keyword.put(opts, :packed, field_opts.packed)
+      else
+        opts
+      end
+
+    opts =
+      if field_opts && is_boolean(field_opts.deprecated) do
+        Keyword.put(opts, :deprecated, field_opts.deprecated)
+      else
+        opts
+      end
+
+    opts
+  end
+
+  defp add_enum_to_opts(opts, %FieldDescriptorProto{type: type}) do
+    if type == :TYPE_ENUM do
+      Keyword.put(opts, :enum, true)
+    else
+      opts
+    end
   end
 
   defp label_name(:LABEL_OPTIONAL), do: "optional"
   defp label_name(:LABEL_REQUIRED), do: "required"
   defp label_name(:LABEL_REPEATED), do: "repeated"
 
-  defp default_value(_, ""), do: nil
-  defp default_value(_, nil), do: nil
-
-  defp default_value(t, val) do
-    v = do_default_value(t, val)
-    if v == nil, do: v, else: inspect(v)
+  defp add_default_value_to_opts(opts, %FieldDescriptorProto{
+         default_value: default_value
+       })
+       when default_value in [nil, ""] do
+    opts
   end
 
-  defp do_default_value(:TYPE_DOUBLE, v), do: float_default(v)
-  defp do_default_value(:TYPE_FLOAT, v), do: float_default(v)
-  defp do_default_value(:TYPE_INT64, v), do: int_default(v)
-  defp do_default_value(:TYPE_UINT64, v), do: int_default(v)
-  defp do_default_value(:TYPE_INT32, v), do: int_default(v)
-  defp do_default_value(:TYPE_FIXED64, v), do: int_default(v)
-  defp do_default_value(:TYPE_FIXED32, v), do: int_default(v)
-  defp do_default_value(:TYPE_BOOL, v), do: String.to_atom(v)
-  defp do_default_value(:TYPE_STRING, v), do: v
-  defp do_default_value(:TYPE_BYTES, v), do: v
-  defp do_default_value(:TYPE_UINT32, v), do: int_default(v)
-  defp do_default_value(:TYPE_ENUM, v), do: String.to_atom(v)
-  defp do_default_value(:TYPE_SFIXED32, v), do: int_default(v)
-  defp do_default_value(:TYPE_SFIXED64, v), do: int_default(v)
-  defp do_default_value(:TYPE_SINT32, v), do: int_default(v)
-  defp do_default_value(:TYPE_SINT64, v), do: int_default(v)
-  defp do_default_value(_, _), do: nil
+  defp add_default_value_to_opts(opts, %FieldDescriptorProto{
+         default_value: default_value,
+         type: type
+       }) do
+    value = cast_default_value(type, default_value)
+
+    if is_nil(value) do
+      opts
+    else
+      Keyword.put(opts, :default, value)
+    end
+  end
+
+  int_types = [
+    :TYPE_INT64,
+    :TYPE_UINT64,
+    :TYPE_INT32,
+    :TYPE_FIXED64,
+    :TYPE_FIXED32,
+    :TYPE_UINT32,
+    :TYPE_SFIXED32,
+    :TYPE_SFIXED64,
+    :TYPE_SINT32,
+    :TYPE_SINT64
+  ]
+
+  float_types = [:TYPE_DOUBLE, :TYPE_FLOAT]
+
+  defp cast_default_value(:TYPE_BOOL, "true"), do: true
+  defp cast_default_value(:TYPE_BOOL, "false"), do: false
+  defp cast_default_value(:TYPE_ENUM, val), do: String.to_atom(val)
+  defp cast_default_value(type, val) when type in [:TYPE_STRING, :TYPE_BYTES], do: val
+  defp cast_default_value(type, val) when type in unquote(int_types), do: int_default(val)
+  defp cast_default_value(type, val) when type in unquote(float_types), do: float_default(val)
 
   defp float_default(value) do
+    # A float can also be "inf", "NaN", and so on.
     case Float.parse(value) do
-      {v, _} -> v
+      {float, ""} -> float
       :error -> value
+      {_float, _rest} -> raise "unparseable float/double default: #{inspect(value)}"
     end
   end
 
   defp int_default(value) do
     case Integer.parse(value) do
-      {v, _} -> v
-      :error -> value
+      {int, ""} -> int
+      _other -> raise "unparseable number default: #{inspect(value)}"
     end
-  end
-
-  defp merge_field_options(opts, %{options: nil}), do: opts
-
-  defp merge_field_options(opts, f) do
-    opts
-    |> Map.put(:packed, f.options.packed)
-    |> Map.put(:deprecated, f.options.deprecated)
   end
 
   # Omit `json_name` from the options list when it matches the original field
   # name to keep the list small. Only Proto3 has JSON support for now.
-  defp put_json_name(opts, :proto3, %{name: name, json_name: name}), do: opts
+  defp add_json_name_to_opts(opts, :proto3, %{name: name, json_name: name}), do: opts
 
-  defp put_json_name(opts, :proto3, %{json_name: json_name}) do
-    Map.put(opts, :json_name, inspect(json_name))
-  end
+  defp add_json_name_to_opts(opts, :proto3, %{json_name: json_name}),
+    do: Keyword.put(opts, :json_name, json_name)
 
-  defp put_json_name(opts, _syntax, _props), do: opts
+  defp add_json_name_to_opts(opts, _syntax, _props), do: opts
 end

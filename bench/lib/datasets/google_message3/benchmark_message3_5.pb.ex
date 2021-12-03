@@ -636,7 +636,8 @@ defmodule Benchmarks.GoogleMessage3.Message10155 do
     repeated: true,
     type: Benchmarks.GoogleMessage3.Enum10167,
     enum: true,
-    packed: true
+    packed: true,
+    deprecated: false
 
   field :field10236, 14, optional: true, type: :int32
   field :field10237, 15, optional: true, type: :int32

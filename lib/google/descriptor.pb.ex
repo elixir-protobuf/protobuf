@@ -751,8 +751,8 @@ defmodule Google.Protobuf.SourceCodeInfo.Location do
             trailing_comments: nil,
             leading_detached_comments: []
 
-  field :path, 1, repeated: true, type: :int32, packed: true
-  field :span, 2, repeated: true, type: :int32, packed: true
+  field :path, 1, repeated: true, type: :int32, packed: true, deprecated: false
+  field :span, 2, repeated: true, type: :int32, packed: true, deprecated: false
   field :leading_comments, 3, optional: true, type: :string
   field :trailing_comments, 4, optional: true, type: :string
   field :leading_detached_comments, 6, repeated: true, type: :string
@@ -787,7 +787,7 @@ defmodule Google.Protobuf.GeneratedCodeInfo.Annotation do
             begin: nil,
             end: nil
 
-  field :path, 1, repeated: true, type: :int32, packed: true
+  field :path, 1, repeated: true, type: :int32, packed: true, deprecated: false
   field :source_file, 2, optional: true, type: :string
   field :begin, 3, optional: true, type: :int32
   field :end, 4, optional: true, type: :int32

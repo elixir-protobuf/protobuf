@@ -175,6 +175,14 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
             type: :TYPE_INT32,
             label: :LABEL_OPTIONAL,
             default_value: "42"
+          ),
+          Google.Protobuf.FieldDescriptorProto.new(
+            name: "b",
+            json_name: "b",
+            number: 2,
+            type: :TYPE_BOOL,
+            label: :LABEL_OPTIONAL,
+            default_value: "false"
           )
         ]
       )
@@ -182,9 +190,11 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "a: integer"
     assert msg =~ "field :a, 1, optional: true, type: :int32, default: 42\n"
+    assert msg =~ "field :b, 2, optional: true, type: :bool, default: false\n"
 
     assert msg =~ """
-             defstruct a: nil
+             defstruct a: nil,
+                       b: nil
            """
   end
 
@@ -234,7 +244,30 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "field :a, 1, optional: true, type: :int32, packed: true\n"
+    assert msg =~ "field :a, 1, optional: true, type: :int32, packed: true, deprecated: false\n"
+  end
+
+  test "generated supports explicit option [packed = false] in proto3" do
+    ctx = %Context{syntax: :proto3}
+
+    desc =
+      Google.Protobuf.DescriptorProto.new!(
+        name: "Foo",
+        field: [
+          Google.Protobuf.FieldDescriptorProto.new!(
+            name: "a",
+            json_name: "a",
+            number: 1,
+            type: :TYPE_BOOL,
+            label: :LABEL_REQUIRED,
+            options: Google.Protobuf.FieldOptions.new!(packed: false)
+          )
+        ]
+      )
+
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
+
+    assert msg =~ "field :a, 1, type: :bool, packed: false"
   end
 
   test "generate/2 supports option :deprecated" do

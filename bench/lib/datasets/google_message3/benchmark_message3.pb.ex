@@ -564,8 +564,8 @@ defmodule Benchmarks.GoogleMessage3.Message10278 do
             field10287: [],
             field10288: nil
 
-  field :field10286, 1, repeated: true, type: :int32, packed: true
-  field :field10287, 2, repeated: true, type: :int32, packed: true
+  field :field10286, 1, repeated: true, type: :int32, packed: true, deprecated: false
+  field :field10287, 2, repeated: true, type: :int32, packed: true, deprecated: false
   field :field10288, 3, optional: true, type: :int32
 end
 
