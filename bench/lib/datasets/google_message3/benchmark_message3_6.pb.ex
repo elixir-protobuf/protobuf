@@ -1262,7 +1262,7 @@ defmodule Benchmarks.GoogleMessage3.Message8888 do
 
   field :field8908, 1, optional: true, type: :int32
   field :field8909, 4, optional: true, type: Benchmarks.GoogleMessage3.Enum8900, enum: true
-  field :field8910, 2, repeated: true, type: :int32, packed: true
+  field :field8910, 2, repeated: true, type: :int32, packed: true, deprecated: false
   field :field8911, 3, optional: true, type: :bytes
 end
 

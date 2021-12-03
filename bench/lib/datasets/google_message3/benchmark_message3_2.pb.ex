@@ -17,9 +17,9 @@ defmodule Benchmarks.GoogleMessage3.Message22853 do
             field22873: nil
 
   field :field22869, 1, optional: true, type: Benchmarks.GoogleMessage3.Enum22854, enum: true
-  field :field22870, 2, repeated: true, type: :uint32, packed: true
-  field :field22871, 3, repeated: true, type: :float, packed: true
-  field :field22872, 5, repeated: true, type: :float, packed: true
+  field :field22870, 2, repeated: true, type: :uint32, packed: true, deprecated: false
+  field :field22871, 3, repeated: true, type: :float, packed: true, deprecated: false
+  field :field22872, 5, repeated: true, type: :float, packed: true, deprecated: false
   field :field22873, 4, optional: true, type: Benchmarks.GoogleMessage3.UnusedEmptyMessage
 end
 

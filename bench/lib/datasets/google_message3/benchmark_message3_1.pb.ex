@@ -92,7 +92,7 @@ defmodule Benchmarks.GoogleMessage3.Message34791 do
   field :field34803, 13, optional: true, type: :int32
   field :field34804, 14, optional: true, type: :string
   field :field34805, 15, optional: true, type: :int64
-  field :field34806, 17, repeated: true, type: :fixed64, packed: true
+  field :field34806, 17, repeated: true, type: :fixed64, packed: true, deprecated: false
 end
 
 defmodule Benchmarks.GoogleMessage3.Message35483 do
