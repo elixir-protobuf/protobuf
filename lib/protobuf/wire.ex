@@ -104,11 +104,15 @@ defmodule Protobuf.Wire do
   def to_proto(:bool, val), do: val != 0
 
   def to_proto({:enum, enum_mod}, val) when is_atom(enum_mod) and is_integer(val) do
-    enum_mod.key(val)
-  rescue
-    FunctionClauseError ->
-      Logger.warn("unknown enum value #{val} when decoding for #{inspect(enum_mod)}")
-      val
+    val = to_proto(:int32, val)
+
+    try do
+      enum_mod.key(val)
+    rescue
+      FunctionClauseError ->
+        Logger.warn("unknown enum value #{val} when decoding for #{inspect(enum_mod)}")
+        val
+    end
   end
 
   def to_proto(:float, <<n::little-float-32>>), do: n

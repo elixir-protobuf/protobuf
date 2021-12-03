@@ -307,6 +307,11 @@ defmodule Protobuf.WireTest do
              end) =~ ~r/unknown enum value 5 when decoding for TestMsg\.EnumFoo/
     end
 
+    test "enum wraps to an int32" do
+      max_int32 = 0x7FFFFFFFFFFFFFFF
+      assert Wire.to_proto({:enum, TestMsg.EnumFoo}, max_int32 + 2) == :A
+    end
+
     test "a fixed64" do
       assert 8_446_744_073_709_551_615 ==
                Wire.to_proto(:fixed64, <<255, 255, 23, 118, 251, 220, 56, 117>>)
