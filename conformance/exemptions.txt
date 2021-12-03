@@ -1,7 +1,4 @@
 Recommended.Proto2.JsonInput.FieldNameExtension.Validator
-Recommended.Proto2.ProtobufInput.ValidDataOneofBinary.MESSAGE.Merge.ProtobufOutput
-Recommended.Proto2.ProtobufInput.ValidDataOneofBinary.MESSAGE.MultipleValuesForDifferentField.ProtobufOutput
-Recommended.Proto2.ProtobufInput.ValidDataOneofBinary.MESSAGE.MultipleValuesForSameField.ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataRepeated.ENUM.PackedInput.DefaultOutput.ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataRepeated.ENUM.PackedInput.PackedOutput.ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataRepeated.ENUM.PackedInput.UnpackedOutput.ProtobufOutput
@@ -11,8 +8,6 @@ Recommended.Proto2.ProtobufInput.ValidDataRepeated.ENUM.UnpackedInput.UnpackedOu
 Recommended.Proto2.ProtobufInput.ValidDataScalarBinary.ENUM[4].ProtobufOutput
 Recommended.Proto2.ProtobufInput.ValidDataScalarBinary.ENUM[5].ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataOneofBinary.MESSAGE.Merge.ProtobufOutput
-Recommended.Proto3.ProtobufInput.ValidDataOneofBinary.MESSAGE.MultipleValuesForDifferentField.ProtobufOutput
-Recommended.Proto3.ProtobufInput.ValidDataOneofBinary.MESSAGE.MultipleValuesForSameField.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataRepeated.BOOL.PackedInput.UnpackedOutput.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataRepeated.BOOL.UnpackedInput.UnpackedOutput.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataRepeated.DOUBLE.PackedInput.UnpackedOutput.ProtobufOutput
@@ -48,11 +43,7 @@ Recommended.Proto3.ProtobufInput.ValidDataRepeated.UINT64.UnpackedInput.Unpacked
 Recommended.Proto3.ProtobufInput.ValidDataScalarBinary.ENUM[4].ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataScalarBinary.ENUM[5].ProtobufOutput
 Required.Proto2.JsonInput.StoresDefaultPrimitive.Validator
-Required.Proto2.ProtobufInput.RepeatedScalarMessageMerge.ProtobufOutput
 Required.Proto2.ProtobufInput.UnknownVarint.ProtobufOutput
-Required.Proto2.ProtobufInput.ValidDataOneof.MESSAGE.Merge.ProtobufOutput
-Required.Proto2.ProtobufInput.ValidDataOneof.MESSAGE.MultipleValuesForDifferentField.ProtobufOutput
-Required.Proto2.ProtobufInput.ValidDataOneof.MESSAGE.MultipleValuesForSameField.ProtobufOutput
 Required.Proto3.JsonInput.Any.JsonOutput
 Required.Proto3.JsonInput.Any.ProtobufOutput
 Required.Proto3.JsonInput.AnyNested.JsonOutput
@@ -73,16 +64,8 @@ Required.Proto3.JsonInput.AnyWithValueForInteger.JsonOutput
 Required.Proto3.JsonInput.AnyWithValueForInteger.ProtobufOutput
 Required.Proto3.JsonInput.AnyWithValueForJsonObject.JsonOutput
 Required.Proto3.JsonInput.AnyWithValueForJsonObject.ProtobufOutput
-Required.Proto3.ProtobufInput.RepeatedScalarMessageMerge.JsonOutput
-Required.Proto3.ProtobufInput.RepeatedScalarMessageMerge.ProtobufOutput
 Required.Proto3.ProtobufInput.RepeatedScalarSelectsLast.ENUM.JsonOutput
 Required.Proto3.ProtobufInput.UnknownVarint.ProtobufOutput
-Required.Proto3.ProtobufInput.ValidDataOneof.MESSAGE.Merge.JsonOutput
-Required.Proto3.ProtobufInput.ValidDataOneof.MESSAGE.Merge.ProtobufOutput
-Required.Proto3.ProtobufInput.ValidDataOneof.MESSAGE.MultipleValuesForDifferentField.JsonOutput
-Required.Proto3.ProtobufInput.ValidDataOneof.MESSAGE.MultipleValuesForDifferentField.ProtobufOutput
-Required.Proto3.ProtobufInput.ValidDataOneof.MESSAGE.MultipleValuesForSameField.JsonOutput
-Required.Proto3.ProtobufInput.ValidDataOneof.MESSAGE.MultipleValuesForSameField.ProtobufOutput
 Required.Proto3.ProtobufInput.ValidDataRepeated.ENUM.PackedInput.JsonOutput
 Required.Proto3.ProtobufInput.ValidDataRepeated.ENUM.UnpackedInput.JsonOutput
 Required.Proto3.ProtobufInput.ValidDataScalar.ENUM[3].JsonOutput

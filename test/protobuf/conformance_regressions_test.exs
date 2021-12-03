@@ -1,10 +1,10 @@
 defmodule Protobuf.ConformanceRegressionsTest do
   use ExUnit.Case, async: true
 
-  setup :url_to_message
-  setup :decode_conformance_input
-
   describe "proto3" do
+    setup :url_to_message
+    setup :decode_conformance_input
+
     @describetag message_type: "protobuf_test_messages.proto3.TestAllTypesProto3"
 
     @tag skip: "Issue #218"
@@ -28,9 +28,22 @@ defmodule Protobuf.ConformanceRegressionsTest do
       # Value gets "cast" back to an int32.
       assert message_mod.decode(proto_input).optional_sint32 == 1
     end
+
+    @tag conformance_input:
+           ~S{\222\001\014\022\n\010\322\t\020\322\t\370\001\322\t\222\001\014\022\n\010\341!\030\341!\370\001\341!}
+    test "Required.Proto3.ProtobufInput.RepeatedScalarMessageMerge.ProtobufOutput",
+         %{proto_input: proto_input, message_mod: message_mod} do
+      decoded = message_mod.decode(proto_input)
+
+      assert decoded.optional_nested_message.corecursive.repeated_int32 == [1234, 4321]
+      assert decoded.optional_nested_message.corecursive.optional_int64 == 1234
+    end
   end
 
   describe "proto2" do
+    setup :url_to_message
+    setup :decode_conformance_input
+
     @describetag message_type: "protobuf_test_messages.proto2.TestAllTypesProto2"
     @tag conformance_input:
            ~S{\332\002(\000\001\377\377\377\377\377\377\377\377\377\001\316\302\361\005\200\200\200\200 \377\377\377\377\377\377\377\377\177\200\200\200\200\200\200\200\200\200\001}
@@ -49,6 +62,8 @@ defmodule Protobuf.ConformanceRegressionsTest do
   end
 
   describe "JSON" do
+    setup :url_to_message
+
     @describetag message_type: "protobuf_test_messages.proto3.TestAllTypesProto3"
 
     test "Recommended.Proto3.JsonInput.NullValueInOtherOneofNewFormat.Validator",

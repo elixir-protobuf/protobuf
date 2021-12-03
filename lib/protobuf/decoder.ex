@@ -196,12 +196,91 @@ defmodule Protobuf.Decoder do
     val = if map?, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
     val = if oneof, do: {name_atom, val}, else: val
 
-    cond do
-      is_nil(current) and repeated? -> [val]
-      is_nil(current) and not repeated? -> val
-      repeated? -> [val | current]
-      not repeated? -> Map.merge(current, val)
+    if repeated? do
+      # List.wrap/1 wraps nil into [].
+      [val | List.wrap(current)]
+    else
+      # If the field is embedded but not repeated, it means that we need to merge the existing
+      # embedded message together with the new embedded message. If there is not existing embedded
+      # message, we default to a new empty message.
+      current =
+        cond do
+          current -> current
+          oneof -> {name_atom, type.new!([])}
+          true -> type.new!([])
+        end
+
+      deep_merge(current, val, type.__message_props__())
     end
+  end
+
+  # If the field is a oneof, we merge its value and keep the tag.
+  defp deep_merge(_oneof1 = {tag, val1}, _oneof2 = {tag, val2}, props) do
+    {tag, deep_merge(val1, val2, props)}
+  end
+
+  # If the two fields to merge are the same message, we merge it by merging their fields.
+  defp deep_merge(%mod{} = msg1, %mod{} = msg2, %MessageProps{} = props) do
+    merged =
+      Enum.reduce(props.field_props, msg2, fn {_number, field_prop}, acc ->
+        %FieldProps{name_atom: field_name, oneof: oneof} = field_prop
+
+        case {msg1, msg2} do
+          {%{^field_name => val1}, %{^field_name => val2}} ->
+            if oneof do
+              %{acc | field_name => val2}
+            else
+              %{acc | field_name => deep_merge_field(val1, val2, field_prop, props.syntax)}
+            end
+
+          {%{^field_name => val1}, %{}} ->
+            Map.put(acc, field_name, val1)
+
+          {_msg1, _msg2} ->
+            acc
+        end
+      end)
+
+    # Merge extensions. Not 100% sure this is right but it doesn't break any tests nor any
+    # conformance tests...
+    case {Map.fetch(msg1, :__pb_extensions__), Map.fetch(msg2, :__pb_extensions__)} do
+      {{:ok, %{} = ext1}, {:ok, %{} = ext2}} ->
+        %{merged | __pb_extensions__: Map.merge(ext1, ext2)}
+
+      {{:ok, ext1}, :error} ->
+        %{merged | __pb_extensions__: ext1}
+
+      _other ->
+        merged
+    end
+  end
+
+  # If the two fields to merge are maps (which is a special case of embedded fields), we don't
+  # merge them recursively.
+  defp deep_merge(%{} = msg1, %{} = msg2, _props) do
+    Map.merge(msg1, msg2)
+  end
+
+  # TODO: transform_module
+  defp deep_merge(_val1, val2, _props) do
+    val2
+  end
+
+  # Merging lists means concatenating them.
+  defp deep_merge_field(val1, val2, %FieldProps{repeated?: true}, _syntax) do
+    val1 ++ val2
+  end
+
+  # Recursively go up and merge two embedded messages with their new "message props".
+  defp deep_merge_field(val1, val2, %FieldProps{embedded?: true, type: type}, _syntax)
+       when not is_nil(val1) and not is_nil(val2) do
+    deep_merge(val1, val2, type.__message_props__())
+  end
+
+  # If the two fields are normal fields, then we pick the second one unless it's a default value.
+  defp deep_merge_field(val1, val2, %FieldProps{} = prop, syntax) do
+    default? = val2 == Protobuf.Builder.field_default(syntax, prop)
+    if default?, do: val1, else: val2
   end
 
   # The "packed" flag is, essentially, a suggestion. If a field says it's packed, it could be
