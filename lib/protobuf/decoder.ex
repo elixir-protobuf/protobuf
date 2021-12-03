@@ -34,8 +34,12 @@ defmodule Protobuf.Decoder do
   end
 
   defdecoderp decode_field(message, props) do
+    # From the docs:
+    # "Each key in the streamed message is a varint with the value
+    # (field_number << 3) | wire_type, in other words, the last three bits of
+    # the number store the wire type."
     field_number = bsr(value, 3)
-    wire_type = band(value, 7)
+    wire_type = band(value, 0b00000111)
 
     if field_number != 0 do
       handle_field(rest, field_number, wire_type, message, props)
