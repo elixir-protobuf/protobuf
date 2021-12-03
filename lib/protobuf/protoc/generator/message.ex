@@ -246,7 +246,19 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   # To avoid unnecessarily changing the files that users of this library generated with previous
   # versions, we try to guarantee an order of field options in the generated files.
-  ordered_opts = [:json_name, :optional, :repeated, :type, :default, :enum, :packed, :deprecated]
+  ordered_opts = [
+    :json_name,
+    :optional,
+    :repeated,
+    :map,
+    :type,
+    :default,
+    :enum,
+    :oneof,
+    :packed,
+    :deprecated
+  ]
+
   weights = Map.new(Enum.with_index(ordered_opts))
 
   defp sort_field_opts_to_reduce_changes(opts) do

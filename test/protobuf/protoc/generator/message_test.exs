@@ -244,7 +244,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "field :a, 1, optional: true, type: :int32, packed: true\n"
+    assert msg =~ "field :a, 1, optional: true, type: :int32, packed: true, deprecated: false\n"
   end
 
   test "generated supports explicit option [packed = false] in proto3" do
