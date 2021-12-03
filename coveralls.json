@@ -1,0 +1,11 @@
+{
+  "skip_files": [
+    "_build",
+    "deps",
+    "test",
+    "generated",
+    "conformance",
+    "lib/google/compiler/plugin.pb.ex",
+    "lib/google/descriptor.pb.ex"
+  ]
+}

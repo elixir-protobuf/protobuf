@@ -176,6 +176,7 @@ defmodule Protobuf.Wire.Varint do
   defp def_decoder_failure_clause(name, args) do
     args =
       Enum.map(args, fn
+        {:_, _meta, _ctxt} = underscore -> underscore
         {name, meta, ctxt} when is_atom(name) and is_atom(ctxt) -> {:"_#{name}", meta, ctxt}
         other -> other
       end)
