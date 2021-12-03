@@ -132,16 +132,16 @@ defmodule Protobuf.Decoder do
     handle_value(rest, field_number, wire_delimited(), bytes, message, props)
   end
 
-  defp handle_value(<<bin::bits>>, field_number, wire_type, value, message, props) do
+  defp handle_value(<<rest::bits>>, field_number, wire_type, value, message, props) do
     case props.field_props do
       %{^field_number => %FieldProps{packed?: true, name_atom: name_atom} = prop} ->
         new_message = update_in_message(message, name_atom, &value_for_packed(value, &1, prop))
-        build_message(bin, new_message, props)
+        build_message(rest, new_message, props)
 
       %{^field_number => %FieldProps{wire_type: ^wire_type} = prop} ->
         key = field_key(prop, props)
         new_message = update_in_message(message, key, &value_for_field(value, &1, prop))
-        build_message(bin, new_message, props)
+        build_message(rest, new_message, props)
 
       # Repeated fields of primitive numeric types can be "packed". Their packed? flag will be
       # false, but they will be encoded as wire_delimited() one after the other. In proto2, this
@@ -150,7 +150,7 @@ defmodule Protobuf.Decoder do
       %{^field_number => %FieldProps{repeated?: true, name_atom: name_atom} = prop}
       when wire_type == wire_delimited() ->
         new_message = update_in_message(message, name_atom, &value_for_packed(value, &1, prop))
-        build_message(bin, new_message, props)
+        build_message(rest, new_message, props)
 
       %{^field_number => %FieldProps{wire_type: expected, name: field}} ->
         raise DecodeError,
@@ -170,7 +170,7 @@ defmodule Protobuf.Decoder do
               message
           end
 
-        build_message(bin, new_message, props)
+        build_message(rest, new_message, props)
     end
   end
 
