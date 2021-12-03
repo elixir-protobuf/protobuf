@@ -30,6 +30,24 @@ defmodule Protobuf.ConformanceRegressionsTest do
     end
   end
 
+  describe "proto2" do
+    @describetag message_type: "protobuf_test_messages.proto2.TestAllTypesProto2"
+    @tag conformance_input:
+           ~S{\332\002(\000\001\377\377\377\377\377\377\377\377\377\001\316\302\361\005\200\200\200\200 \377\377\377\377\377\377\377\377\177\200\200\200\200\200\200\200\200\200\001}
+    test "Recommended.Proto2.ProtobufInput.ValidDataRepeated.BOOL.PackedInput.DefaultOutput.ProtobufOutput",
+         %{proto_input: proto_input, message_mod: message_mod} do
+      assert message_mod.decode(proto_input).repeated_bool == [
+               false,
+               true,
+               true,
+               true,
+               true,
+               true,
+               true
+             ]
+    end
+  end
+
   describe "JSON" do
     @describetag message_type: "protobuf_test_messages.proto3.TestAllTypesProto3"
 
