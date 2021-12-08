@@ -59,7 +59,7 @@ defmodule Protobuf.DSL do
 
       unquote(gen_defstruct(env.module, msg_props))
 
-      unquote(def_t_typespec(msg_props))
+      unquote(def_t_typespec(msg_props, extension_props))
 
       unquote(def_enum_functions(msg_props, fields))
 
@@ -79,7 +79,7 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp def_t_typespec(%MessageProps{enum?: true} = props) do
+  defp def_t_typespec(%MessageProps{enum?: true} = props, _extension_props) do
     spec =
       props.field_props
       |> Enum.map(fn {_fnum, %FieldProps{name_atom: name}} -> name end)
@@ -93,8 +93,8 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp def_t_typespec(%MessageProps{field_props: field_props} = message_props)
-       when field_props != %{} do
+  defp def_t_typespec(%MessageProps{field_props: field_props} = message_props, extension_props)
+       when is_nil(extension_props) do
     fields_with_specs =
       for {_fnum, prop} <- field_props,
           is_nil(prop.oneof),
@@ -118,7 +118,7 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp def_t_typespec(_props) do
+  defp def_t_typespec(_props, _extension_props) do
     nil
   end
 
@@ -140,6 +140,8 @@ defmodule Protobuf.DSL do
     value_prop = map_props.field_props[map_props.field_tags.value]
 
     value_spec = type_to_spec(value_prop.type, value_prop)
+
+    value_spec = if prop.embedded?, do: quote(do: unquote(value_spec) | nil), else: value_spec
     quote do: %{optional(unquote(key_spec)) => unquote(value_spec)}
   end
 
