@@ -273,11 +273,6 @@ defmodule TestMsg do
     @moduledoc false
     use Protobuf, syntax: :proto2
 
-    @type t :: %__MODULE__{
-            fa: non_neg_integer,
-            __pb_extensions__: map
-          }
-
     field :fa, 1, optional: true, type: :uint32
 
     extensions([{100, 101}, {1000, 536_870_912}])
@@ -286,11 +281,6 @@ defmodule TestMsg do
   defmodule Ext.Foo2 do
     @moduledoc false
     use Protobuf, syntax: :proto2
-
-    @type t :: %__MODULE__{
-            fa: non_neg_integer,
-            __pb_extensions__: map
-          }
 
     field :fa, 1, optional: true, type: :uint32
 
@@ -301,18 +291,12 @@ defmodule TestMsg do
     @moduledoc false
     use Protobuf, syntax: :proto2
 
-    @type t :: %__MODULE__{
-            a: String.t()
-          }
-
     field :a, 1, optional: true, type: :string
   end
 
   defmodule Ext.Parent do
     @moduledoc false
     use Protobuf, syntax: :proto2
-
-    @type t :: %__MODULE__{}
   end
 
   defmodule Ext.PbExtension do

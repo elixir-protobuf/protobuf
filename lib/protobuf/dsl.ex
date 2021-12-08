@@ -57,9 +57,9 @@ defmodule Protobuf.DSL do
         unquote(Macro.escape(msg_props))
       end
 
-      unquote(def_t_typespec(msg_props))
-
       unquote(gen_defstruct(env.module, msg_props))
+
+      unquote(def_t_typespec(msg_props))
 
       unquote(def_enum_functions(msg_props, fields))
 
@@ -83,18 +83,113 @@ defmodule Protobuf.DSL do
     spec =
       props.field_props
       |> Enum.map(fn {_fnum, %FieldProps{name_atom: name}} -> name end)
-      |> Enum.reduce(quote(do: integer()), fn field_name, acc ->
-        quote do: unquote(acc) | unquote(field_name)
+      |> Enum.reverse()
+      |> Enum.reduce(fn field_name, acc ->
+        quote do: unquote(field_name) | unquote(acc)
       end)
 
     quote do
-      @type t() :: unquote(spec)
+      @type t() :: integer() | unquote(spec)
+    end
+  end
+
+  defp def_t_typespec(%MessageProps{field_props: field_props} = message_props)
+       when field_props != %{} do
+    fields_with_specs =
+      for {_fnum, prop} <- field_props,
+          is_nil(prop.oneof),
+          do: {prop.name_atom, field_prop_to_spec(prop)}
+
+    oneofs =
+      for {field_name, fnum} <- message_props.oneof do
+        possible_fields = Enum.filter(field_props, fn {_fnum, prop} -> prop.oneof == fnum end)
+        {field_name, oneof_spec(possible_fields)}
+      end
+
+    extensions =
+      if is_list(message_props.extension_range) and message_props.extension_range != [] do
+        [{:__pb_extensions__, quote(do: map())}]
+      else
+        []
+      end
+
+    quote do
+      @type t() :: %__MODULE__{unquote_splicing(fields_with_specs ++ oneofs ++ extensions)}
     end
   end
 
   defp def_t_typespec(_props) do
     nil
   end
+
+  defp oneof_spec(fields) do
+    fields
+    |> Enum.map(fn {_fnum, prop} ->
+      quote do: {unquote(prop.name_atom), unquote(field_prop_to_spec(prop))}
+    end)
+    |> Enum.reduce(fn spec, acc ->
+      quote do: unquote(acc) | unquote(spec)
+    end)
+  end
+
+  defp field_prop_to_spec(%FieldProps{map?: true, type: map_mod} = prop) do
+    Code.ensure_loaded!(map_mod)
+    map_props = map_mod.__message_props__()
+
+    key_spec = scalar_type_to_spec(map_props.field_props[map_props.field_tags.key].type)
+    value_prop = map_props.field_props[map_props.field_tags.value]
+
+    value_spec = type_to_spec(value_prop.type, value_prop)
+    quote do: %{optional(unquote(key_spec)) => unquote(value_spec)}
+  end
+
+  defp field_prop_to_spec(%FieldProps{type: type} = prop) do
+    spec = type_to_spec(type, prop)
+
+    cond do
+      prop.repeated? -> quote do: [unquote(spec)]
+      prop.embedded? -> quote do: unquote(spec) | nil
+      true -> spec
+    end
+  end
+
+  defp field_prop_to_spec(%FieldProps{repeated?: true} = prop) do
+    nested_spec = field_prop_to_spec(%FieldProps{prop | repeated?: false})
+    quote do: [unquote(nested_spec)]
+  end
+
+  defp field_prop_to_spec(%FieldProps{embedded?: true, type: mod}) do
+    quote do: unquote(mod).t()
+  end
+
+  defp field_prop_to_spec(%FieldProps{optional?: true} = prop) do
+    nested_spec = field_prop_to_spec(%FieldProps{prop | optional?: false})
+    quote do: unquote(nested_spec) | nil
+  end
+
+  defp field_prop_to_spec(%FieldProps{}) do
+    quote do: term()
+  end
+
+  defp type_to_spec({:enum, enum_mod}, _prop), do: quote(do: unquote(enum_mod).t())
+  defp type_to_spec(mod, %FieldProps{embedded?: true}), do: quote(do: unquote(mod).t())
+  defp type_to_spec(:group, _prop), do: quote(do: term())
+  defp type_to_spec(type, _prop), do: scalar_type_to_spec(type)
+
+  defp scalar_type_to_spec(:string), do: quote(do: String.t())
+  defp scalar_type_to_spec(:bytes), do: quote(do: binary())
+  defp scalar_type_to_spec(:bool), do: quote(do: boolean())
+
+  defp scalar_type_to_spec(type)
+       when type in [:int32, :int64, :sint32, :sint64, :sfixed32, :sfixed64],
+       do: quote(do: integer())
+
+  defp scalar_type_to_spec(type)
+       when type in [:uint32, :uint64, :fixed32, :fixed64],
+       do: quote(do: non_neg_integer())
+
+  defp scalar_type_to_spec(type) when type in [:float, :double],
+    do: quote(do: float() | :infinity | :negative_infinity | :nan)
 
   defp def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}, fields) do
     if syntax == :proto3 do

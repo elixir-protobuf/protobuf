@@ -10,13 +10,6 @@ defmodule Google.Protobuf.Compiler.Version do
   @moduledoc false
   use Protobuf, syntax: :proto2
 
-  @type t :: %__MODULE__{
-          major: integer,
-          minor: integer,
-          patch: integer,
-          suffix: String.t()
-        }
-
   field :major, 1, optional: true, type: :int32
   field :minor, 2, optional: true, type: :int32
   field :patch, 3, optional: true, type: :int32
@@ -26,13 +19,6 @@ end
 defmodule Google.Protobuf.Compiler.CodeGeneratorRequest do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
-  @type t :: %__MODULE__{
-          file_to_generate: [String.t()],
-          parameter: String.t(),
-          proto_file: [Google.Protobuf.FileDescriptorProto.t()],
-          compiler_version: Google.Protobuf.Compiler.Version.t() | nil
-        }
 
   field :file_to_generate, 1, repeated: true, type: :string
   field :parameter, 2, optional: true, type: :string
@@ -44,13 +30,6 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorResponse.File do
   @moduledoc false
   use Protobuf, syntax: :proto2
 
-  @type t :: %__MODULE__{
-          name: String.t(),
-          insertion_point: String.t(),
-          content: String.t(),
-          generated_code_info: Google.Protobuf.GeneratedCodeInfo.t() | nil
-        }
-
   field :name, 1, optional: true, type: :string
   field :insertion_point, 2, optional: true, type: :string
   field :content, 15, optional: true, type: :string
@@ -60,12 +39,6 @@ end
 defmodule Google.Protobuf.Compiler.CodeGeneratorResponse do
   @moduledoc false
   use Protobuf, syntax: :proto2
-
-  @type t :: %__MODULE__{
-          error: String.t(),
-          supported_features: non_neg_integer,
-          file: [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()]
-        }
 
   field :error, 1, optional: true, type: :string
   field :supported_features, 2, optional: true, type: :uint64

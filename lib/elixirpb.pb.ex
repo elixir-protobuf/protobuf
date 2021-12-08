@@ -2,10 +2,6 @@ defmodule Elixirpb.FileOptions do
   @moduledoc false
   use Protobuf, syntax: :proto2
 
-  @type t :: %__MODULE__{
-          module_prefix: String.t()
-        }
-
   field :module_prefix, 1, optional: true, type: :string
 end
 

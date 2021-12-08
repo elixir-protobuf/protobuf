@@ -5,7 +5,6 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator.Util
-  alias Protobuf.TypeUtil
   alias Protobuf.Protoc.Generator.Enum, as: EnumGenerator
 
   require EEx
@@ -49,7 +48,6 @@ defmodule Protobuf.Protoc.Generator.Message do
          message_template(
            module: msg_name,
            use_options: msg_opts_str(ctx, desc.options),
-           struct_field_typespecs: struct_field_typespecs(fields, desc.oneof_decl, extensions),
            oneofs: desc.oneof_decl,
            fields: gen_fields(ctx.syntax, fields),
            descriptor_fun_body: descriptor_fun_body,
@@ -90,66 +88,6 @@ defmodule Protobuf.Protoc.Generator.Message do
     str = Util.options_to_str(opts)
     if String.length(str) > 0, do: ", " <> str, else: ""
   end
-
-  defp struct_field_typespecs(fields, oneofs, extensions) do
-    {oneof_fields, regular_fields} = Enum.split_with(fields, & &1[:oneof])
-
-    oneof_types = oneof_types(oneofs, oneof_fields)
-    regular_types = regular_types(regular_fields)
-    extensions_types = extensions_types(extensions)
-
-    oneof_types ++ regular_types ++ extensions_types
-  end
-
-  defp oneof_types(oneofs, oneof_fields) do
-    oneofs
-    |> Enum.with_index()
-    |> Enum.map(fn {oneof, index} ->
-      typespec =
-        oneof_fields
-        |> Enum.filter(&(&1.oneof == index))
-        |> Enum.map_join(" | ", &"{:#{&1.name}, #{fmt_type(&1)}}")
-
-      {oneof.name, typespec}
-    end)
-  end
-
-  defp regular_types(fields) do
-    for f <- fields, do: {f.name, fmt_type(f)}
-  end
-
-  defp extensions_types(_extensions = []), do: []
-
-  defp extensions_types(_extensions) do
-    [{:__pb_extensions__, "map"}]
-  end
-
-  defp fmt_type(%{opts: %{map: true}, map: {{k_type_enum, _k_type}, {v_type_enum, v_type}}}) do
-    # Keys are guaranteed to be scalars. Values can be anything except another map. Map fields
-    # cannot be `repeated`.
-    k_spec = TypeUtil.enum_to_spec(k_type_enum)
-    v_spec = type_to_spec(v_type_enum, v_type)
-    v_spec = optional_if_message(v_type_enum, v_spec)
-
-    "%{#{k_spec} => #{v_spec}}"
-  end
-
-  defp fmt_type(%{label: label, type_enum: type_enum, type: type}) do
-    spec = type_to_spec(type_enum, type)
-
-    if label == "repeated" do
-      "[#{spec}]"
-    else
-      optional_if_message(type_enum, spec)
-    end
-  end
-
-  defp type_to_spec(:TYPE_MESSAGE, type), do: "#{type}.t()"
-  defp type_to_spec(:TYPE_ENUM, type), do: "#{type}.t()"
-  defp type_to_spec(type_scalar, _type), do: TypeUtil.enum_to_spec(type_scalar)
-
-  defp optional_if_message(:TYPE_MESSAGE, spec), do: "#{spec} | nil"
-  defp optional_if_message(_type_others, spec), do: spec
 
   defp get_fields(ctx, desc) do
     oneofs = Enum.map(desc.oneof_decl, & &1.name)
@@ -227,7 +165,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp field_type_name(ctx, f) do
-    type = TypeUtil.from_enum(f.type)
+    type = from_enum(f.type)
 
     if f.type_name && (type == :enum || type == :message) do
       Util.type_from_type_name(ctx, f.type_name)
@@ -358,4 +296,23 @@ defmodule Protobuf.Protoc.Generator.Message do
     do: Keyword.put(opts, :json_name, json_name)
 
   defp add_json_name_to_opts(opts, _syntax, _props), do: opts
+
+  defp from_enum(:TYPE_DOUBLE), do: :double
+  defp from_enum(:TYPE_FLOAT), do: :float
+  defp from_enum(:TYPE_INT64), do: :int64
+  defp from_enum(:TYPE_UINT64), do: :uint64
+  defp from_enum(:TYPE_INT32), do: :int32
+  defp from_enum(:TYPE_FIXED64), do: :fixed64
+  defp from_enum(:TYPE_FIXED32), do: :fixed32
+  defp from_enum(:TYPE_BOOL), do: :bool
+  defp from_enum(:TYPE_STRING), do: :string
+  defp from_enum(:TYPE_GROUP), do: :group
+  defp from_enum(:TYPE_MESSAGE), do: :message
+  defp from_enum(:TYPE_BYTES), do: :bytes
+  defp from_enum(:TYPE_UINT32), do: :uint32
+  defp from_enum(:TYPE_ENUM), do: :enum
+  defp from_enum(:TYPE_SFIXED32), do: :sfixed32
+  defp from_enum(:TYPE_SFIXED64), do: :sfixed64
+  defp from_enum(:TYPE_SINT32), do: :sint32
+  defp from_enum(:TYPE_SINT64), do: :sint64
 end
