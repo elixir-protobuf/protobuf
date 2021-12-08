@@ -35,21 +35,24 @@ defmodule Protobuf.DSL do
     end
   end
 
+  alias Protobuf.FieldProps
+  alias Protobuf.MessageProps
   alias Protobuf.Wire
 
   # Registered as the @before_compile callback for modules that call "use Protobuf".
   defmacro __before_compile__(env) do
     fields = Module.get_attribute(env.module, :fields)
     options = Module.get_attribute(env.module, :options)
+    oneofs = Module.get_attribute(env.module, :oneofs)
+    extensions = Module.get_attribute(env.module, :extensions)
 
     extension_props =
       Module.get_attribute(env.module, :extends)
       |> gen_extension_props()
 
-    extensions = Module.get_attribute(env.module, :extensions)
     syntax = Keyword.get(options, :syntax, :proto2)
-    oneofs = Module.get_attribute(env.module, :oneofs)
-    msg_props = generate_msg_props(fields, oneofs, extensions, options)
+
+    msg_props = generate_message_props(fields, oneofs, extensions, options)
     default_fields = generate_default_fields(syntax, msg_props)
     enum_fields = enum_fields(msg_props, false)
     default_struct = Map.put(default_fields, :__struct__, env.module)
@@ -148,27 +151,29 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp generate_msg_props(fields, oneofs, extensions, options) do
+  defp generate_message_props(fields, oneofs, extensions, options) do
     syntax = Keyword.get(options, :syntax, :proto2)
-    field_props = field_props_map(syntax, fields)
+
+    field_props =
+      Map.new(fields, fn {name, fnum, opts} -> {fnum, field_props(syntax, name, fnum, opts)} end)
+
+    # The "reverse" of field props, that is, a map from atom name to field number.
+    field_tags =
+      Map.new(field_props, fn {fnum, %FieldProps{name_atom: name_atom}} -> {name_atom, fnum} end)
 
     repeated_fields =
-      field_props
-      |> Map.values()
-      |> Enum.filter(fn props -> props.repeated? end)
-      |> Enum.map(fn props -> Map.get(props, :name_atom) end)
+      for {_fnum, %FieldProps{repeated?: true, name_atom: name}} <- field_props,
+          do: name
 
     embedded_fields =
-      field_props
-      |> Map.values()
-      |> Enum.filter(fn props -> props.embedded? && !props.map? end)
-      |> Enum.map(fn props -> Map.get(props, :name_atom) end)
+      for {_fnum, %FieldProps{embedded?: true, map?: false, name_atom: name}} <- field_props,
+          do: name
 
-    %Protobuf.MessageProps{
-      tags_map: tags_map(fields),
-      ordered_tags: ordered_tags(fields),
+    %MessageProps{
+      tags_map: Map.new(fields, fn {_, fnum, _} -> {fnum, fnum} end),
+      ordered_tags: field_props |> Map.keys() |> Enum.sort(),
       field_props: field_props,
-      field_tags: field_tags(fields),
+      field_tags: field_tags,
       repeated_fields: repeated_fields,
       embedded_fields: embedded_fields,
       syntax: syntax,
@@ -203,30 +208,6 @@ defmodule Protobuf.DSL do
 
   defp gen_extension_props(_) do
     nil
-  end
-
-  defp tags_map(fields) do
-    fields
-    |> Enum.map(fn {_, fnum, _} -> {fnum, fnum} end)
-    |> Enum.into(%{})
-  end
-
-  defp ordered_tags(fields) do
-    fields
-    |> Enum.map(fn {_, fnum, _} -> fnum end)
-    |> Enum.sort()
-  end
-
-  defp field_props_map(syntax, fields) do
-    fields
-    |> Enum.map(fn {name, fnum, opts} -> {fnum, field_props(syntax, name, fnum, opts)} end)
-    |> Enum.into(%{})
-  end
-
-  defp field_tags(fields) do
-    fields
-    |> Enum.map(fn {name, fnum, _} -> {name, fnum} end)
-    |> Enum.into(%{})
   end
 
   defp field_props(syntax, name, fnum, opts) do

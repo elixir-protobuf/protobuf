@@ -3,18 +3,22 @@ defmodule Protobuf.MessageProps do
 
   alias Protobuf.FieldProps
 
+  # A "field number".
+  @type tag() :: integer()
+  @type field_name() :: atom()
+
   @type t :: %__MODULE__{
-          ordered_tags: [integer],
-          tags_map: %{integer => integer},
-          field_props: %{integer => FieldProps.T},
-          field_tags: %{atom => integer},
-          repeated_fields: [atom],
-          embedded_fields: [atom],
-          syntax: atom,
+          ordered_tags: [tag()],
+          tags_map: %{tag() => tag()},
+          field_props: %{tag() => FieldProps.t()},
+          field_tags: %{field_name() => tag()},
+          repeated_fields: [field_name()],
+          embedded_fields: [field_name()],
+          syntax: atom(),
           oneof: [{atom, non_neg_integer}],
-          enum?: boolean,
-          extendable?: boolean,
-          map?: boolean,
+          enum?: boolean(),
+          extendable?: boolean(),
+          map?: boolean(),
           extension_range: [{non_neg_integer, non_neg_integer}]
         }
   defstruct ordered_tags: [],
