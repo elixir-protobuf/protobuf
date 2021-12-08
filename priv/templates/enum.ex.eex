@@ -2,8 +2,6 @@ defmodule <%= @module %> do
   @moduledoc false
   use Protobuf, <%= @use_options %>
 
-  @type t :: integer | <%= Enum.map_join(@fields, " | ", &(":#{&1.name}")) %>
-
   <%= if @descriptor_fun_body do %>
   def descriptor do
     # credo:disable-for-next-line

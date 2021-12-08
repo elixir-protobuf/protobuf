@@ -263,8 +263,6 @@ defmodule TestMsg do
     @moduledoc false
     use Protobuf, enum: true, syntax: :proto2
 
-    @type t :: integer | :UNKNOWN | :A | :B | :C
-
     field :UNKNOWN, 0
     field :A, 1
     field :B, 2

@@ -29,9 +29,6 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
     assert msg =~ "defmodule #{module} do\n"
     assert msg =~ "use Protobuf, enum: true\n"
 
-    assert msg =~
-             "@type t :: integer | :A | :B | :HAS_UNDERSCORES | :HAS_UNDERSCORES_X | :HAS_UNDERSCORES_\n"
-
     refute msg =~ "defstruct "
 
     assert msg =~ """
@@ -67,9 +64,6 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
 
     assert msg =~ "defmodule #{module} do\n"
     assert msg =~ "use Protobuf, enum: true\n"
-
-    assert msg =~
-             "@type t :: integer | :A | :B | :HAS_UNDERSCORES | :HAS_UNDERSCORES_X | :HAS_UNDERSCORES_\n"
 
     refute msg =~ "defstruct "
 

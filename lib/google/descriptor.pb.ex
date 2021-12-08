@@ -2,27 +2,6 @@ defmodule Google.Protobuf.FieldDescriptorProto.Type do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :TYPE_DOUBLE
-          | :TYPE_FLOAT
-          | :TYPE_INT64
-          | :TYPE_UINT64
-          | :TYPE_INT32
-          | :TYPE_FIXED64
-          | :TYPE_FIXED32
-          | :TYPE_BOOL
-          | :TYPE_STRING
-          | :TYPE_GROUP
-          | :TYPE_MESSAGE
-          | :TYPE_BYTES
-          | :TYPE_UINT32
-          | :TYPE_ENUM
-          | :TYPE_SFIXED32
-          | :TYPE_SFIXED64
-          | :TYPE_SINT32
-          | :TYPE_SINT64
-
   field :TYPE_DOUBLE, 1
   field :TYPE_FLOAT, 2
   field :TYPE_INT64, 3
@@ -47,8 +26,6 @@ defmodule Google.Protobuf.FieldDescriptorProto.Label do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :LABEL_OPTIONAL | :LABEL_REQUIRED | :LABEL_REPEATED
-
   field :LABEL_OPTIONAL, 1
   field :LABEL_REQUIRED, 2
   field :LABEL_REPEATED, 3
@@ -57,8 +34,6 @@ end
 defmodule Google.Protobuf.FileOptions.OptimizeMode do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t :: integer | :SPEED | :CODE_SIZE | :LITE_RUNTIME
 
   field :SPEED, 1
   field :CODE_SIZE, 2
@@ -69,8 +44,6 @@ defmodule Google.Protobuf.FieldOptions.CType do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :STRING | :CORD | :STRING_PIECE
-
   field :STRING, 0
   field :CORD, 1
   field :STRING_PIECE, 2
@@ -80,8 +53,6 @@ defmodule Google.Protobuf.FieldOptions.JSType do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :JS_NORMAL | :JS_STRING | :JS_NUMBER
-
   field :JS_NORMAL, 0
   field :JS_STRING, 1
   field :JS_NUMBER, 2
@@ -90,8 +61,6 @@ end
 defmodule Google.Protobuf.MethodOptions.IdempotencyLevel do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t :: integer | :IDEMPOTENCY_UNKNOWN | :NO_SIDE_EFFECTS | :IDEMPOTENT
 
   field :IDEMPOTENCY_UNKNOWN, 0
   field :NO_SIDE_EFFECTS, 1

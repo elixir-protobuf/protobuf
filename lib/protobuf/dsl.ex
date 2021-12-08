@@ -57,6 +57,8 @@ defmodule Protobuf.DSL do
         unquote(Macro.escape(msg_props))
       end
 
+      unquote(def_t_typespec(msg_props))
+
       unquote(gen_defstruct(env.module, msg_props))
 
       unquote(def_enum_functions(msg_props, fields))
@@ -75,6 +77,23 @@ defmodule Protobuf.DSL do
         unquote(def_extension_functions())
       end
     end
+  end
+
+  defp def_t_typespec(%MessageProps{enum?: true} = props) do
+    spec =
+      props.field_props
+      |> Enum.map(fn {_fnum, %FieldProps{name_atom: name}} -> name end)
+      |> Enum.reduce(quote(do: integer()), fn field_name, acc ->
+        quote do: unquote(acc) | unquote(field_name)
+      end)
+
+    quote do
+      @type t() :: unquote(spec)
+    end
+  end
+
+  defp def_t_typespec(_props) do
+    nil
   end
 
   defp def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}, fields) do

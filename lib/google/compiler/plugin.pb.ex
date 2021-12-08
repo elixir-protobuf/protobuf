@@ -2,8 +2,6 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorResponse.Feature do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :FEATURE_NONE | :FEATURE_PROTO3_OPTIONAL
-
   field :FEATURE_NONE, 0
   field :FEATURE_PROTO3_OPTIONAL, 1
 end
