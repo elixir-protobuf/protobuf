@@ -453,7 +453,7 @@ defmodule Protobuf.DSL do
     non_oneof_fields_with_defaults =
       for {_fnum, %FieldProps{oneof: oneof} = prop} <- message_props.field_props,
           is_nil(oneof),
-          do: {prop.name_atom, Protobuf.Builder.field_default(syntax, prop)}
+          do: {prop.name_atom, field_default(syntax, prop)}
 
     oneof_fields =
       for {name_atom, _fnum} <- message_props.oneof,
@@ -501,4 +501,34 @@ defmodule Protobuf.DSL do
       quote do: unquote(spec) | unquote(acc)
     end)
   end
+
+  # Used by Protobuf.Decoder
+  @doc false
+  def field_default(syntax, field_props)
+
+  def field_default(_syntax, %FieldProps{default: default}) when not is_nil(default), do: default
+  def field_default(_syntax, %FieldProps{repeated?: true}), do: []
+  def field_default(_syntax, %FieldProps{map?: true}), do: %{}
+  def field_default(:proto3, props), do: type_default(props.type)
+  def field_default(_syntax, _props), do: nil
+
+  defp type_default(:int32), do: 0
+  defp type_default(:int64), do: 0
+  defp type_default(:uint32), do: 0
+  defp type_default(:uint64), do: 0
+  defp type_default(:sint32), do: 0
+  defp type_default(:sint64), do: 0
+  defp type_default(:bool), do: false
+  defp type_default({:enum, mod}), do: Code.ensure_loaded(mod) && mod.key(0)
+  defp type_default(:fixed32), do: 0
+  defp type_default(:sfixed32), do: 0
+  defp type_default(:fixed64), do: 0
+  defp type_default(:sfixed64), do: 0
+  defp type_default(:float), do: 0.0
+  defp type_default(:double), do: 0.0
+  defp type_default(:bytes), do: <<>>
+  defp type_default(:string), do: ""
+  defp type_default(:message), do: nil
+  defp type_default(:group), do: nil
+  defp type_default(_), do: nil
 end
