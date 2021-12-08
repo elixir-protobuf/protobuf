@@ -80,16 +80,13 @@ defmodule Protobuf.DSL do
   end
 
   defp def_t_typespec(%MessageProps{enum?: true} = props, _extension_props) do
-    spec =
+    atom_specs =
       props.field_props
       |> Enum.map(fn {_fnum, %FieldProps{name_atom: name}} -> name end)
-      |> Enum.reverse()
-      |> Enum.reduce(fn field_name, acc ->
-        quote do: unquote(field_name) | unquote(acc)
-      end)
+      |> union_specs()
 
     quote do
-      @type t() :: integer() | unquote(spec)
+      @type t() :: integer() | unquote(atom_specs)
     end
   end
 
@@ -127,9 +124,7 @@ defmodule Protobuf.DSL do
     |> Enum.map(fn {_fnum, prop} ->
       quote do: {unquote(prop.name_atom), unquote(field_prop_to_spec(prop))}
     end)
-    |> Enum.reduce(fn spec, acc ->
-      quote do: unquote(acc) | unquote(spec)
-    end)
+    |> union_specs()
   end
 
   defp field_prop_to_spec(%FieldProps{map?: true, type: map_mod} = prop) do
@@ -497,4 +492,13 @@ defmodule Protobuf.DSL do
   defp type_numeric?(:float), do: true
   defp type_numeric?(:double), do: true
   defp type_numeric?(_), do: false
+
+  # We do this because the :| operator is left-associative, so if we just map and build "acc |
+  # spec" then we end up with "((foo | bar) | baz) | bong". By building it from right to left, it
+  # works just fine.
+  defp union_specs(specs) do
+    Enum.reduce(Enum.reverse(specs), fn spec, acc ->
+      quote do: unquote(spec) | unquote(acc)
+    end)
+  end
 end

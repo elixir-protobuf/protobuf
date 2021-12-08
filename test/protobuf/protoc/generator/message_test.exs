@@ -16,6 +16,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
              "t() :: %Foo{}"
+  after
+    TestHelpers.purge_modules([Foo])
   end
 
   test "generate/2 has right syntax" do
@@ -28,6 +30,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
              "t() :: %Foo{}"
+  after
+    TestHelpers.purge_modules([Foo])
   end
 
   test "generate/2 has right name with package" do
@@ -153,6 +157,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "field :a, 1, type: :int32\n"
     assert msg =~ "field :b, 2, type: :string\n"
     assert msg =~ "field :c, 3, repeated: true, type: :int32\n"
+  after
+    TestHelpers.purge_modules([Foo])
   end
 
   test "generate/2 supports option :default" do
@@ -312,6 +318,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
              "t() :: %Foo{bar: Bar.t() | nil, baz: [Baz.t()]}"
+  after
+    TestHelpers.purge_modules([Foo])
   end
 
   test "generate/2 supports map field" do
@@ -371,6 +379,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
              "t() :: %FooBar.AbCd.Foo{a: %{optional(integer()) => FooBar.AbCd.Bar.t() | nil}}"
+  after
+    TestHelpers.purge_modules([FooBar.AbCd.Foo])
   end
 
   test "generate/2 supports enum field" do
@@ -431,6 +441,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
              "t() :: %FooBar.AbCd.Foo{a: FooBar.AbCd.EnumFoo.t()}"
+  after
+    TestHelpers.purge_modules([FooBar.AbCd.Foo])
   end
 
   test "generate/2 generate right enum type name with different package" do
@@ -486,6 +498,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
              "t() :: %FooBar.AbCd.Foo{a: OtherPkg.MsgFoo.t() | nil}"
+  after
+    TestHelpers.purge_modules([FooBar.AbCd.Foo])
   end
 
   test "generate/2 supports nested messages" do
@@ -538,6 +552,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
              "t() :: %MyPkg.Foo{a: MyPkg.Foo.Nested.t() | nil}"
+  after
+    TestHelpers.purge_modules([MyPkg.Foo])
   end
 
   test "generate/2 supports nested enum messages" do
@@ -641,6 +657,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "field :c, 3, optional: true, type: :int32, oneof: 1\n"
     assert msg =~ "field :d, 4, optional: true, type: :int32, oneof: 1\n"
     assert msg =~ "field :other, 5, optional: true, type: :int32\n"
+  after
+    TestHelpers.purge_modules([Foo])
   end
 
   describe "generate/2 json_name" do
@@ -726,5 +744,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
              "t() :: %FooBar.AbCd.Foo{a: [FooBar.AbCd.EnumFoo.t()]}"
+  after
+    TestHelpers.purge_modules([FooBar.AbCd.Foo])
   end
 end

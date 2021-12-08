@@ -8,8 +8,8 @@ defmodule Protobuf.TestHelpers do
 
   def purge_modules(modules) when is_list(modules) do
     Enum.each(modules, fn mod ->
-      :code.delete(mod)
       :code.purge(mod)
+      :code.delete(mod)
     end)
   end
 
