@@ -1,24 +1,27 @@
 defmodule Protobuf.DSLTest do
   use ExUnit.Case, async: true
 
-  alias Protobuf.FieldProps
+  alias Protobuf.{FieldProps, MessageProps}
   alias TestMsg.{Foo, Foo2}
 
-  defmodule DefaultSyntax do
-    use Protobuf
-  end
-
   test "default syntax is proto2" do
-    assert DefaultSyntax.__message_props__().syntax == :proto2
+    defmodule DefaultSyntax do
+      use Protobuf
+    end
+
+    assert %MessageProps{syntax: :proto2} = DefaultSyntax.__message_props__()
   end
 
   test "supports syntax option" do
-    msg_props = TestMsg.SyntaxOption.__message_props__()
-    assert msg_props.syntax == :proto3
+    defmodule Proto3Syntax do
+      use Protobuf, syntax: :proto3
+    end
+
+    assert %MessageProps{syntax: :proto3} = Proto3Syntax.__message_props__()
   end
 
-  test "creates __message_props__ function" do
-    msg_props = Foo.__message_props__()
+  test "creates __message_props__/0 function" do
+    assert %MessageProps{} = msg_props = Foo.__message_props__()
 
     tags_map =
       Enum.reduce([1, 2, 3] ++ Enum.to_list(5..17) ++ [101], %{}, fn i, acc ->
