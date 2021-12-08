@@ -50,31 +50,14 @@ defmodule Protobuf.DSL do
       Module.get_attribute(env.module, :extends)
       |> gen_extension_props()
 
-    syntax = Keyword.get(options, :syntax, :proto2)
-
     msg_props = generate_message_props(fields, oneofs, extensions, options)
-    default_fields = generate_default_fields(syntax, msg_props)
-    enum_fields = enum_fields(msg_props, false)
-    default_struct = Map.put(default_fields, :__struct__, env.module)
-
-    default_struct =
-      if syntax == :proto3 do
-        Enum.reduce(enum_fields, default_struct, fn {name, type}, acc ->
-          Code.ensure_loaded(type)
-          Map.put(acc, name, type.key(0))
-        end)
-      else
-        if extensions do
-          Map.put(default_struct, :__pb_extensions__, %{})
-        else
-          default_struct
-        end
-      end
 
     quote do
       def __message_props__ do
         unquote(Macro.escape(msg_props))
       end
+
+      unquote(gen_defstruct(env.module, msg_props))
 
       unquote(def_enum_functions(msg_props, fields))
 
@@ -90,10 +73,6 @@ defmodule Protobuf.DSL do
 
       if unquote(Macro.escape(extensions)) do
         unquote(def_extension_functions())
-      end
-
-      def __default_struct__ do
-        unquote(Macro.escape(default_struct))
       end
     end
   end
@@ -359,35 +338,33 @@ defmodule Protobuf.DSL do
     props
   end
 
-  defp generate_default_fields(syntax, msg_props) do
-    fields =
-      msg_props.field_props
-      |> Map.values()
-      |> Enum.reduce(%{}, fn props, acc ->
-        if props.oneof do
-          acc
-        else
-          Map.put(acc, props.name_atom, Protobuf.Builder.field_default(syntax, props))
-        end
-      end)
+  defp gen_defstruct(mod, %MessageProps{syntax: syntax} = message_props) do
+    non_oneof_fields_with_defaults =
+      for {_fnum, %FieldProps{oneof: oneof} = prop} <- message_props.field_props,
+          is_nil(oneof),
+          do: {prop.name_atom, Protobuf.Builder.field_default(syntax, prop)}
 
-    Enum.reduce(msg_props.oneof, fields, fn {key, _}, acc ->
-      Map.put(acc, key, nil)
-    end)
+    oneof_fields =
+      for {name_atom, _fnum} <- message_props.oneof,
+          do: {name_atom, _struct_default = nil}
+
+    extension_fields =
+      if message_props.extension_range do
+        [{:__pb_extensions__, _default = %{}}]
+      else
+        []
+      end
+
+    if Module.defines?(mod, {:__struct__, 1}) do
+      nil
+    else
+      fields = non_oneof_fields_with_defaults ++ oneof_fields ++ extension_fields
+
+      quote do
+        defstruct unquote(Macro.escape(fields))
+      end
+    end
   end
-
-  defp enum_fields(%{syntax: :proto3} = msg_props, include_oneof?) do
-    msg_props.field_props
-    |> Map.values()
-    |> Enum.filter(fn props ->
-      props.enum? && !props.default && !props.repeated? && (!props.oneof || include_oneof?)
-    end)
-    |> Enum.map(fn props ->
-      {props.name_atom, elem(props.type, 1)}
-    end)
-  end
-
-  defp enum_fields(%{syntax: _}, _include_oneof?), do: %{}
 
   defp type_numeric?(:int32), do: true
   defp type_numeric?(:int64), do: true

@@ -177,28 +177,6 @@ defmodule Protobuf.DSLTest do
     refute msg_props.field_props[11].embedded?
   end
 
-  test "generates __default_struct__ function" do
-    assert %Foo{
-             a: 0,
-             b: 0,
-             c: "",
-             d: 0.0,
-             e: nil,
-             f: 0,
-             g: [],
-             h: [],
-             i: [],
-             j: :UNKNOWN,
-             k: false,
-             l: %{},
-             m: :UNKNOWN,
-             n: 0.0,
-             o: [],
-             p: "",
-             non_matched: ""
-           } == Foo.__default_struct__()
-  end
-
   test "generates new function" do
     assert %Foo{
              a: 0,

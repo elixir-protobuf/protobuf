@@ -5,7 +5,7 @@ defmodule Protobuf.Builder do
 
   @spec new(module) :: %{required(:__struct__) => module} when module: module()
   def new(mod) when is_atom(mod) do
-    mod.__default_struct__()
+    struct(mod, [])
   end
 
   @spec new(module, Enum.t()) :: %{required(:__struct__) => module} when module: module()
@@ -39,7 +39,7 @@ defmodule Protobuf.Builder do
   def type_default(:sint32), do: 0
   def type_default(:sint64), do: 0
   def type_default(:bool), do: false
-  def type_default({:enum, _}), do: 0
+  def type_default({:enum, mod}), do: Code.ensure_loaded(mod) && mod.key(0)
   def type_default(:fixed32), do: 0
   def type_default(:sfixed32), do: 0
   def type_default(:fixed64), do: 0
@@ -76,8 +76,7 @@ defmodule Protobuf.Builder do
 
   defp new_from_enum(mod, attrs, strict?) do
     props = mod.__message_props__()
-    default_struct = mod.__default_struct__()
-    msg = if strict?, do: struct!(default_struct, attrs), else: struct(default_struct, attrs)
+    msg = if strict?, do: struct!(mod, attrs), else: struct(mod, attrs)
 
     Enum.reduce(props.embedded_fields, msg, fn field_name, acc ->
       case msg do

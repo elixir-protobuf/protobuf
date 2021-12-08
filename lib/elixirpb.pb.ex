@@ -6,8 +6,6 @@ defmodule Elixirpb.FileOptions do
           module_prefix: String.t()
         }
 
-  defstruct module_prefix: nil
-
   field :module_prefix, 1, optional: true, type: :string
 end
 

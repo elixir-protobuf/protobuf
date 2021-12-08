@@ -19,11 +19,6 @@ defmodule Google.Protobuf.Compiler.Version do
           suffix: String.t()
         }
 
-  defstruct major: nil,
-            minor: nil,
-            patch: nil,
-            suffix: nil
-
   field :major, 1, optional: true, type: :int32
   field :minor, 2, optional: true, type: :int32
   field :patch, 3, optional: true, type: :int32
@@ -40,11 +35,6 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorRequest do
           proto_file: [Google.Protobuf.FileDescriptorProto.t()],
           compiler_version: Google.Protobuf.Compiler.Version.t() | nil
         }
-
-  defstruct file_to_generate: [],
-            parameter: nil,
-            proto_file: [],
-            compiler_version: nil
 
   field :file_to_generate, 1, repeated: true, type: :string
   field :parameter, 2, optional: true, type: :string
@@ -63,11 +53,6 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorResponse.File do
           generated_code_info: Google.Protobuf.GeneratedCodeInfo.t() | nil
         }
 
-  defstruct name: nil,
-            insertion_point: nil,
-            content: nil,
-            generated_code_info: nil
-
   field :name, 1, optional: true, type: :string
   field :insertion_point, 2, optional: true, type: :string
   field :content, 15, optional: true, type: :string
@@ -83,10 +68,6 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorResponse do
           supported_features: non_neg_integer,
           file: [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()]
         }
-
-  defstruct error: nil,
-            supported_features: nil,
-            file: []
 
   field :error, 1, optional: true, type: :string
   field :supported_features, 2, optional: true, type: :uint64

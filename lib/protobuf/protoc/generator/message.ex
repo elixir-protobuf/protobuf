@@ -49,7 +49,6 @@ defmodule Protobuf.Protoc.Generator.Message do
          message_template(
            module: msg_name,
            use_options: msg_opts_str(ctx, desc.options),
-           struct_fields: struct_fields_with_defaults(ctx, desc, fields, extensions),
            struct_field_typespecs: struct_field_typespecs(fields, desc.oneof_decl, extensions),
            oneofs: desc.oneof_decl,
            fields: gen_fields(ctx.syntax, fields),
@@ -90,50 +89,6 @@ defmodule Protobuf.Protoc.Generator.Message do
 
     str = Util.options_to_str(opts)
     if String.length(str) > 0, do: ", " <> str, else: ""
-  end
-
-  defp struct_fields_with_defaults(ctx, desc, fields, extensions) do
-    oneof_fields = Enum.map(desc.oneof_decl, &{&1.name, _default = "nil"})
-
-    fields =
-      for field <- fields,
-          is_nil(field.oneof),
-          do: {field.name, struct_default_value(field, ctx)}
-
-    extensions_fields =
-      if Enum.empty?(extensions), do: [], else: [{:__pb_extensions__, _default = "nil"}]
-
-    oneof_fields ++ fields ++ extensions_fields
-  end
-
-  defp struct_default_value(%{label: "optional"}, %{syntax: syntax}) when syntax != :proto3 do
-    "nil"
-  end
-
-  defp struct_default_value(%{map: map}, _ctx) when not is_nil(map) do
-    "%{}"
-  end
-
-  defp struct_default_value(%{label: "repeated"}, _ctx) do
-    "[]"
-  end
-
-  defp struct_default_value(%{opts: %{default: default}}, _ctx) when not is_nil(default) do
-    inspect(default)
-  end
-
-  defp struct_default_value(%{type_enum: :TYPE_ENUM, type: type}, %{enums: enums}) do
-    case Map.fetch(enums, type) do
-      {:ok, default} -> ":#{default}"
-      :error -> "0"
-    end
-  end
-
-  defp struct_default_value(%{type_enum: type}, _ctx) do
-    type
-    |> TypeUtil.from_enum()
-    |> Protobuf.Builder.type_default()
-    |> inspect()
   end
 
   defp struct_field_typespecs(fields, oneofs, extensions) do

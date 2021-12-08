@@ -106,8 +106,6 @@ defmodule Google.Protobuf.FileDescriptorSet do
           file: [Google.Protobuf.FileDescriptorProto.t()]
         }
 
-  defstruct file: []
-
   field :file, 1, repeated: true, type: Google.Protobuf.FileDescriptorProto
 end
 
@@ -129,19 +127,6 @@ defmodule Google.Protobuf.FileDescriptorProto do
           source_code_info: Google.Protobuf.SourceCodeInfo.t() | nil,
           syntax: String.t()
         }
-
-  defstruct name: nil,
-            package: nil,
-            dependency: [],
-            public_dependency: [],
-            weak_dependency: [],
-            message_type: [],
-            enum_type: [],
-            service: [],
-            extension: [],
-            options: nil,
-            source_code_info: nil,
-            syntax: nil
 
   field :name, 1, optional: true, type: :string
   field :package, 2, optional: true, type: :string
@@ -167,10 +152,6 @@ defmodule Google.Protobuf.DescriptorProto.ExtensionRange do
           options: Google.Protobuf.ExtensionRangeOptions.t() | nil
         }
 
-  defstruct start: nil,
-            end: nil,
-            options: nil
-
   field :start, 1, optional: true, type: :int32
   field :end, 2, optional: true, type: :int32
   field :options, 3, optional: true, type: Google.Protobuf.ExtensionRangeOptions
@@ -184,9 +165,6 @@ defmodule Google.Protobuf.DescriptorProto.ReservedRange do
           start: integer,
           end: integer
         }
-
-  defstruct start: nil,
-            end: nil
 
   field :start, 1, optional: true, type: :int32
   field :end, 2, optional: true, type: :int32
@@ -209,17 +187,6 @@ defmodule Google.Protobuf.DescriptorProto do
           reserved_name: [String.t()]
         }
 
-  defstruct name: nil,
-            field: [],
-            extension: [],
-            nested_type: [],
-            enum_type: [],
-            extension_range: [],
-            oneof_decl: [],
-            options: nil,
-            reserved_range: [],
-            reserved_name: []
-
   field :name, 1, optional: true, type: :string
   field :field, 2, repeated: true, type: Google.Protobuf.FieldDescriptorProto
   field :extension, 6, repeated: true, type: Google.Protobuf.FieldDescriptorProto
@@ -240,9 +207,6 @@ defmodule Google.Protobuf.ExtensionRangeOptions do
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()],
           __pb_extensions__: map
         }
-
-  defstruct uninterpreted_option: [],
-            __pb_extensions__: nil
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
@@ -267,18 +231,6 @@ defmodule Google.Protobuf.FieldDescriptorProto do
           proto3_optional: boolean
         }
 
-  defstruct name: nil,
-            number: nil,
-            label: nil,
-            type: nil,
-            type_name: nil,
-            extendee: nil,
-            default_value: nil,
-            oneof_index: nil,
-            json_name: nil,
-            options: nil,
-            proto3_optional: nil
-
   field :name, 1, optional: true, type: :string
   field :number, 3, optional: true, type: :int32
   field :label, 4, optional: true, type: Google.Protobuf.FieldDescriptorProto.Label, enum: true
@@ -301,9 +253,6 @@ defmodule Google.Protobuf.OneofDescriptorProto do
           options: Google.Protobuf.OneofOptions.t() | nil
         }
 
-  defstruct name: nil,
-            options: nil
-
   field :name, 1, optional: true, type: :string
   field :options, 2, optional: true, type: Google.Protobuf.OneofOptions
 end
@@ -316,9 +265,6 @@ defmodule Google.Protobuf.EnumDescriptorProto.EnumReservedRange do
           start: integer,
           end: integer
         }
-
-  defstruct start: nil,
-            end: nil
 
   field :start, 1, optional: true, type: :int32
   field :end, 2, optional: true, type: :int32
@@ -335,12 +281,6 @@ defmodule Google.Protobuf.EnumDescriptorProto do
           reserved_range: [Google.Protobuf.EnumDescriptorProto.EnumReservedRange.t()],
           reserved_name: [String.t()]
         }
-
-  defstruct name: nil,
-            value: [],
-            options: nil,
-            reserved_range: [],
-            reserved_name: []
 
   field :name, 1, optional: true, type: :string
   field :value, 2, repeated: true, type: Google.Protobuf.EnumValueDescriptorProto
@@ -363,10 +303,6 @@ defmodule Google.Protobuf.EnumValueDescriptorProto do
           options: Google.Protobuf.EnumValueOptions.t() | nil
         }
 
-  defstruct name: nil,
-            number: nil,
-            options: nil
-
   field :name, 1, optional: true, type: :string
   field :number, 2, optional: true, type: :int32
   field :options, 3, optional: true, type: Google.Protobuf.EnumValueOptions
@@ -381,10 +317,6 @@ defmodule Google.Protobuf.ServiceDescriptorProto do
           method: [Google.Protobuf.MethodDescriptorProto.t()],
           options: Google.Protobuf.ServiceOptions.t() | nil
         }
-
-  defstruct name: nil,
-            method: [],
-            options: nil
 
   field :name, 1, optional: true, type: :string
   field :method, 2, repeated: true, type: Google.Protobuf.MethodDescriptorProto
@@ -403,13 +335,6 @@ defmodule Google.Protobuf.MethodDescriptorProto do
           client_streaming: boolean,
           server_streaming: boolean
         }
-
-  defstruct name: nil,
-            input_type: nil,
-            output_type: nil,
-            options: nil,
-            client_streaming: nil,
-            server_streaming: nil
 
   field :name, 1, optional: true, type: :string
   field :input_type, 2, optional: true, type: :string
@@ -447,29 +372,6 @@ defmodule Google.Protobuf.FileOptions do
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()],
           __pb_extensions__: map
         }
-
-  defstruct java_package: nil,
-            java_outer_classname: nil,
-            java_multiple_files: nil,
-            java_generate_equals_and_hash: nil,
-            java_string_check_utf8: nil,
-            optimize_for: nil,
-            go_package: nil,
-            cc_generic_services: nil,
-            java_generic_services: nil,
-            py_generic_services: nil,
-            php_generic_services: nil,
-            deprecated: nil,
-            cc_enable_arenas: nil,
-            objc_class_prefix: nil,
-            csharp_namespace: nil,
-            swift_prefix: nil,
-            php_class_prefix: nil,
-            php_namespace: nil,
-            php_metadata_namespace: nil,
-            ruby_package: nil,
-            uninterpreted_option: [],
-            __pb_extensions__: nil
 
   field :java_package, 1, optional: true, type: :string
   field :java_outer_classname, 8, optional: true, type: :string
@@ -515,13 +417,6 @@ defmodule Google.Protobuf.MessageOptions do
           __pb_extensions__: map
         }
 
-  defstruct message_set_wire_format: nil,
-            no_standard_descriptor_accessor: nil,
-            deprecated: nil,
-            map_entry: nil,
-            uninterpreted_option: [],
-            __pb_extensions__: nil
-
   field :message_set_wire_format, 1, optional: true, type: :bool, default: false
   field :no_standard_descriptor_accessor, 2, optional: true, type: :bool, default: false
   field :deprecated, 3, optional: true, type: :bool, default: false
@@ -545,15 +440,6 @@ defmodule Google.Protobuf.FieldOptions do
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()],
           __pb_extensions__: map
         }
-
-  defstruct ctype: nil,
-            packed: nil,
-            jstype: nil,
-            lazy: nil,
-            deprecated: nil,
-            weak: nil,
-            uninterpreted_option: [],
-            __pb_extensions__: nil
 
   field :ctype, 1,
     optional: true,
@@ -586,9 +472,6 @@ defmodule Google.Protobuf.OneofOptions do
           __pb_extensions__: map
         }
 
-  defstruct uninterpreted_option: [],
-            __pb_extensions__: nil
-
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
   extensions [{1000, 536_870_912}]
@@ -604,11 +487,6 @@ defmodule Google.Protobuf.EnumOptions do
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()],
           __pb_extensions__: map
         }
-
-  defstruct allow_alias: nil,
-            deprecated: nil,
-            uninterpreted_option: [],
-            __pb_extensions__: nil
 
   field :allow_alias, 2, optional: true, type: :bool
   field :deprecated, 3, optional: true, type: :bool, default: false
@@ -627,10 +505,6 @@ defmodule Google.Protobuf.EnumValueOptions do
           __pb_extensions__: map
         }
 
-  defstruct deprecated: nil,
-            uninterpreted_option: [],
-            __pb_extensions__: nil
-
   field :deprecated, 1, optional: true, type: :bool, default: false
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
@@ -646,10 +520,6 @@ defmodule Google.Protobuf.ServiceOptions do
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()],
           __pb_extensions__: map
         }
-
-  defstruct deprecated: nil,
-            uninterpreted_option: [],
-            __pb_extensions__: nil
 
   field :deprecated, 33, optional: true, type: :bool, default: false
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
@@ -667,11 +537,6 @@ defmodule Google.Protobuf.MethodOptions do
           uninterpreted_option: [Google.Protobuf.UninterpretedOption.t()],
           __pb_extensions__: map
         }
-
-  defstruct deprecated: nil,
-            idempotency_level: nil,
-            uninterpreted_option: [],
-            __pb_extensions__: nil
 
   field :deprecated, 33, optional: true, type: :bool, default: false
 
@@ -695,9 +560,6 @@ defmodule Google.Protobuf.UninterpretedOption.NamePart do
           is_extension: boolean
         }
 
-  defstruct name_part: "",
-            is_extension: false
-
   field :name_part, 1, required: true, type: :string
   field :is_extension, 2, required: true, type: :bool
 end
@@ -715,14 +577,6 @@ defmodule Google.Protobuf.UninterpretedOption do
           string_value: binary,
           aggregate_value: String.t()
         }
-
-  defstruct name: [],
-            identifier_value: nil,
-            positive_int_value: nil,
-            negative_int_value: nil,
-            double_value: nil,
-            string_value: nil,
-            aggregate_value: nil
 
   field :name, 2, repeated: true, type: Google.Protobuf.UninterpretedOption.NamePart
   field :identifier_value, 3, optional: true, type: :string
@@ -745,12 +599,6 @@ defmodule Google.Protobuf.SourceCodeInfo.Location do
           leading_detached_comments: [String.t()]
         }
 
-  defstruct path: [],
-            span: [],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: []
-
   field :path, 1, repeated: true, type: :int32, packed: true, deprecated: false
   field :span, 2, repeated: true, type: :int32, packed: true, deprecated: false
   field :leading_comments, 3, optional: true, type: :string
@@ -766,8 +614,6 @@ defmodule Google.Protobuf.SourceCodeInfo do
           location: [Google.Protobuf.SourceCodeInfo.Location.t()]
         }
 
-  defstruct location: []
-
   field :location, 1, repeated: true, type: Google.Protobuf.SourceCodeInfo.Location
 end
 
@@ -782,11 +628,6 @@ defmodule Google.Protobuf.GeneratedCodeInfo.Annotation do
           end: integer
         }
 
-  defstruct path: [],
-            source_file: nil,
-            begin: nil,
-            end: nil
-
   field :path, 1, repeated: true, type: :int32, packed: true, deprecated: false
   field :source_file, 2, optional: true, type: :string
   field :begin, 3, optional: true, type: :int32
@@ -800,8 +641,6 @@ defmodule Google.Protobuf.GeneratedCodeInfo do
   @type t :: %__MODULE__{
           annotation: [Google.Protobuf.GeneratedCodeInfo.Annotation.t()]
         }
-
-  defstruct annotation: []
 
   field :annotation, 1, repeated: true, type: Google.Protobuf.GeneratedCodeInfo.Annotation
 end
