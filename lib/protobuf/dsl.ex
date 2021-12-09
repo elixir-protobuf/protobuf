@@ -53,15 +53,16 @@ defmodule Protobuf.DSL do
     msg_props = generate_message_props(fields, oneofs, extensions, options)
 
     quote do
+      @spec __message_props__() :: Protobuf.MessageProps.t()
       def __message_props__ do
         unquote(Macro.escape(msg_props))
       end
 
-      unquote(gen_defstruct(env.module, msg_props))
+      unquote(maybe_gen_defstruct(env.module, msg_props))
 
-      unquote(def_t_typespec(msg_props, extension_props))
+      unquote(maybe_def_t_typespec(env.module, msg_props, extension_props))
 
-      unquote(def_enum_functions(msg_props, fields))
+      unquote(maybe_def_enum_functions(msg_props, fields))
 
       if unquote(Macro.escape(extension_props)) != nil do
         def __protobuf_info__(:extension_props) do
@@ -79,116 +80,47 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp def_t_typespec(%MessageProps{enum?: true} = props, _extension_props) do
-    atom_specs =
-      props.field_props
-      |> Enum.map(fn {_fnum, %FieldProps{name_atom: name}} -> name end)
-      |> union_specs()
-
-    quote do
-      @type t() :: integer() | unquote(atom_specs)
+  defp maybe_def_t_typespec(mod, %MessageProps{enum?: true} = props, _extension_props) do
+    if warn_if_t_type_already_defined(mod) do
+      nil
+    else
+      quote do
+        @type t() :: unquote(Protobuf.DSL.Typespecs.quoted_enum_typespec(props))
+      end
     end
   end
 
-  defp def_t_typespec(%MessageProps{field_props: field_props} = message_props, extension_props)
-       when is_nil(extension_props) do
-    fields_with_specs =
-      for {_fnum, prop} <- field_props,
-          is_nil(prop.oneof),
-          do: {prop.name_atom, field_prop_to_spec(prop)}
-
-    oneofs =
-      for {field_name, fnum} <- message_props.oneof do
-        possible_fields = Enum.filter(field_props, fn {_fnum, prop} -> prop.oneof == fnum end)
-        {field_name, oneof_spec(possible_fields)}
+  defp maybe_def_t_typespec(mod, %MessageProps{} = props, _extension_props = nil) do
+    if warn_if_t_type_already_defined(mod) do
+      nil
+    else
+      quote do
+        @type t() :: unquote(Protobuf.DSL.Typespecs.quoted_message_typespec(props))
       end
-
-    extensions =
-      if is_list(message_props.extension_range) and message_props.extension_range != [] do
-        [{:__pb_extensions__, quote(do: map())}]
-      else
-        []
-      end
-
-    quote do
-      @type t() :: %__MODULE__{unquote_splicing(fields_with_specs ++ oneofs ++ extensions)}
     end
   end
 
-  defp def_t_typespec(_props, _extension_props) do
+  defp maybe_def_t_typespec(_mod, _props, _extension_props) do
     nil
   end
 
-  defp oneof_spec(fields) do
-    fields
-    |> Enum.map(fn {_fnum, prop} ->
-      quote do: {unquote(prop.name_atom), unquote(field_prop_to_spec(prop))}
-    end)
-    |> union_specs()
-  end
+  defp warn_if_t_type_already_defined(mod) do
+    if Module.defines_type?(mod, {:t, 0}) do
+      IO.warn("""
+      Since v0.9.0 of the :protobuf library, the t/0 type is automatically generated for \
+      modules that call "use Protobuf" if they are Protobuf enums or messages. \
+      Remove your explicit definition of the t/0 type or regenerate the files with the \
+      latest version of the protoc-gen-elixir plugin. This warning will become an error \
+      in version 0.10.0+ of the :protobuf library.\
+      """)
 
-  defp field_prop_to_spec(%FieldProps{map?: true, type: map_mod} = prop) do
-    Code.ensure_loaded!(map_mod)
-    map_props = map_mod.__message_props__()
-
-    key_spec = scalar_type_to_spec(map_props.field_props[map_props.field_tags.key].type)
-    value_prop = map_props.field_props[map_props.field_tags.value]
-
-    value_spec = type_to_spec(value_prop.type, value_prop)
-
-    value_spec = if prop.embedded?, do: quote(do: unquote(value_spec) | nil), else: value_spec
-    quote do: %{optional(unquote(key_spec)) => unquote(value_spec)}
-  end
-
-  defp field_prop_to_spec(%FieldProps{type: type} = prop) do
-    spec = type_to_spec(type, prop)
-
-    cond do
-      prop.repeated? -> quote do: [unquote(spec)]
-      prop.embedded? -> quote do: unquote(spec) | nil
-      true -> spec
+      true
+    else
+      false
     end
   end
 
-  defp field_prop_to_spec(%FieldProps{repeated?: true} = prop) do
-    nested_spec = field_prop_to_spec(%FieldProps{prop | repeated?: false})
-    quote do: [unquote(nested_spec)]
-  end
-
-  defp field_prop_to_spec(%FieldProps{embedded?: true, type: mod}) do
-    quote do: unquote(mod).t()
-  end
-
-  defp field_prop_to_spec(%FieldProps{optional?: true} = prop) do
-    nested_spec = field_prop_to_spec(%FieldProps{prop | optional?: false})
-    quote do: unquote(nested_spec) | nil
-  end
-
-  defp field_prop_to_spec(%FieldProps{}) do
-    quote do: term()
-  end
-
-  defp type_to_spec({:enum, enum_mod}, _prop), do: quote(do: unquote(enum_mod).t())
-  defp type_to_spec(mod, %FieldProps{embedded?: true}), do: quote(do: unquote(mod).t())
-  defp type_to_spec(:group, _prop), do: quote(do: term())
-  defp type_to_spec(type, _prop), do: scalar_type_to_spec(type)
-
-  defp scalar_type_to_spec(:string), do: quote(do: String.t())
-  defp scalar_type_to_spec(:bytes), do: quote(do: binary())
-  defp scalar_type_to_spec(:bool), do: quote(do: boolean())
-
-  defp scalar_type_to_spec(type)
-       when type in [:int32, :int64, :sint32, :sint64, :sfixed32, :sfixed64],
-       do: quote(do: integer())
-
-  defp scalar_type_to_spec(type)
-       when type in [:uint32, :uint64, :fixed32, :fixed64],
-       do: quote(do: non_neg_integer())
-
-  defp scalar_type_to_spec(type) when type in [:float, :double],
-    do: quote(do: float() | :infinity | :negative_infinity | :nan)
-
-  defp def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}, fields) do
+  defp maybe_def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}, fields) do
     if syntax == :proto3 do
       unless props[0], do: raise("The first enum value must be zero in proto3")
     end
@@ -227,7 +159,7 @@ defmodule Protobuf.DSL do
       ]
   end
 
-  defp def_enum_functions(_, _), do: nil
+  defp maybe_def_enum_functions(_, _), do: nil
 
   defp def_extension_functions() do
     quote do
@@ -449,11 +381,24 @@ defmodule Protobuf.DSL do
     props
   end
 
-  defp gen_defstruct(mod, %MessageProps{syntax: syntax} = message_props) do
-    non_oneof_fields_with_defaults =
+  defp maybe_gen_defstruct(mod, message_props) do
+    if Module.defines?(mod, {:__struct__, 1}) do
+      IO.warn("""
+      Since v0.9.0 of the :protobuf library, structs are automatically generated for \
+      modules that call "use Protobuf". Remove the struct definition or regenerate the files \
+      with the latest version of the protoc-gen-elixir plugin. This warning \
+      will become an error in version 0.10.0+ of the :protobuf library.\
+      """)
+    else
+      gen_defstruct(message_props)
+    end
+  end
+
+  defp gen_defstruct(%MessageProps{} = message_props) do
+    regular_fields =
       for {_fnum, %FieldProps{oneof: oneof} = prop} <- message_props.field_props,
           is_nil(oneof),
-          do: {prop.name_atom, field_default(syntax, prop)}
+          do: {prop.name_atom, field_default(message_props.syntax, prop)}
 
     oneof_fields =
       for {name_atom, _fnum} <- message_props.oneof,
@@ -466,14 +411,8 @@ defmodule Protobuf.DSL do
         []
       end
 
-    if Module.defines?(mod, {:__struct__, 1}) do
-      nil
-    else
-      fields = non_oneof_fields_with_defaults ++ oneof_fields ++ extension_fields
-
-      quote do
-        defstruct unquote(Macro.escape(fields))
-      end
+    quote do
+      defstruct unquote(Macro.escape(regular_fields ++ oneof_fields ++ extension_fields))
     end
   end
 
