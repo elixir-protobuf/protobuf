@@ -431,15 +431,6 @@ defmodule Protobuf.DSL do
   defp type_numeric?(:double), do: true
   defp type_numeric?(_), do: false
 
-  # We do this because the :| operator is left-associative, so if we just map and build "acc |
-  # spec" then we end up with "((foo | bar) | baz) | bong". By building it from right to left, it
-  # works just fine.
-  defp union_specs(specs) do
-    Enum.reduce(Enum.reverse(specs), fn spec, acc ->
-      quote do: unquote(spec) | unquote(acc)
-    end)
-  end
-
   # Used by Protobuf.Decoder
   @doc false
   def field_default(syntax, field_props)
