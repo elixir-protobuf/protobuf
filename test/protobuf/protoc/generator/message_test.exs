@@ -410,41 +410,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "field :a, 1, optional: true, type: FooBar.AbCd.EnumFoo, enum: true\n"
   end
 
-  test "generate/2 generate right enum struct defaults" do
-    ctx = %Context{
-      package: "foo_bar.ab_cd",
-      dep_type_mapping: %{
-        ".foo_bar.ab_cd.EnumFoo" => %{type_name: "FooBar.AbCd.EnumFoo"}
-      },
-      enums: %{"FooBar.AbCd.EnumFoo" => "foo"}
-    }
-
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_ENUM,
-            label: :LABEL_REQUIRED,
-            type_name: ".foo_bar.ab_cd.EnumFoo"
-          )
-        ]
-      )
-
-    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "field :a, 1, required: true, type: FooBar.AbCd.EnumFoo, enum: true\n"
-
-    assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
-
-    assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
-             "t() :: %FooBar.AbCd.Foo{a: FooBar.AbCd.EnumFoo.t()}"
-  after
-    TestHelpers.purge_modules([FooBar.AbCd.Foo])
-  end
-
   test "generate/2 generate right enum type name with different package" do
     ctx = %Context{
       package: "foo_bar.ab_cd",
