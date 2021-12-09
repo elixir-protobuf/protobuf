@@ -5,7 +5,7 @@ defmodule Protobuf.Builder do
 
   @spec new(module) :: %{required(:__struct__) => module} when module: module()
   def new(mod) when is_atom(mod) do
-    struct(mod, [])
+    struct(mod)
   end
 
   @spec new(module, Enum.t()) :: %{required(:__struct__) => module} when module: module()
