@@ -19,7 +19,6 @@ defmodule Protobuf.Protoc.CLI do
   """
 
   alias Protobuf.Protoc.Context
-  alias Protobuf.Protoc.Generator.Util
 
   # Entrypoint for the escript (protoc-gen-elixir).
   @doc false
