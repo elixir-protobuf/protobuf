@@ -17,27 +17,23 @@ defmodule Protobuf.DSL.Typespecs do
   end
 
   @spec quoted_message_typespec(MessageProps.t()) :: Macro.t()
-  def quoted_message_typespec(%MessageProps{} = message_props) do
+  def quoted_message_typespec(%MessageProps{syntax: syntax} = message_props) do
     regular_fields =
-      for {_fnum, prop} <- message_props.field_props,
-          is_nil(prop.oneof),
-          do: {prop.name_atom, field_prop_to_spec(prop)}
+      for {_fnum, %FieldProps{oneof: nil} = prop} <- message_props.field_props,
+          do: {prop.name_atom, field_prop_to_spec(syntax, prop)}
 
     oneof_fields =
       for {field_name, fnum} <- message_props.oneof do
         possible_fields =
-          for {_fnum, prop} <- message_props.field_props,
-              prop.oneof == fnum,
-              do: prop
+          for {_fnum, %FieldProps{oneof: ^fnum} = prop} <- message_props.field_props, do: prop
 
-        {field_name, oneof_spec(possible_fields)}
+        {field_name, oneof_spec(syntax, possible_fields)}
       end
 
     extension_fields =
-      if is_list(message_props.extension_range) and message_props.extension_range != [] do
-        [{:__pb_extensions__, quote(do: map())}]
-      else
-        []
+      case message_props.extension_range do
+        [_ | _] -> [{:__pb_extensions__, quote(do: map())}]
+        _other -> []
       end
 
     quote do
@@ -45,15 +41,15 @@ defmodule Protobuf.DSL.Typespecs do
     end
   end
 
-  defp oneof_spec(possible_oneof_fields) do
+  defp oneof_spec(syntax, possible_oneof_fields) do
     possible_oneof_fields
     |> Enum.map(fn prop ->
-      quote do: {unquote(prop.name_atom), unquote(field_prop_to_spec(prop))}
+      quote do: {unquote(prop.name_atom), unquote(field_prop_to_spec(syntax, prop))}
     end)
     |> union_specs()
   end
 
-  defp field_prop_to_spec(%FieldProps{map?: true, type: map_mod} = prop) do
+  defp field_prop_to_spec(_syntax, %FieldProps{map?: true, type: map_mod} = prop) do
     if not Code.ensure_loaded?(map_mod) do
       raise "module #{inspect(map_mod)} was not loaded, but was expected to be since it's used as a map entry"
     end
@@ -69,32 +65,19 @@ defmodule Protobuf.DSL.Typespecs do
     quote do: %{optional(unquote(key_spec)) => unquote(value_spec)}
   end
 
-  defp field_prop_to_spec(%FieldProps{type: type} = prop) do
+  defp field_prop_to_spec(syntax, %FieldProps{type: type} = prop) do
     spec = type_to_spec(type, prop)
 
     cond do
-      prop.repeated? -> quote do: [unquote(spec)]
-      prop.embedded? -> quote do: unquote(spec) | nil
-      true -> spec
+      prop.repeated? ->
+        quote do: [unquote(spec)]
+
+      prop.embedded? or (prop.optional? and is_nil(prop.oneof) and syntax != :proto3) ->
+        quote do: unquote(spec) | nil
+
+      true ->
+        spec
     end
-  end
-
-  defp field_prop_to_spec(%FieldProps{repeated?: true} = prop) do
-    nested_spec = field_prop_to_spec(%FieldProps{prop | repeated?: false})
-    quote do: [unquote(nested_spec)]
-  end
-
-  defp field_prop_to_spec(%FieldProps{embedded?: true, type: mod}) do
-    quote do: unquote(mod).t()
-  end
-
-  defp field_prop_to_spec(%FieldProps{optional?: true} = prop) do
-    nested_spec = field_prop_to_spec(%FieldProps{prop | optional?: false})
-    quote do: unquote(nested_spec) | nil
-  end
-
-  defp field_prop_to_spec(%FieldProps{}) do
-    quote do: term()
   end
 
   defp type_to_spec({:enum, enum_mod}, _prop), do: quote(do: unquote(enum_mod).t())

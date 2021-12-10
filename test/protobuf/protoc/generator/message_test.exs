@@ -611,7 +611,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
-             "t() :: %Foo{first: {:a, integer()} | {:b, integer()}, other: integer(), second: {:c, integer()} | {:d, integer()}}"
+             "t() :: %Foo{first: {:a, integer()} | {:b, integer()}, other: integer() | nil, second: {:c, integer()} | {:d, integer()}}"
 
     refute msg =~ "a: integer,\n"
 

@@ -135,6 +135,17 @@ defmodule Protobuf.DSL.TypespecsTest do
       assert Macro.to_string(quoted) == "%__MODULE__{foo: EmbeddedFoo.t() | nil}"
     end
 
+    test "with an optional field" do
+      message_props = %MessageProps{
+        field_props: %{1 => %FieldProps{name_atom: :foo, type: :int32, optional?: true}},
+        oneof: []
+      }
+
+      quoted = Typespecs.quoted_message_typespec(message_props)
+
+      assert Macro.to_string(quoted) == "%__MODULE__{foo: integer() | nil}"
+    end
+
     test "with extensions" do
       message_props = %MessageProps{
         field_props: %{},
