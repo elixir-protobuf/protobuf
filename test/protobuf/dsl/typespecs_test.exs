@@ -1,5 +1,6 @@
 defmodule Protobuf.DSL.TypespecsTest do
   use ExUnit.Case, async: true
+  use ExUnitProperties
 
   alias Protobuf.{FieldProps, MessageProps}
   alias Protobuf.DSL.Typespecs
@@ -19,7 +20,22 @@ defmodule Protobuf.DSL.TypespecsTest do
           integer() | :FOO | :BAR | :BAZ
         end
 
-      assert Typespecs.quoted_enum_typespec(message_props) == expected
+      assert Typespecs.quoted_enum_typespec(message_props) ==
+               clean_meta(expected, [:import, :context])
+    end
+
+    property "works for any number of possible enum values" do
+      check all field_names <- list_of(atom(:alphanumeric), min_length: 1) do
+        field_props =
+          field_names
+          |> Enum.with_index(1)
+          |> Map.new(fn {name, index} -> {index, %FieldProps{name_atom: name}} end)
+
+        message_props = %MessageProps{field_props: field_props}
+        expected = "integer() | #{Enum.map_join(field_names, " | ", &inspect/1)}"
+
+        assert message_props |> Typespecs.quoted_enum_typespec() |> Macro.to_string() == expected
+      end
     end
   end
 
@@ -29,5 +45,111 @@ defmodule Protobuf.DSL.TypespecsTest do
       quoted = Typespecs.quoted_message_typespec(message_props)
       assert Macro.to_string(quoted) == "%__MODULE__{}"
     end
+
+    test "with a field" do
+      message_props = %MessageProps{
+        field_props: %{1 => %FieldProps{name_atom: :foo, type: :int32}},
+        oneof: []
+      }
+
+      quoted = Typespecs.quoted_message_typespec(message_props)
+      assert Macro.to_string(quoted) == "%__MODULE__{foo: integer()}"
+    end
+
+    test "with a oneof field" do
+      message_props = %MessageProps{
+        field_props: %{
+          1 => %FieldProps{name_atom: :foo, type: :int32, oneof: 0},
+          2 => %FieldProps{name_atom: :bar, type: :bool, oneof: 0}
+        },
+        oneof: [my_oneof_field: 0]
+      }
+
+      quoted = Typespecs.quoted_message_typespec(message_props)
+
+      assert Macro.to_string(quoted) ==
+               "%__MODULE__{my_oneof_field: {:foo, integer()} | {:bar, boolean()}}"
+    end
+
+    test "with fields of scalar types" do
+      mappings = [
+        {:string, "String.t()"},
+        {:bytes, "binary()"},
+        {:bool, "boolean()"},
+        {:int32, "integer()"},
+        {:int64, "integer()"},
+        {:sint32, "integer()"},
+        {:sint64, "integer()"},
+        {:sfixed32, "integer()"},
+        {:sfixed64, "integer()"},
+        {:uint32, "non_neg_integer()"},
+        {:uint64, "non_neg_integer()"},
+        {:fixed32, "non_neg_integer()"},
+        {:fixed64, "non_neg_integer()"},
+        {:float, "float() | :infinity | :negative_infinity | :nan"},
+        {:double, "float() | :infinity | :negative_infinity | :nan"}
+      ]
+
+      for {proto_type, string_spec} <- mappings do
+        message_props = %MessageProps{
+          field_props: %{1 => %FieldProps{name_atom: :foo, type: proto_type}},
+          oneof: []
+        }
+
+        quoted = Typespecs.quoted_message_typespec(message_props)
+
+        assert Macro.to_string(quoted) == "%__MODULE__{foo: #{string_spec}}"
+      end
+    end
+
+    test "with an enum field" do
+      message_props = %MessageProps{
+        field_props: %{1 => %FieldProps{name_atom: :foo, type: {:enum, Foo}}},
+        oneof: []
+      }
+
+      quoted = Typespecs.quoted_message_typespec(message_props)
+
+      assert Macro.to_string(quoted) == "%__MODULE__{foo: Foo.t()}"
+    end
+
+    test "with a group field" do
+      message_props = %MessageProps{
+        field_props: %{1 => %FieldProps{name_atom: :foo, type: :group}},
+        oneof: []
+      }
+
+      quoted = Typespecs.quoted_message_typespec(message_props)
+
+      assert Macro.to_string(quoted) == "%__MODULE__{foo: term()}"
+    end
+
+    test "with an embedded field" do
+      message_props = %MessageProps{
+        field_props: %{1 => %FieldProps{name_atom: :foo, type: EmbeddedFoo, embedded?: true}},
+        oneof: []
+      }
+
+      quoted = Typespecs.quoted_message_typespec(message_props)
+
+      assert Macro.to_string(quoted) == "%__MODULE__{foo: EmbeddedFoo.t() | nil}"
+    end
+
+    test "with extensions" do
+      message_props = %MessageProps{
+        field_props: %{},
+        oneof: [],
+        extension_range: [{1, 10}]
+      }
+
+      quoted = Typespecs.quoted_message_typespec(message_props)
+
+      assert Macro.to_string(quoted) == "%__MODULE__{__pb_extensions__: map()}"
+    end
+  end
+
+  defp clean_meta(expr, vars) do
+    cleaner = &Keyword.drop(&1, vars)
+    Macro.prewalk(expr, &Macro.update_meta(&1, cleaner))
   end
 end

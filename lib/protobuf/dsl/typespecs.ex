@@ -7,6 +7,7 @@ defmodule Protobuf.DSL.Typespecs do
   def quoted_enum_typespec(%MessageProps{field_props: field_props}) do
     atom_specs =
       field_props
+      |> Enum.sort_by(fn {fnum, _prop} -> fnum end)
       |> Enum.map(fn {_fnum, %FieldProps{name_atom: name}} -> name end)
       |> union_specs()
 
