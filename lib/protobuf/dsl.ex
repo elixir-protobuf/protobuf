@@ -81,9 +81,7 @@ defmodule Protobuf.DSL do
   end
 
   defp maybe_def_t_typespec(mod, %MessageProps{enum?: true} = props, _extension_props) do
-    if warn_if_t_type_already_defined(mod) do
-      nil
-    else
+    unless warn_if_t_type_already_defined(mod) do
       quote do
         @type t() :: unquote(Protobuf.DSL.Typespecs.quoted_enum_typespec(props))
       end
