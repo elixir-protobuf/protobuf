@@ -89,9 +89,7 @@ defmodule Protobuf.DSL do
   end
 
   defp maybe_def_t_typespec(mod, %MessageProps{} = props, _extension_props = nil) do
-    if warn_if_t_type_already_defined(mod) do
-      nil
-    else
+    unless warn_if_t_type_already_defined(mod) do
       quote do
         @type t() :: unquote(Protobuf.DSL.Typespecs.quoted_message_typespec(props))
       end
