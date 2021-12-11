@@ -30,20 +30,9 @@ defmodule Protobuf.TestHelpers do
 
   def get_type_spec_as_string(module, bytecode, type)
       when is_atom(module) and is_binary(bytecode) and is_atom(type) do
-    assert {:ok, {_, [debug_info: {:debug_info_v1, backend, data}]}} =
+    # This code is taken from Code.Typespec in Elixir (v1.13 in particular).
+    assert {:ok, {_, [debug_info: {:debug_info_v1, _backend, {:elixir_v1, %{}, specs}}]}} =
              :beam_lib.chunks(bytecode, [:debug_info])
-
-    assert {:ok, specs} =
-             (case data do
-                {:elixir_v1, %{}, specs} ->
-                  {:ok, specs}
-
-                _ ->
-                  case backend.debug_info(:erlang_v1, module, data, []) do
-                    {:ok, abstract_code} -> {:ok, abstract_code}
-                    _ -> :error
-                  end
-              end)
 
     spec =
       Enum.find_value(specs, fn
@@ -51,8 +40,12 @@ defmodule Protobuf.TestHelpers do
         _other -> nil
       end)
 
-    quoted = Code.Typespec.type_to_quoted(spec)
+    assert not is_nil(spec), "Spec for type #{inspect(module)}.#{type} not found"
 
-    Macro.to_string(quoted)
+    # Code.Typespec.type_to_quoted/1 is not public API in Elixir, but we're still using
+    # it here for tests.
+    spec
+    |> Code.Typespec.type_to_quoted()
+    |> Macro.to_string()
   end
 end

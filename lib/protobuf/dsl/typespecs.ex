@@ -43,9 +43,7 @@ defmodule Protobuf.DSL.Typespecs do
 
   defp oneof_spec(syntax, possible_oneof_fields) do
     possible_oneof_fields
-    |> Enum.map(fn prop ->
-      quote do: {unquote(prop.name_atom), unquote(field_prop_to_spec(syntax, prop))}
-    end)
+    |> Enum.map(fn prop -> {prop.name_atom, field_prop_to_spec(syntax, prop)} end)
     |> union_specs()
   end
 
