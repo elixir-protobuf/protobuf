@@ -283,7 +283,7 @@ defmodule Protobuf.Decoder do
 
   # If the two fields are normal fields, then we pick the second one unless it's a default value.
   defp deep_merge_field(val1, val2, %FieldProps{} = prop, syntax) do
-    default? = val2 == Protobuf.Builder.field_default(syntax, prop)
+    default? = val2 == Protobuf.DSL.field_default(syntax, prop)
     if default?, do: val1, else: val2
   end
 

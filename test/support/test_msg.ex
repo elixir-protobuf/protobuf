@@ -4,14 +4,11 @@ defmodule TestMsg do
   defmodule SyntaxOption do
     @moduledoc false
     use Protobuf, syntax: :proto3
-    defstruct []
   end
 
   defmodule Foo.Bar do
     @moduledoc false
     use Protobuf, syntax: :proto3
-
-    defstruct [:a, :b]
 
     field :a, 1, type: :int32
     field :b, 2, type: :string
@@ -33,7 +30,6 @@ defmodule TestMsg do
     @moduledoc false
     use Protobuf, map: true, syntax: :proto3
 
-    defstruct [:key, :value]
     field :key, 1, type: :string
     field :value, 2, type: :int32
   end
@@ -41,8 +37,6 @@ defmodule TestMsg do
   defmodule Foo do
     @moduledoc false
     use Protobuf, syntax: :proto3
-
-    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :n, :o, :p, :non_matched]
 
     field :a, 1, type: :int32
     field :b, 2, type: :fixed64
@@ -69,8 +63,6 @@ defmodule TestMsg do
     @moduledoc false
     use Protobuf, syntax: :proto2
 
-    defstruct [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :non_matched]
-
     field :a, 1, required: true, type: :int32
     field :b, 2, optional: true, type: :fixed64, default: 5
     field :c, 3, optional: true, type: :string
@@ -91,8 +83,6 @@ defmodule TestMsg do
     @moduledoc false
     use Protobuf, syntax: :proto2
 
-    defstruct [:a]
-
     field :a, 1, repeated: true, type: :sint32
   end
 
@@ -100,16 +90,12 @@ defmodule TestMsg do
     @moduledoc false
     use Protobuf, syntax: :proto2
 
-    defstruct [:a]
-
     field :a, 1, repeated: true, type: :sint32, packed: true
   end
 
   defmodule Oneof do
     @moduledoc false
     use Protobuf
-
-    defstruct [:first, :second, :other]
 
     oneof :first, 0
     oneof :second, 1
@@ -125,8 +111,6 @@ defmodule TestMsg do
     @moduledoc false
     use Protobuf, syntax: :proto3
 
-    defstruct [:first, :second, :other]
-
     oneof :first, 0
     oneof :second, 1
     field :a, 1, optional: true, type: :int32, oneof: 0
@@ -140,21 +124,18 @@ defmodule TestMsg do
   defmodule Parent do
     @moduledoc false
     use Protobuf, syntax: :proto3
-    defstruct [:child]
     field :child, 1, type: Parent.Child
   end
 
   defmodule Parent.Child do
     @moduledoc false
     use Protobuf, syntax: :proto3
-    defstruct [:parent]
     field :parent, 1, type: Parent
   end
 
   defmodule Link do
     @moduledoc false
     use Protobuf, syntax: :proto3
-    defstruct [:child, :value]
     field :child, 1, type: Link
     field :value, 2, type: :int32
   end
@@ -186,39 +167,6 @@ defmodule TestMsg do
   defmodule Scalars do
     @moduledoc false
     use Protobuf, syntax: :proto3
-
-    defstruct [
-      :string,
-      :bool,
-      :float,
-      :double,
-      :int32,
-      :uint32,
-      :sint32,
-      :fixed32,
-      :sfixed32,
-      :int64,
-      :uint64,
-      :sint64,
-      :fixed64,
-      :sfixed64,
-      :bytes,
-      :repeated_string,
-      :repeated_bool,
-      :repeated_float,
-      :repeated_double,
-      :repeated_int32,
-      :repeated_uint32,
-      :repeated_sint32,
-      :repeated_fixed32,
-      :repeated_sfixed32,
-      :repeated_int64,
-      :repeated_uint64,
-      :repeated_sint64,
-      :repeated_fixed64,
-      :repeated_sfixed64,
-      :repeated_bytes
-    ]
 
     field :string, 1, type: :string
     field :bool, 2, type: :bool
@@ -264,8 +212,6 @@ defmodule TestMsg do
   defmodule MapIntToInt do
     use Protobuf, map: true, syntax: :proto3
 
-    defstruct [:key, :value]
-
     field :key, 1, type: :int32
     field :value, 2, type: :int32
   end
@@ -273,16 +219,12 @@ defmodule TestMsg do
   defmodule MapBoolToInt do
     use Protobuf, map: true, syntax: :proto3
 
-    defstruct [:key, :value]
-
     field :key, 1, type: :bool
     field :value, 2, type: :int32
   end
 
   defmodule Maps do
     use Protobuf, syntax: :proto3
-
-    defstruct [:mapii, :mapbi, :mapsi]
 
     field :mapii, 1, repeated: true, map: true, type: MapIntToInt
     field :mapbi, 2, repeated: true, map: true, type: MapBoolToInt
@@ -292,8 +234,6 @@ defmodule TestMsg do
   defmodule WithTransformModule do
     use Protobuf, syntax: :proto3
 
-    defstruct [:field]
-
     field :field, 1, type: :int32
 
     def transform_module(), do: TestMsg.TransformModule
@@ -301,8 +241,6 @@ defmodule TestMsg do
 
   defmodule ContainsTransformModule do
     use Protobuf, syntax: :proto3
-
-    defstruct [:field]
 
     field :field, 1, type: WithTransformModule
   end
@@ -325,8 +263,6 @@ defmodule TestMsg do
     @moduledoc false
     use Protobuf, enum: true, syntax: :proto2
 
-    @type t :: integer | :UNKNOWN | :A | :B | :C
-
     field :UNKNOWN, 0
     field :A, 1
     field :B, 2
@@ -337,12 +273,6 @@ defmodule TestMsg do
     @moduledoc false
     use Protobuf, syntax: :proto2
 
-    @type t :: %__MODULE__{
-            fa: non_neg_integer,
-            __pb_extensions__: map
-          }
-    defstruct [:fa, :__pb_extensions__]
-
     field :fa, 1, optional: true, type: :uint32
 
     extensions([{100, 101}, {1000, 536_870_912}])
@@ -351,12 +281,6 @@ defmodule TestMsg do
   defmodule Ext.Foo2 do
     @moduledoc false
     use Protobuf, syntax: :proto2
-
-    @type t :: %__MODULE__{
-            fa: non_neg_integer,
-            __pb_extensions__: map
-          }
-    defstruct [:fa, :__pb_extensions__]
 
     field :fa, 1, optional: true, type: :uint32
 
@@ -367,20 +291,12 @@ defmodule TestMsg do
     @moduledoc false
     use Protobuf, syntax: :proto2
 
-    @type t :: %__MODULE__{
-            a: String.t()
-          }
-    defstruct [:a]
-
     field :a, 1, optional: true, type: :string
   end
 
   defmodule Ext.Parent do
     @moduledoc false
     use Protobuf, syntax: :proto2
-
-    @type t :: %__MODULE__{}
-    defstruct []
   end
 
   defmodule Ext.PbExtension do

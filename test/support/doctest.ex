@@ -12,8 +12,6 @@ defmodule Car do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
-  defstruct [:color, :top_speed]
-
   field :color, 1, type: Color, enum: true
   field :top_speed, 2, type: :float, json_name: "topSpeed"
 end

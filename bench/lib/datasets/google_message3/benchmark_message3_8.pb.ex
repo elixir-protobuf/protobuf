@@ -2,8 +2,6 @@ defmodule Benchmarks.GoogleMessage3.Enum720 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :ENUM_VALUE721 | :ENUM_VALUE722
-
   field :ENUM_VALUE721, 1
   field :ENUM_VALUE722, 2
 end
@@ -11,193 +9,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum3476 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE3477
-          | :ENUM_VALUE3478
-          | :ENUM_VALUE3479
-          | :ENUM_VALUE3480
-          | :ENUM_VALUE3481
-          | :ENUM_VALUE3482
-          | :ENUM_VALUE3483
-          | :ENUM_VALUE3484
-          | :ENUM_VALUE3485
-          | :ENUM_VALUE3486
-          | :ENUM_VALUE3487
-          | :ENUM_VALUE3488
-          | :ENUM_VALUE3489
-          | :ENUM_VALUE3490
-          | :ENUM_VALUE3491
-          | :ENUM_VALUE3492
-          | :ENUM_VALUE3493
-          | :ENUM_VALUE3494
-          | :ENUM_VALUE3495
-          | :ENUM_VALUE3496
-          | :ENUM_VALUE3497
-          | :ENUM_VALUE3498
-          | :ENUM_VALUE3499
-          | :ENUM_VALUE3500
-          | :ENUM_VALUE3501
-          | :ENUM_VALUE3502
-          | :ENUM_VALUE3503
-          | :ENUM_VALUE3504
-          | :ENUM_VALUE3505
-          | :ENUM_VALUE3506
-          | :ENUM_VALUE3507
-          | :ENUM_VALUE3508
-          | :ENUM_VALUE3509
-          | :ENUM_VALUE3510
-          | :ENUM_VALUE3511
-          | :ENUM_VALUE3512
-          | :ENUM_VALUE3513
-          | :ENUM_VALUE3514
-          | :ENUM_VALUE3515
-          | :ENUM_VALUE3516
-          | :ENUM_VALUE3517
-          | :ENUM_VALUE3518
-          | :ENUM_VALUE3519
-          | :ENUM_VALUE3520
-          | :ENUM_VALUE3521
-          | :ENUM_VALUE3522
-          | :ENUM_VALUE3523
-          | :ENUM_VALUE3524
-          | :ENUM_VALUE3525
-          | :ENUM_VALUE3526
-          | :ENUM_VALUE3527
-          | :ENUM_VALUE3528
-          | :ENUM_VALUE3529
-          | :ENUM_VALUE3530
-          | :ENUM_VALUE3531
-          | :ENUM_VALUE3532
-          | :ENUM_VALUE3533
-          | :ENUM_VALUE3534
-          | :ENUM_VALUE3535
-          | :ENUM_VALUE3536
-          | :ENUM_VALUE3537
-          | :ENUM_VALUE3538
-          | :ENUM_VALUE3539
-          | :ENUM_VALUE3540
-          | :ENUM_VALUE3541
-          | :ENUM_VALUE3542
-          | :ENUM_VALUE3543
-          | :ENUM_VALUE3544
-          | :ENUM_VALUE3545
-          | :ENUM_VALUE3546
-          | :ENUM_VALUE3547
-          | :ENUM_VALUE3548
-          | :ENUM_VALUE3549
-          | :ENUM_VALUE3550
-          | :ENUM_VALUE3551
-          | :ENUM_VALUE3552
-          | :ENUM_VALUE3553
-          | :ENUM_VALUE3554
-          | :ENUM_VALUE3555
-          | :ENUM_VALUE3556
-          | :ENUM_VALUE3557
-          | :ENUM_VALUE3558
-          | :ENUM_VALUE3559
-          | :ENUM_VALUE3560
-          | :ENUM_VALUE3561
-          | :ENUM_VALUE3562
-          | :ENUM_VALUE3563
-          | :ENUM_VALUE3564
-          | :ENUM_VALUE3565
-          | :ENUM_VALUE3566
-          | :ENUM_VALUE3567
-          | :ENUM_VALUE3568
-          | :ENUM_VALUE3569
-          | :ENUM_VALUE3570
-          | :ENUM_VALUE3571
-          | :ENUM_VALUE3572
-          | :ENUM_VALUE3573
-          | :ENUM_VALUE3574
-          | :ENUM_VALUE3575
-          | :ENUM_VALUE3576
-          | :ENUM_VALUE3577
-          | :ENUM_VALUE3578
-          | :ENUM_VALUE3579
-          | :ENUM_VALUE3580
-          | :ENUM_VALUE3581
-          | :ENUM_VALUE3582
-          | :ENUM_VALUE3583
-          | :ENUM_VALUE3584
-          | :ENUM_VALUE3585
-          | :ENUM_VALUE3586
-          | :ENUM_VALUE3587
-          | :ENUM_VALUE3588
-          | :ENUM_VALUE3589
-          | :ENUM_VALUE3590
-          | :ENUM_VALUE3591
-          | :ENUM_VALUE3592
-          | :ENUM_VALUE3593
-          | :ENUM_VALUE3594
-          | :ENUM_VALUE3595
-          | :ENUM_VALUE3596
-          | :ENUM_VALUE3597
-          | :ENUM_VALUE3598
-          | :ENUM_VALUE3599
-          | :ENUM_VALUE3600
-          | :ENUM_VALUE3601
-          | :ENUM_VALUE3602
-          | :ENUM_VALUE3603
-          | :ENUM_VALUE3604
-          | :ENUM_VALUE3605
-          | :ENUM_VALUE3606
-          | :ENUM_VALUE3607
-          | :ENUM_VALUE3608
-          | :ENUM_VALUE3609
-          | :ENUM_VALUE3610
-          | :ENUM_VALUE3611
-          | :ENUM_VALUE3612
-          | :ENUM_VALUE3613
-          | :ENUM_VALUE3614
-          | :ENUM_VALUE3615
-          | :ENUM_VALUE3616
-          | :ENUM_VALUE3617
-          | :ENUM_VALUE3618
-          | :ENUM_VALUE3619
-          | :ENUM_VALUE3620
-          | :ENUM_VALUE3621
-          | :ENUM_VALUE3622
-          | :ENUM_VALUE3623
-          | :ENUM_VALUE3624
-          | :ENUM_VALUE3625
-          | :ENUM_VALUE3626
-          | :ENUM_VALUE3627
-          | :ENUM_VALUE3628
-          | :ENUM_VALUE3629
-          | :ENUM_VALUE3630
-          | :ENUM_VALUE3631
-          | :ENUM_VALUE3632
-          | :ENUM_VALUE3633
-          | :ENUM_VALUE3634
-          | :ENUM_VALUE3635
-          | :ENUM_VALUE3636
-          | :ENUM_VALUE3637
-          | :ENUM_VALUE3638
-          | :ENUM_VALUE3639
-          | :ENUM_VALUE3640
-          | :ENUM_VALUE3641
-          | :ENUM_VALUE3642
-          | :ENUM_VALUE3643
-          | :ENUM_VALUE3644
-          | :ENUM_VALUE3645
-          | :ENUM_VALUE3646
-          | :ENUM_VALUE3647
-          | :ENUM_VALUE3648
-          | :ENUM_VALUE3649
-          | :ENUM_VALUE3650
-          | :ENUM_VALUE3651
-          | :ENUM_VALUE3652
-          | :ENUM_VALUE3653
-          | :ENUM_VALUE3654
-          | :ENUM_VALUE3655
-          | :ENUM_VALUE3656
-          | :ENUM_VALUE3657
-          | :ENUM_VALUE3658
-          | :ENUM_VALUE3659
-          | :ENUM_VALUE3660
 
   field :ENUM_VALUE3477, 0
   field :ENUM_VALUE3478, 1
@@ -389,21 +200,6 @@ defmodule Benchmarks.GoogleMessage3.Enum3805 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE3806
-          | :ENUM_VALUE3807
-          | :ENUM_VALUE3808
-          | :ENUM_VALUE3809
-          | :ENUM_VALUE3810
-          | :ENUM_VALUE3811
-          | :ENUM_VALUE3812
-          | :ENUM_VALUE3813
-          | :ENUM_VALUE3814
-          | :ENUM_VALUE3815
-          | :ENUM_VALUE3816
-          | :ENUM_VALUE3817
-
   field :ENUM_VALUE3806, 0
   field :ENUM_VALUE3807, 1
   field :ENUM_VALUE3808, 2
@@ -421,29 +217,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum3783 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE3784
-          | :ENUM_VALUE3785
-          | :ENUM_VALUE3786
-          | :ENUM_VALUE3787
-          | :ENUM_VALUE3788
-          | :ENUM_VALUE3789
-          | :ENUM_VALUE3790
-          | :ENUM_VALUE3791
-          | :ENUM_VALUE3792
-          | :ENUM_VALUE3793
-          | :ENUM_VALUE3794
-          | :ENUM_VALUE3795
-          | :ENUM_VALUE3796
-          | :ENUM_VALUE3797
-          | :ENUM_VALUE3798
-          | :ENUM_VALUE3799
-          | :ENUM_VALUE3800
-          | :ENUM_VALUE3801
-          | :ENUM_VALUE3802
-          | :ENUM_VALUE3803
 
   field :ENUM_VALUE3784, 0
   field :ENUM_VALUE3785, 1
@@ -471,27 +244,6 @@ defmodule Benchmarks.GoogleMessage3.Enum3851 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE3852
-          | :ENUM_VALUE3853
-          | :ENUM_VALUE3854
-          | :ENUM_VALUE3855
-          | :ENUM_VALUE3856
-          | :ENUM_VALUE3857
-          | :ENUM_VALUE3858
-          | :ENUM_VALUE3859
-          | :ENUM_VALUE3860
-          | :ENUM_VALUE3861
-          | :ENUM_VALUE3862
-          | :ENUM_VALUE3863
-          | :ENUM_VALUE3864
-          | :ENUM_VALUE3865
-          | :ENUM_VALUE3866
-          | :ENUM_VALUE3867
-          | :ENUM_VALUE3868
-          | :ENUM_VALUE3869
-
   field :ENUM_VALUE3852, 0
   field :ENUM_VALUE3853, 1
   field :ENUM_VALUE3854, 2
@@ -516,8 +268,6 @@ defmodule Benchmarks.GoogleMessage3.UnusedEnum do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :UNUSED_ENUM_VALUE1 | :UNUSED_ENUM_VALUE2
-
   field :UNUSED_ENUM_VALUE1, 0
   field :UNUSED_ENUM_VALUE2, 1
 end
@@ -525,14 +275,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum4146 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE4147
-          | :ENUM_VALUE4148
-          | :ENUM_VALUE4149
-          | :ENUM_VALUE4150
-          | :ENUM_VALUE4151
 
   field :ENUM_VALUE4147, 0
   field :ENUM_VALUE4148, 1
@@ -545,8 +287,6 @@ defmodule Benchmarks.GoogleMessage3.Enum4160 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :ENUM_VALUE4161 | :ENUM_VALUE4162
-
   field :ENUM_VALUE4161, 0
   field :ENUM_VALUE4162, 1
 end
@@ -554,16 +294,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum4152 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE4153
-          | :ENUM_VALUE4154
-          | :ENUM_VALUE4155
-          | :ENUM_VALUE4156
-          | :ENUM_VALUE4157
-          | :ENUM_VALUE4158
-          | :ENUM_VALUE4159
 
   field :ENUM_VALUE4153, 0
   field :ENUM_VALUE4154, 1
@@ -577,31 +307,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum6025 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE6026
-          | :ENUM_VALUE6027
-          | :ENUM_VALUE6028
-          | :ENUM_VALUE6029
-          | :ENUM_VALUE6030
-          | :ENUM_VALUE6031
-          | :ENUM_VALUE6032
-          | :ENUM_VALUE6033
-          | :ENUM_VALUE6034
-          | :ENUM_VALUE6035
-          | :ENUM_VALUE6036
-          | :ENUM_VALUE6037
-          | :ENUM_VALUE6038
-          | :ENUM_VALUE6039
-          | :ENUM_VALUE6040
-          | :ENUM_VALUE6041
-          | :ENUM_VALUE6042
-          | :ENUM_VALUE6043
-          | :ENUM_VALUE6044
-          | :ENUM_VALUE6045
-          | :ENUM_VALUE6046
-          | :ENUM_VALUE6047
 
   field :ENUM_VALUE6026, 0
   field :ENUM_VALUE6027, 1
@@ -631,24 +336,6 @@ defmodule Benchmarks.GoogleMessage3.Enum6065 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE6066
-          | :ENUM_VALUE6067
-          | :ENUM_VALUE6068
-          | :ENUM_VALUE6069
-          | :ENUM_VALUE6070
-          | :ENUM_VALUE6071
-          | :ENUM_VALUE6072
-          | :ENUM_VALUE6073
-          | :ENUM_VALUE6074
-          | :ENUM_VALUE6075
-          | :ENUM_VALUE6076
-          | :ENUM_VALUE6077
-          | :ENUM_VALUE6078
-          | :ENUM_VALUE6079
-          | :ENUM_VALUE6080
-
   field :ENUM_VALUE6066, 0
   field :ENUM_VALUE6067, 1
   field :ENUM_VALUE6068, 2
@@ -670,17 +357,6 @@ defmodule Benchmarks.GoogleMessage3.Enum6579 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE6580
-          | :ENUM_VALUE6581
-          | :ENUM_VALUE6582
-          | :ENUM_VALUE6583
-          | :ENUM_VALUE6584
-          | :ENUM_VALUE6585
-          | :ENUM_VALUE6586
-          | :ENUM_VALUE6587
-
   field :ENUM_VALUE6580, 0
   field :ENUM_VALUE6581, 2
   field :ENUM_VALUE6582, 3
@@ -694,43 +370,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum6588 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE6589
-          | :ENUM_VALUE6590
-          | :ENUM_VALUE6591
-          | :ENUM_VALUE6592
-          | :ENUM_VALUE6593
-          | :ENUM_VALUE6594
-          | :ENUM_VALUE6595
-          | :ENUM_VALUE6596
-          | :ENUM_VALUE6597
-          | :ENUM_VALUE6598
-          | :ENUM_VALUE6599
-          | :ENUM_VALUE6600
-          | :ENUM_VALUE6601
-          | :ENUM_VALUE6602
-          | :ENUM_VALUE6603
-          | :ENUM_VALUE6604
-          | :ENUM_VALUE6605
-          | :ENUM_VALUE6606
-          | :ENUM_VALUE6607
-          | :ENUM_VALUE6608
-          | :ENUM_VALUE6609
-          | :ENUM_VALUE6610
-          | :ENUM_VALUE6611
-          | :ENUM_VALUE6612
-          | :ENUM_VALUE6613
-          | :ENUM_VALUE6614
-          | :ENUM_VALUE6615
-          | :ENUM_VALUE6616
-          | :ENUM_VALUE6617
-          | :ENUM_VALUE6618
-          | :ENUM_VALUE6619
-          | :ENUM_VALUE6620
-          | :ENUM_VALUE6621
-          | :ENUM_VALUE6622
 
   field :ENUM_VALUE6589, 0
   field :ENUM_VALUE6590, 1
@@ -772,8 +411,6 @@ defmodule Benchmarks.GoogleMessage3.Enum6769 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :ENUM_VALUE6770 | :ENUM_VALUE6771 | :ENUM_VALUE6772
-
   field :ENUM_VALUE6770, 0
   field :ENUM_VALUE6771, 1
   field :ENUM_VALUE6772, 2
@@ -782,16 +419,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum6774 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE6775
-          | :ENUM_VALUE6776
-          | :ENUM_VALUE6777
-          | :ENUM_VALUE6778
-          | :ENUM_VALUE6779
-          | :ENUM_VALUE6780
-          | :ENUM_VALUE6781
 
   field :ENUM_VALUE6775, 0
   field :ENUM_VALUE6776, 1
@@ -806,15 +433,6 @@ defmodule Benchmarks.GoogleMessage3.Enum6782 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE6783
-          | :ENUM_VALUE6784
-          | :ENUM_VALUE6785
-          | :ENUM_VALUE6786
-          | :ENUM_VALUE6787
-          | :ENUM_VALUE6788
-
   field :ENUM_VALUE6783, 0
   field :ENUM_VALUE6784, 1
   field :ENUM_VALUE6785, 2
@@ -827,8 +445,6 @@ defmodule Benchmarks.GoogleMessage3.Enum6858 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :ENUM_VALUE6859 | :ENUM_VALUE6860 | :ENUM_VALUE6861 | :ENUM_VALUE6862
-
   field :ENUM_VALUE6859, 1
   field :ENUM_VALUE6860, 2
   field :ENUM_VALUE6861, 3
@@ -838,15 +454,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum6815 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE6816
-          | :ENUM_VALUE6817
-          | :ENUM_VALUE6818
-          | :ENUM_VALUE6819
-          | :ENUM_VALUE6820
-          | :ENUM_VALUE6821
 
   field :ENUM_VALUE6816, 0
   field :ENUM_VALUE6817, 1
@@ -860,8 +467,6 @@ defmodule Benchmarks.GoogleMessage3.Enum6822 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :ENUM_VALUE6823 | :ENUM_VALUE6824 | :ENUM_VALUE6825 | :ENUM_VALUE6826
-
   field :ENUM_VALUE6823, 0
   field :ENUM_VALUE6824, 1
   field :ENUM_VALUE6825, 2
@@ -872,8 +477,6 @@ defmodule Benchmarks.GoogleMessage3.Enum7654 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :ENUM_VALUE7655 | :ENUM_VALUE7656 | :ENUM_VALUE7657
-
   field :ENUM_VALUE7655, 1
   field :ENUM_VALUE7656, 2
   field :ENUM_VALUE7657, 3
@@ -882,8 +485,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum8292 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t :: integer | :ENUM_VALUE8293 | :ENUM_VALUE8294 | :ENUM_VALUE8295
 
   field :ENUM_VALUE8293, 0
   field :ENUM_VALUE8294, 1
@@ -894,8 +495,6 @@ defmodule Benchmarks.GoogleMessage3.Enum8450 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :ENUM_VALUE8451 | :ENUM_VALUE8452 | :ENUM_VALUE8453
-
   field :ENUM_VALUE8451, 0
   field :ENUM_VALUE8452, 1
   field :ENUM_VALUE8453, 2
@@ -904,14 +503,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum8900 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE8901
-          | :ENUM_VALUE8902
-          | :ENUM_VALUE8903
-          | :ENUM_VALUE8904
-          | :ENUM_VALUE8905
 
   field :ENUM_VALUE8901, 0
   field :ENUM_VALUE8902, 1
@@ -924,14 +515,6 @@ defmodule Benchmarks.GoogleMessage3.Enum8945 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE8946
-          | :ENUM_VALUE8947
-          | :ENUM_VALUE8948
-          | :ENUM_VALUE8949
-          | :ENUM_VALUE8950
-
   field :ENUM_VALUE8946, 0
   field :ENUM_VALUE8947, 1
   field :ENUM_VALUE8948, 2
@@ -942,17 +525,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum8951 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE8952
-          | :ENUM_VALUE8953
-          | :ENUM_VALUE8954
-          | :ENUM_VALUE8955
-          | :ENUM_VALUE8956
-          | :ENUM_VALUE8957
-          | :ENUM_VALUE8958
-          | :ENUM_VALUE8959
 
   field :ENUM_VALUE8952, 1
   field :ENUM_VALUE8953, 2
@@ -967,92 +539,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum9243 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE9244
-          | :ENUM_VALUE9245
-          | :ENUM_VALUE9246
-          | :ENUM_VALUE9247
-          | :ENUM_VALUE9248
-          | :ENUM_VALUE9249
-          | :ENUM_VALUE9250
-          | :ENUM_VALUE9251
-          | :ENUM_VALUE9252
-          | :ENUM_VALUE9253
-          | :ENUM_VALUE9254
-          | :ENUM_VALUE9255
-          | :ENUM_VALUE9256
-          | :ENUM_VALUE9257
-          | :ENUM_VALUE9258
-          | :ENUM_VALUE9259
-          | :ENUM_VALUE9260
-          | :ENUM_VALUE9261
-          | :ENUM_VALUE9262
-          | :ENUM_VALUE9263
-          | :ENUM_VALUE9264
-          | :ENUM_VALUE9265
-          | :ENUM_VALUE9266
-          | :ENUM_VALUE9267
-          | :ENUM_VALUE9268
-          | :ENUM_VALUE9269
-          | :ENUM_VALUE9270
-          | :ENUM_VALUE9271
-          | :ENUM_VALUE9272
-          | :ENUM_VALUE9273
-          | :ENUM_VALUE9274
-          | :ENUM_VALUE9275
-          | :ENUM_VALUE9276
-          | :ENUM_VALUE9277
-          | :ENUM_VALUE9278
-          | :ENUM_VALUE9279
-          | :ENUM_VALUE9280
-          | :ENUM_VALUE9281
-          | :ENUM_VALUE9282
-          | :ENUM_VALUE9283
-          | :ENUM_VALUE9284
-          | :ENUM_VALUE9285
-          | :ENUM_VALUE9286
-          | :ENUM_VALUE9287
-          | :ENUM_VALUE9288
-          | :ENUM_VALUE9289
-          | :ENUM_VALUE9290
-          | :ENUM_VALUE9291
-          | :ENUM_VALUE9292
-          | :ENUM_VALUE9293
-          | :ENUM_VALUE9294
-          | :ENUM_VALUE9295
-          | :ENUM_VALUE9296
-          | :ENUM_VALUE9297
-          | :ENUM_VALUE9298
-          | :ENUM_VALUE9299
-          | :ENUM_VALUE9300
-          | :ENUM_VALUE9301
-          | :ENUM_VALUE9302
-          | :ENUM_VALUE9303
-          | :ENUM_VALUE9304
-          | :ENUM_VALUE9305
-          | :ENUM_VALUE9306
-          | :ENUM_VALUE9307
-          | :ENUM_VALUE9308
-          | :ENUM_VALUE9309
-          | :ENUM_VALUE9310
-          | :ENUM_VALUE9311
-          | :ENUM_VALUE9312
-          | :ENUM_VALUE9313
-          | :ENUM_VALUE9314
-          | :ENUM_VALUE9315
-          | :ENUM_VALUE9316
-          | :ENUM_VALUE9317
-          | :ENUM_VALUE9318
-          | :ENUM_VALUE9319
-          | :ENUM_VALUE9320
-          | :ENUM_VALUE9321
-          | :ENUM_VALUE9322
-          | :ENUM_VALUE9323
-          | :ENUM_VALUE9324
-          | :ENUM_VALUE9325
-          | :ENUM_VALUE9326
 
   field :ENUM_VALUE9244, -1
   field :ENUM_VALUE9245, 0
@@ -1143,18 +629,6 @@ defmodule Benchmarks.GoogleMessage3.Enum10157 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE10158
-          | :ENUM_VALUE10159
-          | :ENUM_VALUE10160
-          | :ENUM_VALUE10161
-          | :ENUM_VALUE10162
-          | :ENUM_VALUE10163
-          | :ENUM_VALUE10164
-          | :ENUM_VALUE10165
-          | :ENUM_VALUE10166
-
   field :ENUM_VALUE10158, 0
   field :ENUM_VALUE10159, 1
   field :ENUM_VALUE10160, 2
@@ -1170,18 +644,6 @@ defmodule Benchmarks.GoogleMessage3.Enum10167 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE10168
-          | :ENUM_VALUE10169
-          | :ENUM_VALUE10170
-          | :ENUM_VALUE10171
-          | :ENUM_VALUE10172
-          | :ENUM_VALUE10173
-          | :ENUM_VALUE10174
-          | :ENUM_VALUE10175
-          | :ENUM_VALUE10176
-
   field :ENUM_VALUE10168, 0
   field :ENUM_VALUE10169, 1
   field :ENUM_VALUE10170, 2
@@ -1196,25 +658,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum8862 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE8863
-          | :ENUM_VALUE8864
-          | :ENUM_VALUE8865
-          | :ENUM_VALUE8866
-          | :ENUM_VALUE8867
-          | :ENUM_VALUE8868
-          | :ENUM_VALUE8869
-          | :ENUM_VALUE8870
-          | :ENUM_VALUE8871
-          | :ENUM_VALUE8872
-          | :ENUM_VALUE8873
-          | :ENUM_VALUE8874
-          | :ENUM_VALUE8875
-          | :ENUM_VALUE8876
-          | :ENUM_VALUE8877
-          | :ENUM_VALUE8878
 
   field :ENUM_VALUE8863, 0
   field :ENUM_VALUE8864, 1
@@ -1238,18 +681,6 @@ defmodule Benchmarks.GoogleMessage3.Enum10325 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE10326
-          | :ENUM_VALUE10327
-          | :ENUM_VALUE10328
-          | :ENUM_VALUE10329
-          | :ENUM_VALUE10330
-          | :ENUM_VALUE10331
-          | :ENUM_VALUE10332
-          | :ENUM_VALUE10333
-          | :ENUM_VALUE10334
-
   field :ENUM_VALUE10326, 0
   field :ENUM_VALUE10327, 1
   field :ENUM_VALUE10328, 2
@@ -1265,16 +696,12 @@ defmodule Benchmarks.GoogleMessage3.Enum10335 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :ENUM_VALUE10336
-
   field :ENUM_VALUE10336, 0
 end
 
 defmodule Benchmarks.GoogleMessage3.Enum10337 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t :: integer | :ENUM_VALUE10338 | :ENUM_VALUE10339
 
   field :ENUM_VALUE10338, 0
   field :ENUM_VALUE10339, 1
@@ -1283,27 +710,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum10392 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE10393
-          | :ENUM_VALUE10394
-          | :ENUM_VALUE10395
-          | :ENUM_VALUE10396
-          | :ENUM_VALUE10397
-          | :ENUM_VALUE10398
-          | :ENUM_VALUE10399
-          | :ENUM_VALUE10400
-          | :ENUM_VALUE10401
-          | :ENUM_VALUE10402
-          | :ENUM_VALUE10403
-          | :ENUM_VALUE10404
-          | :ENUM_VALUE10405
-          | :ENUM_VALUE10406
-          | :ENUM_VALUE10407
-          | :ENUM_VALUE10408
-          | :ENUM_VALUE10409
-          | :ENUM_VALUE10410
 
   field :ENUM_VALUE10393, 0
   field :ENUM_VALUE10394, 1
@@ -1328,369 +734,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum11107 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE11108
-          | :ENUM_VALUE11109
-          | :ENUM_VALUE11110
-          | :ENUM_VALUE11111
-          | :ENUM_VALUE11112
-          | :ENUM_VALUE11113
-          | :ENUM_VALUE11114
-          | :ENUM_VALUE11115
-          | :ENUM_VALUE11116
-          | :ENUM_VALUE11117
-          | :ENUM_VALUE11118
-          | :ENUM_VALUE11119
-          | :ENUM_VALUE11120
-          | :ENUM_VALUE11121
-          | :ENUM_VALUE11122
-          | :ENUM_VALUE11123
-          | :ENUM_VALUE11124
-          | :ENUM_VALUE11125
-          | :ENUM_VALUE11126
-          | :ENUM_VALUE11127
-          | :ENUM_VALUE11128
-          | :ENUM_VALUE11129
-          | :ENUM_VALUE11130
-          | :ENUM_VALUE11131
-          | :ENUM_VALUE11132
-          | :ENUM_VALUE11133
-          | :ENUM_VALUE11134
-          | :ENUM_VALUE11135
-          | :ENUM_VALUE11136
-          | :ENUM_VALUE11137
-          | :ENUM_VALUE11138
-          | :ENUM_VALUE11139
-          | :ENUM_VALUE11140
-          | :ENUM_VALUE11141
-          | :ENUM_VALUE11142
-          | :ENUM_VALUE11143
-          | :ENUM_VALUE11144
-          | :ENUM_VALUE11145
-          | :ENUM_VALUE11146
-          | :ENUM_VALUE11147
-          | :ENUM_VALUE11148
-          | :ENUM_VALUE11149
-          | :ENUM_VALUE11150
-          | :ENUM_VALUE11151
-          | :ENUM_VALUE11152
-          | :ENUM_VALUE11153
-          | :ENUM_VALUE11154
-          | :ENUM_VALUE11155
-          | :ENUM_VALUE11156
-          | :ENUM_VALUE11157
-          | :ENUM_VALUE11158
-          | :ENUM_VALUE11159
-          | :ENUM_VALUE11160
-          | :ENUM_VALUE11161
-          | :ENUM_VALUE11162
-          | :ENUM_VALUE11163
-          | :ENUM_VALUE11164
-          | :ENUM_VALUE11165
-          | :ENUM_VALUE11166
-          | :ENUM_VALUE11167
-          | :ENUM_VALUE11168
-          | :ENUM_VALUE11169
-          | :ENUM_VALUE11170
-          | :ENUM_VALUE11171
-          | :ENUM_VALUE11172
-          | :ENUM_VALUE11173
-          | :ENUM_VALUE11174
-          | :ENUM_VALUE11175
-          | :ENUM_VALUE11176
-          | :ENUM_VALUE11177
-          | :ENUM_VALUE11178
-          | :ENUM_VALUE11179
-          | :ENUM_VALUE11180
-          | :ENUM_VALUE11181
-          | :ENUM_VALUE11182
-          | :ENUM_VALUE11183
-          | :ENUM_VALUE11184
-          | :ENUM_VALUE11185
-          | :ENUM_VALUE11186
-          | :ENUM_VALUE11187
-          | :ENUM_VALUE11188
-          | :ENUM_VALUE11189
-          | :ENUM_VALUE11190
-          | :ENUM_VALUE11191
-          | :ENUM_VALUE11192
-          | :ENUM_VALUE11193
-          | :ENUM_VALUE11194
-          | :ENUM_VALUE11195
-          | :ENUM_VALUE11196
-          | :ENUM_VALUE11197
-          | :ENUM_VALUE11198
-          | :ENUM_VALUE11199
-          | :ENUM_VALUE11200
-          | :ENUM_VALUE11201
-          | :ENUM_VALUE11202
-          | :ENUM_VALUE11203
-          | :ENUM_VALUE11204
-          | :ENUM_VALUE11205
-          | :ENUM_VALUE11206
-          | :ENUM_VALUE11207
-          | :ENUM_VALUE11208
-          | :ENUM_VALUE11209
-          | :ENUM_VALUE11210
-          | :ENUM_VALUE11211
-          | :ENUM_VALUE11212
-          | :ENUM_VALUE11213
-          | :ENUM_VALUE11214
-          | :ENUM_VALUE11215
-          | :ENUM_VALUE11216
-          | :ENUM_VALUE11217
-          | :ENUM_VALUE11218
-          | :ENUM_VALUE11219
-          | :ENUM_VALUE11220
-          | :ENUM_VALUE11221
-          | :ENUM_VALUE11222
-          | :ENUM_VALUE11223
-          | :ENUM_VALUE11224
-          | :ENUM_VALUE11225
-          | :ENUM_VALUE11226
-          | :ENUM_VALUE11227
-          | :ENUM_VALUE11228
-          | :ENUM_VALUE11229
-          | :ENUM_VALUE11230
-          | :ENUM_VALUE11231
-          | :ENUM_VALUE11232
-          | :ENUM_VALUE11233
-          | :ENUM_VALUE11234
-          | :ENUM_VALUE11235
-          | :ENUM_VALUE11236
-          | :ENUM_VALUE11237
-          | :ENUM_VALUE11238
-          | :ENUM_VALUE11239
-          | :ENUM_VALUE11240
-          | :ENUM_VALUE11241
-          | :ENUM_VALUE11242
-          | :ENUM_VALUE11243
-          | :ENUM_VALUE11244
-          | :ENUM_VALUE11245
-          | :ENUM_VALUE11246
-          | :ENUM_VALUE11247
-          | :ENUM_VALUE11248
-          | :ENUM_VALUE11249
-          | :ENUM_VALUE11250
-          | :ENUM_VALUE11251
-          | :ENUM_VALUE11252
-          | :ENUM_VALUE11253
-          | :ENUM_VALUE11254
-          | :ENUM_VALUE11255
-          | :ENUM_VALUE11256
-          | :ENUM_VALUE11257
-          | :ENUM_VALUE11258
-          | :ENUM_VALUE11259
-          | :ENUM_VALUE11260
-          | :ENUM_VALUE11261
-          | :ENUM_VALUE11262
-          | :ENUM_VALUE11263
-          | :ENUM_VALUE11264
-          | :ENUM_VALUE11265
-          | :ENUM_VALUE11266
-          | :ENUM_VALUE11267
-          | :ENUM_VALUE11268
-          | :ENUM_VALUE11269
-          | :ENUM_VALUE11270
-          | :ENUM_VALUE11271
-          | :ENUM_VALUE11272
-          | :ENUM_VALUE11273
-          | :ENUM_VALUE11274
-          | :ENUM_VALUE11275
-          | :ENUM_VALUE11276
-          | :ENUM_VALUE11277
-          | :ENUM_VALUE11278
-          | :ENUM_VALUE11279
-          | :ENUM_VALUE11280
-          | :ENUM_VALUE11281
-          | :ENUM_VALUE11282
-          | :ENUM_VALUE11283
-          | :ENUM_VALUE11284
-          | :ENUM_VALUE11285
-          | :ENUM_VALUE11286
-          | :ENUM_VALUE11287
-          | :ENUM_VALUE11288
-          | :ENUM_VALUE11289
-          | :ENUM_VALUE11290
-          | :ENUM_VALUE11291
-          | :ENUM_VALUE11292
-          | :ENUM_VALUE11293
-          | :ENUM_VALUE11294
-          | :ENUM_VALUE11295
-          | :ENUM_VALUE11296
-          | :ENUM_VALUE11297
-          | :ENUM_VALUE11298
-          | :ENUM_VALUE11299
-          | :ENUM_VALUE11300
-          | :ENUM_VALUE11301
-          | :ENUM_VALUE11302
-          | :ENUM_VALUE11303
-          | :ENUM_VALUE11304
-          | :ENUM_VALUE11305
-          | :ENUM_VALUE11306
-          | :ENUM_VALUE11307
-          | :ENUM_VALUE11308
-          | :ENUM_VALUE11309
-          | :ENUM_VALUE11310
-          | :ENUM_VALUE11311
-          | :ENUM_VALUE11312
-          | :ENUM_VALUE11313
-          | :ENUM_VALUE11314
-          | :ENUM_VALUE11315
-          | :ENUM_VALUE11316
-          | :ENUM_VALUE11317
-          | :ENUM_VALUE11318
-          | :ENUM_VALUE11319
-          | :ENUM_VALUE11320
-          | :ENUM_VALUE11321
-          | :ENUM_VALUE11322
-          | :ENUM_VALUE11323
-          | :ENUM_VALUE11324
-          | :ENUM_VALUE11325
-          | :ENUM_VALUE11326
-          | :ENUM_VALUE11327
-          | :ENUM_VALUE11328
-          | :ENUM_VALUE11329
-          | :ENUM_VALUE11330
-          | :ENUM_VALUE11331
-          | :ENUM_VALUE11332
-          | :ENUM_VALUE11333
-          | :ENUM_VALUE11334
-          | :ENUM_VALUE11335
-          | :ENUM_VALUE11336
-          | :ENUM_VALUE11337
-          | :ENUM_VALUE11338
-          | :ENUM_VALUE11339
-          | :ENUM_VALUE11340
-          | :ENUM_VALUE11341
-          | :ENUM_VALUE11342
-          | :ENUM_VALUE11343
-          | :ENUM_VALUE11344
-          | :ENUM_VALUE11345
-          | :ENUM_VALUE11346
-          | :ENUM_VALUE11347
-          | :ENUM_VALUE11348
-          | :ENUM_VALUE11349
-          | :ENUM_VALUE11350
-          | :ENUM_VALUE11351
-          | :ENUM_VALUE11352
-          | :ENUM_VALUE11353
-          | :ENUM_VALUE11354
-          | :ENUM_VALUE11355
-          | :ENUM_VALUE11356
-          | :ENUM_VALUE11357
-          | :ENUM_VALUE11358
-          | :ENUM_VALUE11359
-          | :ENUM_VALUE11360
-          | :ENUM_VALUE11361
-          | :ENUM_VALUE11362
-          | :ENUM_VALUE11363
-          | :ENUM_VALUE11364
-          | :ENUM_VALUE11365
-          | :ENUM_VALUE11366
-          | :ENUM_VALUE11367
-          | :ENUM_VALUE11368
-          | :ENUM_VALUE11369
-          | :ENUM_VALUE11370
-          | :ENUM_VALUE11371
-          | :ENUM_VALUE11372
-          | :ENUM_VALUE11373
-          | :ENUM_VALUE11374
-          | :ENUM_VALUE11375
-          | :ENUM_VALUE11376
-          | :ENUM_VALUE11377
-          | :ENUM_VALUE11378
-          | :ENUM_VALUE11379
-          | :ENUM_VALUE11380
-          | :ENUM_VALUE11381
-          | :ENUM_VALUE11382
-          | :ENUM_VALUE11383
-          | :ENUM_VALUE11384
-          | :ENUM_VALUE11385
-          | :ENUM_VALUE11386
-          | :ENUM_VALUE11387
-          | :ENUM_VALUE11388
-          | :ENUM_VALUE11389
-          | :ENUM_VALUE11390
-          | :ENUM_VALUE11391
-          | :ENUM_VALUE11392
-          | :ENUM_VALUE11393
-          | :ENUM_VALUE11394
-          | :ENUM_VALUE11395
-          | :ENUM_VALUE11396
-          | :ENUM_VALUE11397
-          | :ENUM_VALUE11398
-          | :ENUM_VALUE11399
-          | :ENUM_VALUE11400
-          | :ENUM_VALUE11401
-          | :ENUM_VALUE11402
-          | :ENUM_VALUE11403
-          | :ENUM_VALUE11404
-          | :ENUM_VALUE11405
-          | :ENUM_VALUE11406
-          | :ENUM_VALUE11407
-          | :ENUM_VALUE11408
-          | :ENUM_VALUE11409
-          | :ENUM_VALUE11410
-          | :ENUM_VALUE11411
-          | :ENUM_VALUE11412
-          | :ENUM_VALUE11413
-          | :ENUM_VALUE11414
-          | :ENUM_VALUE11415
-          | :ENUM_VALUE11416
-          | :ENUM_VALUE11417
-          | :ENUM_VALUE11418
-          | :ENUM_VALUE11419
-          | :ENUM_VALUE11420
-          | :ENUM_VALUE11421
-          | :ENUM_VALUE11422
-          | :ENUM_VALUE11423
-          | :ENUM_VALUE11424
-          | :ENUM_VALUE11425
-          | :ENUM_VALUE11426
-          | :ENUM_VALUE11427
-          | :ENUM_VALUE11428
-          | :ENUM_VALUE11429
-          | :ENUM_VALUE11430
-          | :ENUM_VALUE11431
-          | :ENUM_VALUE11432
-          | :ENUM_VALUE11433
-          | :ENUM_VALUE11434
-          | :ENUM_VALUE11435
-          | :ENUM_VALUE11436
-          | :ENUM_VALUE11437
-          | :ENUM_VALUE11438
-          | :ENUM_VALUE11439
-          | :ENUM_VALUE11440
-          | :ENUM_VALUE11441
-          | :ENUM_VALUE11442
-          | :ENUM_VALUE11443
-          | :ENUM_VALUE11444
-          | :ENUM_VALUE11445
-          | :ENUM_VALUE11446
-          | :ENUM_VALUE11447
-          | :ENUM_VALUE11448
-          | :ENUM_VALUE11449
-          | :ENUM_VALUE11450
-          | :ENUM_VALUE11451
-          | :ENUM_VALUE11452
-          | :ENUM_VALUE11453
-          | :ENUM_VALUE11454
-          | :ENUM_VALUE11455
-          | :ENUM_VALUE11456
-          | :ENUM_VALUE11457
-          | :ENUM_VALUE11458
-          | :ENUM_VALUE11459
-          | :ENUM_VALUE11460
-          | :ENUM_VALUE11461
-          | :ENUM_VALUE11462
-          | :ENUM_VALUE11463
-          | :ENUM_VALUE11464
-          | :ENUM_VALUE11465
-          | :ENUM_VALUE11466
-          | :ENUM_VALUE11467
 
   field :ENUM_VALUE11108, 0
   field :ENUM_VALUE11109, 1
@@ -2058,200 +1101,6 @@ defmodule Benchmarks.GoogleMessage3.Enum11541 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE11542
-          | :ENUM_VALUE11543
-          | :ENUM_VALUE11544
-          | :ENUM_VALUE11545
-          | :ENUM_VALUE11546
-          | :ENUM_VALUE11547
-          | :ENUM_VALUE11548
-          | :ENUM_VALUE11549
-          | :ENUM_VALUE11550
-          | :ENUM_VALUE11551
-          | :ENUM_VALUE11552
-          | :ENUM_VALUE11553
-          | :ENUM_VALUE11554
-          | :ENUM_VALUE11555
-          | :ENUM_VALUE11556
-          | :ENUM_VALUE11557
-          | :ENUM_VALUE11558
-          | :ENUM_VALUE11559
-          | :ENUM_VALUE11560
-          | :ENUM_VALUE11561
-          | :ENUM_VALUE11562
-          | :ENUM_VALUE11563
-          | :ENUM_VALUE11564
-          | :ENUM_VALUE11565
-          | :ENUM_VALUE11566
-          | :ENUM_VALUE11567
-          | :ENUM_VALUE11568
-          | :ENUM_VALUE11569
-          | :ENUM_VALUE11570
-          | :ENUM_VALUE11571
-          | :ENUM_VALUE11572
-          | :ENUM_VALUE11573
-          | :ENUM_VALUE11574
-          | :ENUM_VALUE11575
-          | :ENUM_VALUE11576
-          | :ENUM_VALUE11577
-          | :ENUM_VALUE11578
-          | :ENUM_VALUE11579
-          | :ENUM_VALUE11580
-          | :ENUM_VALUE11581
-          | :ENUM_VALUE11582
-          | :ENUM_VALUE11583
-          | :ENUM_VALUE11584
-          | :ENUM_VALUE11585
-          | :ENUM_VALUE11586
-          | :ENUM_VALUE11587
-          | :ENUM_VALUE11588
-          | :ENUM_VALUE11589
-          | :ENUM_VALUE11590
-          | :ENUM_VALUE11591
-          | :ENUM_VALUE11592
-          | :ENUM_VALUE11593
-          | :ENUM_VALUE11594
-          | :ENUM_VALUE11595
-          | :ENUM_VALUE11596
-          | :ENUM_VALUE11597
-          | :ENUM_VALUE11598
-          | :ENUM_VALUE11599
-          | :ENUM_VALUE11600
-          | :ENUM_VALUE11601
-          | :ENUM_VALUE11602
-          | :ENUM_VALUE11603
-          | :ENUM_VALUE11604
-          | :ENUM_VALUE11605
-          | :ENUM_VALUE11606
-          | :ENUM_VALUE11607
-          | :ENUM_VALUE11608
-          | :ENUM_VALUE11609
-          | :ENUM_VALUE11610
-          | :ENUM_VALUE11611
-          | :ENUM_VALUE11612
-          | :ENUM_VALUE11613
-          | :ENUM_VALUE11614
-          | :ENUM_VALUE11615
-          | :ENUM_VALUE11616
-          | :ENUM_VALUE11617
-          | :ENUM_VALUE11618
-          | :ENUM_VALUE11619
-          | :ENUM_VALUE11620
-          | :ENUM_VALUE11621
-          | :ENUM_VALUE11622
-          | :ENUM_VALUE11623
-          | :ENUM_VALUE11624
-          | :ENUM_VALUE11625
-          | :ENUM_VALUE11626
-          | :ENUM_VALUE11627
-          | :ENUM_VALUE11628
-          | :ENUM_VALUE11629
-          | :ENUM_VALUE11630
-          | :ENUM_VALUE11631
-          | :ENUM_VALUE11632
-          | :ENUM_VALUE11633
-          | :ENUM_VALUE11634
-          | :ENUM_VALUE11635
-          | :ENUM_VALUE11636
-          | :ENUM_VALUE11637
-          | :ENUM_VALUE11638
-          | :ENUM_VALUE11639
-          | :ENUM_VALUE11640
-          | :ENUM_VALUE11641
-          | :ENUM_VALUE11642
-          | :ENUM_VALUE11643
-          | :ENUM_VALUE11644
-          | :ENUM_VALUE11645
-          | :ENUM_VALUE11646
-          | :ENUM_VALUE11647
-          | :ENUM_VALUE11648
-          | :ENUM_VALUE11649
-          | :ENUM_VALUE11650
-          | :ENUM_VALUE11651
-          | :ENUM_VALUE11652
-          | :ENUM_VALUE11653
-          | :ENUM_VALUE11654
-          | :ENUM_VALUE11655
-          | :ENUM_VALUE11656
-          | :ENUM_VALUE11657
-          | :ENUM_VALUE11658
-          | :ENUM_VALUE11659
-          | :ENUM_VALUE11660
-          | :ENUM_VALUE11661
-          | :ENUM_VALUE11662
-          | :ENUM_VALUE11663
-          | :ENUM_VALUE11664
-          | :ENUM_VALUE11665
-          | :ENUM_VALUE11666
-          | :ENUM_VALUE11667
-          | :ENUM_VALUE11668
-          | :ENUM_VALUE11669
-          | :ENUM_VALUE11670
-          | :ENUM_VALUE11671
-          | :ENUM_VALUE11672
-          | :ENUM_VALUE11673
-          | :ENUM_VALUE11674
-          | :ENUM_VALUE11675
-          | :ENUM_VALUE11676
-          | :ENUM_VALUE11677
-          | :ENUM_VALUE11678
-          | :ENUM_VALUE11679
-          | :ENUM_VALUE11680
-          | :ENUM_VALUE11681
-          | :ENUM_VALUE11682
-          | :ENUM_VALUE11683
-          | :ENUM_VALUE11684
-          | :ENUM_VALUE11685
-          | :ENUM_VALUE11686
-          | :ENUM_VALUE11687
-          | :ENUM_VALUE11688
-          | :ENUM_VALUE11689
-          | :ENUM_VALUE11690
-          | :ENUM_VALUE11691
-          | :ENUM_VALUE11692
-          | :ENUM_VALUE11693
-          | :ENUM_VALUE11694
-          | :ENUM_VALUE11695
-          | :ENUM_VALUE11696
-          | :ENUM_VALUE11697
-          | :ENUM_VALUE11698
-          | :ENUM_VALUE11699
-          | :ENUM_VALUE11700
-          | :ENUM_VALUE11701
-          | :ENUM_VALUE11702
-          | :ENUM_VALUE11703
-          | :ENUM_VALUE11704
-          | :ENUM_VALUE11705
-          | :ENUM_VALUE11706
-          | :ENUM_VALUE11707
-          | :ENUM_VALUE11708
-          | :ENUM_VALUE11709
-          | :ENUM_VALUE11710
-          | :ENUM_VALUE11711
-          | :ENUM_VALUE11712
-          | :ENUM_VALUE11713
-          | :ENUM_VALUE11714
-          | :ENUM_VALUE11715
-          | :ENUM_VALUE11716
-          | :ENUM_VALUE11717
-          | :ENUM_VALUE11718
-          | :ENUM_VALUE11719
-          | :ENUM_VALUE11720
-          | :ENUM_VALUE11721
-          | :ENUM_VALUE11722
-          | :ENUM_VALUE11723
-          | :ENUM_VALUE11724
-          | :ENUM_VALUE11725
-          | :ENUM_VALUE11726
-          | :ENUM_VALUE11727
-          | :ENUM_VALUE11728
-          | :ENUM_VALUE11729
-          | :ENUM_VALUE11730
-          | :ENUM_VALUE11731
-          | :ENUM_VALUE11732
-
   field :ENUM_VALUE11542, -1
   field :ENUM_VALUE11543, 0
   field :ENUM_VALUE11544, 1
@@ -2449,33 +1298,6 @@ defmodule Benchmarks.GoogleMessage3.Enum11468 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE11469
-          | :ENUM_VALUE11470
-          | :ENUM_VALUE11471
-          | :ENUM_VALUE11472
-          | :ENUM_VALUE11473
-          | :ENUM_VALUE11474
-          | :ENUM_VALUE11475
-          | :ENUM_VALUE11476
-          | :ENUM_VALUE11477
-          | :ENUM_VALUE11478
-          | :ENUM_VALUE11479
-          | :ENUM_VALUE11480
-          | :ENUM_VALUE11481
-          | :ENUM_VALUE11482
-          | :ENUM_VALUE11483
-          | :ENUM_VALUE11484
-          | :ENUM_VALUE11485
-          | :ENUM_VALUE11486
-          | :ENUM_VALUE11487
-          | :ENUM_VALUE11488
-          | :ENUM_VALUE11489
-          | :ENUM_VALUE11490
-          | :ENUM_VALUE11491
-          | :ENUM_VALUE11492
-
   field :ENUM_VALUE11469, -99
   field :ENUM_VALUE11470, 0
   field :ENUM_VALUE11471, 1
@@ -2505,93 +1327,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum11022 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE11023
-          | :ENUM_VALUE11024
-          | :ENUM_VALUE11025
-          | :ENUM_VALUE11026
-          | :ENUM_VALUE11027
-          | :ENUM_VALUE11028
-          | :ENUM_VALUE11029
-          | :ENUM_VALUE11030
-          | :ENUM_VALUE11031
-          | :ENUM_VALUE11032
-          | :ENUM_VALUE11033
-          | :ENUM_VALUE11034
-          | :ENUM_VALUE11035
-          | :ENUM_VALUE11036
-          | :ENUM_VALUE11037
-          | :ENUM_VALUE11038
-          | :ENUM_VALUE11039
-          | :ENUM_VALUE11040
-          | :ENUM_VALUE11041
-          | :ENUM_VALUE11042
-          | :ENUM_VALUE11043
-          | :ENUM_VALUE11044
-          | :ENUM_VALUE11045
-          | :ENUM_VALUE11046
-          | :ENUM_VALUE11047
-          | :ENUM_VALUE11048
-          | :ENUM_VALUE11049
-          | :ENUM_VALUE11050
-          | :ENUM_VALUE11051
-          | :ENUM_VALUE11052
-          | :ENUM_VALUE11053
-          | :ENUM_VALUE11054
-          | :ENUM_VALUE11055
-          | :ENUM_VALUE11056
-          | :ENUM_VALUE11057
-          | :ENUM_VALUE11058
-          | :ENUM_VALUE11059
-          | :ENUM_VALUE11060
-          | :ENUM_VALUE11061
-          | :ENUM_VALUE11062
-          | :ENUM_VALUE11063
-          | :ENUM_VALUE11064
-          | :ENUM_VALUE11065
-          | :ENUM_VALUE11066
-          | :ENUM_VALUE11067
-          | :ENUM_VALUE11068
-          | :ENUM_VALUE11069
-          | :ENUM_VALUE11070
-          | :ENUM_VALUE11071
-          | :ENUM_VALUE11072
-          | :ENUM_VALUE11073
-          | :ENUM_VALUE11074
-          | :ENUM_VALUE11075
-          | :ENUM_VALUE11076
-          | :ENUM_VALUE11077
-          | :ENUM_VALUE11078
-          | :ENUM_VALUE11079
-          | :ENUM_VALUE11080
-          | :ENUM_VALUE11081
-          | :ENUM_VALUE11082
-          | :ENUM_VALUE11083
-          | :ENUM_VALUE11084
-          | :ENUM_VALUE11085
-          | :ENUM_VALUE11086
-          | :ENUM_VALUE11087
-          | :ENUM_VALUE11088
-          | :ENUM_VALUE11089
-          | :ENUM_VALUE11090
-          | :ENUM_VALUE11091
-          | :ENUM_VALUE11092
-          | :ENUM_VALUE11093
-          | :ENUM_VALUE11094
-          | :ENUM_VALUE11095
-          | :ENUM_VALUE11096
-          | :ENUM_VALUE11097
-          | :ENUM_VALUE11098
-          | :ENUM_VALUE11099
-          | :ENUM_VALUE11100
-          | :ENUM_VALUE11101
-          | :ENUM_VALUE11102
-          | :ENUM_VALUE11103
-          | :ENUM_VALUE11104
-          | :ENUM_VALUE11105
-          | :ENUM_VALUE11106
 
   field :ENUM_VALUE11023, 0
   field :ENUM_VALUE11024, 1
@@ -2683,8 +1418,6 @@ defmodule Benchmarks.GoogleMessage3.Enum12670 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :ENUM_VALUE12671 | :ENUM_VALUE12672 | :ENUM_VALUE12673
-
   field :ENUM_VALUE12671, 0
   field :ENUM_VALUE12672, 1
   field :ENUM_VALUE12673, 2
@@ -2693,15 +1426,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum12871 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE12872
-          | :ENUM_VALUE12873
-          | :ENUM_VALUE12874
-          | :ENUM_VALUE12875
-          | :ENUM_VALUE12876
-          | :ENUM_VALUE12877
 
   field :ENUM_VALUE12872, 1
   field :ENUM_VALUE12873, 2
@@ -2715,8 +1439,6 @@ defmodule Benchmarks.GoogleMessage3.Enum13092 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :ENUM_VALUE13093 | :ENUM_VALUE13094 | :ENUM_VALUE13095
-
   field :ENUM_VALUE13093, 1
   field :ENUM_VALUE13094, 2
   field :ENUM_VALUE13095, 3
@@ -2725,8 +1447,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum13146 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t :: integer | :ENUM_VALUE13147 | :ENUM_VALUE13148 | :ENUM_VALUE13149 | :ENUM_VALUE13150
 
   field :ENUM_VALUE13147, 0
   field :ENUM_VALUE13148, 1
@@ -2737,371 +1457,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum16042 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE16043
-          | :ENUM_VALUE16044
-          | :ENUM_VALUE16045
-          | :ENUM_VALUE16046
-          | :ENUM_VALUE16047
-          | :ENUM_VALUE16048
-          | :ENUM_VALUE16049
-          | :ENUM_VALUE16050
-          | :ENUM_VALUE16051
-          | :ENUM_VALUE16052
-          | :ENUM_VALUE16053
-          | :ENUM_VALUE16054
-          | :ENUM_VALUE16055
-          | :ENUM_VALUE16056
-          | :ENUM_VALUE16057
-          | :ENUM_VALUE16058
-          | :ENUM_VALUE16059
-          | :ENUM_VALUE16060
-          | :ENUM_VALUE16061
-          | :ENUM_VALUE16062
-          | :ENUM_VALUE16063
-          | :ENUM_VALUE16064
-          | :ENUM_VALUE16065
-          | :ENUM_VALUE16066
-          | :ENUM_VALUE16067
-          | :ENUM_VALUE16068
-          | :ENUM_VALUE16069
-          | :ENUM_VALUE16070
-          | :ENUM_VALUE16071
-          | :ENUM_VALUE16072
-          | :ENUM_VALUE16073
-          | :ENUM_VALUE16074
-          | :ENUM_VALUE16075
-          | :ENUM_VALUE16076
-          | :ENUM_VALUE16077
-          | :ENUM_VALUE16078
-          | :ENUM_VALUE16079
-          | :ENUM_VALUE16080
-          | :ENUM_VALUE16081
-          | :ENUM_VALUE16082
-          | :ENUM_VALUE16083
-          | :ENUM_VALUE16084
-          | :ENUM_VALUE16085
-          | :ENUM_VALUE16086
-          | :ENUM_VALUE16087
-          | :ENUM_VALUE16088
-          | :ENUM_VALUE16089
-          | :ENUM_VALUE16090
-          | :ENUM_VALUE16091
-          | :ENUM_VALUE16092
-          | :ENUM_VALUE16093
-          | :ENUM_VALUE16094
-          | :ENUM_VALUE16095
-          | :ENUM_VALUE16096
-          | :ENUM_VALUE16097
-          | :ENUM_VALUE16098
-          | :ENUM_VALUE16099
-          | :ENUM_VALUE16100
-          | :ENUM_VALUE16101
-          | :ENUM_VALUE16102
-          | :ENUM_VALUE16103
-          | :ENUM_VALUE16104
-          | :ENUM_VALUE16105
-          | :ENUM_VALUE16106
-          | :ENUM_VALUE16107
-          | :ENUM_VALUE16108
-          | :ENUM_VALUE16109
-          | :ENUM_VALUE16110
-          | :ENUM_VALUE16111
-          | :ENUM_VALUE16112
-          | :ENUM_VALUE16113
-          | :ENUM_VALUE16114
-          | :ENUM_VALUE16115
-          | :ENUM_VALUE16116
-          | :ENUM_VALUE16117
-          | :ENUM_VALUE16118
-          | :ENUM_VALUE16119
-          | :ENUM_VALUE16120
-          | :ENUM_VALUE16121
-          | :ENUM_VALUE16122
-          | :ENUM_VALUE16123
-          | :ENUM_VALUE16124
-          | :ENUM_VALUE16125
-          | :ENUM_VALUE16126
-          | :ENUM_VALUE16127
-          | :ENUM_VALUE16128
-          | :ENUM_VALUE16129
-          | :ENUM_VALUE16130
-          | :ENUM_VALUE16131
-          | :ENUM_VALUE16132
-          | :ENUM_VALUE16133
-          | :ENUM_VALUE16134
-          | :ENUM_VALUE16135
-          | :ENUM_VALUE16136
-          | :ENUM_VALUE16137
-          | :ENUM_VALUE16138
-          | :ENUM_VALUE16139
-          | :ENUM_VALUE16140
-          | :ENUM_VALUE16141
-          | :ENUM_VALUE16142
-          | :ENUM_VALUE16143
-          | :ENUM_VALUE16144
-          | :ENUM_VALUE16145
-          | :ENUM_VALUE16146
-          | :ENUM_VALUE16147
-          | :ENUM_VALUE16148
-          | :ENUM_VALUE16149
-          | :ENUM_VALUE16150
-          | :ENUM_VALUE16151
-          | :ENUM_VALUE16152
-          | :ENUM_VALUE16153
-          | :ENUM_VALUE16154
-          | :ENUM_VALUE16155
-          | :ENUM_VALUE16156
-          | :ENUM_VALUE16157
-          | :ENUM_VALUE16158
-          | :ENUM_VALUE16159
-          | :ENUM_VALUE16160
-          | :ENUM_VALUE16161
-          | :ENUM_VALUE16162
-          | :ENUM_VALUE16163
-          | :ENUM_VALUE16164
-          | :ENUM_VALUE16165
-          | :ENUM_VALUE16166
-          | :ENUM_VALUE16167
-          | :ENUM_VALUE16168
-          | :ENUM_VALUE16169
-          | :ENUM_VALUE16170
-          | :ENUM_VALUE16171
-          | :ENUM_VALUE16172
-          | :ENUM_VALUE16173
-          | :ENUM_VALUE16174
-          | :ENUM_VALUE16175
-          | :ENUM_VALUE16176
-          | :ENUM_VALUE16177
-          | :ENUM_VALUE16178
-          | :ENUM_VALUE16179
-          | :ENUM_VALUE16180
-          | :ENUM_VALUE16181
-          | :ENUM_VALUE16182
-          | :ENUM_VALUE16183
-          | :ENUM_VALUE16184
-          | :ENUM_VALUE16185
-          | :ENUM_VALUE16186
-          | :ENUM_VALUE16187
-          | :ENUM_VALUE16188
-          | :ENUM_VALUE16189
-          | :ENUM_VALUE16190
-          | :ENUM_VALUE16191
-          | :ENUM_VALUE16192
-          | :ENUM_VALUE16193
-          | :ENUM_VALUE16194
-          | :ENUM_VALUE16195
-          | :ENUM_VALUE16196
-          | :ENUM_VALUE16197
-          | :ENUM_VALUE16198
-          | :ENUM_VALUE16199
-          | :ENUM_VALUE16200
-          | :ENUM_VALUE16201
-          | :ENUM_VALUE16202
-          | :ENUM_VALUE16203
-          | :ENUM_VALUE16204
-          | :ENUM_VALUE16205
-          | :ENUM_VALUE16206
-          | :ENUM_VALUE16207
-          | :ENUM_VALUE16208
-          | :ENUM_VALUE16209
-          | :ENUM_VALUE16210
-          | :ENUM_VALUE16211
-          | :ENUM_VALUE16212
-          | :ENUM_VALUE16213
-          | :ENUM_VALUE16214
-          | :ENUM_VALUE16215
-          | :ENUM_VALUE16216
-          | :ENUM_VALUE16217
-          | :ENUM_VALUE16218
-          | :ENUM_VALUE16219
-          | :ENUM_VALUE16220
-          | :ENUM_VALUE16221
-          | :ENUM_VALUE16222
-          | :ENUM_VALUE16223
-          | :ENUM_VALUE16224
-          | :ENUM_VALUE16225
-          | :ENUM_VALUE16226
-          | :ENUM_VALUE16227
-          | :ENUM_VALUE16228
-          | :ENUM_VALUE16229
-          | :ENUM_VALUE16230
-          | :ENUM_VALUE16231
-          | :ENUM_VALUE16232
-          | :ENUM_VALUE16233
-          | :ENUM_VALUE16234
-          | :ENUM_VALUE16235
-          | :ENUM_VALUE16236
-          | :ENUM_VALUE16237
-          | :ENUM_VALUE16238
-          | :ENUM_VALUE16239
-          | :ENUM_VALUE16240
-          | :ENUM_VALUE16241
-          | :ENUM_VALUE16242
-          | :ENUM_VALUE16243
-          | :ENUM_VALUE16244
-          | :ENUM_VALUE16245
-          | :ENUM_VALUE16246
-          | :ENUM_VALUE16247
-          | :ENUM_VALUE16248
-          | :ENUM_VALUE16249
-          | :ENUM_VALUE16250
-          | :ENUM_VALUE16251
-          | :ENUM_VALUE16252
-          | :ENUM_VALUE16253
-          | :ENUM_VALUE16254
-          | :ENUM_VALUE16255
-          | :ENUM_VALUE16256
-          | :ENUM_VALUE16257
-          | :ENUM_VALUE16258
-          | :ENUM_VALUE16259
-          | :ENUM_VALUE16260
-          | :ENUM_VALUE16261
-          | :ENUM_VALUE16262
-          | :ENUM_VALUE16263
-          | :ENUM_VALUE16264
-          | :ENUM_VALUE16265
-          | :ENUM_VALUE16266
-          | :ENUM_VALUE16267
-          | :ENUM_VALUE16268
-          | :ENUM_VALUE16269
-          | :ENUM_VALUE16270
-          | :ENUM_VALUE16271
-          | :ENUM_VALUE16272
-          | :ENUM_VALUE16273
-          | :ENUM_VALUE16274
-          | :ENUM_VALUE16275
-          | :ENUM_VALUE16276
-          | :ENUM_VALUE16277
-          | :ENUM_VALUE16278
-          | :ENUM_VALUE16279
-          | :ENUM_VALUE16280
-          | :ENUM_VALUE16281
-          | :ENUM_VALUE16282
-          | :ENUM_VALUE16283
-          | :ENUM_VALUE16284
-          | :ENUM_VALUE16285
-          | :ENUM_VALUE16286
-          | :ENUM_VALUE16287
-          | :ENUM_VALUE16288
-          | :ENUM_VALUE16289
-          | :ENUM_VALUE16290
-          | :ENUM_VALUE16291
-          | :ENUM_VALUE16292
-          | :ENUM_VALUE16293
-          | :ENUM_VALUE16294
-          | :ENUM_VALUE16295
-          | :ENUM_VALUE16296
-          | :ENUM_VALUE16297
-          | :ENUM_VALUE16298
-          | :ENUM_VALUE16299
-          | :ENUM_VALUE16300
-          | :ENUM_VALUE16301
-          | :ENUM_VALUE16302
-          | :ENUM_VALUE16303
-          | :ENUM_VALUE16304
-          | :ENUM_VALUE16305
-          | :ENUM_VALUE16306
-          | :ENUM_VALUE16307
-          | :ENUM_VALUE16308
-          | :ENUM_VALUE16309
-          | :ENUM_VALUE16310
-          | :ENUM_VALUE16311
-          | :ENUM_VALUE16312
-          | :ENUM_VALUE16313
-          | :ENUM_VALUE16314
-          | :ENUM_VALUE16315
-          | :ENUM_VALUE16316
-          | :ENUM_VALUE16317
-          | :ENUM_VALUE16318
-          | :ENUM_VALUE16319
-          | :ENUM_VALUE16320
-          | :ENUM_VALUE16321
-          | :ENUM_VALUE16322
-          | :ENUM_VALUE16323
-          | :ENUM_VALUE16324
-          | :ENUM_VALUE16325
-          | :ENUM_VALUE16326
-          | :ENUM_VALUE16327
-          | :ENUM_VALUE16328
-          | :ENUM_VALUE16329
-          | :ENUM_VALUE16330
-          | :ENUM_VALUE16331
-          | :ENUM_VALUE16332
-          | :ENUM_VALUE16333
-          | :ENUM_VALUE16334
-          | :ENUM_VALUE16335
-          | :ENUM_VALUE16336
-          | :ENUM_VALUE16337
-          | :ENUM_VALUE16338
-          | :ENUM_VALUE16339
-          | :ENUM_VALUE16340
-          | :ENUM_VALUE16341
-          | :ENUM_VALUE16342
-          | :ENUM_VALUE16343
-          | :ENUM_VALUE16344
-          | :ENUM_VALUE16345
-          | :ENUM_VALUE16346
-          | :ENUM_VALUE16347
-          | :ENUM_VALUE16348
-          | :ENUM_VALUE16349
-          | :ENUM_VALUE16350
-          | :ENUM_VALUE16351
-          | :ENUM_VALUE16352
-          | :ENUM_VALUE16353
-          | :ENUM_VALUE16354
-          | :ENUM_VALUE16355
-          | :ENUM_VALUE16356
-          | :ENUM_VALUE16357
-          | :ENUM_VALUE16358
-          | :ENUM_VALUE16359
-          | :ENUM_VALUE16360
-          | :ENUM_VALUE16361
-          | :ENUM_VALUE16362
-          | :ENUM_VALUE16363
-          | :ENUM_VALUE16364
-          | :ENUM_VALUE16365
-          | :ENUM_VALUE16366
-          | :ENUM_VALUE16367
-          | :ENUM_VALUE16368
-          | :ENUM_VALUE16369
-          | :ENUM_VALUE16370
-          | :ENUM_VALUE16371
-          | :ENUM_VALUE16372
-          | :ENUM_VALUE16373
-          | :ENUM_VALUE16374
-          | :ENUM_VALUE16375
-          | :ENUM_VALUE16376
-          | :ENUM_VALUE16377
-          | :ENUM_VALUE16378
-          | :ENUM_VALUE16379
-          | :ENUM_VALUE16380
-          | :ENUM_VALUE16381
-          | :ENUM_VALUE16382
-          | :ENUM_VALUE16383
-          | :ENUM_VALUE16384
-          | :ENUM_VALUE16385
-          | :ENUM_VALUE16386
-          | :ENUM_VALUE16387
-          | :ENUM_VALUE16388
-          | :ENUM_VALUE16389
-          | :ENUM_VALUE16390
-          | :ENUM_VALUE16391
-          | :ENUM_VALUE16392
-          | :ENUM_VALUE16393
-          | :ENUM_VALUE16394
-          | :ENUM_VALUE16395
-          | :ENUM_VALUE16396
-          | :ENUM_VALUE16397
-          | :ENUM_VALUE16398
-          | :ENUM_VALUE16399
-          | :ENUM_VALUE16400
-          | :ENUM_VALUE16401
-          | :ENUM_VALUE16402
-          | :ENUM_VALUE16403
-          | :ENUM_VALUE16404
 
   field :ENUM_VALUE16043, 0
   field :ENUM_VALUE16044, 1
@@ -3471,19 +1826,6 @@ defmodule Benchmarks.GoogleMessage3.Enum16553 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE16554
-          | :ENUM_VALUE16555
-          | :ENUM_VALUE16556
-          | :ENUM_VALUE16557
-          | :ENUM_VALUE16558
-          | :ENUM_VALUE16559
-          | :ENUM_VALUE16560
-          | :ENUM_VALUE16561
-          | :ENUM_VALUE16562
-          | :ENUM_VALUE16563
-
   field :ENUM_VALUE16554, 0
   field :ENUM_VALUE16555, 1
   field :ENUM_VALUE16556, 2
@@ -3500,8 +1842,6 @@ defmodule Benchmarks.GoogleMessage3.Enum16728 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :ENUM_VALUE16729 | :ENUM_VALUE16730 | :ENUM_VALUE16731
-
   field :ENUM_VALUE16729, 1
   field :ENUM_VALUE16730, 2
   field :ENUM_VALUE16731, 3
@@ -3510,14 +1850,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum16732 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE16733
-          | :ENUM_VALUE16734
-          | :ENUM_VALUE16735
-          | :ENUM_VALUE16736
-          | :ENUM_VALUE16737
 
   field :ENUM_VALUE16733, 1
   field :ENUM_VALUE16734, 2
@@ -3529,16 +1861,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum16738 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE16739
-          | :ENUM_VALUE16740
-          | :ENUM_VALUE16741
-          | :ENUM_VALUE16742
-          | :ENUM_VALUE16743
-          | :ENUM_VALUE16744
-          | :ENUM_VALUE16745
 
   field :ENUM_VALUE16739, 1
   field :ENUM_VALUE16740, 2
@@ -3552,32 +1874,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum16698 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE16699
-          | :ENUM_VALUE16700
-          | :ENUM_VALUE16701
-          | :ENUM_VALUE16702
-          | :ENUM_VALUE16703
-          | :ENUM_VALUE16704
-          | :ENUM_VALUE16705
-          | :ENUM_VALUE16706
-          | :ENUM_VALUE16707
-          | :ENUM_VALUE16708
-          | :ENUM_VALUE16709
-          | :ENUM_VALUE16710
-          | :ENUM_VALUE16711
-          | :ENUM_VALUE16712
-          | :ENUM_VALUE16713
-          | :ENUM_VALUE16714
-          | :ENUM_VALUE16715
-          | :ENUM_VALUE16716
-          | :ENUM_VALUE16717
-          | :ENUM_VALUE16718
-          | :ENUM_VALUE16719
-          | :ENUM_VALUE16720
-          | :ENUM_VALUE16721
 
   field :ENUM_VALUE16699, -1
   field :ENUM_VALUE16700, 100
@@ -3608,15 +1904,6 @@ defmodule Benchmarks.GoogleMessage3.Enum16819 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE16820
-          | :ENUM_VALUE16821
-          | :ENUM_VALUE16822
-          | :ENUM_VALUE16823
-          | :ENUM_VALUE16824
-          | :ENUM_VALUE16825
-
   field :ENUM_VALUE16820, 0
   field :ENUM_VALUE16821, 1
   field :ENUM_VALUE16822, 2
@@ -3628,23 +1915,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum16925 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE16926
-          | :ENUM_VALUE16927
-          | :ENUM_VALUE16928
-          | :ENUM_VALUE16929
-          | :ENUM_VALUE16930
-          | :ENUM_VALUE16931
-          | :ENUM_VALUE16932
-          | :ENUM_VALUE16933
-          | :ENUM_VALUE16934
-          | :ENUM_VALUE16935
-          | :ENUM_VALUE16936
-          | :ENUM_VALUE16937
-          | :ENUM_VALUE16938
-          | :ENUM_VALUE16939
 
   field :ENUM_VALUE16926, 0
   field :ENUM_VALUE16927, 1
@@ -3666,8 +1936,6 @@ defmodule Benchmarks.GoogleMessage3.Enum22854 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :ENUM_VALUE22855 | :ENUM_VALUE22856
-
   field :ENUM_VALUE22855, 0
   field :ENUM_VALUE22856, 1
 end
@@ -3675,8 +1943,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum24361 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t :: integer | :ENUM_VALUE24362 | :ENUM_VALUE24363 | :ENUM_VALUE24364 | :ENUM_VALUE24365
 
   field :ENUM_VALUE24362, 0
   field :ENUM_VALUE24363, 1
@@ -3687,41 +1953,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum16891 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE16892
-          | :ENUM_VALUE16893
-          | :ENUM_VALUE16894
-          | :ENUM_VALUE16895
-          | :ENUM_VALUE16896
-          | :ENUM_VALUE16897
-          | :ENUM_VALUE16898
-          | :ENUM_VALUE16899
-          | :ENUM_VALUE16900
-          | :ENUM_VALUE16901
-          | :ENUM_VALUE16902
-          | :ENUM_VALUE16903
-          | :ENUM_VALUE16904
-          | :ENUM_VALUE16905
-          | :ENUM_VALUE16906
-          | :ENUM_VALUE16907
-          | :ENUM_VALUE16908
-          | :ENUM_VALUE16909
-          | :ENUM_VALUE16910
-          | :ENUM_VALUE16911
-          | :ENUM_VALUE16912
-          | :ENUM_VALUE16913
-          | :ENUM_VALUE16914
-          | :ENUM_VALUE16915
-          | :ENUM_VALUE16916
-          | :ENUM_VALUE16917
-          | :ENUM_VALUE16918
-          | :ENUM_VALUE16919
-          | :ENUM_VALUE16920
-          | :ENUM_VALUE16921
-          | :ENUM_VALUE16922
-          | :ENUM_VALUE16923
 
   field :ENUM_VALUE16892, 0
   field :ENUM_VALUE16893, 1
@@ -3761,14 +1992,6 @@ defmodule Benchmarks.GoogleMessage3.Enum27361 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE27362
-          | :ENUM_VALUE27363
-          | :ENUM_VALUE27364
-          | :ENUM_VALUE27365
-          | :ENUM_VALUE27366
-
   field :ENUM_VALUE27362, 0
   field :ENUM_VALUE27363, 1
   field :ENUM_VALUE27364, 2
@@ -3779,16 +2002,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum33960 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE33961
-          | :ENUM_VALUE33962
-          | :ENUM_VALUE33963
-          | :ENUM_VALUE33964
-          | :ENUM_VALUE33965
-          | :ENUM_VALUE33966
-          | :ENUM_VALUE33967
 
   field :ENUM_VALUE33961, 0
   field :ENUM_VALUE33962, 1
@@ -3803,22 +2016,12 @@ defmodule Benchmarks.GoogleMessage3.Enum34388 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t :: integer | :ENUM_VALUE34389
-
   field :ENUM_VALUE34389, 1
 end
 
 defmodule Benchmarks.GoogleMessage3.Enum35477 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE35478
-          | :ENUM_VALUE35479
-          | :ENUM_VALUE35480
-          | :ENUM_VALUE35481
-          | :ENUM_VALUE35482
 
   field :ENUM_VALUE35478, 4
   field :ENUM_VALUE35479, 3
@@ -3830,19 +2033,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum35507 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t ::
-          integer
-          | :ENUM_VALUE35508
-          | :ENUM_VALUE35509
-          | :ENUM_VALUE35510
-          | :ENUM_VALUE35511
-          | :ENUM_VALUE35512
-          | :ENUM_VALUE35513
-          | :ENUM_VALUE35514
-          | :ENUM_VALUE35515
-          | :ENUM_VALUE35516
-          | :ENUM_VALUE35517
 
   field :ENUM_VALUE35508, 0
   field :ENUM_VALUE35509, 1
@@ -3860,17 +2050,6 @@ defmodule Benchmarks.GoogleMessage3.Enum36860 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
 
-  @type t ::
-          integer
-          | :ENUM_VALUE36861
-          | :ENUM_VALUE36862
-          | :ENUM_VALUE36863
-          | :ENUM_VALUE36864
-          | :ENUM_VALUE36865
-          | :ENUM_VALUE36866
-          | :ENUM_VALUE36867
-          | :ENUM_VALUE36868
-
   field :ENUM_VALUE36861, 0
   field :ENUM_VALUE36862, 1
   field :ENUM_VALUE36863, 2
@@ -3884,8 +2063,6 @@ end
 defmodule Benchmarks.GoogleMessage3.Enum36890 do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto2
-
-  @type t :: integer | :ENUM_VALUE36891 | :ENUM_VALUE36892
 
   field :ENUM_VALUE36891, 0
   field :ENUM_VALUE36892, 1

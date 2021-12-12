@@ -3,6 +3,7 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
 
   alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator.Enum, as: Generator
+  alias Protobuf.TestHelpers
 
   test "generate/2 generates enum type messages" do
     ctx = %Context{}
@@ -23,14 +24,11 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
     assert {^module, msg} = Generator.generate(ctx, desc)
 
     # Make sure the generated file is compilable.
-    assert [{compiled_mod, _bytecode}] = Code.compile_string(msg)
+    assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
     assert inspect(compiled_mod) == module
 
     assert msg =~ "defmodule #{module} do\n"
     assert msg =~ "use Protobuf, enum: true\n"
-
-    assert msg =~
-             "@type t :: integer | :A | :B | :HAS_UNDERSCORES | :HAS_UNDERSCORES_X | :HAS_UNDERSCORES_\n"
 
     refute msg =~ "defstruct "
 
@@ -41,6 +39,9 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
              field :HAS_UNDERSCORES_X, 3
              field :HAS_UNDERSCORES_, 4
            """
+
+    assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
+             "t() :: integer() | :A | :B | :HAS_UNDERSCORES | :HAS_UNDERSCORES_X | :HAS_UNDERSCORES_"
   end
 
   test "generate/2 generates enum type messages with descriptor" do
@@ -62,14 +63,11 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
     assert {^module, msg} = Generator.generate(ctx, desc)
 
     # Make sure the generated file is compilable.
-    assert [{compiled_mod, _bytecode}] = Code.compile_string(msg)
+    assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
     assert inspect(compiled_mod) == module
 
     assert msg =~ "defmodule #{module} do\n"
     assert msg =~ "use Protobuf, enum: true\n"
-
-    assert msg =~
-             "@type t :: integer | :A | :B | :HAS_UNDERSCORES | :HAS_UNDERSCORES_X | :HAS_UNDERSCORES_\n"
 
     refute msg =~ "defstruct "
 
@@ -88,5 +86,8 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
              def descriptor do
                # credo:disable-for-next-line
            """
+
+    assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
+             "t() :: integer() | :A | :B | :HAS_UNDERSCORES | :HAS_UNDERSCORES_X | :HAS_UNDERSCORES_"
   end
 end

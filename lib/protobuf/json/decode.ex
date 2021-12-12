@@ -166,7 +166,7 @@ defmodule Protobuf.JSON.Decode do
     regular = decode_regular_fields(data, message_props)
     oneofs = decode_oneof_fields(data, message_props)
 
-    module.__default_struct__()
+    module
     |> struct(regular)
     |> struct(oneofs)
   end

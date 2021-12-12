@@ -1,24 +1,29 @@
 defmodule Protobuf.DSLTest do
   use ExUnit.Case, async: true
 
-  alias Protobuf.FieldProps
+  import ExUnit.CaptureIO
+
+  alias Protobuf.{FieldProps, MessageProps}
   alias TestMsg.{Foo, Foo2}
 
-  defmodule DefaultSyntax do
-    use Protobuf
-  end
-
   test "default syntax is proto2" do
-    assert DefaultSyntax.__message_props__().syntax == :proto2
+    defmodule DefaultSyntax do
+      use Protobuf
+    end
+
+    assert %MessageProps{syntax: :proto2} = DefaultSyntax.__message_props__()
   end
 
   test "supports syntax option" do
-    msg_props = TestMsg.SyntaxOption.__message_props__()
-    assert msg_props.syntax == :proto3
+    defmodule Proto3Syntax do
+      use Protobuf, syntax: :proto3
+    end
+
+    assert %MessageProps{syntax: :proto3} = Proto3Syntax.__message_props__()
   end
 
-  test "creates __message_props__ function" do
-    msg_props = Foo.__message_props__()
+  test "creates __message_props__/0 function" do
+    assert %MessageProps{} = msg_props = Foo.__message_props__()
 
     tags_map =
       Enum.reduce([1, 2, 3] ++ Enum.to_list(5..17) ++ [101], %{}, fn i, acc ->
@@ -177,28 +182,6 @@ defmodule Protobuf.DSLTest do
     refute msg_props.field_props[11].embedded?
   end
 
-  test "generates __default_struct__ function" do
-    assert %Foo{
-             a: 0,
-             b: 0,
-             c: "",
-             d: 0.0,
-             e: nil,
-             f: 0,
-             g: [],
-             h: [],
-             i: [],
-             j: :UNKNOWN,
-             k: false,
-             l: %{},
-             m: :UNKNOWN,
-             n: 0.0,
-             o: [],
-             p: "",
-             non_matched: ""
-           } == Foo.__default_struct__()
-  end
-
   test "generates new function" do
     assert %Foo{
              a: 0,
@@ -243,5 +226,44 @@ defmodule Protobuf.DSLTest do
   test "creates transform_module/1 function" do
     assert TestMsg.Foo.transform_module() == nil
     assert TestMsg.WithTransformModule.transform_module() == TestMsg.TransformModule
+  end
+
+  test "emits a warning when there is already a call to defstruct/1" do
+    output =
+      capture_io(:stderr, fn ->
+        Code.eval_quoted(
+          quote do
+            defmodule MessageWithDefstructWarning do
+              use Protobuf, syntax: :proto3
+
+              defstruct [:foo]
+
+              field :foo, 1, type: :bool
+            end
+          end
+        )
+      end)
+
+    assert output =~ "Since v0.9.0 of the :protobuf library, structs are automatically generated"
+  end
+
+  test "emits a warning when there is already a definition for the t/0 type" do
+    output =
+      capture_io(:stderr, fn ->
+        Code.eval_quoted(
+          quote do
+            defmodule MessageWithTTypeWarning do
+              use Protobuf, syntax: :proto3
+
+              @type t() :: %__MODULE__{foo: boolean()}
+
+              field :foo, 1, type: :bool
+            end
+          end
+        )
+      end)
+
+    assert output =~
+             "Since v0.9.0 of the :protobuf library, the t/0 type is automatically generated"
   end
 end

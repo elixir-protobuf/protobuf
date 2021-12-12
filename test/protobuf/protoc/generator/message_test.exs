@@ -3,6 +3,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
   alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator.Message, as: Generator
+  alias Protobuf.TestHelpers
 
   test "generate/2 has right name" do
     ctx = %Context{}
@@ -10,7 +11,13 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
     assert msg =~ "use Protobuf\n"
-    assert msg =~ "@type t :: %__MODULE__{}\n"
+
+    assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
+
+    assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
+             "t() :: %Foo{}"
+  after
+    TestHelpers.purge_modules([Foo])
   end
 
   test "generate/2 has right syntax" do
@@ -19,7 +26,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
     assert msg =~ "use Protobuf, syntax: :proto3\n"
-    assert msg =~ "@type t :: %__MODULE__{}\n"
+    assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
+
+    assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
+             "t() :: %Foo{}"
+  after
+    TestHelpers.purge_modules([Foo])
   end
 
   test "generate/2 has right name with package" do
@@ -80,13 +92,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
-    assert msg =~ """
-             defstruct a: nil,
-                       b: ""
-           """
-
-    assert msg =~ "a: integer"
-    assert msg =~ "b: String.t()"
     assert msg =~ "field :a, 1, optional: true, type: :int32\n"
     assert msg =~ "field :b, 2, required: true, type: :string\n"
   end
@@ -108,11 +113,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-
-    assert msg =~ """
-             defstruct a: false
-           """
+    {[], [{_mod, _msg}]} = Generator.generate(ctx, desc)
   end
 
   test "generate/2 has right fields for proto3" do
@@ -148,17 +149,16 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
-    assert msg =~ """
-             defstruct a: 0,
-                       b: "",
-                       c: []
-           """
+    assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
 
-    assert msg =~ "a: integer"
-    assert msg =~ "b: String.t()"
+    assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
+             "t() :: %Foo{a: integer(), b: String.t(), c: [integer()]}"
+
     assert msg =~ "field :a, 1, type: :int32\n"
     assert msg =~ "field :b, 2, type: :string\n"
     assert msg =~ "field :c, 3, repeated: true, type: :int32\n"
+  after
+    TestHelpers.purge_modules([Foo])
   end
 
   test "generate/2 supports option :default" do
@@ -188,14 +188,8 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "a: integer"
     assert msg =~ "field :a, 1, optional: true, type: :int32, default: 42\n"
     assert msg =~ "field :b, 2, optional: true, type: :bool, default: false\n"
-
-    assert msg =~ """
-             defstruct a: nil,
-                       b: nil
-           """
   end
 
   test "generate/2 supports option :default and uses right default if field is required" do
@@ -217,12 +211,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "a: integer"
     assert msg =~ "field :a, 1, required: true, type: :int32, default: 42\n"
-
-    assert msg =~ """
-             defstruct a: 42
-           """
   end
 
   test "generate/2 supports option :packed" do
@@ -315,7 +304,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
           Google.Protobuf.FieldDescriptorProto.new(
             name: "baz",
             json_name: "baz",
-            number: 1,
+            number: 2,
             type: :TYPE_MESSAGE,
             label: :LABEL_REPEATED,
             type_name: ".Baz"
@@ -324,8 +313,13 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "bar: Bar.t() | nil"
-    assert msg =~ "baz: [Baz.t()]"
+
+    assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
+
+    assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
+             "t() :: %Foo{bar: Bar.t() | nil, baz: [Baz.t()]}"
+  after
+    TestHelpers.purge_modules([Foo])
   end
 
   test "generate/2 supports map field" do
@@ -376,9 +370,17 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
         ]
       )
 
-    {[[]], [_, {_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "a: %{integer => FooBar.AbCd.Bar.t() | nil}"
+    {[[]], [[{_, nested_msg}], {_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "field :a, 1, repeated: true, type: FooBar.AbCd.Foo.ProjectsEntry, map: true\n"
+
+    assert [{_mod, _bytecode}] = Code.compile_string(nested_msg)
+
+    assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
+
+    assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
+             "t() :: %FooBar.AbCd.Foo{a: %{optional(integer()) => FooBar.AbCd.Bar.t() | nil}}"
+  after
+    TestHelpers.purge_modules([FooBar.AbCd.Foo])
   end
 
   test "generate/2 supports enum field" do
@@ -405,45 +407,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "a: FooBar.AbCd.EnumFoo.t()"
     assert msg =~ "field :a, 1, optional: true, type: FooBar.AbCd.EnumFoo, enum: true\n"
-
-    assert msg =~ """
-             defstruct a: nil
-           """
-  end
-
-  test "generate/2 generate right enum struct defaults" do
-    ctx = %Context{
-      package: "foo_bar.ab_cd",
-      dep_type_mapping: %{
-        ".foo_bar.ab_cd.EnumFoo" => %{type_name: "FooBar.AbCd.EnumFoo"}
-      },
-      enums: %{"FooBar.AbCd.EnumFoo" => "foo"}
-    }
-
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_ENUM,
-            label: :LABEL_REQUIRED,
-            type_name: ".foo_bar.ab_cd.EnumFoo"
-          )
-        ]
-      )
-
-    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "a: FooBar.AbCd.EnumFoo.t()"
-    assert msg =~ "field :a, 1, required: true, type: FooBar.AbCd.EnumFoo, enum: true\n"
-
-    assert msg =~ """
-             defstruct a: :foo
-           """
   end
 
   test "generate/2 generate right enum type name with different package" do
@@ -469,10 +433,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: OtherPkg.EnumFoo, enum: true\n"
-
-    assert msg =~ """
-             defstruct a: nil
-           """
   end
 
   test "generate/2 generate right message type name with different package" do
@@ -497,12 +457,14 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "a: OtherPkg.MsgFoo.t()"
     assert msg =~ "field :a, 1, optional: true, type: OtherPkg.MsgFoo\n"
 
-    assert msg =~ """
-             defstruct a: nil
-           """
+    assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
+
+    assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
+             "t() :: %FooBar.AbCd.Foo{a: OtherPkg.MsgFoo.t() | nil}"
+  after
+    TestHelpers.purge_modules([FooBar.AbCd.Foo])
   end
 
   test "generate/2 supports nested messages" do
@@ -518,7 +480,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     {[[]], [[{_mod, msg}], _]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo.Nested do\n"
-    assert msg =~ "defstruct []\n"
   end
 
   test "generate/2 supports nested messages with right defaults" do
@@ -547,21 +508,17 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     {[[]], [[{_, nested_msg}], {_, main_msg}]} = Generator.generate(ctx, desc)
     assert nested_msg =~ "defmodule MyPkg.Foo.Nested do\n"
-    assert nested_msg =~ "defstruct []\n"
 
     assert main_msg =~ "defmodule MyPkg.Foo do"
 
-    assert main_msg =~ """
-             @type t :: %__MODULE__{
-                     a: MyPkg.Foo.Nested.t() | nil
-                   }
-           """
-
-    assert main_msg =~ """
-             defstruct a: nil
-           """
-
     assert main_msg =~ "field :a, 1, required: true, type: MyPkg.Foo.Nested"
+
+    assert [{compiled_mod, bytecode}] = Code.compile_string(main_msg)
+
+    assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
+             "t() :: %MyPkg.Foo{a: MyPkg.Foo.Nested.t() | nil}"
+  after
+    TestHelpers.purge_modules([MyPkg.Foo])
   end
 
   test "generate/2 supports nested enum messages" do
@@ -642,7 +599,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
           Google.Protobuf.FieldDescriptorProto.new(
             name: "other",
             json_name: "other",
-            number: 4,
+            number: 5,
             type: :TYPE_INT32,
             label: :LABEL_OPTIONAL
           )
@@ -651,21 +608,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
-    assert msg =~ """
-             @type t :: %__MODULE__{
-                     first: {:a, integer} | {:b, integer},
-                     second: {:c, integer} | {:d, integer},
-                     other: integer
-                   }
-           """
+    assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
+
+    assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
+             "t() :: %Foo{first: {:a, integer()} | {:b, integer()}, other: integer() | nil, second: {:c, integer()} | {:d, integer()}}"
 
     refute msg =~ "a: integer,\n"
-
-    assert msg =~ """
-             defstruct first: nil,
-                       second: nil,
-                       other: nil
-           """
 
     assert msg =~ "oneof :first, 0\n"
     assert msg =~ "oneof :second, 1\n"
@@ -673,7 +621,9 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "field :b, 2, optional: true, type: :int32, oneof: 0\n"
     assert msg =~ "field :c, 3, optional: true, type: :int32, oneof: 1\n"
     assert msg =~ "field :d, 4, optional: true, type: :int32, oneof: 1\n"
-    assert msg =~ "field :other, 4, optional: true, type: :int32\n"
+    assert msg =~ "field :other, 5, optional: true, type: :int32\n"
+  after
+    TestHelpers.purge_modules([Foo])
   end
 
   describe "generate/2 json_name" do
@@ -703,11 +653,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
       {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
-      assert msg =~ """
-               defstruct simple: 0,
-                         the_field_name: ""
-             """
-
       assert msg =~ "field :simple, 1, type: :int32\n"
       assert msg =~ "field :the_field_name, 2, type: :string, json_name: \"theFieldName\"\n"
     end
@@ -731,7 +676,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
       {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
-      assert msg =~ "defstruct the_field_name: \"\""
       assert msg =~ "field :the_field_name, 1, required: true, type: :string\n"
     end
   end
@@ -760,10 +704,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "a: [FooBar.AbCd.EnumFoo.t()]"
 
-    assert msg =~ """
-             defstruct a: []
-           """
+    assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
+
+    assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
+             "t() :: %FooBar.AbCd.Foo{a: [FooBar.AbCd.EnumFoo.t()]}"
+  after
+    TestHelpers.purge_modules([FooBar.AbCd.Foo])
   end
 end

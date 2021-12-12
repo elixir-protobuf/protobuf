@@ -2,18 +2,6 @@ defmodule <%= @module %> do
   @moduledoc false
   use Protobuf<%= @use_options %>
 
-  @type t :: %__MODULE__{
-    <%= for {name, spec} <- @struct_field_typespecs do %>
-    <%= name %>: <%= spec %>,
-    <% end %>
-  }
-
-  defstruct [
-    <%= for {name, default_value} <- @struct_fields do %>
-    <%= name %>: <%= default_value %>,
-    <% end %>
-  ]
-
   <%= if @descriptor_fun_body do %>
   def descriptor do
     # credo:disable-for-next-line

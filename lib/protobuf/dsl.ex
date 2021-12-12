@@ -50,33 +50,19 @@ defmodule Protobuf.DSL do
       Module.get_attribute(env.module, :extends)
       |> gen_extension_props()
 
-    syntax = Keyword.get(options, :syntax, :proto2)
-
     msg_props = generate_message_props(fields, oneofs, extensions, options)
-    default_fields = generate_default_fields(syntax, msg_props)
-    enum_fields = enum_fields(msg_props, false)
-    default_struct = Map.put(default_fields, :__struct__, env.module)
-
-    default_struct =
-      if syntax == :proto3 do
-        Enum.reduce(enum_fields, default_struct, fn {name, type}, acc ->
-          Code.ensure_loaded(type)
-          Map.put(acc, name, type.key(0))
-        end)
-      else
-        if extensions do
-          Map.put(default_struct, :__pb_extensions__, %{})
-        else
-          default_struct
-        end
-      end
 
     quote do
+      @spec __message_props__() :: Protobuf.MessageProps.t()
       def __message_props__ do
         unquote(Macro.escape(msg_props))
       end
 
-      unquote(def_enum_functions(msg_props, fields))
+      unquote(maybe_gen_defstruct(env.module, msg_props))
+
+      unquote(maybe_def_t_typespec(env.module, msg_props, extension_props))
+
+      unquote(maybe_def_enum_functions(msg_props, fields))
 
       if unquote(Macro.escape(extension_props)) != nil do
         def __protobuf_info__(:extension_props) do
@@ -91,14 +77,46 @@ defmodule Protobuf.DSL do
       if unquote(Macro.escape(extensions)) do
         unquote(def_extension_functions())
       end
+    end
+  end
 
-      def __default_struct__ do
-        unquote(Macro.escape(default_struct))
+  defp maybe_def_t_typespec(mod, %MessageProps{enum?: true} = props, _extension_props) do
+    unless warn_if_t_type_already_defined(mod) do
+      quote do
+        @type t() :: unquote(Protobuf.DSL.Typespecs.quoted_enum_typespec(props))
       end
     end
   end
 
-  defp def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}, fields) do
+  defp maybe_def_t_typespec(mod, %MessageProps{} = props, _extension_props = nil) do
+    unless warn_if_t_type_already_defined(mod) do
+      quote do
+        @type t() :: unquote(Protobuf.DSL.Typespecs.quoted_message_typespec(props))
+      end
+    end
+  end
+
+  defp maybe_def_t_typespec(_mod, _props, _extension_props) do
+    nil
+  end
+
+  defp warn_if_t_type_already_defined(mod) do
+    if Module.defines_type?(mod, {:t, 0}) do
+      IO.warn("""
+      Since v0.9.0 of the :protobuf library, the t/0 type is automatically generated for \
+      modules that call "use Protobuf" if they are Protobuf enums or messages. \
+      Remove your explicit definition of the t/0 type or regenerate the files with the \
+      latest version of the protoc-gen-elixir plugin. This warning will become an error \
+      in version 0.10.0+ of the :protobuf library.\
+      """)
+
+      true
+    else
+      false
+    end
+  end
+
+  defp maybe_def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}, fields) do
     if syntax == :proto3 do
       unless props[0], do: raise("The first enum value must be zero in proto3")
     end
@@ -137,7 +155,7 @@ defmodule Protobuf.DSL do
       ]
   end
 
-  defp def_enum_functions(_, _), do: nil
+  defp maybe_def_enum_functions(_, _), do: nil
 
   defp def_extension_functions() do
     quote do
@@ -359,35 +377,39 @@ defmodule Protobuf.DSL do
     props
   end
 
-  defp generate_default_fields(syntax, msg_props) do
-    fields =
-      msg_props.field_props
-      |> Map.values()
-      |> Enum.reduce(%{}, fn props, acc ->
-        if props.oneof do
-          acc
-        else
-          Map.put(acc, props.name_atom, Protobuf.Builder.field_default(syntax, props))
-        end
-      end)
-
-    Enum.reduce(msg_props.oneof, fields, fn {key, _}, acc ->
-      Map.put(acc, key, nil)
-    end)
+  defp maybe_gen_defstruct(mod, message_props) do
+    if Module.defines?(mod, {:__struct__, 1}) do
+      IO.warn("""
+      Since v0.9.0 of the :protobuf library, structs are automatically generated for \
+      modules that call "use Protobuf". Remove the struct definition or regenerate the files \
+      with the latest version of the protoc-gen-elixir plugin. This warning \
+      will become an error in version 0.10.0+ of the :protobuf library.\
+      """)
+    else
+      gen_defstruct(message_props)
+    end
   end
 
-  defp enum_fields(%{syntax: :proto3} = msg_props, include_oneof?) do
-    msg_props.field_props
-    |> Map.values()
-    |> Enum.filter(fn props ->
-      props.enum? && !props.default && !props.repeated? && (!props.oneof || include_oneof?)
-    end)
-    |> Enum.map(fn props ->
-      {props.name_atom, elem(props.type, 1)}
-    end)
-  end
+  defp gen_defstruct(%MessageProps{} = message_props) do
+    regular_fields =
+      for {_fnum, %FieldProps{oneof: nil} = prop} <- message_props.field_props,
+          do: {prop.name_atom, field_default(message_props.syntax, prop)}
 
-  defp enum_fields(%{syntax: _}, _include_oneof?), do: %{}
+    oneof_fields =
+      for {name_atom, _fnum} <- message_props.oneof,
+          do: {name_atom, _struct_default = nil}
+
+    extension_fields =
+      if message_props.extension_range do
+        [{:__pb_extensions__, _default = %{}}]
+      else
+        []
+      end
+
+    quote do
+      defstruct unquote(Macro.escape(regular_fields ++ oneof_fields ++ extension_fields))
+    end
+  end
 
   defp type_numeric?(:int32), do: true
   defp type_numeric?(:int64), do: true
@@ -404,4 +426,34 @@ defmodule Protobuf.DSL do
   defp type_numeric?(:float), do: true
   defp type_numeric?(:double), do: true
   defp type_numeric?(_), do: false
+
+  # Used by Protobuf.Decoder
+  @doc false
+  def field_default(syntax, field_props)
+
+  def field_default(_syntax, %FieldProps{default: default}) when not is_nil(default), do: default
+  def field_default(_syntax, %FieldProps{repeated?: true}), do: []
+  def field_default(_syntax, %FieldProps{map?: true}), do: %{}
+  def field_default(:proto3, props), do: type_default(props.type)
+  def field_default(_syntax, _props), do: nil
+
+  defp type_default(:int32), do: 0
+  defp type_default(:int64), do: 0
+  defp type_default(:uint32), do: 0
+  defp type_default(:uint64), do: 0
+  defp type_default(:sint32), do: 0
+  defp type_default(:sint64), do: 0
+  defp type_default(:bool), do: false
+  defp type_default({:enum, mod}), do: Code.ensure_loaded?(mod) && mod.key(0)
+  defp type_default(:fixed32), do: 0
+  defp type_default(:sfixed32), do: 0
+  defp type_default(:fixed64), do: 0
+  defp type_default(:sfixed64), do: 0
+  defp type_default(:float), do: 0.0
+  defp type_default(:double), do: 0.0
+  defp type_default(:bytes), do: <<>>
+  defp type_default(:string), do: ""
+  defp type_default(:message), do: nil
+  defp type_default(:group), do: nil
+  defp type_default(_), do: nil
 end
