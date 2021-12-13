@@ -5,6 +5,8 @@ defmodule Protobuf.DSL.TypespecsTest do
   alias Protobuf.{FieldProps, MessageProps}
   alias Protobuf.DSL.Typespecs
 
+  @unknown_fields_spec "__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: integer()}]"
+
   describe "quoted_enum_typespec/1" do
     test "returns integer() | ..." do
       message_props = %MessageProps{
@@ -43,7 +45,7 @@ defmodule Protobuf.DSL.TypespecsTest do
     test "with an empty message" do
       message_props = %MessageProps{field_props: %{}, oneof: []}
       quoted = Typespecs.quoted_message_typespec(message_props)
-      assert Macro.to_string(quoted) == "%__MODULE__{}"
+      assert Macro.to_string(quoted) == "%__MODULE__{#{@unknown_fields_spec}}"
     end
 
     test "with a field" do
@@ -53,7 +55,7 @@ defmodule Protobuf.DSL.TypespecsTest do
       }
 
       quoted = Typespecs.quoted_message_typespec(message_props)
-      assert Macro.to_string(quoted) == "%__MODULE__{foo: integer()}"
+      assert Macro.to_string(quoted) == "%__MODULE__{foo: integer(), #{@unknown_fields_spec}}"
     end
 
     test "with a oneof field" do
@@ -68,7 +70,7 @@ defmodule Protobuf.DSL.TypespecsTest do
       quoted = Typespecs.quoted_message_typespec(message_props)
 
       assert Macro.to_string(quoted) ==
-               "%__MODULE__{my_oneof_field: {:foo, integer()} | {:bar, boolean()}}"
+               "%__MODULE__{my_oneof_field: {:foo, integer()} | {:bar, boolean()}, #{@unknown_fields_spec}}"
     end
 
     test "with fields of scalar types" do
@@ -98,7 +100,8 @@ defmodule Protobuf.DSL.TypespecsTest do
 
         quoted = Typespecs.quoted_message_typespec(message_props)
 
-        assert Macro.to_string(quoted) == "%__MODULE__{foo: #{string_spec}}"
+        assert Macro.to_string(quoted) ==
+                 "%__MODULE__{foo: #{string_spec}, #{@unknown_fields_spec}}"
       end
     end
 
@@ -110,7 +113,7 @@ defmodule Protobuf.DSL.TypespecsTest do
 
       quoted = Typespecs.quoted_message_typespec(message_props)
 
-      assert Macro.to_string(quoted) == "%__MODULE__{foo: Foo.t()}"
+      assert Macro.to_string(quoted) == "%__MODULE__{foo: Foo.t(), #{@unknown_fields_spec}}"
     end
 
     test "with a group field" do
@@ -121,7 +124,7 @@ defmodule Protobuf.DSL.TypespecsTest do
 
       quoted = Typespecs.quoted_message_typespec(message_props)
 
-      assert Macro.to_string(quoted) == "%__MODULE__{foo: term()}"
+      assert Macro.to_string(quoted) == "%__MODULE__{foo: term(), #{@unknown_fields_spec}}"
     end
 
     test "with an embedded field" do
@@ -132,7 +135,8 @@ defmodule Protobuf.DSL.TypespecsTest do
 
       quoted = Typespecs.quoted_message_typespec(message_props)
 
-      assert Macro.to_string(quoted) == "%__MODULE__{foo: EmbeddedFoo.t() | nil}"
+      assert Macro.to_string(quoted) ==
+               "%__MODULE__{foo: EmbeddedFoo.t() | nil, #{@unknown_fields_spec}}"
     end
 
     test "with an optional field" do
@@ -143,7 +147,8 @@ defmodule Protobuf.DSL.TypespecsTest do
 
       quoted = Typespecs.quoted_message_typespec(message_props)
 
-      assert Macro.to_string(quoted) == "%__MODULE__{foo: integer() | nil}"
+      assert Macro.to_string(quoted) ==
+               "%__MODULE__{foo: integer() | nil, #{@unknown_fields_spec}}"
     end
 
     test "with extensions" do
@@ -155,7 +160,8 @@ defmodule Protobuf.DSL.TypespecsTest do
 
       quoted = Typespecs.quoted_message_typespec(message_props)
 
-      assert Macro.to_string(quoted) == "%__MODULE__{__pb_extensions__: map()}"
+      assert Macro.to_string(quoted) ==
+               "%__MODULE__{__pb_extensions__: map(), #{@unknown_fields_spec}}"
     end
   end
 

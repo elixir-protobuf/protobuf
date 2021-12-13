@@ -1,6 +1,8 @@
 defmodule Protobuf.DecoderTest do
   use ExUnit.Case, async: true
 
+  import Protobuf.Wire.Types
+
   alias Protobuf.Decoder
 
   test "decodes one simple field" do
@@ -54,17 +56,22 @@ defmodule Protobuf.DecoderTest do
     assert struct == TestMsg.Foo.new(a: 123, g: [12, 13, 14])
   end
 
-  test "decodes unknown varints" do
+  test "decodes unknown fields" do
     struct =
       Decoder.decode(
         <<8, 42, 45, 0, 0, 247, 66, 32, 100, 160, 6, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-          1>>,
+          1, 202, 62, 3, 102, 111, 111>>,
         TestMsg.Foo
       )
 
     assert struct.a == 42
     assert struct.d == 123.5
-    assert Protobuf.get_unknown_varints(struct) == [{4, 100}, {100, 18_446_744_073_709_551_615}]
+
+    assert Protobuf.get_unknown_fields(struct) == [
+             {4, wire_varint(), 100},
+             {100, wire_varint(), 18_446_744_073_709_551_615},
+             {1001, wire_delimited(), "foo"}
+           ]
   end
 
   test "decodes repeated embedded fields" do

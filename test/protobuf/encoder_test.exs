@@ -1,6 +1,8 @@
 defmodule Protobuf.EncoderTest do
   use ExUnit.Case, async: true
 
+  import Protobuf.Wire.Types
+
   alias Protobuf.Encoder
 
   test "encodes one simple field" do
@@ -220,12 +222,20 @@ defmodule Protobuf.EncoderTest do
     assert Encoder.encode(msg) == <<>>
   end
 
-  test "encodes unknown varints" do
-    msg = %TestMsg.Foo{__unknown_varints__: [{4, 100}, {100, -1}], a: 42, d: 123.5}
+  test "encodes unknown fields" do
+    msg = %TestMsg.Foo{
+      __unknown_fields__: [
+        {4, wire_varint(), 100},
+        {100, wire_varint(), -1},
+        {1001, wire_delimited(), "foo"}
+      ],
+      a: 42,
+      d: 123.5
+    }
 
     assert Encoder.encode(msg) ==
              <<8, 42, 45, 0, 0, 247, 66, 32, 100, 160, 6, 255, 255, 255, 255, 255, 255, 255, 255,
-               255, 1>>
+               255, 1, 202, 62, 3, 102, 111, 111>>
   end
 
   test "encodes with transformer module" do
