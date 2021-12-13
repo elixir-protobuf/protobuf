@@ -187,7 +187,7 @@ defmodule Protobuf.Decoder do
   defp value_for_field(value, current, %FieldProps{embedded?: false} = prop) do
     %FieldProps{type: type, name_atom: name_atom, oneof: oneof, repeated?: repeated?} = prop
 
-    val = Wire.to_proto(type, value)
+    val = Wire.decode(type, value)
     val = if oneof, do: {name_atom, val}, else: val
 
     if repeated? do
@@ -321,17 +321,17 @@ defmodule Protobuf.Decoder do
   defp decode_varints(<<>>, _type, acc), do: acc
 
   defdecoderp decode_varints(type, acc) do
-    decode_varints(rest, type, [Wire.to_proto(type, value) | acc])
+    decode_varints(rest, type, [Wire.decode(type, value) | acc])
   end
 
   defp decode_fixed32(<<n::bits-32, bin::bits>>, type, acc) do
-    decode_fixed32(bin, type, [Wire.to_proto(type, n) | acc])
+    decode_fixed32(bin, type, [Wire.decode(type, n) | acc])
   end
 
   defp decode_fixed32(<<>>, _type, acc), do: acc
 
   defp decode_fixed64(<<n::bits-64, bin::bits>>, type, acc) do
-    decode_fixed64(bin, type, [Wire.to_proto(type, n) | acc])
+    decode_fixed64(bin, type, [Wire.decode(type, n) | acc])
   end
 
   defp decode_fixed64(<<>>, _type, acc), do: acc

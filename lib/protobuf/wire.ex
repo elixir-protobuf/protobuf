@@ -53,79 +53,79 @@ defmodule Protobuf.Wire do
   def wire_type(:float), do: wire_32bits()
   def wire_type(mod) when is_atom(mod), do: wire_delimited()
 
-  @spec from_proto(proto_type(), proto_value()) :: iodata()
-  def from_proto(type, value)
+  @spec encode(proto_type(), proto_value()) :: iodata()
+  def encode(type, value)
 
   # Returns improper list, but still valid iodata.
-  def from_proto(type, binary) when is_binary(binary) and type in [:string, :bytes] do
+  def encode(type, binary) when is_binary(binary) and type in [:string, :bytes] do
     Varint.encode(byte_size(binary)) ++ binary
   end
 
-  def from_proto(:int32, n) when n in @sint32_range, do: Varint.encode(n)
-  def from_proto(:int64, n) when n in @sint64_range, do: Varint.encode(n)
-  def from_proto(:uint32, n) when n in @uint32_range, do: Varint.encode(n)
-  def from_proto(:uint64, n) when n in @uint64_range, do: Varint.encode(n)
+  def encode(:int32, n) when n in @sint32_range, do: Varint.encode(n)
+  def encode(:int64, n) when n in @sint64_range, do: Varint.encode(n)
+  def encode(:uint32, n) when n in @uint32_range, do: Varint.encode(n)
+  def encode(:uint64, n) when n in @uint64_range, do: Varint.encode(n)
 
-  def from_proto(:bool, true), do: Varint.encode(1)
-  def from_proto(:bool, false), do: Varint.encode(0)
+  def encode(:bool, true), do: Varint.encode(1)
+  def encode(:bool, false), do: Varint.encode(0)
 
-  def from_proto({:enum, enum_mod}, key) when is_atom(enum_mod) and is_atom(key),
+  def encode({:enum, enum_mod}, key) when is_atom(enum_mod) and is_atom(key),
     do: Varint.encode(enum_mod.value(key))
 
-  def from_proto({:enum, enum_mod}, n) when is_atom(enum_mod) and is_integer(n),
+  def encode({:enum, enum_mod}, n) when is_atom(enum_mod) and is_integer(n),
     do: Varint.encode(n)
 
-  def from_proto(:float, :infinity), do: [0, 0, 128, 127]
-  def from_proto(:float, :negative_infinity), do: [0, 0, 128, 255]
-  def from_proto(:float, :nan), do: [0, 0, 192, 127]
-  def from_proto(:float, n), do: <<n::32-float-little>>
+  def encode(:float, :infinity), do: [0, 0, 128, 127]
+  def encode(:float, :negative_infinity), do: [0, 0, 128, 255]
+  def encode(:float, :nan), do: [0, 0, 192, 127]
+  def encode(:float, n), do: <<n::32-float-little>>
 
-  def from_proto(:double, :infinity), do: [0, 0, 0, 0, 0, 0, 240, 127]
-  def from_proto(:double, :negative_infinity), do: [0, 0, 0, 0, 0, 0, 240, 255]
-  def from_proto(:double, :nan), do: [1, 0, 0, 0, 0, 0, 248, 127]
-  def from_proto(:double, n), do: <<n::64-float-little>>
+  def encode(:double, :infinity), do: [0, 0, 0, 0, 0, 0, 240, 127]
+  def encode(:double, :negative_infinity), do: [0, 0, 0, 0, 0, 0, 240, 255]
+  def encode(:double, :nan), do: [1, 0, 0, 0, 0, 0, 248, 127]
+  def encode(:double, n), do: <<n::64-float-little>>
 
-  def from_proto(:sint32, n) when n in @sint32_range, do: Varint.encode(Zigzag.encode(n))
-  def from_proto(:sint64, n) when n in @sint64_range, do: Varint.encode(Zigzag.encode(n))
-  def from_proto(:fixed32, n) when n in @uint32_range, do: <<n::32-little>>
-  def from_proto(:fixed64, n) when n in @uint64_range, do: <<n::64-little>>
-  def from_proto(:sfixed32, n) when n in @sint32_range, do: <<n::32-signed-little>>
-  def from_proto(:sfixed64, n) when n in @sint64_range, do: <<n::64-signed-little>>
+  def encode(:sint32, n) when n in @sint32_range, do: Varint.encode(Zigzag.encode(n))
+  def encode(:sint64, n) when n in @sint64_range, do: Varint.encode(Zigzag.encode(n))
+  def encode(:fixed32, n) when n in @uint32_range, do: <<n::32-little>>
+  def encode(:fixed64, n) when n in @uint64_range, do: <<n::64-little>>
+  def encode(:sfixed32, n) when n in @sint32_range, do: <<n::32-signed-little>>
+  def encode(:sfixed64, n) when n in @sint64_range, do: <<n::64-signed-little>>
 
-  def from_proto(type, value) do
+  def encode(type, value) do
     raise Protobuf.TypeEncodeError,
       message: "#{inspect(value)} is invalid for type #{inspect(type)}"
   end
 
-  @spec to_proto(proto_type(), binary() | integer()) :: proto_value()
-  def to_proto(type, value)
+  @spec decode(proto_type(), binary() | integer()) :: proto_value()
+  def decode(type, value)
 
-  def to_proto(type, val) when type in [:string, :bytes], do: val
+  def decode(type, val) when type in [:string, :bytes], do: val
 
-  def to_proto(:int32, val) do
+  def decode(:int32, val) do
     <<n::signed-integer-32>> = <<val::32>>
     n
   end
 
-  def to_proto(:int64, val) do
+  def decode(:int64, val) do
     <<n::signed-integer-64>> = <<val::64>>
     n
   end
 
-  def to_proto(:uint32, val) do
+  def decode(:uint32, val) do
     <<n::unsigned-integer-32>> = <<val::32>>
     n
   end
 
-  def to_proto(:uint64, val) do
+  def decode(:uint64, val) do
     <<n::unsigned-integer-64>> = <<val::64>>
     n
   end
 
-  def to_proto(:bool, val), do: val != 0
+  def decode(:bool, val), do: val != 0
 
-  def to_proto({:enum, enum_mod}, val) when is_atom(enum_mod) and is_integer(val) do
-    val = to_proto(:int32, val)
+  def decode({:enum, enum_mod}, val) when is_atom(enum_mod) and is_integer(val) do
+    val = decode(:int32, val)
 
     try do
       enum_mod.key(val)
@@ -136,37 +136,37 @@ defmodule Protobuf.Wire do
     end
   end
 
-  def to_proto(:float, <<n::little-float-32>>), do: n
+  def decode(:float, <<n::little-float-32>>), do: n
   # little endianness, should be 0b0_11111111_000000000...
-  def to_proto(:float, <<0, 0, 0b1000_0000::8, 0b01111111::8>>), do: :infinity
+  def decode(:float, <<0, 0, 0b1000_0000::8, 0b01111111::8>>), do: :infinity
   # little endianness, should be 0b1_11111111_000000000...
-  def to_proto(:float, <<0, 0, 0b1000_0000::8, 0b11111111::8>>), do: :negative_infinity
+  def decode(:float, <<0, 0, 0b1000_0000::8, 0b11111111::8>>), do: :negative_infinity
   # should be 0b*_11111111_not_zero...
-  def to_proto(:float, <<a::16, 1::1, b::7, _::1, 0b1111111::7>>) when a != 0 or b != 0,
+  def decode(:float, <<a::16, 1::1, b::7, _::1, 0b1111111::7>>) when a != 0 or b != 0,
     do: :nan
 
-  def to_proto(:double, <<n::little-float-64>>), do: n
+  def decode(:double, <<n::little-float-64>>), do: n
   # little endianness, should be 0b0_11111111111_000000000...
-  def to_proto(:double, <<0::48, 0b1111::4, 0::4, 0b01111111::8>>), do: :infinity
+  def decode(:double, <<0::48, 0b1111::4, 0::4, 0b01111111::8>>), do: :infinity
   # little endianness, should be 0b1_11111111111_000000000...
-  def to_proto(:double, <<0::48, 0b1111::4, 0::4, 0b11111111::8>>), do: :negative_infinity
+  def decode(:double, <<0::48, 0b1111::4, 0::4, 0b11111111::8>>), do: :negative_infinity
 
-  def to_proto(:double, <<a::48, 0b1111::4, b::4, _::1, 0b1111111::7>>) when a != 0 or b != 0,
+  def decode(:double, <<a::48, 0b1111::4, b::4, _::1, 0b1111111::7>>) when a != 0 or b != 0,
     do: :nan
 
   # For sint32 and sint64, we cast to their respective uint first and only then use zigzag
   # decoding. This ensures that if, for example, a 32 bit integer overflows because it was encoded
   # as a 64 bit integer (which is allowed for forward and backward compatibility), we first cast
   # it to a 32 bit integer and then zigzag-decode it.
-  def to_proto(:sint32, val), do: Zigzag.decode(to_proto(:uint32, val))
-  def to_proto(:sint64, val), do: Zigzag.decode(to_proto(:uint64, val))
+  def decode(:sint32, val), do: Zigzag.decode(decode(:uint32, val))
+  def decode(:sint64, val), do: Zigzag.decode(decode(:uint64, val))
 
-  def to_proto(:fixed32, <<n::little-32>>), do: n
-  def to_proto(:fixed64, <<n::little-64>>), do: n
-  def to_proto(:sfixed32, <<n::little-signed-32>>), do: n
-  def to_proto(:sfixed64, <<n::little-signed-64>>), do: n
+  def decode(:fixed32, <<n::little-32>>), do: n
+  def decode(:fixed64, <<n::little-64>>), do: n
+  def decode(:sfixed32, <<n::little-signed-32>>), do: n
+  def decode(:sfixed64, <<n::little-signed-64>>), do: n
 
-  def to_proto(type, val) do
+  def decode(type, val) do
     raise Protobuf.DecodeError, message: "can't decode #{inspect(val)} into type #{inspect(type)}"
   end
 end

@@ -31,7 +31,7 @@ defmodule Protobuf.EncoderTest.Validation do
     assert_invalid = fn type, others ->
       Enum.each(other_types(others), fn {invalid, err_type} ->
         assert_raise err_type, fn ->
-          Protobuf.Wire.from_proto(type, invalid)
+          Protobuf.Wire.encode(type, invalid)
         end
       end)
     end

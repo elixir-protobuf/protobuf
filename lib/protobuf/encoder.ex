@@ -87,7 +87,7 @@ defmodule Protobuf.Encoder do
     if skip_field?(syntax, val, prop) or skip_enum?(syntax, val, prop) do
       :skip
     else
-      iodata = apply_or_map(val, repeated?, &[fnum | Wire.from_proto(type, &1)])
+      iodata = apply_or_map(val, repeated?, &[fnum | Wire.encode(type, &1)])
       {:ok, iodata}
     end
   end
@@ -125,7 +125,7 @@ defmodule Protobuf.Encoder do
     if skip_field?(syntax, val, prop) or skip_enum?(syntax, val, prop) do
       :skip
     else
-      encoded = Enum.map(val, &Wire.from_proto(type, &1))
+      encoded = Enum.map(val, &Wire.encode(type, &1))
       byte_size = IO.iodata_length(encoded)
       {:ok, [fnum | Varint.encode(byte_size)] ++ encoded}
     end
