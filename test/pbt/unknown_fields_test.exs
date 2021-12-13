@@ -21,17 +21,17 @@ defmodule Protobuf.UnknownFieldsTest do
   end
 
   defp unknown_field_generator() do
-    gen all field_number <- integer(100_000..200_000),
-            {wire_type, value} <- one_of([delimited_generator(), varint_generator()]) do
+    value_generator =
+      one_of([delimited_generator(), varint_generator(), bits32_generator(), bits64_generator()])
+
+    gen all field_number <- integer(_unknown_fields_range = 100_000..200_000),
+            {wire_type, value} <- value_generator do
       {field_number, wire_type, value}
     end
   end
 
-  defp delimited_generator() do
-    map(binary(), &{wire_delimited(), &1})
-  end
-
-  defp varint_generator() do
-    map(integer(0..10_000), &{wire_varint(), &1})
-  end
+  defp delimited_generator(), do: map(binary(), &{wire_delimited(), &1})
+  defp varint_generator(), do: map(integer(0..10_000), &{wire_varint(), &1})
+  defp bits64_generator(), do: map(binary(length: 8), &{wire_64bits(), &1})
+  defp bits32_generator(), do: map(binary(length: 4), &{wire_32bits(), &1})
 end
