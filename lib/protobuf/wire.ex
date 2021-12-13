@@ -7,6 +7,8 @@ defmodule Protobuf.Wire do
 
   require Logger
 
+  @compile {:inline, encode_from_wire_type: 2}
+
   @type proto_type() ::
           :int32
           | :int64
