@@ -220,9 +220,9 @@ defmodule Protobuf do
 
   """
   @doc since: "0.10.0"
-  @spec get_unknown_fields(struct()) :: [varint_field]
-        when varint_field:
-               {field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: integer()}
+  @spec get_unknown_fields(struct()) :: [unknown_field]
+        when unknown_field:
+               {field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: any()}
   def get_unknown_fields(message)
 
   def get_unknown_fields(%_{__unknown_fields__: unknown_fields}) do
