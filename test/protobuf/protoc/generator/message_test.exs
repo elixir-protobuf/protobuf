@@ -15,7 +15,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
-             "t() :: %Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: integer()}]}"
+             "t() :: %Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: term()}]}"
   after
     TestHelpers.purge_modules([Foo])
   end
@@ -29,7 +29,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
-             "t() :: %Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: integer()}]}"
+             "t() :: %Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: term()}]}"
   after
     TestHelpers.purge_modules([Foo])
   end
@@ -152,7 +152,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
-             "t() :: %Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: integer()}], a: integer(), b: String.t(), c: [integer()]}"
+             "t() :: %Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: term()}], a: integer(), b: String.t(), c: [integer()]}"
 
     assert msg =~ "field :a, 1, type: :int32\n"
     assert msg =~ "field :b, 2, type: :string\n"
@@ -317,7 +317,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
-             "t() :: %Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: integer()}], bar: Bar.t() | nil, baz: [Baz.t()]}"
+             "t() :: %Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: term()}], bar: Bar.t() | nil, baz: [Baz.t()]}"
   after
     TestHelpers.purge_modules([Foo])
   end
@@ -378,7 +378,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
-             "t() :: %FooBar.AbCd.Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: integer()}], a: %{optional(integer()) => FooBar.AbCd.Bar.t() | nil}}"
+             "t() :: %FooBar.AbCd.Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: term()}], a: %{optional(integer()) => FooBar.AbCd.Bar.t() | nil}}"
   after
     TestHelpers.purge_modules([FooBar.AbCd.Foo])
   end
@@ -462,7 +462,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
-             "t() :: %FooBar.AbCd.Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: integer()}], a: OtherPkg.MsgFoo.t() | nil}"
+             "t() :: %FooBar.AbCd.Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: term()}], a: OtherPkg.MsgFoo.t() | nil}"
   after
     TestHelpers.purge_modules([FooBar.AbCd.Foo])
   end
@@ -516,7 +516,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert [{compiled_mod, bytecode}] = Code.compile_string(main_msg)
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
-             "t() :: %MyPkg.Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: integer()}], a: MyPkg.Foo.Nested.t() | nil}"
+             "t() :: %MyPkg.Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: term()}], a: MyPkg.Foo.Nested.t() | nil}"
   after
     TestHelpers.purge_modules([MyPkg.Foo])
   end
@@ -611,7 +611,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
-             "t() :: %Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: integer()}], first: {:a, integer()} | {:b, integer()}, other: integer() | nil, second: {:c, integer()} | {:d, integer()}}"
+             "t() :: %Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: term()}], first: {:a, integer()} | {:b, integer()}, other: integer() | nil, second: {:c, integer()} | {:d, integer()}}"
 
     refute msg =~ "a: integer,\n"
 
@@ -708,7 +708,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
-             "t() :: %FooBar.AbCd.Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: integer()}], a: [FooBar.AbCd.EnumFoo.t()]}"
+             "t() :: %FooBar.AbCd.Foo{__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: term()}], a: [FooBar.AbCd.EnumFoo.t()]}"
   after
     TestHelpers.purge_modules([FooBar.AbCd.Foo])
   end

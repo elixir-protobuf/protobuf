@@ -40,7 +40,7 @@ defmodule Protobuf.DSL.Typespecs do
       {:__unknown_fields__,
        quote(
          do: [
-           {field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: integer()}
+           {field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: term()}
          ]
        )}
     ]
