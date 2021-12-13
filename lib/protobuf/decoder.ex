@@ -16,6 +16,7 @@ defmodule Protobuf.Decoder do
     bin
     |> build_message(module.new(), props)
     |> reverse_repeated(repeated_fields)
+    |> Map.update!(props.unknown_varints_field, &Enum.reverse/1)
     |> transform_module(module)
   end
 
@@ -169,6 +170,11 @@ defmodule Protobuf.Decoder do
               current_value = Protobuf.Extension.get(message, ext_mod, prop.name_atom, nil)
               new_value = value_for_field(value, current_value, prop)
               Protobuf.Extension.put(mod, message, ext_mod, prop.name_atom, new_value)
+
+            # Unknown varints
+            _ when wire_type == wire_varint() ->
+              unknown_varint = {field_number, value}
+              Map.update!(message, props.unknown_varints_field, &[unknown_varint | &1])
 
             _ ->
               message

@@ -220,6 +220,14 @@ defmodule Protobuf.EncoderTest do
     assert Encoder.encode(msg) == <<>>
   end
 
+  test "encodes unknown varints" do
+    msg = %TestMsg.Foo{__unknown_varints__: [{4, 100}, {100, -1}], a: 42, d: 123.5}
+
+    assert Encoder.encode(msg) ==
+             <<8, 42, 45, 0, 0, 247, 66, 32, 100, 160, 6, 255, 255, 255, 255, 255, 255, 255, 255,
+               255, 1>>
+  end
+
   test "encodes with transformer module" do
     msg = %TestMsg.ContainsTransformModule{field: 0}
     assert Encoder.encode(msg) == <<10, 0>>

@@ -173,6 +173,59 @@ defmodule Protobuf do
   defdelegate encode_to_iodata(struct), to: Protobuf.Encoder
 
   @doc """
+  Returns the unknown varint fields that were decoded but were not understood from the schema.
+
+  In Protobuf, you can decode a payload (for the same message) encoded with a different version of
+  the schema for that message. This can result in, for example, the payload containing fields that
+  cannot be decoded correctly because they're not present in the schema used for decoding. These
+  fields are skipped, but in some cases you might wish to preserve them in order to re-encode
+  them, log them, or other. A common case is having to do "round-trips" with messages: you decode
+  a payload, update the resulting message somehow, and re-encode it for future use. In these
+  cases, you would probably want to re-encode the unknown fields to maintain symmetry.
+
+  The returned value of this function is a list of `{field_number, field_value}` tuples where
+  `field_number` is the number of the unknown field in the schema used for its encoding and
+  `field_value` is its varint-decoded value.
+
+  The reason why these fields need to be accessed through this function, instead of just as a
+  field of the struct, is that the field name is *dynamically-generated* when `use Protobuf` is
+  called (to avoid potential conflicts with existing schema fields).
+
+  ## Examples
+
+  Imagine you have this Protobuf schema:
+
+      message User {
+        uint32 age = 1;
+      }
+
+  You encode this:
+
+      payload = Protobuf.encode(User.new!(age: 30))
+      #=> <<...>>
+
+  Now, you try to decode this payload using this schema instead:
+
+      message User {
+        string email = 2;
+      }
+
+  In this case, this function will return the decoded unknown field:
+
+    message = User.decode(<<...>>)
+    Protobuf.get_unknown_varints(message)
+    #=> [{1, 30}]
+
+  """
+  @doc since: "0.10.0"
+  @spec get_unknown_varints(struct()) :: [varint_field]
+        when varint_field: {field_number :: integer(), value :: integer()}
+  def get_unknown_varints(%mod{} = struct) do
+    %Protobuf.MessageProps{unknown_varints_field: field} = mod.__message_props__()
+    Map.fetch!(struct, field)
+  end
+
+  @doc """
   Loads extensions modules.
 
   This function should be called in your application's `c:Application.start/2` callback,

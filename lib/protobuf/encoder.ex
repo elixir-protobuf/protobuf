@@ -26,6 +26,8 @@ defmodule Protobuf.Encoder do
 
     encoded = encode_fields(Map.values(field_props), syntax, struct, oneofs, _acc = [])
 
+    encoded = [encoded | encode_unknown_varints(struct, props)]
+
     if syntax == :proto2 do
       [encoded | encode_extensions(struct)]
     else
@@ -133,6 +135,12 @@ defmodule Protobuf.Encoder do
     case msg do
       %{__struct__: ^mod} -> encode_to_iodata(msg)
       _ -> encode_to_iodata(mod.new(msg))
+    end
+  end
+
+  defp encode_unknown_varints(message, %MessageProps{unknown_varints_field: field}) do
+    for {fnum, value} <- Map.fetch!(message, field) do
+      [Protobuf.Encoder.encode_fnum(fnum, wire_varint()), Varint.encode(value)]
     end
   end
 

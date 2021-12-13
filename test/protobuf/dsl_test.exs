@@ -228,13 +228,15 @@ defmodule Protobuf.DSLTest do
     assert TestMsg.WithTransformModule.transform_module() == TestMsg.TransformModule
   end
 
-  test "emits a warning when there is already a call to defstruct/1" do
+  test "emits a warning if there is already a call to defstruct/1 and a definition for the t/0 type" do
     output =
       capture_io(:stderr, fn ->
         Code.eval_quoted(
           quote do
-            defmodule MessageWithDefstructWarning do
+            defmodule MessageWithWarning do
               use Protobuf, syntax: :proto3
+
+              @type t() :: %__MODULE__{foo: boolean()}
 
               defstruct [:foo]
 
@@ -244,26 +246,38 @@ defmodule Protobuf.DSLTest do
         )
       end)
 
-    assert output =~ "Since v0.9.0 of the :protobuf library, structs are automatically generated"
+    assert output =~ "t/0 type and the struct are automatically generated"
   end
 
-  test "emits a warning when there is already a definition for the t/0 type" do
-    output =
-      capture_io(:stderr, fn ->
-        Code.eval_quoted(
-          quote do
-            defmodule MessageWithTTypeWarning do
-              use Protobuf, syntax: :proto3
+  test "raises a compilation error there is already a call to defstruct/1 but no definition for the t/0 type" do
+    assert_raise RuntimeError, ~r{t/0 type and the struct are automatically generated}, fn ->
+      Code.eval_quoted(
+        quote do
+          defmodule MessageWithDefstructError do
+            use Protobuf, syntax: :proto3
 
-              @type t() :: %__MODULE__{foo: boolean()}
+            defstruct [:foo]
 
-              field :foo, 1, type: :bool
-            end
+            field :foo, 1, type: :bool
           end
-        )
-      end)
+        end
+      )
+    end
+  end
 
-    assert output =~
-             "Since v0.9.0 of the :protobuf library, the t/0 type is automatically generated"
+  test "raises a compilation error there is already a definition for the t/0 type but no defstruct" do
+    assert_raise RuntimeError, ~r{the t/0 type and the struct are automatically generated}, fn ->
+      Code.eval_quoted(
+        quote do
+          defmodule MessageWithTTypeError do
+            use Protobuf, syntax: :proto3
+
+            @type t() :: %__MODULE__{foo: boolean()}
+
+            field :foo, 1, type: :bool
+          end
+        end
+      )
+    end
   end
 end

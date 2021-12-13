@@ -15,12 +15,14 @@ defmodule Protobuf.MessageProps do
           repeated_fields: [field_name()],
           embedded_fields: [field_name()],
           syntax: atom(),
-          oneof: [{atom, non_neg_integer}],
+          oneof: [{field_name(), tag()}],
           enum?: boolean(),
           extendable?: boolean(),
           map?: boolean(),
-          extension_range: [{non_neg_integer, non_neg_integer}]
+          extension_range: [{non_neg_integer(), non_neg_integer()}],
+          unknown_varints_field: atom()
         }
+
   defstruct ordered_tags: [],
             tags_map: %{},
             field_props: %{},
@@ -32,5 +34,6 @@ defmodule Protobuf.MessageProps do
             enum?: false,
             extendable?: false,
             map?: false,
-            extension_range: []
+            extension_range: [],
+            unknown_varints_field: nil
 end

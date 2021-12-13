@@ -32,11 +32,6 @@ defmodule Protobuf.DecoderTest do
     end)
   end
 
-  test "skips unknown varint fields" do
-    struct = Decoder.decode(<<8, 42, 32, 100, 45, 0, 0, 247, 66>>, TestMsg.Foo)
-    assert struct == TestMsg.Foo.new(a: 42, d: 123.5)
-  end
-
   test "skips unknown string fields" do
     struct = Decoder.decode(<<8, 42, 45, 0, 0, 247, 66>>, TestMsg.Foo)
     assert struct == TestMsg.Foo.new(a: 42, d: 123.5)
@@ -57,6 +52,19 @@ defmodule Protobuf.DecoderTest do
   test "decodes repeated varint fields" do
     struct = Decoder.decode(<<64, 12, 8, 123, 64, 13, 64, 14>>, TestMsg.Foo)
     assert struct == TestMsg.Foo.new(a: 123, g: [12, 13, 14])
+  end
+
+  test "decodes unknown varints" do
+    struct =
+      Decoder.decode(
+        <<8, 42, 45, 0, 0, 247, 66, 32, 100, 160, 6, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+          1>>,
+        TestMsg.Foo
+      )
+
+    assert struct.a == 42
+    assert struct.d == 123.5
+    assert Protobuf.get_unknown_varints(struct) == [{4, 100}, {100, 18_446_744_073_709_551_615}]
   end
 
   test "decodes repeated embedded fields" do
