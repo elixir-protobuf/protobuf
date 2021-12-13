@@ -218,18 +218,8 @@ defmodule Protobuf.DSL do
       oneof: Enum.reverse(oneofs),
       enum?: Keyword.get(options, :enum) == true,
       map?: Keyword.get(options, :map) == true,
-      extension_range: extensions,
-      unknown_varints_field: gen_unique_varints_field(Map.keys(field_tags))
+      extension_range: extensions
     }
-  end
-
-  defp gen_unique_varints_field(existing_field_names) do
-    indexed_names =
-      Stream.iterate(0, &(&1 + 1))
-      |> Stream.map(&:"__unknown_varints_#{&1}__")
-
-    Stream.concat([:__unknown_varints__], indexed_names)
-    |> Enum.find(fn tentative_name -> tentative_name not in existing_field_names end)
   end
 
   defp gen_extension_props([_ | _] = extends) do
@@ -423,9 +413,9 @@ defmodule Protobuf.DSL do
         []
       end
 
-    unknown_varints_field = {message_props.unknown_varints_field, _default = []}
+    unknown_fields = {:__unknown_fields__, _default = []}
 
-    struct_fields = regular_fields ++ oneof_fields ++ extension_fields ++ [unknown_varints_field]
+    struct_fields = regular_fields ++ oneof_fields ++ extension_fields ++ [unknown_fields]
 
     quote do
       defstruct unquote(Macro.escape(struct_fields))

@@ -7,6 +7,8 @@ defmodule Protobuf.Wire do
 
   require Logger
 
+  @compile {:inline, encode_from_wire_type: 2}
+
   @type proto_type() ::
           :int32
           | :int64
@@ -53,44 +55,77 @@ defmodule Protobuf.Wire do
   def wire_type(:float), do: wire_32bits()
   def wire_type(mod) when is_atom(mod), do: wire_delimited()
 
+  @spec encode_from_wire_type(Protobuf.Wire.Types.wire_type(), term()) :: iodata()
+  def encode_from_wire_type(wire_type, value)
+
+  def encode_from_wire_type(wire_varint(), int) when is_integer(int), do: Varint.encode(int)
+
+  # Returns improper list, but still valid iodata.
+  def encode_from_wire_type(wire_delimited(), bin) when is_binary(bin),
+    do: [Varint.encode(byte_size(bin)) | bin]
+
+  def encode_from_wire_type(wire_64bits(), bin) when is_binary(bin) and bit_size(bin) == 64,
+    do: bin
+
+  def encode_from_wire_type(wire_32bits(), bin) when is_binary(bin) and bit_size(bin) == 32,
+    do: bin
+
   @spec encode(proto_type(), proto_value()) :: iodata()
   def encode(type, value)
 
-  # Returns improper list, but still valid iodata.
-  def encode(type, binary) when is_binary(binary) and type in [:string, :bytes] do
-    Varint.encode(byte_size(binary)) ++ binary
-  end
+  def encode(type, binary) when is_binary(binary) and type in [:string, :bytes],
+    do: encode_from_wire_type(wire_delimited(), binary)
 
-  def encode(:int32, n) when n in @sint32_range, do: Varint.encode(n)
-  def encode(:int64, n) when n in @sint64_range, do: Varint.encode(n)
-  def encode(:uint32, n) when n in @uint32_range, do: Varint.encode(n)
-  def encode(:uint64, n) when n in @uint64_range, do: Varint.encode(n)
+  def encode(:int32, n) when n in @sint32_range, do: encode_from_wire_type(wire_varint(), n)
+  def encode(:int64, n) when n in @sint64_range, do: encode_from_wire_type(wire_varint(), n)
+  def encode(:uint32, n) when n in @uint32_range, do: encode_from_wire_type(wire_varint(), n)
+  def encode(:uint64, n) when n in @uint64_range, do: encode_from_wire_type(wire_varint(), n)
 
-  def encode(:bool, true), do: Varint.encode(1)
-  def encode(:bool, false), do: Varint.encode(0)
+  def encode(:bool, true), do: encode_from_wire_type(wire_varint(), 1)
+  def encode(:bool, false), do: encode_from_wire_type(wire_varint(), 0)
 
   def encode({:enum, enum_mod}, key) when is_atom(enum_mod) and is_atom(key),
-    do: Varint.encode(enum_mod.value(key))
+    do: encode_from_wire_type(wire_varint(), enum_mod.value(key))
 
-  def encode({:enum, enum_mod}, n) when is_atom(enum_mod) and is_integer(n),
-    do: Varint.encode(n)
+  def encode({:enum, enum_mod}, number) when is_atom(enum_mod) and is_integer(number),
+    do: encode_from_wire_type(wire_varint(), number)
 
-  def encode(:float, :infinity), do: [0, 0, 128, 127]
-  def encode(:float, :negative_infinity), do: [0, 0, 128, 255]
-  def encode(:float, :nan), do: [0, 0, 192, 127]
-  def encode(:float, n), do: <<n::32-float-little>>
+  def encode(:float, :infinity), do: encode_from_wire_type(wire_32bits(), <<0, 0, 128, 127>>)
 
-  def encode(:double, :infinity), do: [0, 0, 0, 0, 0, 0, 240, 127]
-  def encode(:double, :negative_infinity), do: [0, 0, 0, 0, 0, 0, 240, 255]
-  def encode(:double, :nan), do: [1, 0, 0, 0, 0, 0, 248, 127]
-  def encode(:double, n), do: <<n::64-float-little>>
+  def encode(:float, :negative_infinity),
+    do: encode_from_wire_type(wire_32bits(), <<0, 0, 128, 255>>)
 
-  def encode(:sint32, n) when n in @sint32_range, do: Varint.encode(Zigzag.encode(n))
-  def encode(:sint64, n) when n in @sint64_range, do: Varint.encode(Zigzag.encode(n))
-  def encode(:fixed32, n) when n in @uint32_range, do: <<n::32-little>>
-  def encode(:fixed64, n) when n in @uint64_range, do: <<n::64-little>>
-  def encode(:sfixed32, n) when n in @sint32_range, do: <<n::32-signed-little>>
-  def encode(:sfixed64, n) when n in @sint64_range, do: <<n::64-signed-little>>
+  def encode(:float, :nan), do: encode_from_wire_type(wire_32bits(), <<0, 0, 192, 127>>)
+  def encode(:float, n), do: encode_from_wire_type(wire_32bits(), <<n::32-float-little>>)
+
+  def encode(:double, :infinity),
+    do: encode_from_wire_type(wire_64bits(), <<0, 0, 0, 0, 0, 0, 240, 127>>)
+
+  def encode(:double, :negative_infinity),
+    do: encode_from_wire_type(wire_64bits(), <<0, 0, 0, 0, 0, 0, 240, 255>>)
+
+  def encode(:double, :nan),
+    do: encode_from_wire_type(wire_64bits(), <<1, 0, 0, 0, 0, 0, 248, 127>>)
+
+  def encode(:double, n), do: encode_from_wire_type(wire_64bits(), <<n::64-float-little>>)
+
+  def encode(:sint32, n) when n in @sint32_range,
+    do: encode_from_wire_type(wire_varint(), Zigzag.encode(n))
+
+  def encode(:sint64, n) when n in @sint64_range,
+    do: encode_from_wire_type(wire_varint(), Zigzag.encode(n))
+
+  def encode(:fixed32, n) when n in @uint32_range,
+    do: encode_from_wire_type(wire_32bits(), <<n::32-little>>)
+
+  def encode(:fixed64, n) when n in @uint64_range,
+    do: encode_from_wire_type(wire_64bits(), <<n::64-little>>)
+
+  def encode(:sfixed32, n) when n in @sint32_range,
+    do: encode_from_wire_type(wire_32bits(), <<n::32-signed-little>>)
+
+  def encode(:sfixed64, n) when n in @sint64_range,
+    do: encode_from_wire_type(wire_64bits(), <<n::64-signed-little>>)
 
   def encode(type, value) do
     raise Protobuf.TypeEncodeError,

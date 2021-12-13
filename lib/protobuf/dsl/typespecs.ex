@@ -36,14 +36,16 @@ defmodule Protobuf.DSL.Typespecs do
         _other -> []
       end
 
-    unknown_varints_fields =
-      if field_name = message_props.unknown_varints_field do
-        [{field_name, quote(do: [{field_number :: integer(), value :: integer()}])}]
-      else
-        []
-      end
+    unknown_fields = [
+      {:__unknown_fields__,
+       quote(
+         do: [
+           {field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: term()}
+         ]
+       )}
+    ]
 
-    field_specs = regular_fields ++ oneof_fields ++ extension_fields ++ unknown_varints_fields
+    field_specs = regular_fields ++ oneof_fields ++ extension_fields ++ unknown_fields
 
     quote do: %__MODULE__{unquote_splicing(field_specs)}
   end

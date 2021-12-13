@@ -28,11 +28,17 @@ defmodule Protobuf.ProtobufTest do
     end
   end
 
-  describe "get_unknown_varints/1" do
+  describe "get_unknown_fields/1" do
     test "returns a list of decoded unknown varints" do
       input = <<168, 31, 1>>
       message = ProtobufTestMessages.Proto3.TestAllTypesProto3.decode(input)
-      assert Protobuf.get_unknown_varints(message) == [{501, 1}]
+      assert Protobuf.get_unknown_fields(message) == [{501, _wire_varint = 0, 1}]
+    end
+
+    test "raises if the given struct doesn't have an :__unknown_fields__ field" do
+      assert_raise ArgumentError, ~r/can't retrieve unknown fields for struct URI/, fn ->
+        Protobuf.get_unknown_fields(%URI{})
+      end
     end
   end
 
