@@ -249,152 +249,113 @@ defmodule Protobuf.DSL do
   end
 
   defp field_props(syntax, name, fnum, opts) do
-    props = %Protobuf.FieldProps{
+    %FieldProps{
       fnum: fnum,
-      name: to_string(name),
+      name: Atom.to_string(name),
       name_atom: name
     }
-
-    opts_map = Enum.into(opts, %{})
-    # parse simple fields then calculate others in cal_*
-    parts =
-      opts
-      |> parse_field_opts(opts_map)
-      |> cal_label(syntax)
-      |> cal_type()
-      |> cal_json_name(props.name)
-      |> cal_default(syntax)
-      |> cal_embedded()
-      |> cal_packed(syntax)
-      |> cal_repeated(opts_map)
-      |> cal_deprecated()
-
-    struct(props, parts)
+    |> parse_field_opts_to_field_props(opts)
+    |> verify_no_default_in_proto3(syntax)
+    |> wrap_enum_type()
+    |> cal_label(syntax)
+    |> cal_json_name()
+    |> cal_embedded()
+    |> cal_packed(syntax)
+    |> cal_repeated()
     |> cal_encoded_fnum()
   end
 
-  defp parse_field_opts([{:optional, true} | t], acc) do
-    parse_field_opts(t, Map.put(acc, :optional?, true))
+  defp parse_field_opts_to_field_props(%FieldProps{} = props, opts) do
+    Enum.reduce(opts, props, fn
+      {:optional, optional?}, acc -> %FieldProps{acc | optional?: optional?}
+      {:required, required?}, acc -> %FieldProps{acc | required?: required?}
+      {:enum, enum?}, acc -> %FieldProps{acc | enum?: enum?}
+      {:map, map?}, acc -> %FieldProps{acc | map?: map?}
+      {:repeated, repeated?}, acc -> %FieldProps{acc | repeated?: repeated?}
+      {:embedded, embedded}, acc -> %FieldProps{acc | embedded?: embedded}
+      {:deprecated, deprecated?}, acc -> %FieldProps{acc | deprecated?: deprecated?}
+      {:packed, packed?}, acc -> %FieldProps{acc | packed?: packed?}
+      {:type, type}, acc -> %FieldProps{acc | type: type}
+      {:default, default}, acc -> %FieldProps{acc | default: default}
+      {:oneof, oneof}, acc -> %FieldProps{acc | oneof: oneof}
+      {:json_name, json_name}, acc -> %FieldProps{acc | json_name: json_name}
+    end)
   end
 
-  defp parse_field_opts([{:required, true} | t], acc) do
-    parse_field_opts(t, Map.put(acc, :required?, true))
+  defp cal_label(%FieldProps{} = props, :proto3) do
+    if props.required? do
+      raise Protobuf.InvalidError, message: "required can't be used in proto3"
+    else
+      %FieldProps{props | optional?: true}
+    end
   end
 
-  defp parse_field_opts([{:enum, true} | t], acc) do
-    parse_field_opts(t, Map.put(acc, :enum?, true))
+  defp cal_label(props, _syntax), do: props
+
+  defp wrap_enum_type(%FieldProps{enum?: true, type: type} = props) do
+    %FieldProps{props | type: {:enum, type}, wire_type: Wire.wire_type({:enum, type})}
   end
 
-  defp parse_field_opts([{:map, true} | t], acc) do
-    parse_field_opts(t, Map.put(acc, :map?, true))
+  defp wrap_enum_type(%FieldProps{type: type} = props) do
+    %FieldProps{props | wire_type: Wire.wire_type(type)}
   end
-
-  defp parse_field_opts([{:default, default} | t], acc) do
-    parse_field_opts(t, Map.put(acc, :default, default))
-  end
-
-  defp parse_field_opts([{:oneof, oneof} | t], acc) do
-    parse_field_opts(t, Map.put(acc, :oneof, oneof))
-  end
-
-  defp parse_field_opts([{:json_name, json_name} | t], acc) do
-    parse_field_opts(t, Map.put(acc, :json_name, json_name))
-  end
-
-  # skip unknown option
-  defp parse_field_opts([{_, _} | t], acc) do
-    parse_field_opts(t, acc)
-  end
-
-  defp parse_field_opts(_, acc), do: acc
-
-  defp cal_label(%{required?: true}, :proto3) do
-    raise Protobuf.InvalidError, message: "required can't be used in proto3"
-  end
-
-  defp cal_label(props, :proto3) do
-    Map.put(props, :optional?, true)
-  end
-
-  defp cal_label(props, _), do: props
-
-  defp cal_type(%{enum?: true, type: type} = props) do
-    Map.merge(props, %{type: {:enum, type}, wire_type: Wire.wire_type({:enum, type})})
-  end
-
-  defp cal_type(%{type: type} = props) do
-    Map.merge(props, %{type: type, wire_type: Wire.wire_type(type)})
-  end
-
-  defp cal_type(props), do: props
 
   # The compiler always emits a json name, but we omit it in the DSL when it
   # matches the name, to keep it uncluttered. Now we infer it back from name.
-  defp cal_json_name(%{json_name: _} = props, _name), do: props
-  defp cal_json_name(props, name), do: Map.put(props, :json_name, name)
+  defp cal_json_name(%FieldProps{json_name: name} = props) when is_binary(name), do: props
+  defp cal_json_name(props), do: %FieldProps{props | json_name: props.name}
 
-  defp cal_default(%{default: default}, :proto3) when not is_nil(default) do
-    raise Protobuf.InvalidError, message: "default can't be used in proto3"
+  defp verify_no_default_in_proto3(%FieldProps{} = props, syntax) do
+    if syntax == :proto3 and not is_nil(props.default) do
+      raise Protobuf.InvalidError, message: "default can't be used in proto3"
+    else
+      props
+    end
   end
 
-  defp cal_default(props, _), do: props
-
-  defp cal_embedded(%{type: type} = props) when is_atom(type) do
+  defp cal_embedded(%FieldProps{type: type, enum?: false} = props) when is_atom(type) do
     case to_string(type) do
-      "Elixir." <> _ -> Map.put(props, :embedded?, !props[:enum?])
+      "Elixir." <> _ -> %FieldProps{props | embedded?: true}
       _ -> props
     end
   end
 
   defp cal_embedded(props), do: props
 
-  defp cal_packed(%{packed: true, repeated: repeated} = props, _) do
+  defp cal_packed(%FieldProps{packed?: true, repeated?: repeated?} = props, _syntax) do
     cond do
-      props[:embedded?] -> raise ":packed can't be used with :embedded field"
-      repeated -> Map.put(props, :packed?, true)
+      props.embedded? -> raise ":packed can't be used with :embedded field"
+      repeated? -> %FieldProps{props | packed?: true}
       true -> raise ":packed must be used with :repeated"
     end
   end
 
-  defp cal_packed(%{packed: false} = props, _) do
-    Map.put(props, :packed?, false)
+  defp cal_packed(%FieldProps{packed?: false} = props, _syntax) do
+    props
   end
 
-  defp cal_packed(%{repeated: repeated, type: type} = props, :proto3) do
-    packed = (props[:enum?] || !props[:embedded?]) && type_numeric?(type)
-
-    if packed && !repeated do
-      raise ":packed must be used with :repeated"
-    else
-      Map.put(props, :packed?, packed)
-    end
+  defp cal_packed(%FieldProps{type: type, repeated?: true} = props, :proto3) do
+    packed? = (props.enum? or not props.embedded?) and type_numeric?(type)
+    %FieldProps{props | packed?: packed?}
   end
 
-  defp cal_packed(props, _), do: Map.put(props, :packed?, false)
+  defp cal_packed(props, _syntax), do: %FieldProps{props | packed?: false}
 
-  defp cal_repeated(%{map?: true} = props, _), do: Map.put(props, :repeated?, false)
-  defp cal_repeated(props, %{repeated: true}), do: Map.put(props, :repeated?, true)
+  defp cal_repeated(%FieldProps{map?: true} = props), do: %FieldProps{props | repeated?: false}
 
-  defp cal_repeated(_props, %{repeated: true, oneof: true}),
+  defp cal_repeated(%FieldProps{repeated?: true, oneof: oneof}) when not is_nil(oneof),
     do: raise(":oneof can't be used with repeated")
 
-  defp cal_repeated(props, _), do: props
+  defp cal_repeated(props), do: props
 
-  defp cal_deprecated(%{deprecated: true} = props), do: Map.put(props, :deprecated?, true)
-  defp cal_deprecated(props), do: props
-
-  defp cal_encoded_fnum(%{fnum: fnum, packed?: true} = props) do
+  defp cal_encoded_fnum(%FieldProps{fnum: fnum, packed?: true} = props) do
     encoded_fnum = Protobuf.Encoder.encode_fnum(fnum, Wire.wire_type(:bytes))
-    Map.put(props, :encoded_fnum, encoded_fnum)
+    %FieldProps{props | encoded_fnum: encoded_fnum}
   end
 
-  defp cal_encoded_fnum(%{fnum: fnum, wire_type: wire} = props) when is_integer(wire) do
-    encoded_fnum = Protobuf.Encoder.encode_fnum(fnum, wire)
-    Map.put(props, :encoded_fnum, encoded_fnum)
-  end
-
-  defp cal_encoded_fnum(props) do
-    props
+  defp cal_encoded_fnum(%FieldProps{fnum: fnum, wire_type: wire_type} = props) do
+    encoded_fnum = Protobuf.Encoder.encode_fnum(fnum, wire_type)
+    %FieldProps{props | encoded_fnum: encoded_fnum}
   end
 
   defp gen_defstruct(%MessageProps{} = message_props) do
