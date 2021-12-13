@@ -5,7 +5,7 @@ defmodule Protobuf.DSL.TypespecsTest do
   alias Protobuf.{FieldProps, MessageProps}
   alias Protobuf.DSL.Typespecs
 
-  @unknown_fields_spec "__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: integer()}]"
+  @unknown_fields_spec "__unknown_fields__: [{field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: term()}]"
 
   describe "quoted_enum_typespec/1" do
     test "returns integer() | ..." do
