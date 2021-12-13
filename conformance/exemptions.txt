@@ -1,6 +1,5 @@
 Recommended.Proto2.JsonInput.FieldNameExtension.Validator
 Required.Proto2.JsonInput.StoresDefaultPrimitive.Validator
-Required.Proto2.ProtobufInput.UnknownVarint.ProtobufOutput
 Required.Proto3.JsonInput.Any.JsonOutput
 Required.Proto3.JsonInput.Any.ProtobufOutput
 Required.Proto3.JsonInput.AnyNested.JsonOutput
@@ -21,4 +20,3 @@ Required.Proto3.JsonInput.AnyWithValueForInteger.JsonOutput
 Required.Proto3.JsonInput.AnyWithValueForInteger.ProtobufOutput
 Required.Proto3.JsonInput.AnyWithValueForJsonObject.JsonOutput
 Required.Proto3.JsonInput.AnyWithValueForJsonObject.ProtobufOutput
-Required.Proto3.ProtobufInput.UnknownVarint.ProtobufOutput

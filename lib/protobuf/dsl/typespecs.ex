@@ -36,9 +36,16 @@ defmodule Protobuf.DSL.Typespecs do
         _other -> []
       end
 
-    quote do
-      %__MODULE__{unquote_splicing(regular_fields ++ oneof_fields ++ extension_fields)}
-    end
+    unknown_varints_fields =
+      if field_name = message_props.unknown_varints_field do
+        [{field_name, quote(do: [{field_number :: integer(), value :: integer()}])}]
+      else
+        []
+      end
+
+    field_specs = regular_fields ++ oneof_fields ++ extension_fields ++ unknown_varints_fields
+
+    quote do: %__MODULE__{unquote_splicing(field_specs)}
   end
 
   defp oneof_spec(syntax, possible_oneof_fields) do

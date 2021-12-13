@@ -28,6 +28,14 @@ defmodule Protobuf.ProtobufTest do
     end
   end
 
+  describe "get_unknown_varints/1" do
+    test "returns a list of decoded unknown varints" do
+      input = <<168, 31, 1>>
+      message = ProtobufTestMessages.Proto3.TestAllTypesProto3.decode(input)
+      assert Protobuf.get_unknown_varints(message) == [{501, 1}]
+    end
+  end
+
   defp loaded_extensions do
     Enum.count(:persistent_term.get(), &match?({{Protobuf.Extension, _, _}, _}, &1))
   end
