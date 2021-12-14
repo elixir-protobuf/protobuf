@@ -18,10 +18,10 @@ defmodule Protobuf.Mixfile do
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.html": :test,
-        conformance_test: :conformance
+        conformance_test: :test
       ],
       deps: deps(),
-      escript: escript(Mix.env()),
+      escript: escript(),
       description: @description,
       package: package(),
       docs: docs(),
@@ -35,9 +35,8 @@ defmodule Protobuf.Mixfile do
     ]
   end
 
-  defp elixirc_paths(:test), do: ["lib", "test/support", "generated"]
-  defp elixirc_paths(:conformance), do: ["lib", "conformance", "generated"]
-  defp elixirc_paths(_), do: ["lib"]
+  defp elixirc_paths(:test), do: ["lib", "conformance", "test/support", "generated"]
+  defp elixirc_paths(_env), do: ["lib"]
 
   defp deps do
     [
@@ -45,22 +44,18 @@ defmodule Protobuf.Mixfile do
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:stream_data, "~> 0.5.0", only: [:dev, :test, :conformance]},
+      {:stream_data, "~> 0.5.0", only: [:dev, :test]},
       {:excoveralls, "~> 0.14.4", only: :test},
       {:google_protobuf,
        github: "protocolbuffers/protobuf",
        tag: "v3.19.1",
        app: false,
        compile: false,
-       only: [:dev, :test, :conformance]}
+       only: [:dev, :test]}
     ]
   end
 
-  defp escript(:conformance) do
-    [main_module: Conformance.Protobuf.Runner, name: "conformance_client"]
-  end
-
-  defp escript(_env) do
+  defp escript do
     [main_module: Protobuf.Protoc.CLI, name: "protoc-gen-elixir"]
   end
 
@@ -104,13 +99,10 @@ defmodule Protobuf.Mixfile do
         "test"
       ],
       conformance_test: [
-        fn _ ->
-          Mix.shell().cmd("mix escript.build", env: %{"MIX_ENV" => "test"})
-        end,
+        &build_escript/1,
         &create_generated_dir/1,
         &gen_google_test_protos/1,
         &gen_conformance_protos/1,
-        "escript.build",
         &run_conformance_tests/1
       ],
       gen_bench_protos: [&build_escript/1, &gen_bench_protos/1]
@@ -252,7 +244,7 @@ defmodule Protobuf.Mixfile do
       "--enforce_recommended",
       "--failure_list",
       "conformance/exemptions.txt",
-      "./conformance_client"
+      "./conformance/runner.sh"
     ]
 
     args = if verbose?, do: ["--verbose"] ++ args, else: args
