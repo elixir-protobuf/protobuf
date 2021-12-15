@@ -20,11 +20,16 @@ defmodule Protobuf.Encoder do
 
   defp encode_with_message_props(
          struct,
-         %MessageProps{syntax: syntax, field_props: field_props} = props
+         %MessageProps{syntax: syntax, field_props: field_props, ordered_tags: ordered_tags} =
+           props
        ) do
     oneofs = oneof_actual_vals(props, struct)
 
-    encoded = encode_fields(Map.values(field_props), syntax, struct, oneofs, _acc = [])
+    # We encode the fields in order since some recommended conformance tests expect us to do so.
+    encoded =
+      ordered_tags
+      |> Enum.map(fn fnum -> Map.fetch!(field_props, fnum) end)
+      |> encode_fields(syntax, struct, oneofs, _acc = [])
 
     encoded = [encoded | encode_unknown_fields(struct)]
 

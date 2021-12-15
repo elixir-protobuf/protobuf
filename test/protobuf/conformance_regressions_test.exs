@@ -38,6 +38,12 @@ defmodule Protobuf.ConformanceRegressionsTest do
       assert decoded.optional_nested_message.corecursive.repeated_int32 == [1234, 4321]
       assert decoded.optional_nested_message.corecursive.optional_int64 == 1234
     end
+
+    @tag conformance_input: ~S(\202\007\014\022\012\010\001\020\001\310\005\001\310\005\001)
+    test "Recommended.Proto3.ProtobufInput.ValidDataOneofBinary.MESSAGE.Merge.ProtobufOutput",
+         %{proto_input: proto_input, message_mod: message_mod} do
+      assert proto_input |> message_mod.decode() |> message_mod.encode() == proto_input
+    end
   end
 
   describe "proto2" do
