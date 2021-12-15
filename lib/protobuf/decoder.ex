@@ -204,50 +204,45 @@ defmodule Protobuf.Decoder do
     val = if map?, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
     val = if oneof, do: {name_atom, val}, else: val
 
-    if repeated? do
-      # List.wrap/1 wraps nil into [].
-      [val | List.wrap(current)]
-    else
-      # If the field is embedded but not repeated, it means that we need to merge the existing
-      # embedded message together with the new embedded message. If there is not existing embedded
-      # message, we default to a new empty message.
-      current =
-        cond do
-          current -> current
-          oneof -> {name_atom, type.new!([])}
-          true -> type.new!([])
-        end
+    cond do
+      repeated? ->
+        # List.wrap/1 wraps nil into [].
+        [val | List.wrap(current)]
 
-      deep_merge(current, val, type.__message_props__())
+      current && map? ->
+        Map.merge(current, val)
+
+      # If the field is embedded but not repeated, it means that we need to merge the existing
+      # embedded message together with the new embedded message.
+      current ->
+        deep_merge(current, val, type.__message_props__())
+
+      true ->
+        val
     end
   end
 
-  # If the field is a oneof, we merge its value and keep the tag.
-  defp deep_merge(_oneof1 = {tag, val1}, _oneof2 = {tag, val2}, props) do
-    {tag, deep_merge(val1, val2, props)}
+  defp deep_merge(_oneof1 = {tag1, val1}, oneof2 = {tag2, val2}, props) do
+    if tag1 == tag2 do
+      # If the field is a oneof, we merge its value and keep the tag.
+      {tag1, deep_merge(val1, val2, props)}
+    else
+      # If the field is a oneof but not with the same tag, then the second one takes over
+      # completely.
+      oneof2
+    end
   end
 
   # If the two fields to merge are the same message, we merge it by merging their fields.
-  defp deep_merge(%mod{} = msg1, %mod{} = msg2, %MessageProps{} = props) do
-    merged =
-      Enum.reduce(props.field_props, msg2, fn {_number, field_prop}, acc ->
-        %FieldProps{name_atom: field_name, oneof: oneof} = field_prop
+  defp deep_merge(%mod{} = msg1, %mod{} = msg2, %MessageProps{syntax: syntax} = props) do
+    merged_attributes =
+      for {_number, field_prop} <- props.field_props do
+        key = field_key(field_prop, props)
+        value = deep_merge_field(Map.fetch!(msg1, key), Map.fetch!(msg2, key), field_prop, syntax)
+        {key, value}
+      end
 
-        case {msg1, msg2} do
-          {%{^field_name => val1}, %{^field_name => val2}} ->
-            if oneof do
-              %{acc | field_name => val2}
-            else
-              %{acc | field_name => deep_merge_field(val1, val2, field_prop, props.syntax)}
-            end
-
-          {%{^field_name => val1}, %{}} ->
-            Map.put(acc, field_name, val1)
-
-          {_msg1, _msg2} ->
-            acc
-        end
-      end)
+    merged = struct!(mod, merged_attributes)
 
     # Merge extensions. Not 100% sure this is right but it doesn't break any tests nor any
     # conformance tests...
@@ -263,20 +258,14 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  # If the two fields to merge are maps (which is a special case of embedded fields), we don't
-  # merge them recursively.
-  defp deep_merge(%{} = msg1, %{} = msg2, _props) do
-    Map.merge(msg1, msg2)
-  end
-
-  # TODO: transform_module
-  defp deep_merge(_val1, val2, _props) do
-    val2
-  end
-
   # Merging lists means concatenating them.
   defp deep_merge_field(val1, val2, %FieldProps{repeated?: true}, _syntax) do
     val1 ++ val2
+  end
+
+  # Merge maps by, well, merging the maps.
+  defp deep_merge_field(val1, val2, %FieldProps{map?: true}, _syntax) do
+    Map.merge(val1, val2)
   end
 
   # Recursively go up and merge two embedded messages with their new "message props".
@@ -346,10 +335,12 @@ defmodule Protobuf.Decoder do
     end)
   end
 
-  defp field_key(%FieldProps{oneof: nil, name_atom: key}, _message_props), do: key
+  defp field_key(%FieldProps{oneof: nil, name_atom: key}, _message_props) do
+    key
+  end
 
   defp field_key(%FieldProps{oneof: oneof_number}, %MessageProps{oneof: oneofs}) do
-    {key, ^oneof_number} = Enum.at(oneofs, oneof_number)
+    {key, _num} = Enum.find(oneofs, &match?({_key, ^oneof_number}, &1))
     key
   end
 
