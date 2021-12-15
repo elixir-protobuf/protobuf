@@ -99,8 +99,8 @@ defmodule Protobuf.JSON.Encode do
     Enum.join(paths, ",")
   end
 
-  def to_encodable(struct, opts) do
-    message_props = Utils.message_props(struct)
+  def to_encodable(%mod{} = struct, opts) do
+    message_props = mod.__message_props__()
     regular = encode_regular_fields(struct, message_props, opts)
     oneofs = encode_oneof_fields(struct, message_props, opts)
 

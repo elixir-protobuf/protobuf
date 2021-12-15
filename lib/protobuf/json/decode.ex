@@ -162,7 +162,7 @@ defmodule Protobuf.JSON.Decode do
   end
 
   def from_json_data(data, module) when is_map(data) and is_atom(module) do
-    message_props = Utils.message_props(module)
+    message_props = module.__message_props__()
     regular = decode_regular_fields(data, message_props)
     oneofs = decode_oneof_fields(data, message_props)
 
@@ -237,7 +237,7 @@ defmodule Protobuf.JSON.Decode do
   defp decode_value(%{repeated?: false} = prop, value), do: decode_singular(prop, value)
 
   defp decode_map(%{type: module, name_atom: field}, map) when is_map(map) do
-    %{field_props: field_props, field_tags: field_tags} = Utils.message_props(module)
+    %{field_props: field_props, field_tags: field_tags} = module.__message_props__()
     key_type = field_props[field_tags[:key]].type
     val_prop = field_props[field_tags[:value]]
 
