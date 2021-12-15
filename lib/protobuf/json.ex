@@ -3,37 +3,37 @@ defmodule Protobuf.JSON do
   JSON encoding and decoding utilities for Protobuf structs.
 
   It follows Google's [specs](https://developers.google.com/protocol-buffers/docs/proto3#json)
-  and reference implementation. Only `proto3` syntax is supported at the moment. Some features
+  and reference implementation. Some features
   such as [well-known](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf)
   types are not fully supported yet.
 
+  Proto3 is supported as per the specification. Proto2 is supported in practice, but some of its
+  features might not work correctly, such as extensions.
+
   ## Types
 
-  Protobuf messages and embedded messages are encoded as objects, _repeated_ fields as arrays,
-  _bytes_ as Base64 strings, _bool_ as booleans, _map_ as objects and so on.
-
-  | proto3                   | JSON                  | Supported |
-  |--------------------------|-----------------------|-----------|
-  | `message`                | `object`              | Yes       |
-  | `enum`                   | `string`              | Yes       |
-  | `map<K,V>`               | `object`              | Yes       |
-  | `repeated V`             | `array [v, …]`        | Yes       |
-  | `bool`                   | `true, false`         | Yes       |
-  | `string`                 | `string`              | Yes       |
-  | `bytes`                  | `base64 string`       | Yes       |
-  | `int32, fixed32, uint32` | `number`              | Yes       |
-  | `int64, fixed64, uint64` | `string`              | Yes       |
-  | `float, double`          | `number`              | Yes       |
-  | `Any`                    | `object`              | No        |
-  | `Timestamp`              | `string`              | Yes       |
-  | `Duration`               | `string`              | Yes       |
-  | `Struct`                 | `object`              | Yes       |
-  | `Wrapper types`          | `various types`       | Yes       |
-  | `FieldMask`              | `string`              | Yes       |
-  | `ListValue`              | `array [foo, bar, …]` | Yes       |
-  | `Value`                  | `value`               | Yes       |
-  | `NullValue`              | `null`                | Yes       |
-  | `Empty`                  | `object`              | Yes       |
+  | Protobuf                     | JSON                        | Supported |
+  |------------------------------|-----------------------------|-----------|
+  | `bool`                       | `true`/`false`              | Yes       |
+  | `int32`, `fixed32`, `uint32` | Number                      | Yes       |
+  | `int64`, `fixed64`, `uint64` | String                      | Yes       |
+  | `float`, `double`            | Number                      | Yes       |
+  | `bytes`                      | Base64 string               | Yes       |
+  | `string`                     | String                      | Yes       |
+  | `message`                    | Object (`{…}`)              | Yes       |
+  | `enum`                       | String                      | Yes       |
+  | `map<K,V>`                   | Object (`{…}`)              | Yes       |
+  | `repeated V`                 | Array of `[v, …]`           | Yes       |
+  | `Any`                        | Object (`{…}`)              | No        |
+  | `Timestamp`                  | RFC3339 datetime            | Yes       |
+  | `Duration`                   | String (`seconds.fraction`) | Yes       |
+  | `Struct`                     | Object (`{…}`)              | Yes       |
+  | `Wrapper types`              | Various types               | Yes       |
+  | `FieldMask`                  | String                      | Yes       |
+  | `ListValue`                  | Array                       | Yes       |
+  | `Value`                      | Any JSON value              | Yes       |
+  | `NullValue`                  | `null`                      | Yes       |
+  | `Empty`                      | Object (`{…}`)              | Yes       |
 
   ## Usage
 
@@ -59,7 +59,7 @@ defmodule Protobuf.JSON do
       iex> Protobuf.JSON.decode(json, Car)
       {:ok, %Car{color: :RED, top_speed: 125.3}}
 
-  JSON keys are encoded as camelCase strings by default, specified by the `json_name` field
+  JSON keys are encoded as *camelCase strings* by default, specified by the `json_name` field
   option. So make sure to *recompile the `.proto` files in your project* before working with
   JSON encoding, the compiler will generate all the required `json_name` options. You can set
   your own `json_name` for a particular field too:
@@ -69,12 +69,12 @@ defmodule Protobuf.JSON do
         double longitude = 2 [ json_name = "long" ];
       }
 
-  ## Known issues and limitations
+  ## Known Issues and Limitations
 
-  Currently, the `protoc` compiler won't check for field name collisions, this library either.
-  So make sure your field names will be unique when serialized to JSON. For instance, this
-  message definition will not encode correctly, it will emit just one of the two fields, and
-  the problem might go unnoticed:
+  Currently, the `protoc` compiler won't check for field name collisions. This library won't
+  check that either. Make sure your field names will be unique when serialized to JSON.
+  For instance, this message definition will not encode correctly since it will emit just
+  one of the two fields and the problem might go unnoticed:
 
       message CollidingFields {
         int32 f1 = 1 [json_name = "sameName"];
@@ -104,8 +104,6 @@ defmodule Protobuf.JSON do
       iex> Car.new(top_speed: 80.0) |> Protobuf.JSON.encode!()
       ~S|{"topSpeed":80.0}|
 
-      iex> TestMsg.Foo2.new() |> Protobuf.JSON.encode!()
-      ** (Protobuf.JSON.EncodeError) JSON encoding of 'proto2' syntax is unsupported, try proto3
   """
   @spec encode!(struct, [encode_opt]) :: String.t() | no_return
   def encode!(struct, opts \\ []) do
@@ -121,15 +119,15 @@ defmodule Protobuf.JSON do
   ## Options
 
     * `:use_proto_names` - use original field `name` instead of the camelCase `json_name` for
-      JSON keys (default is `false`).
-    * `:use_enum_numbers` - encode `enum` field values as numbers instead of their labels
-      (default is `false`).
-    * `:emit_unpopulated` - emit all fields, even when they are blank, empty or set to their
-      default value (default is `false`).
+      JSON keys. Defaults to `false`.
+    * `:use_enum_numbers` - encode `enum` field values as numbers instead of their labels.
+      Defaults to `false`.
+    * `:emit_unpopulated` - emit all fields, even when they are blank, empty, or set to their
+      default value. Defaults to `false`.
 
   ## Examples
 
-  Suppose these are you proto modules:
+  Suppose that this is you Protobuf message:
 
       syntax = "proto3";
 
@@ -143,7 +141,7 @@ defmodule Protobuf.JSON do
         float top_speed = 2;
       }
 
-  Encoding should be as simple as:
+  Encoding is as simple as:
 
       iex> Car.new(color: :RED, top_speed: 125.3) |> Protobuf.JSON.encode()
       {:ok, ~S|{"color":"RED","topSpeed":125.3}|}
@@ -153,6 +151,7 @@ defmodule Protobuf.JSON do
 
       iex> Car.new() |> Protobuf.JSON.encode(emit_unpopulated: true)
       {:ok, ~S|{"color":"GREEN","topSpeed":0.0}|}
+
   """
   @spec encode(struct, [encode_opt]) ::
           {:ok, String.t()} | {:error, EncodeError.t() | Exception.t()}
@@ -165,9 +164,13 @@ defmodule Protobuf.JSON do
   end
 
   @doc """
-  Generates a JSON-encodable map for the given protobuf `struct`.
+  Generates a JSON-encodable map for the given Protobuf `struct`.
 
   Similar to `encode/2` except it will return an intermediate `map` representation.
+  This is especially useful if you want to use custom JSON encoding or a custom
+  JSON library.
+
+  Supports the same options as `encode/2`.
 
   ## Examples
 
@@ -179,6 +182,7 @@ defmodule Protobuf.JSON do
 
       iex> Car.new() |> Protobuf.JSON.to_encodable(emit_unpopulated: true)
       {:ok, %{"color" => :GREEN, "topSpeed" => 0.0}}
+
   """
   @spec to_encodable(struct, [encode_opt]) :: {:ok, json_data} | {:error, EncodeError.t()}
   def to_encodable(%_{} = struct, opts \\ []) when is_list(opts) do
@@ -217,7 +221,7 @@ defmodule Protobuf.JSON do
 
   ## Examples
 
-  Given these proto modules:
+  Given this Protobuf message:
 
       syntax = "proto3";
 
@@ -231,7 +235,7 @@ defmodule Protobuf.JSON do
         float top_speed = 2;
       }
 
-  You can build their structs from JSON like so:
+  You can build its structs from JSON like this:
 
       iex> Protobuf.JSON.decode("{}", Car)
       {:ok, %Car{color: :GREEN, top_speed: 0.0}}
@@ -241,6 +245,7 @@ defmodule Protobuf.JSON do
 
       iex> ~S|{"color":"GREEN","topSpeed":80.0}| |> Protobuf.JSON.decode(Car)
       {:ok, %Car{color: :GREEN, top_speed: 80.0}}
+
   """
   @spec decode(iodata, module) :: {:ok, struct} | {:error, DecodeError.t() | Exception.t()}
   def decode(iodata, module) when is_atom(module) do
@@ -256,6 +261,8 @@ defmodule Protobuf.JSON do
   Decodes a `json_data` map into a `module` Protobuf struct.
 
   Similar to `decode/2` except it takes a JSON `map` representation of the data.
+    This is especially useful if you want to use custom JSON encoding or a custom
+  JSON library.
 
   ## Examples
 

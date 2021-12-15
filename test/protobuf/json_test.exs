@@ -4,10 +4,8 @@ defmodule Protobuf.JSONTest do
 
   alias TestMsg.Scalars
 
-  test "only encodes valid protobuf structs" do
-    assert_raise Protobuf.JSON.EncodeError, ~r/'proto2' syntax is unsupported/, fn ->
-      Protobuf.JSON.encode!(%TestMsg.Foo2{})
-    end
+  test "encodes proto2 structs" do
+    assert Protobuf.JSON.encode!(%TestMsg.Foo2{b: 10}) == ~S|{"b":"10"}|
   end
 
   test "encoding string field with invalid UTF-8 data" do
