@@ -105,7 +105,8 @@ defmodule Protobuf.Mixfile do
         &gen_conformance_protos/1,
         &run_conformance_tests/1
       ],
-      gen_bench_protos: [&build_escript/1, &gen_bench_protos/1]
+      gen_bench_protos: [&build_escript/1, &gen_bench_protos/1],
+      build_conformance_runner: &build_conformance_runner/1
     ]
   end
 
@@ -220,14 +221,7 @@ defmodule Protobuf.Mixfile do
   end
 
   defp protoc!(args, files_to_generate) when is_binary(args) and is_list(files_to_generate) do
-    cmd = "protoc --plugin=./protoc-gen-elixir #{args} #{Enum.join(files_to_generate, " ")}"
-
-    Mix.shell().info([:cyan, "Running: ", :reset, cmd])
-
-    case Mix.shell().cmd(cmd) do
-      0 -> :ok
-      other -> Mix.raise("protoc exited with non-zero status: #{other}")
-    end
+    cmd!("protoc --plugin=./protoc-gen-elixir #{args} #{Enum.join(files_to_generate, " ")}")
   end
 
   defp run_conformance_tests(args) do
@@ -235,7 +229,26 @@ defmodule Protobuf.Mixfile do
 
     runner =
       options
-      |> Keyword.get_lazy(:runner, fn -> Mix.raise("Missing required option --runner") end)
+      |> Keyword.get_lazy(:runner, fn ->
+        path = path_in_protobuf_source("conformance/conformance-test-runner")
+        relative_path = Path.relative_to_cwd(path)
+
+        if File.exists?(path) do
+          Mix.shell().info([:faint, "Using default conformance runner: ", :reset, relative_path])
+          path
+        else
+          Mix.raise("""
+          No --runner option was passed and we didn't find the default runner we use,
+          which should be in: #{relative_path}
+
+          If you want to build the conformance runner locally from the Google Protobuf
+          dependency of this library, run:
+
+              mix build_conformance_runner
+
+          """)
+        end
+      end)
       |> Path.expand()
 
     verbose? = Keyword.get(options, :verbose, false)
@@ -248,10 +261,24 @@ defmodule Protobuf.Mixfile do
     ]
 
     args = if verbose?, do: ["--verbose"] ++ args, else: args
+    cmd!("#{runner} #{Enum.join(args, " ")}")
+  end
 
-    case Mix.shell().cmd("#{runner} #{Enum.join(args, " ")}", stderr_to_stdout: true) do
+  defp build_conformance_runner(_args) do
+    File.cd!(Mix.Project.deps_paths().google_protobuf, fn ->
+      cmd!("./autogen.sh")
+      cmd!("./configure")
+      cmd!("make -C ./src protoc")
+      cmd!("make -C ./conformance conformance-test-runner")
+    end)
+  end
+
+  defp cmd!(cmd) do
+    Mix.shell().info([:cyan, "Running: ", :reset, cmd])
+
+    case Mix.shell().cmd(cmd) do
       0 -> :ok
-      other -> Mix.raise("#{runner} exited with non-zero status: #{other}")
+      other -> Mix.raise("Command exited with non-zero status: #{other}")
     end
   end
 end

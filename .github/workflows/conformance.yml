@@ -79,6 +79,6 @@ jobs:
       - name: Compile project
         run: mix compile
 
-      - name: Run mix protobuf.conformance
+      - name: Run mix protobuf.conformance with the runner from Protobuf's master branch
         run: |
           mix conformance_test --runner=./protobuf/conformance/conformance-test-runner --verbose
