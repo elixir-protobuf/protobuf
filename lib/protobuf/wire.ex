@@ -5,8 +5,6 @@ defmodule Protobuf.Wire do
 
   alias Protobuf.Wire.{Varint, Zigzag}
 
-  require Logger
-
   @compile {:inline, encode_from_wire_type: 2}
 
   @type proto_type() ::
@@ -160,15 +158,10 @@ defmodule Protobuf.Wire do
   def decode(:bool, val), do: val != 0
 
   def decode({:enum, enum_mod}, val) when is_atom(enum_mod) and is_integer(val) do
-    val = decode(:int32, val)
-
-    try do
-      enum_mod.key(val)
-    rescue
-      FunctionClauseError ->
-        Logger.warn("unknown enum value #{val} when decoding for #{inspect(enum_mod)}")
-        val
-    end
+    # We cast the integer to int32 first.
+    number = decode(:int32, val)
+    # key/1 returns the integer "number" itself if no atom key is found for "number".
+    enum_mod.key(number)
   end
 
   def decode(:float, <<n::little-float-32>>), do: n

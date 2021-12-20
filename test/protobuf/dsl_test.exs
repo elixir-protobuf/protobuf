@@ -156,7 +156,7 @@ defmodule Protobuf.DSLTest do
     assert TestMsg.EnumFoo.key(1) == :A
     assert TestMsg.EnumFoo.key(2) == :B
     assert TestMsg.EnumFoo.key(4) == :C
-    assert_raise FunctionClauseError, fn -> TestMsg.EnumFoo.key(5) end
+    assert TestMsg.EnumFoo.key(213_123) == 213_123
     assert TestMsg.EnumFoo.mapping() == %{UNKNOWN: 0, A: 1, B: 2, C: 4, D: 4, E: 4}
 
     assert TestMsg.EnumFoo.__reverse_mapping__() == %{

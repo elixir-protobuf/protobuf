@@ -301,10 +301,7 @@ defmodule Protobuf.WireTest do
 
     test "enum known and unknown integer" do
       assert :A == Wire.decode({:enum, TestMsg.EnumFoo}, 1)
-
-      assert ExUnit.CaptureLog.capture_log(fn ->
-               assert 5 == Wire.decode({:enum, TestMsg.EnumFoo}, 5)
-             end) =~ ~r/unknown enum value 5 when decoding for TestMsg\.EnumFoo/
+      assert 5 == Wire.decode({:enum, TestMsg.EnumFoo}, 5)
     end
 
     test "enum wraps to an int32" do
