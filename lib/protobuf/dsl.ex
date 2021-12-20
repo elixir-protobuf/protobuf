@@ -167,6 +167,9 @@ defmodule Protobuf.DSL do
       end) ++
       [
         quote do
+          def key(int) when is_integer(int), do: int
+        end,
+        quote do
           def mapping(), do: unquote(Macro.escape(atom_to_num))
         end,
         quote do
