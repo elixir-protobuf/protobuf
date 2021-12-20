@@ -75,7 +75,7 @@ defmodule Protobuf.Encoder do
   defp skip_field?(_syntax, [], _prop), do: true
   defp skip_field?(_syntax, val, _prop) when is_map(val), do: map_size(val) == 0
   defp skip_field?(:proto2, nil, %FieldProps{optional?: optional?}), do: optional?
-  defp skip_field?(:proto2, value, %FieldProps{default: value}), do: true
+  defp skip_field?(:proto2, value, %FieldProps{default: value, oneof: nil}), do: true
   defp skip_field?(:proto3, nil, _prop), do: true
   defp skip_field?(:proto3, 0, %FieldProps{oneof: nil}), do: true
   defp skip_field?(:proto3, 0.0, %FieldProps{oneof: nil}), do: true
