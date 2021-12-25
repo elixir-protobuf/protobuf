@@ -222,6 +222,12 @@ defmodule Protobuf.EncoderTest do
     assert Encoder.encode(msg) == <<>>
   end
 
+  test "encodes oneof fields' default values for proto2" do
+    msg = TestMsg.Oneof.new(first: {:e, :A})
+    assert Encoder.encode(msg) == <<48, 1>>
+    assert TestMsg.Oneof.decode(<<48, 1>>) == msg
+  end
+
   test "encodes unknown fields" do
     msg = %TestMsg.Foo{
       __unknown_fields__: [
