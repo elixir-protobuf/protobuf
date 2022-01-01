@@ -6,11 +6,6 @@ on:
       - main
   pull_request:
 
-env:
-  PROTOC_VERSION: 3.17.3
-  LATEST_ELIXIR_VERSION: 1.13.1
-  LATEST_OTP_VERSION: 24.0
-
 jobs:
   test:
     name: Test (Elixir ${{matrix.elixir}} | Erlang/OTP ${{matrix.otp}})
@@ -18,9 +13,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        protoc: 3.17.3
         include:
-          - otp: ${{ env.LATEST_OTP_VERSION }}
-            elixir: ${{ env.LATEST_ELIXIR_VERSION }}
+          - otp: 24.0
+            elixir: 1.13.1
             lint: true
             integration: true
           - otp: 23.3
@@ -40,7 +36,7 @@ jobs:
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
-          version: '${{ env.PROTOC_VERSION }}'
+          version: '${{ matrix.protoc }}'
           repo-token: ${{ secrets.GITHUB_TOKEN }} # to avoid rate limiting
 
       - name: Install OTP and Elixir
@@ -112,6 +108,9 @@ jobs:
     runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
+      matrix:
+        otp: 24.0
+        elixir: 1.13.1
 
     env:
       MIX_ENV: test
@@ -126,8 +125,8 @@ jobs:
       - name: Install OTP and Elixir
         uses: erlef/setup-elixir@v1
         with:
-          otp-version: ${{ env.LATEST_OTP_VERSION }}
-          elixir-version: ${{ env.LATEST_ELIXIR_VERSION }}
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
 
       - name: Cache dependencies
         id: cache-deps
