@@ -1,9 +1,8 @@
 name: Conformance
 
 # This workflow *only* tries to run the conformance checks. It is triggered periodically on a cron
-# to catch when new conformance tests are added and they don't pass as well as in PRs and pushes.
-#
-# Without the scheduled run, the new tests wouldn't be noticed until a PR was made.
+# to catch when new conformance tests are added and they don't pass. It uses the latest version of
+# protoc to catch any changes in conformance test.
 
 on:
   # This is needed to trigger the workflow manually from the "Actions" tab in the repo.
@@ -12,18 +11,17 @@ on:
   # Every day at 9am.
   schedule:
     - cron: '0 9 * * *'
-  push:
-  pull_request:
 
 jobs:
-  test:
-    name: Run conformance tests
+  latest-conformance-test:
+    name: Run conformance tests on latest protoc
     runs-on: ubuntu-18.04
     strategy:
       matrix:
         include:
           - otp: 24.0
             elixir: 1.12.1
+
     env:
       MIX_ENV: test
 
