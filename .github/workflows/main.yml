@@ -127,12 +127,12 @@ jobs:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
 
-      - name: Cache dependencies
-        id: cache-deps
-        uses: actions/cache@v2
-        with:
-          path: deps
-          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+      # - name: Cache dependencies
+      #   id: cache-deps
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: deps/google_protobuf
+      #     key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
 
       - name: Install dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
