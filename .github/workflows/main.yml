@@ -13,7 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        protoc: 3.17.3
+        protoc:
+          - 3.17.3
         include:
           - otp: 24.0
             elixir: 1.13.1
@@ -109,8 +110,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        otp: 24.0
-        elixir: 1.13.1
+        otp: [24.0]
+        elixir: [1.13.1]
 
     env:
       MIX_ENV: test
