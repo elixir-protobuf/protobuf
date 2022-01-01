@@ -15,7 +15,7 @@ jobs:
       matrix:
         include:
           - otp: 24.0
-            elixir: 1.13.1
+            elixir: 1.12.3
             lint: true
             integration: true
           - otp: 23.3
@@ -109,7 +109,7 @@ jobs:
       fail-fast: false
       matrix:
         otp: [24.0]
-        elixir: [1.13.1]
+        elixir: [1.12.3]
 
     env:
       MIX_ENV: test
@@ -138,9 +138,12 @@ jobs:
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: mix deps.get
 
-      - name: Build the conformance runner from the local Protobuf dependency
+      - name: Build protoc and the conformance runner from the local Protobuf dependency
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: mix build_conformance_runner
+
+      - name: Add local protoc to $GITHUB_PATH
+        run: echo "$PWD/deps/google_protobuf/src" >> $GITHUB_PATH
 
       - name: Run conformance tests
         run: mix conformance_test
