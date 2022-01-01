@@ -7,9 +7,9 @@ on:
   pull_request:
 
 env:
-  protoc-version: 3.17.3
-  latest-elixir-version: 1.13.1
-  latest-otp-version: 24.0
+  PROTOC_VERSION: 3.17.3
+  LATEST_ELIXIR_VERSION: 1.13.1
+  LATEST_OTP_VERSION: 24.0
 
 jobs:
   test:
@@ -19,8 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - otp: ${{ env.latest-otp-version }}
-            elixir: ${{ env.latest-elixir-version }}
+          - otp: ${{ env.LATEST_OTP_VERSION }}
+            elixir: ${{ env.LATEST_ELIXIR_VERSION }}
             lint: true
             integration: true
           - otp: 23.3
@@ -40,7 +40,7 @@ jobs:
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
-          version: '${{ env.protoc-version }}'
+          version: '${{ env.PROTOC_VERSION }}'
           repo-token: ${{ secrets.GITHUB_TOKEN }} # to avoid rate limiting
 
       - name: Install OTP and Elixir
@@ -126,8 +126,8 @@ jobs:
       - name: Install OTP and Elixir
         uses: erlef/setup-elixir@v1
         with:
-          otp-version: ${{ env.latest-otp-version }}
-          elixir-version: ${{ env.latest-elixir-version }}
+          otp-version: ${{ env.LATEST_OTP_VERSION }}
+          elixir-version: ${{ env.LATEST_ELIXIR_VERSION }}
 
       - name: Cache dependencies
         id: cache-deps
