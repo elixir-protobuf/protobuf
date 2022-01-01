@@ -249,7 +249,7 @@ defmodule Protobuf.DSLTest do
     assert output =~ "t/0 type and the struct are automatically generated"
   end
 
-  test "raises a compilation error there is already a call to defstruct/1 but no definition for the t/0 type" do
+  test "raises a compilation error if there is already a call to defstruct/1 but no definition for the t/0 type" do
     assert_raise RuntimeError, ~r{t/0 type and the struct are automatically generated}, fn ->
       Code.eval_quoted(
         quote do
@@ -265,7 +265,7 @@ defmodule Protobuf.DSLTest do
     end
   end
 
-  test "raises a compilation error there is already a definition for the t/0 type but no defstruct" do
+  test "raises a compilation error if there is already a definition for the t/0 type but no defstruct" do
     assert_raise RuntimeError, ~r{the t/0 type and the struct are automatically generated}, fn ->
       Code.eval_quoted(
         quote do
