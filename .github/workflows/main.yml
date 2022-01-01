@@ -13,8 +13,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        protoc:
-          - 3.17.3
         include:
           - otp: 24.0
             elixir: 1.13.1
@@ -37,7 +35,7 @@ jobs:
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
-          version: '${{ matrix.protoc }}'
+          version: '3.17.3'
           repo-token: ${{ secrets.GITHUB_TOKEN }} # to avoid rate limiting
 
       - name: Install OTP and Elixir
