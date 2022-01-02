@@ -147,8 +147,5 @@ jobs:
           echo "$PWD/deps/google_protobuf/src" >> $GITHUB_PATH
           echo "Using local protoc: $(protoc --version)"
 
-      - name: Test
-        run: ./deps/google_protobuf/conformance/conformance-test-runner --help
-
       - name: Run conformance tests
         run: mix conformance_test
