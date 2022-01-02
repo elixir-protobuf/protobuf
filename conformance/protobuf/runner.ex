@@ -4,11 +4,12 @@ defmodule Conformance.Protobuf.Runner do
   def main(_args) do
     Logger.configure_backend(:console, device: :standard_error)
     :io.setopts(:standard_io, encoding: :latin1)
+    IO.puts(:stderr, "Starting runner")
     loop()
   end
 
   defp loop() do
-    case IO.binread(:stdio, 4) do
+    case IO.inspect(:stderr, IO.binread(:stdio, 4), label: "Read 4 bytes stdin") do
       :eof ->
         :ok
 
