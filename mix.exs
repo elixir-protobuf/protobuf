@@ -231,15 +231,14 @@ defmodule Protobuf.Mixfile do
       options
       |> Keyword.get_lazy(:runner, fn ->
         path = path_in_protobuf_source("conformance/conformance-test-runner")
-        relative_path = Path.relative_to_cwd(path)
 
         if File.exists?(path) do
-          Mix.shell().info([:faint, "Using default conformance runner: ", :reset, relative_path])
+          Mix.shell().info([:faint, "Using default conformance runner: ", :reset, path])
           path
         else
           Mix.raise("""
           No --runner option was passed and we didn't find the default runner we use,
-          which should be in: #{relative_path}
+          which should be in: #{path}
 
           If you want to build the conformance runner locally from the Google Protobuf
           dependency of this library, run:
