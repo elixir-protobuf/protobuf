@@ -11,7 +11,16 @@ defmodule Conformance.Protobuf.Runner do
   defp loop() do
     IO.puts(:stderr, "About to read 4 bytes from stdin...")
 
-    case IO.inspect(:stderr, IO.binread(:stdio, 4), label: "Read 4 bytes stdin") do
+    four_bytes =
+      Enum.map(1..4, fn _ ->
+        IO.inspect(:stderr, IO.binread(:stdio, 1), label: "Read a byte from stdin")
+      end)
+      |> List.to_string()
+
+    IO.inspect(:stderr, four_bytes, label: "Read 4 bytes stdin")
+
+    # case IO.inspect(:stderr, IO.binread(:stdio, 4), label: "Read 4 bytes stdin") do
+    case four_bytes do
       :eof ->
         :ok
 
