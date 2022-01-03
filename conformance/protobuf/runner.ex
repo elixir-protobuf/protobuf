@@ -28,6 +28,9 @@ defmodule Conformance.Protobuf.Runner do
             mod = Conformance.ConformanceResponse
             result = handle_encoded_request(encoded_request)
             response = mod.new(result: result)
+
+            IO.inspect(:stderr, response, label: "Response")
+
             encoded_response = Protobuf.encode(response)
 
             :ok =
@@ -35,6 +38,8 @@ defmodule Conformance.Protobuf.Runner do
                 :stdio,
                 [<<IO.iodata_length(encoded_response)::unsigned-little-32>>, encoded_response]
               )
+
+            IO.puts(:stderr, "Wrote encoded response back on the wire")
 
             loop()
         end
