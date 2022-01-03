@@ -146,9 +146,9 @@ jobs:
 
       # We always need to do this, even if the cache hits.
       - name: Add protoc to the PATH
-        run: |
-          echo "$PWD/deps/google_protobuf/src" >> $GITHUB_PATH
-          echo "Using local protoc: $(protoc --version)"
+        run: echo "$PWD/deps/google_protobuf/src" >> $GITHUB_PATH
 
       - name: Run conformance tests
-        run: mix conformance_test
+        run: |
+          echo "Using local protoc: $(protoc --version)"
+          mix conformance_test

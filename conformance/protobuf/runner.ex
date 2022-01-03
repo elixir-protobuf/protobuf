@@ -42,7 +42,9 @@ defmodule Conformance.Protobuf.Runner do
   end
 
   defp handle_encoded_request(encoded_request) do
-    case safe_decode(encoded_request, Conformance.ConformanceRequest) do
+    case IO.inspect(:stderr, safe_decode(encoded_request, Conformance.ConformanceRequest),
+           label: "Decoded req"
+         ) do
       {:ok, request} ->
         handle_conformance_request(request)
 
