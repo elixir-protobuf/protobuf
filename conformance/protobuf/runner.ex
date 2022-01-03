@@ -1,26 +1,22 @@
 defmodule Conformance.Protobuf.Runner do
   @moduledoc false
 
-  def main(_args) do
+  @stdin_read_timeout 5000
+
+  @spec main() :: :ok
+  def main() do
+    # Log things to stderr so that they don't interfere with the stdin/stdout interface
+    # of the conformance runner.
     Logger.configure_backend(:console, device: :standard_error)
-    :io.setopts(:standard_io, encoding: :latin1)
-    IO.puts(:stderr, "Starting runner")
+
+    # Force encoding on stdio.
+    :ok = :io.setopts(:standard_io, binary: true, encoding: :latin1)
+
     loop()
   end
 
   defp loop() do
-    IO.puts(:stderr, "About to read 4 bytes from stdin...")
-
-    four_bytes =
-      Enum.map(1..4, fn _ ->
-        IO.inspect(:stderr, IO.binread(:stdio, 1), label: "Read a byte from stdin")
-      end)
-      |> List.to_string()
-
-    IO.inspect(:stderr, four_bytes, label: "Read 4 bytes stdin")
-
-    # case IO.inspect(:stderr, IO.binread(:stdio, 4), label: "Read 4 bytes stdin") do
-    case four_bytes do
+    case read_bytes(:stdio, 4, @stdin_read_timeout) do
       :eof ->
         :ok
 
@@ -28,7 +24,7 @@ defmodule Conformance.Protobuf.Runner do
         raise "failed to read 4-bytes header: #{inspect(reason)}"
 
       <<len::unsigned-little-32>> ->
-        case IO.inspect(:stderr, IO.binread(:stdio, len), label: "Read #{len} bytes stdin") do
+        case read_bytes(:stdio, len, @stdin_read_timeout) do
           :eof ->
             raise "received unexpected EOF when expecting #{len} bytes"
 
@@ -37,11 +33,9 @@ defmodule Conformance.Protobuf.Runner do
 
           encoded_request ->
             mod = Conformance.ConformanceResponse
-            result = handle_encoded_request(encoded_request)
-            response = mod.new!(result: result)
+            result_oneof = encoded_request |> IO.iodata_to_binary() |> handle_encoded_request()
+            response = mod.new!(result: result_oneof)
             encoded_response = Protobuf.encode(response)
-
-            IO.inspect(:stderr, response, label: "Response")
 
             iodata_to_write = [
               <<IO.iodata_length(encoded_response)::unsigned-little-32>>,
@@ -49,17 +43,19 @@ defmodule Conformance.Protobuf.Runner do
             ]
 
             :ok = IO.binwrite(:stdio, iodata_to_write)
-            IO.inspect(:stderr, iodata_to_write, label: "Wrote iodata back")
 
             loop()
         end
     end
   end
 
+  defp read_bytes(device, count, timeout) do
+    task = Task.async(fn -> IO.binread(device, count) end)
+    Task.await(task, timeout)
+  end
+
   defp handle_encoded_request(encoded_request) do
-    case IO.inspect(:stderr, safe_decode(encoded_request, Conformance.ConformanceRequest),
-           label: "Decoded req"
-         ) do
+    case safe_decode(encoded_request, Conformance.ConformanceRequest) do
       {:ok, request} ->
         handle_conformance_request(request)
 
