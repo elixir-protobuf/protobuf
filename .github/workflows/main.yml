@@ -123,25 +123,25 @@ jobs:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
 
-      - name: Cache dependencies
-        id: cache-deps
+      - name: Cache Elixir dependencies with compiled protoc
+        id: cache-deps-with-compiled-protoc
         uses: actions/cache@v2
         with:
           path: deps
-          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          key: ${{ runner.os }}-mix-and-protoc-${{ hashFiles('**/mix.lock') }}
 
       - name: Install dependencies
-        if: steps.cache-deps.outputs.cache-hit != 'true'
+        if: steps.cache-deps-with-compiled-protoc.outputs.cache-hit != 'true'
         run: mix deps.get
 
       - name: Update and install OS dependencies to build protoc locally
-        if: steps.cache-deps.outputs.cache-hit != 'true'
+        if: steps.cache-deps-with-compiled-protoc.outputs.cache-hit != 'true'
         # Dependencies from https://github.com/protocolbuffers/protobuf/blob/master/src/README.md
         run: sudo apt-get update && sudo apt-get install -y git autoconf automake libtool curl make g++ unzip
 
       # This builds protoc inside deps (not inside _build), so we can cache that whole directory.
       - name: Build protoc and the conformance runner from the local Protobuf dependency
-        if: steps.cache-deps.outputs.cache-hit != 'true'
+        if: steps.cache-deps-with-compiled-protoc.outputs.cache-hit != 'true'
         run: mix build_conformance_runner
 
       # We always need to do this, even if the cache hits.
