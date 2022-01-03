@@ -17,7 +17,7 @@ defmodule Conformance.Protobuf.Runner do
         raise "failed to read 4-bytes header: #{inspect(reason)}"
 
       <<len::unsigned-little-32>> ->
-        case IO.inspect(:stderr, IO.binread(:stdio, len), label: "Read #{len} butes stdin") do
+        case IO.inspect(:stderr, IO.binread(:stdio, len), label: "Read #{len} bytes stdin") do
           :eof ->
             raise "received unexpected EOF when expecting #{len} bytes"
 
@@ -27,19 +27,18 @@ defmodule Conformance.Protobuf.Runner do
           encoded_request ->
             mod = Conformance.ConformanceResponse
             result = handle_encoded_request(encoded_request)
-            response = mod.new(result: result)
+            response = mod.new!(result: result)
+            encoded_response = Protobuf.encode(response)
 
             IO.inspect(:stderr, response, label: "Response")
 
-            encoded_response = Protobuf.encode(response)
+            iodata_to_write = [
+              <<IO.iodata_length(encoded_response)::unsigned-little-32>>,
+              encoded_response
+            ]
 
-            :ok =
-              IO.binwrite(
-                :stdio,
-                [<<IO.iodata_length(encoded_response)::unsigned-little-32>>, encoded_response]
-              )
-
-            IO.puts(:stderr, "Wrote encoded response back on the wire")
+            IO.inspect(:stderr, iodata_to_write, label: "Writing iodata back")
+            :ok = IO.binwrite(:stdio, iodata_to_write)
 
             loop()
         end
