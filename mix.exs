@@ -256,11 +256,11 @@ defmodule Protobuf.Mixfile do
       "--enforce_recommended",
       "--failure_list",
       "conformance/exemptions.txt",
-      "./conformance/runner.exs"
+      "./conformance/runner.sh"
     ]
 
     args = if verbose?, do: ["--verbose"] ++ args, else: args
-    cmd!("#{runner} #{Enum.join(args, " ")}", %{"MIX_ENV" => Atom.to_string(Mix.env())})
+    cmd!("#{runner} #{Enum.join(args, " ")}")
   end
 
   defp build_conformance_runner(_args) do
@@ -272,10 +272,10 @@ defmodule Protobuf.Mixfile do
     end)
   end
 
-  defp cmd!(cmd, env \\ %{}) do
+  defp cmd!(cmd) do
     Mix.shell().info([:cyan, "Running: ", :reset, cmd])
 
-    case Mix.shell().cmd(cmd, env: env) do
+    case Mix.shell().cmd(cmd) do
       0 -> :ok
       other -> Mix.raise("Command exited with non-zero status: #{other}")
     end
