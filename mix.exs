@@ -144,8 +144,10 @@ defmodule Protobuf.Mixfile do
   end
 
   defp gen_test_protos(_args) do
+    proto_src = path_in_protobuf_source(["src"])
+
     protoc!(
-      "-I src -I test/protobuf/protoc/proto --elixir_out=generated",
+      "-I #{proto_src} -I src -I test/protobuf/protoc/proto --elixir_out=generated",
       ["test/protobuf/protoc/proto/extension.proto"]
     )
 

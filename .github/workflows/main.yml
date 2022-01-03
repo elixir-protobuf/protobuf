@@ -109,7 +109,7 @@ jobs:
       fail-fast: false
       matrix:
         otp: [24.0]
-        elixir: [1.12.3]
+        elixir: [1.13.0]
 
     env:
       MIX_ENV: test
