@@ -17,7 +17,7 @@ defmodule Conformance.Protobuf.Runner do
         raise "failed to read 4-bytes header: #{inspect(reason)}"
 
       <<len::unsigned-little-32>> ->
-        case IO.binread(:stdio, len) do
+        case IO.inspect(:stderr, IO.binread(:stdio, len), label: "Read #{len} butes stdin") do
           :eof ->
             raise "received unexpected EOF when expecting #{len} bytes"
 

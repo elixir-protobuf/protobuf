@@ -117,33 +117,33 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Update and install dependencies to build protoc locally
-        # Dependencies from https://github.com/protocolbuffers/protobuf/blob/master/src/README.md
-        run: sudo apt-get update && sudo apt-get install -y git autoconf automake libtool curl make g++ unzip jq
-
       - name: Install OTP and Elixir
         uses: erlef/setup-elixir@v1
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
 
-      # - name: Cache dependencies
-      #   id: cache-deps
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: deps/google_protobuf
-      #     key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+      - name: Cache dependencies
+        id: cache-deps
+        uses: actions/cache@v2
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
 
       - name: Install dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: mix deps.get
 
+      - name: Update and install OS dependencies to build protoc locally
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        # Dependencies from https://github.com/protocolbuffers/protobuf/blob/master/src/README.md
+        run: sudo apt-get update && sudo apt-get install -y git autoconf automake libtool curl make g++ unzip
+
+      # This builds protoc inside deps (not inside _build), so we can cache that whole directory.
       - name: Build protoc and the conformance runner from the local Protobuf dependency
         if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: mix build_conformance_runner
-
-      - name: Add local protoc to $GITHUB_PATH
         run: |
+          mix build_conformance_runner
           echo "$PWD/deps/google_protobuf/src" >> $GITHUB_PATH
           echo "Using local protoc: $(protoc --version)"
 
