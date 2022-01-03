@@ -142,8 +142,11 @@ jobs:
       # This builds protoc inside deps (not inside _build), so we can cache that whole directory.
       - name: Build protoc and the conformance runner from the local Protobuf dependency
         if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: mix build_conformance_runner
+
+      # We always need to do this, even if the cache hits.
+      - name: Add protoc to the PATH
         run: |
-          mix build_conformance_runner
           echo "$PWD/deps/google_protobuf/src" >> $GITHUB_PATH
           echo "Using local protoc: $(protoc --version)"
 
