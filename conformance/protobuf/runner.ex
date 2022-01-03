@@ -9,6 +9,8 @@ defmodule Conformance.Protobuf.Runner do
   end
 
   defp loop() do
+    IO.puts(:stderr, "About to read 4 bytes from stdin...")
+
     case IO.inspect(:stderr, IO.binread(:stdio, 4), label: "Read 4 bytes stdin") do
       :eof ->
         :ok
@@ -37,8 +39,8 @@ defmodule Conformance.Protobuf.Runner do
               encoded_response
             ]
 
-            IO.inspect(:stderr, iodata_to_write, label: "Writing iodata back")
             :ok = IO.binwrite(:stdio, iodata_to_write)
+            IO.inspect(:stderr, iodata_to_write, label: "Wrote iodata back")
 
             loop()
         end
