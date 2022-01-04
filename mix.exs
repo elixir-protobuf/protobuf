@@ -103,6 +103,8 @@ defmodule Protobuf.Mixfile do
         &create_generated_dir/1,
         &gen_google_test_protos/1,
         &gen_conformance_protos/1,
+        fn _ -> Mix.Task.reenable("escript.build") end,
+        &build_escript/1,
         &run_conformance_tests/1
       ],
       gen_bench_protos: [&build_escript/1, &gen_bench_protos/1],
