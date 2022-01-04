@@ -184,8 +184,24 @@ defmodule Protobuf.JSON do
       {:ok, %{"color" => :GREEN, "topSpeed" => 0.0}}
 
   """
+  boolean_opts = [:use_proto_names, :use_enum_numbers, :emit_unpopulated]
+
   @spec to_encodable(struct, [encode_opt]) :: {:ok, json_data} | {:error, EncodeError.t()}
   def to_encodable(%_{} = struct, opts \\ []) when is_list(opts) do
+    Enum.each(opts, fn
+      {key, value} when key in unquote(boolean_opts) and is_boolean(value) ->
+        :ok
+
+      {key, value} when key in unquote(boolean_opts) ->
+        raise ArgumentError, "option #{inspect(key)} must be a boolean, got: #{inspect(value)}"
+
+      {key, _value} ->
+        raise ArgumentError, "unknown option: #{inspect(key)}"
+
+      other ->
+        raise ArgumentError, "invalid element in options list: #{inspect(other)}"
+    end)
+
     {:ok, Encode.to_encodable(struct, opts)}
   catch
     error -> {:error, EncodeError.new(error)}

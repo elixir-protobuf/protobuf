@@ -27,4 +27,20 @@ defmodule Protobuf.JSONTest do
       end
     end
   end
+
+  describe "to_encodable/2" do
+    test "validates options" do
+      assert_raise ArgumentError, ~r"option :use_proto_names must be a boolean", fn ->
+        Protobuf.JSON.to_encodable(%TestMsg.Foo2{b: 10}, use_proto_names: :no_bool)
+      end
+
+      assert_raise ArgumentError, "unknown option: :unknown_opt", fn ->
+        Protobuf.JSON.to_encodable(%TestMsg.Foo2{b: 10}, unknown_opt: 1)
+      end
+
+      assert_raise ArgumentError, "invalid element in options list: :bad_value", fn ->
+        Protobuf.JSON.to_encodable(%TestMsg.Foo2{b: 10}, [:bad_value])
+      end
+    end
+  end
 end
