@@ -1,6 +1,10 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   test:
@@ -11,7 +15,7 @@ jobs:
       matrix:
         include:
           - otp: 24.0
-            elixir: 1.12.1
+            elixir: 1.12.3
             lint: true
             integration: true
           - otp: 23.3
@@ -20,10 +24,13 @@ jobs:
             elixir: 1.10.4
           - otp: 22.3
             elixir: 1.9.4
+
     env:
       MIX_ENV: test
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout this repo
+        uses: actions/checkout@v2
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
@@ -34,8 +41,8 @@ jobs:
       - name: Install OTP and Elixir
         uses: erlef/setup-elixir@v1
         with:
-          otp-version: ${{matrix.otp}}
-          elixir-version: ${{matrix.elixir}}
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
 
       - name: Cache dependencies
         id: cache-deps
@@ -50,21 +57,21 @@ jobs:
 
       - name: Check for unused dependencies
         run: mix deps.unlock --check-unused
-        if: ${{matrix.lint}}
+        if: ${{ matrix.lint }}
 
       - name: Compile with --warnings-as-errors
         run: mix compile --warnings-as-errors
-        if: ${{matrix.lint}}
+        if: ${{ matrix.lint }}
 
       - name: Check mix format
         run: mix format --check-formatted
-        if: ${{matrix.lint}}
+        if: ${{ matrix.lint }}
 
       - name: Run tests
-        run: mix test --trace
+        run: mix test
 
       - name: Compile .proto files to Elixir with protoc
-        if: ${{matrix.integration}}
+        if: ${{ matrix.integration }}
         env:
           PROTO_BENCH: ./deps/google_protobuf/benchmarks
         run: |
@@ -73,11 +80,11 @@ jobs:
           mix gen_bench_protos
 
       - name: Run integration tests
-        if: ${{matrix.integration}}
+        if: ${{ matrix.integration }}
         run: mix test --only integration
 
       - name: Check that generated files did not change
-        if: ${{matrix.integration}}
+        if: ${{ matrix.integration }}
         run: |
           rm -rf ./google_protobuf
           if [[ -n "$(git status -uno --porcelain)" ]]; then
@@ -94,3 +101,54 @@ jobs:
           else
             echo "Generated .pb.ex are up to date"
           fi
+
+  conformance-test:
+    name: Conformance test (Elixir ${{matrix.elixir}} | Erlang/OTP ${{matrix.otp}})
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        otp: [24.2]
+        elixir: [1.13.1]
+
+    env:
+      MIX_ENV: test
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install OTP and Elixir
+        uses: erlef/setup-elixir@v1
+        with:
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+
+      - name: Cache Elixir dependencies with compiled protoc
+        id: cache-deps-with-compiled-protoc
+        uses: actions/cache@v2
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-and-protoc-${{ hashFiles('**/mix.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache-deps-with-compiled-protoc.outputs.cache-hit != 'true'
+        run: mix deps.get
+
+      - name: Update and install OS dependencies to build protoc locally
+        if: steps.cache-deps-with-compiled-protoc.outputs.cache-hit != 'true'
+        # Dependencies from https://github.com/protocolbuffers/protobuf/blob/master/src/README.md
+        run: sudo apt-get update && sudo apt-get install -y git autoconf automake libtool curl make g++ unzip
+
+      # This builds protoc inside deps (not inside _build), so we can cache that whole directory.
+      - name: Build protoc and the conformance runner from the local Protobuf dependency
+        if: steps.cache-deps-with-compiled-protoc.outputs.cache-hit != 'true'
+        run: mix build_conformance_runner
+
+      # We always need to do this, even if the cache hits.
+      - name: Add protoc to the PATH
+        run: echo "$PWD/deps/google_protobuf/src" >> $GITHUB_PATH
+
+      - name: Run conformance tests
+        run: |
+          echo "Using local protoc: $(protoc --version)"
+          mix conformance_test

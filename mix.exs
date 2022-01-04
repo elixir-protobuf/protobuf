@@ -103,6 +103,8 @@ defmodule Protobuf.Mixfile do
         &create_generated_dir/1,
         &gen_google_test_protos/1,
         &gen_conformance_protos/1,
+        fn _ -> Mix.Task.reenable("escript.build") end,
+        &build_escript/1,
         &run_conformance_tests/1
       ],
       gen_bench_protos: [&build_escript/1, &gen_bench_protos/1],
@@ -144,8 +146,10 @@ defmodule Protobuf.Mixfile do
   end
 
   defp gen_test_protos(_args) do
+    proto_src = path_in_protobuf_source(["src"])
+
     protoc!(
-      "-I src -I test/protobuf/protoc/proto --elixir_out=generated",
+      "-I #{proto_src} -I src -I test/protobuf/protoc/proto --elixir_out=generated",
       ["test/protobuf/protoc/proto/extension.proto"]
     )
 
@@ -231,15 +235,14 @@ defmodule Protobuf.Mixfile do
       options
       |> Keyword.get_lazy(:runner, fn ->
         path = path_in_protobuf_source("conformance/conformance-test-runner")
-        relative_path = Path.relative_to_cwd(path)
 
         if File.exists?(path) do
-          Mix.shell().info([:faint, "Using default conformance runner: ", :reset, relative_path])
+          Mix.shell().info([:faint, "Using default conformance runner: ", :reset, path])
           path
         else
           Mix.raise("""
           No --runner option was passed and we didn't find the default runner we use,
-          which should be in: #{relative_path}
+          which should be in: #{path}
 
           If you want to build the conformance runner locally from the Google Protobuf
           dependency of this library, run:

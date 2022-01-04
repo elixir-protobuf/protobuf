@@ -1,14 +1,22 @@
 defmodule Conformance.Protobuf.Runner do
   @moduledoc false
 
-  def main(_args) do
+  @stdin_read_timeout 5000
+
+  @spec main() :: :ok
+  def main() do
+    # Log things to stderr so that they don't interfere with the stdin/stdout interface
+    # of the conformance runner.
     Logger.configure_backend(:console, device: :standard_error)
-    :io.setopts(:standard_io, encoding: :latin1)
+
+    # Force encoding on stdio.
+    :ok = :io.setopts(:standard_io, binary: true, encoding: :latin1)
+
     loop()
   end
 
   defp loop() do
-    case IO.binread(:stdio, 4) do
+    case read_bytes(:stdio, 4, @stdin_read_timeout) do
       :eof ->
         :ok
 
@@ -16,7 +24,7 @@ defmodule Conformance.Protobuf.Runner do
         raise "failed to read 4-bytes header: #{inspect(reason)}"
 
       <<len::unsigned-little-32>> ->
-        case IO.binread(:stdio, len) do
+        case read_bytes(:stdio, len, @stdin_read_timeout) do
           :eof ->
             raise "received unexpected EOF when expecting #{len} bytes"
 
@@ -25,19 +33,25 @@ defmodule Conformance.Protobuf.Runner do
 
           encoded_request ->
             mod = Conformance.ConformanceResponse
-            result = handle_encoded_request(encoded_request)
-            response = mod.new(result: result)
+            result_oneof = encoded_request |> IO.iodata_to_binary() |> handle_encoded_request()
+            response = mod.new!(result: result_oneof)
             encoded_response = Protobuf.encode(response)
 
-            :ok =
-              IO.binwrite(
-                :stdio,
-                [<<IO.iodata_length(encoded_response)::unsigned-little-32>>, encoded_response]
-              )
+            iodata_to_write = [
+              <<IO.iodata_length(encoded_response)::unsigned-little-32>>,
+              encoded_response
+            ]
+
+            :ok = IO.binwrite(:stdio, iodata_to_write)
 
             loop()
         end
     end
+  end
+
+  defp read_bytes(device, count, timeout) do
+    task = Task.async(fn -> IO.binread(device, count) end)
+    Task.await(task, timeout)
   end
 
   defp handle_encoded_request(encoded_request) do
