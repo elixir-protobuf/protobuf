@@ -9,13 +9,10 @@ defmodule Protobuf.Protoc.Generator.Util do
 
   @spec mod_name(Context.t(), [String.t()]) :: String.t()
   def mod_name(%Context{} = ctx, ns) when is_list(ns) do
-    parts =
-      case camelcase_prefix(ctx) do
-        "" -> ns
-        prefix -> [prefix | ns]
-      end
-
-    Enum.join(parts, ".")
+    case camelcase_prefix(ctx) do
+      "" -> Enum.map_join(ns, ".", &Macro.camelize/1)
+      prefix -> prefix <> "." <> Enum.map_join(ns, ".", &Macro.camelize/1)
+    end
   end
 
   defp camelcase_prefix(%{package_prefix: nil, module_prefix: nil, package: nil} = _ctx),

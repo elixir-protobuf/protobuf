@@ -28,6 +28,10 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
       ctx = %Context{module_prefix: "overrides", package_prefix: "custom.prefix", package: "pkg"}
       assert mod_name(ctx, ["Foo", "Bar"]) == "Overrides.Foo.Bar"
     end
+
+    test "ensure all components of namespace are camel-case'd" do
+      assert mod_name(%Context{module_prefix: nil}, ["foo", "Bar"]) == "Foo.Bar"
+    end
   end
 
   describe "options_to_str/1" do
