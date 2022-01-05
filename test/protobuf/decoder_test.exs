@@ -265,7 +265,7 @@ defmodule Protobuf.DecoderTest do
       bin = group_start <> field
 
       assert_raise Protobuf.DecodeError,
-                   ~r{invalid wire_type for skipped field a: got 7, expected 0},
+                   "invalid wire_type for skipped field a: got 7, expected 0",
                    fn -> Decoder.decode(bin, TestMsg.Foo) end
     end
   end
