@@ -138,7 +138,7 @@ defmodule Protobuf.Wire.Varint do
           x6::7, 1::1, x7::7, 1::1, x8::7, 0::1, x9::7>>
       end,
       quote(generated: true) do
-        band(
+        v =
           x0 +
             bsl(x1, 7) +
             bsl(x2, 14) +
@@ -148,9 +148,9 @@ defmodule Protobuf.Wire.Varint do
             bsl(x6, 42) +
             bsl(x7, 49) +
             bsl(x8, 56) +
-            bsl(x9, 63),
-          unquote(@mask64)
-        )
+            bsl(x9, 63)
+
+        _ = band(v, unquote(@mask64))
       end
     }
   ]
