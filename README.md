@@ -54,7 +54,7 @@ end
    install the protocol buffer compiler (`protoc`). MacOS users can also install it through
    Homebrew with `brew install protobuf`.
 
-2. Install `protoc` plugin `protoc-gen-elixir` for Elixir using the command below. Make sure the
+2a. Install `protoc` plugin `protoc-gen-elixir` for Elixir using the command below. Make sure the
    `protoc-gen-elixir` binary is in your `PATH`. Either add `PATH=~/.mix/escripts:$PATH` to your
    bash or zsh profile or, if you used asdf to install elixir, run `asdf reshim` and then verify
    that `protoc-gen-elixir` works:
@@ -63,11 +63,31 @@ end
     $ mix escript.install hex protobuf
     ```
 
-3. Generate Elixir code using `protoc`:
+    Then:
+
+    Generate Elixir code using `protoc`:
 
     ```bash
     $ protoc --elixir_out=./lib helloworld.proto
     ```
+
+2b. Add `proto` to your project's compiler list:
+
+  ```elixir
+  def project do
+    [
+      ...
+      compilers: [:proto | Mix.compilers()]
+      ...
+    ]
+  end
+  ```
+
+  Your `.proto` files will be compiled whenever you type `mix compile` or `iex
+  -S mix`. The files will be recompiled if you make any changes in the source
+  `.proto` files or compiler options.
+
+  See `mix help compile.proto` for available options.
 
 4. A `lib/helloworld.pb.ex` file will be generated, like:
 
