@@ -255,5 +255,18 @@ defmodule Protobuf.DecoderTest do
         Decoder.decode(<<19>>, TestMsg.Foo)
       end
     end
+
+    test "raises when group contains unknown wire type" do
+      # field number 2, wire type 3
+      group_start = <<19>>
+      # field number 1, wire type 7, value 42
+      field = <<15, 42>>
+
+      bin = group_start <> field
+
+      assert_raise Protobuf.DecodeError,
+                   ~r{invalid wire_type for skipped field a: got 7, expected 0},
+                   fn -> Decoder.decode(bin, TestMsg.Foo) end
+    end
   end
 end
