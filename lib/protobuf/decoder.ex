@@ -115,6 +115,18 @@ defmodule Protobuf.Decoder do
       wire_64bits() ->
         <<_skip::bits-64, rest::bits>> = rest
         skip_field(rest, message, props, groups)
+
+      wire_type ->
+        message =
+          case props.field_props do
+            %{^field_number => %FieldProps{wire_type: expected, name: field}} ->
+              "field #{field}: got #{wire_type}, expected #{expected}"
+
+            _ ->
+              "field_number #{field_number}: got #{wire_type}"
+          end
+
+        raise DecodeError, message: "invalid wire_type for skipped " <> message
     end
   end
 
