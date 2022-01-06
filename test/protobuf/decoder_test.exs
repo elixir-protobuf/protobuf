@@ -34,6 +34,15 @@ defmodule Protobuf.DecoderTest do
     end)
   end
 
+  test "raises for length-delimited string with wrong length" do
+    # correct length is <<8, 1, 18, 2, 48, 48>>
+    bin = <<8, 1, 18, 3, 48, 48>>
+
+    assert_raise(Protobuf.DecodeError, ~r{insufficient data decoding field b}, fn ->
+      Decoder.decode(bin, TestMsg.Foo.Bar)
+    end)
+  end
+
   test "skips unknown string fields" do
     struct = Decoder.decode(<<8, 42, 45, 0, 0, 247, 66>>, TestMsg.Foo)
     assert struct == TestMsg.Foo.new(a: 42, d: 123.5)
