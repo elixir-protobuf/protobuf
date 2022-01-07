@@ -48,7 +48,7 @@ defmodule Protobuf.Protoc.CLI do
 
     ctx =
       %Context{}
-      |> parse_params(request.parameter || "")
+      |> parse_params(request.parameter)
       |> find_types(request.proto_file)
 
     files =
@@ -68,6 +68,8 @@ defmodule Protobuf.Protoc.CLI do
 
   # Made public for testing.
   @doc false
+  def parse_params(%Context{} = ctx, nil), do: ctx
+
   def parse_params(%Context{} = ctx, params_str) when is_binary(params_str) do
     params_str
     |> String.split(",")

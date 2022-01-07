@@ -79,6 +79,12 @@ defmodule Protobuf.Protoc.CLITest do
         parse_params(%Context{}, "package_prefix=,gen_descriptors=true")
       end
     end
+
+    test "won't raise when there are no arguments" do
+      assert parse_params(%Context{}, "") == %Context{}
+
+      assert parse_params(%Context{}, nil) == %Context{}
+    end
   end
 
   describe "find_types/2" do
