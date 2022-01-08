@@ -6,6 +6,12 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
   alias Protobuf.Protoc.Context
 
   describe "mod_name/2" do
+    test "camelizes components" do
+      assert mod_name(%Context{}, ["lowercaseName"]) == "LowercaseName"
+      assert mod_name(%Context{}, ["lowercase", "name"]) == "Lowercase.Name"
+      assert mod_name(%Context{}, ["Upper", "lower"]) == "Upper.Lower"
+    end
+
     test "can handle nil prefix" do
       assert mod_name(%Context{module_prefix: nil}, ["Foo", "Bar"]) == "Foo.Bar"
     end
@@ -14,7 +20,7 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
       assert mod_name(%Context{module_prefix: ""}, ["Foo", "Bar"]) == "Foo.Bar"
     end
 
-    test "returns right name" do
+    test "can handle non-empty module prefix" do
       assert mod_name(%Context{module_prefix: "custom.prefix"}, ["Foo", "Bar"]) ==
                "Custom.Prefix.Foo.Bar"
     end

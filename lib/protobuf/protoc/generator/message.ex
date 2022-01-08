@@ -164,13 +164,13 @@ defmodule Protobuf.Protoc.Generator.Message do
     end)
   end
 
-  defp field_type_name(ctx, f) do
-    type = from_enum(f.type)
+  defp field_type_name(ctx, %FieldDescriptorProto{type_name: type_name} = field_desc) do
+    case from_enum(field_desc.type) do
+      type when type in [:enum, :message] and not is_nil(type_name) ->
+        Util.type_from_type_name(ctx, type_name)
 
-    if f.type_name && (type == :enum || type == :message) do
-      Util.type_from_type_name(ctx, f.type_name)
-    else
-      ":#{type}"
+      type ->
+        inspect(type)
     end
   end
 

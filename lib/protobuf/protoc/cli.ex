@@ -118,8 +118,8 @@ defmodule Protobuf.Protoc.CLI do
   @doc false
   def find_types(%Context{} = ctx, descs) do
     global_type_mapping =
-      Map.new(descs, fn desc ->
-        {desc.name, find_types_in_proto(ctx, desc)}
+      Map.new(descs, fn %Google.Protobuf.FileDescriptorProto{name: filename} = desc ->
+        {filename, find_types_in_proto(ctx, desc)}
       end)
 
     %Context{ctx | global_type_mapping: global_type_mapping}
@@ -139,26 +139,24 @@ defmodule Protobuf.Protoc.CLI do
     find_types_in_proto(_types = %{}, ctx, desc.message_type ++ desc.enum_type)
   end
 
-  defp find_types_in_proto(types, ctx, descs) when is_list(descs) do
-    Enum.reduce(descs, types, fn desc, acc ->
-      find_types_in_proto(acc, ctx, desc)
-    end)
+  defp find_types_in_proto(types_acc, ctx, descs) when is_list(descs) do
+    Enum.reduce(descs, types_acc, &find_types_in_proto(_acc = &2, ctx, _desc = &1))
   end
 
-  defp find_types_in_proto(types, ctx, %Google.Protobuf.DescriptorProto{name: name} = desc) do
-    new_ctx = Map.update!(ctx, :namespace, &(&1 ++ [name]))
+  defp find_types_in_proto(types_acc, ctx, %Google.Protobuf.DescriptorProto{name: name} = desc) do
+    new_ctx = update_in(ctx.namespace, &(&1 ++ [name]))
 
-    types
+    types_acc
     |> update_types(ctx, name)
     |> find_types_in_proto(new_ctx, desc.enum_type)
     |> find_types_in_proto(new_ctx, desc.nested_type)
   end
 
-  defp find_types_in_proto(types, ctx, %Google.Protobuf.EnumDescriptorProto{name: name}) do
-    update_types(types, ctx, name)
+  defp find_types_in_proto(types_acc, ctx, %Google.Protobuf.EnumDescriptorProto{name: name}) do
+    update_types(types_acc, ctx, name)
   end
 
-  defp update_types(types, %{namespace: ns, package: pkg} = ctx, name) do
+  defp update_types(types, %Context{namespace: ns, package: pkg} = ctx, name) do
     type_name = Protobuf.Protoc.Generator.Util.mod_name(ctx, ns ++ [name])
 
     mapping_name =
