@@ -82,6 +82,34 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
       assert [mod] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
       assert mod == Mypkg.Foo.User
     end
+
+    # Regression test for https://github.com/elixir-protobuf/protobuf/issues/252
+    test "with lowercase enum", %{tmp_dir: tmp_dir} do
+      proto_path = Path.join(tmp_dir, "lowercase_enum.proto")
+
+      File.write!(proto_path, """
+      syntax = "proto3";
+
+      enum lowercaseEnum {
+        NOT_SET = 0;
+        SET = 1;
+      }
+
+      message UsesLowercaseEnum {
+        lowercaseEnum e = 1;
+      }
+      """)
+
+      protoc!([
+        "--proto_path=#{tmp_dir}",
+        "--elixir_out=#{tmp_dir}",
+        "--plugin=./protoc-gen-elixir",
+        proto_path
+      ])
+
+      assert [LowercaseEnum, UsesLowercaseEnum] =
+               compile_file_and_clean_modules_on_exit("#{tmp_dir}/lowercase_enum.pb.ex")
+    end
   end
 
   defp protoc!(args) do

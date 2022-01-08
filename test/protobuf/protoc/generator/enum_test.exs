@@ -90,4 +90,22 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
              "t() :: integer() | :A | :B | :HAS_UNDERSCORES | :HAS_UNDERSCORES_X | :HAS_UNDERSCORES_"
   end
+
+  test "generate/2 generates the right code when the enum name starts with lowercase" do
+    ctx = %Context{}
+
+    desc = %Google.Protobuf.EnumDescriptorProto{
+      name: "valueType",
+      options: nil,
+      value: [
+        Google.Protobuf.EnumValueDescriptorProto.new(name: "VALUE_TYPE_UNDEFINED", number: 0),
+        Google.Protobuf.EnumValueDescriptorProto.new(name: "VALUE_TYPE_INTEGER", number: 1)
+      ]
+    }
+
+    assert {module, msg} = Generator.generate(ctx, desc)
+
+    assert module == "ValueType"
+    assert msg =~ "defmodule ValueType do"
+  end
 end
