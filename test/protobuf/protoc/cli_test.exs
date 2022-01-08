@@ -87,11 +87,9 @@ defmodule Protobuf.Protoc.CLITest do
       descs = [FileDescriptorProto.new(name: "file1"), FileDescriptorProto.new(name: "file2")]
 
       assert %Context{global_type_mapping: %{"file1" => %{}, "file2" => %{}}} =
-               find_types(ctx, descs)
+               find_types(ctx, descs, [])
     end
-  end
 
-  describe "find_types_in_proto/1" do
     test "merge message and enum" do
       desc =
         FileDescriptorProto.new(
@@ -102,9 +100,11 @@ defmodule Protobuf.Protoc.CLITest do
         )
 
       assert %{
-               ".pkg.Msg" => %{type_name: "Pkg.Msg"},
-               ".pkg.Enum" => %{type_name: "Pkg.Enum"}
-             } = find_types_in_proto(%Context{}, desc)
+               "file1" => %{
+                 ".pkg.Msg" => %{type_name: "Pkg.Msg"},
+                 ".pkg.Enum" => %{type_name: "Pkg.Enum"}
+               }
+             } = find_types(%Context{}, [desc], []).global_type_mapping
     end
 
     test "have nested message types" do
@@ -122,10 +122,12 @@ defmodule Protobuf.Protoc.CLITest do
         )
 
       assert %{
-               ".pkg.Msg" => %{type_name: "Pkg.Msg"},
-               ".pkg.Msg.NestedMsg" => %{type_name: "Pkg.Msg.NestedMsg"},
-               ".pkg.Msg.NestedEnumMsg" => %{type_name: "Pkg.Msg.NestedEnumMsg"}
-             } = find_types_in_proto(%Context{}, desc)
+               "file1" => %{
+                 ".pkg.Msg" => %{type_name: "Pkg.Msg"},
+                 ".pkg.Msg.NestedMsg" => %{type_name: "Pkg.Msg.NestedMsg"},
+                 ".pkg.Msg.NestedEnumMsg" => %{type_name: "Pkg.Msg.NestedEnumMsg"}
+               }
+             } = find_types(%Context{}, [desc], []).global_type_mapping
     end
 
     test "have deeper nested message types" do
@@ -147,10 +149,12 @@ defmodule Protobuf.Protoc.CLITest do
         )
 
       assert %{
-               ".pkg.Msg" => %{type_name: "Pkg.Msg"},
-               ".pkg.Msg.NestedMsg" => %{type_name: "Pkg.Msg.NestedMsg"},
-               ".pkg.Msg.NestedMsg.NestedMsg2" => %{type_name: "Pkg.Msg.NestedMsg.NestedMsg2"}
-             } = find_types_in_proto(%Context{}, desc)
+               "file1" => %{
+                 ".pkg.Msg" => %{type_name: "Pkg.Msg"},
+                 ".pkg.Msg.NestedMsg" => %{type_name: "Pkg.Msg.NestedMsg"},
+                 ".pkg.Msg.NestedMsg.NestedMsg2" => %{type_name: "Pkg.Msg.NestedMsg.NestedMsg2"}
+               }
+             } = find_types(%Context{}, [desc], []).global_type_mapping
     end
 
     test "supports elixir_module_prefix" do
@@ -170,9 +174,55 @@ defmodule Protobuf.Protoc.CLITest do
         )
 
       assert %{
-               ".pkg.Msg" => %{type_name: "FooBar.Prefix.Msg"},
-               ".pkg.Enum" => %{type_name: "FooBar.Prefix.Enum"}
-             } = find_types_in_proto(%Context{}, desc)
+               "file1" => %{
+                 ".pkg.Msg" => %{type_name: "FooBar.Prefix.Msg"},
+                 ".pkg.Enum" => %{type_name: "FooBar.Prefix.Enum"}
+               }
+             } = find_types(%Context{}, [desc], []).global_type_mapping
+    end
+
+    test "supports package_prefix" do
+      ctx = %Context{package_prefix: "pkg_prefix"}
+      files_to_generate = ["file1"]
+
+      descs = [
+        FileDescriptorProto.new(
+          name: "file1",
+          package: "pkg",
+          message_type: [DescriptorProto.new(name: "Msg")]
+        )
+      ]
+
+      assert find_types(ctx, descs, files_to_generate).global_type_mapping == %{
+               "file1" => %{".pkg.Msg" => %{type_name: "PkgPrefix.Pkg.Msg"}}
+             }
+    end
+
+    test "doesn't prepend package_prefix to type mappings for files that are not to be generated" do
+      ctx = %Context{package_prefix: "pkg_prefix"}
+      files_to_generate = ["file_to_generate"]
+
+      descs = [
+        FileDescriptorProto.new(
+          name: "file_to_generate",
+          package: "pkg",
+          message_type: [DescriptorProto.new(name: "Msg")]
+        ),
+        FileDescriptorProto.new(
+          name: "not_in_files_to_generate",
+          package: "other_pkg",
+          message_type: [DescriptorProto.new(name: "OtherMsg")]
+        )
+      ]
+
+      assert find_types(ctx, descs, files_to_generate).global_type_mapping == %{
+               "file_to_generate" => %{
+                 ".pkg.Msg" => %{type_name: "PkgPrefix.Pkg.Msg"}
+               },
+               "not_in_files_to_generate" => %{
+                 ".other_pkg.OtherMsg" => %{type_name: "OtherPkg.OtherMsg"}
+               }
+             }
     end
   end
 end
