@@ -112,6 +112,35 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
     end
   end
 
+  # Regression test for https://github.com/elixir-protobuf/protobuf/issues/242
+  test "with external packages and the package_prefix option", %{tmp_dir: tmp_dir} do
+    proto_path = Path.join(tmp_dir, "timestamp_wrapper.proto")
+
+    File.write!(proto_path, """
+    syntax = "proto3";
+
+    import "google/protobuf/timestamp.proto";
+
+    message TimestampWrapper {
+      google.protobuf.Timestamp some_time = 1;
+    }
+    """)
+
+    protoc!([
+      "--proto_path=#{tmp_dir}",
+      "--proto_path=#{Mix.Project.deps_paths().google_protobuf}/src",
+      "--elixir_out=#{tmp_dir}",
+      "--elixir_opt=package_prefix=my_type",
+      "--plugin=./protoc-gen-elixir",
+      proto_path
+    ])
+
+    assert [mod] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/timestamp_wrapper.pb.ex")
+
+    assert mod == MyType.TimestampWrapper
+    assert Map.fetch!(mod.__message_props__().field_props, 1).type == Google.Protobuf.Timestamp
+  end
+
   defp protoc!(args) do
     {output, exit_code} = System.cmd("protoc", args, stderr_to_stdout: true)
 
