@@ -7,9 +7,9 @@ defmodule Protobuf.UnknownFieldsTest do
   alias ProtobufTestMessages.Proto3.TestAllTypesProto3
 
   property "round-trip encoding and decoding of unknown fields" do
-    unknown_field_generator = unknown_field_generator()
+    unknown_fields_generator = list_of(unknown_field_generator())
 
-    check all unknown_fields <- list_of(unknown_field_generator) do
+    check all unknown_fields <- unknown_fields_generator, max_runs: 20 do
       decoded =
         TestAllTypesProto3.new!([])
         |> Map.put(:__unknown_fields__, unknown_fields)

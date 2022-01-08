@@ -27,7 +27,7 @@ defmodule Protobuf.DSL.TypespecsTest do
     end
 
     property "works for any number of possible enum values" do
-      check all field_names <- list_of(atom(:alphanumeric), min_length: 1) do
+      check all field_names <- list_of(atom(:alphanumeric), min_length: 1), max_runs: 10 do
         field_props =
           field_names
           |> Enum.with_index(1)
