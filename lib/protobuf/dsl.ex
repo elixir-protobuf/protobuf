@@ -56,7 +56,45 @@ defmodule Protobuf.DSL do
     defines_defstruct? = Module.defines?(env.module, {:__struct__, 1})
 
     quote do
-      @spec __message_props__() :: Protobuf.MessageProps.t()
+      alias Protobuf.MessageProps
+      alias Protobuf.FieldProps
+
+      @typep field_props :: %FieldProps{
+               fnum: integer,
+               name: String.t(),
+               name_atom: atom,
+               json_name: String.t(),
+               wire_type: 0..5,
+               type: atom | tuple,
+               default: any,
+               oneof: non_neg_integer | nil,
+               required?: boolean,
+               optional?: boolean,
+               repeated?: boolean,
+               enum?: boolean,
+               embedded?: boolean,
+               packed?: boolean,
+               map?: boolean,
+               deprecated?: boolean,
+               encoded_fnum: iodata
+             }
+
+      @spec __message_props__() :: %MessageProps{
+              ordered_tags: [MessageProps.tag()],
+              tags_map: %{MessageProps.tag() => MessageProps.tag()},
+              field_props: %{MessageProps.tag() => field_props()},
+              field_tags: %{MessageProps.field_name() => MessageProps.tag()},
+              repeated_fields: [MessageProps.field_name()],
+              embedded_fields: [MessageProps.field_name()],
+              syntax: atom(),
+              oneof: [{MessageProps.field_name(), MessageProps.tag()}],
+              enum?: boolean(),
+              extendable?: boolean(),
+              map?: boolean(),
+              extension_range: [{non_neg_integer(), non_neg_integer()}] | nil
+            }
+
+      # @spec __message_props__() :: Protobuf.MessageProps.t()
       def __message_props__ do
         unquote(Macro.escape(msg_props))
       end
