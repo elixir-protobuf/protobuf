@@ -3,6 +3,7 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
 
   alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator.Service, as: Generator
+  alias Protobuf.Protoc.Generator.Util
 
   test "generate/2 generates services" do
     ctx = %Context{
@@ -52,7 +53,10 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
 
     assert {"Foo.ServiceFoo", msg} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo.ServiceFoo.Service do\n"
-    assert msg =~ "use GRPC.Service, name: \"foo.ServiceFoo\"\n"
+
+    assert msg =~
+             "use GRPC.Service, name: \"foo.ServiceFoo\", protoc_gen_elixir_version: \"#{Util.version()}\"\n"
+
     assert msg =~ "rpc :MethodA, Foo.Input0, Foo.Output0\n"
     assert msg =~ "rpc :MethodB, stream(Foo.Input1), Foo.Output1\n"
     assert msg =~ "rpc :MethodC, Foo.Input2, stream(Foo.Output2)\n"

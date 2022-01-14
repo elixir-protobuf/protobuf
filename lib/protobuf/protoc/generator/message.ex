@@ -82,7 +82,8 @@ defmodule Protobuf.Protoc.Generator.Message do
     opts = %{
       syntax: syntax,
       map: msg_options && msg_options.map_entry,
-      deprecated: msg_options && msg_options.deprecated
+      deprecated: msg_options && msg_options.deprecated,
+      protoc_gen_elixir_version: "\"#{Util.version()}\""
     }
 
     str = Util.options_to_str(opts)

@@ -82,4 +82,10 @@ defmodule Protobuf.Protoc.Generator.Util do
     |> Code.format_string!(locals_without_parens: @locals_without_parens)
     |> IO.iodata_to_binary()
   end
+
+  @spec version() :: String.t()
+  def version do
+    {:ok, value} = :application.get_key(:protobuf, :vsn)
+    List.to_string(value)
+  end
 end

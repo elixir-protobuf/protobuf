@@ -3,6 +3,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
   alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator.Message, as: Generator
+  alias Protobuf.Protoc.Generator.Util
   alias Protobuf.TestHelpers
 
   test "generate/2 has right name" do
@@ -10,7 +11,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
-    assert msg =~ "use Protobuf\n"
+    assert msg =~ "use Protobuf, protoc_gen_elixir_version: \"#{Util.version()}\"\n"
 
     assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
 
@@ -25,7 +26,10 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
-    assert msg =~ "use Protobuf, syntax: :proto3\n"
+
+    assert msg =~
+             "use Protobuf, protoc_gen_elixir_version: \"#{Util.version()}\", syntax: :proto3\n"
+
     assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
@@ -63,7 +67,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       )
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "use Protobuf, map: true\n"
+    assert msg =~ "use Protobuf, map: true, protoc_gen_elixir_version: \"#{Util.version()}\"\n"
   end
 
   test "generate/2 has right fields" do
@@ -545,7 +549,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     {[[{_mod, msg}]], _} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo.Nested.EnumFoo do\n"
-    assert msg =~ "use Protobuf, enum: true\n"
+    assert msg =~ "use Protobuf, enum: true, protoc_gen_elixir_version: \"#{Util.version()}\"\n"
 
     assert msg =~ """
              field :a, 0

@@ -33,7 +33,8 @@ defmodule Protobuf.Protoc.Generator.Service do
          module: mod_name,
          service_name: name,
          methods: methods,
-         descriptor_fun_body: descriptor_fun_body
+         descriptor_fun_body: descriptor_fun_body,
+         version: Util.version()
        )
      )}
   end
