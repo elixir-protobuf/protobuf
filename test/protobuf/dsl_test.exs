@@ -228,6 +228,25 @@ defmodule Protobuf.DSLTest do
     assert TestMsg.WithTransformModule.transform_module() == TestMsg.TransformModule
   end
 
+  test "emits a warning if there is already a definition for the t/0 type for an enum" do
+    output =
+      capture_io(:stderr, fn ->
+        Code.eval_quoted(
+          quote do
+            defmodule MessageWithWarning do
+              use Protobuf, syntax: :proto3, enum: true
+
+              @type t() :: integer() | :FOO
+
+              field :FOO, 0, type: :bool
+            end
+          end
+        )
+      end)
+
+    assert output =~ "the t/0 type in Protobuf enum modules is automatically generated"
+  end
+
   test "emits a warning if there is already a call to defstruct/1 and a definition for the t/0 type" do
     output =
       capture_io(:stderr, fn ->
