@@ -163,7 +163,7 @@ defmodule Protobuf.DSLTest do
              0 => :UNKNOWN,
              1 => :A,
              2 => :B,
-             4 => :C,
+             4 => :E,
              "A" => :A,
              "B" => :B,
              "C" => :C,

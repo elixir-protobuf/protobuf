@@ -115,16 +115,12 @@ defmodule Protobuf.DSL do
           unquote(gen_defstruct(msg_props))
       end
 
-      unquote(maybe_def_enum_functions(msg_props, fields))
+      unquote(msg_props.enum? && Protobuf.DSL.Enum.quoted_enum_functions(msg_props))
 
       if unquote(Macro.escape(extension_props)) != nil do
         def __protobuf_info__(:extension_props) do
           unquote(Macro.escape(extension_props))
         end
-      end
-
-      def __protobuf_info__(_) do
-        nil
       end
 
       if unquote(Macro.escape(extensions)) do
@@ -149,50 +145,6 @@ defmodule Protobuf.DSL do
     nil
   end
 
-  defp maybe_def_enum_functions(%{syntax: syntax, enum?: true, field_props: props}, fields) do
-    if syntax == :proto3 do
-      unless props[0], do: raise("The first enum value must be zero in proto3")
-    end
-
-    num_to_atom = for {fnum, %{name_atom: name_atom}} <- props, do: {fnum, name_atom}
-    atom_to_num = for {name_atom, fnum, _opts} <- fields, do: {name_atom, fnum}, into: %{}
-
-    reverse_mapping =
-      for {name_atom, field_number, _opts} <- fields,
-          key <- [field_number, Atom.to_string(name_atom)],
-          into: %{},
-          do: {key, name_atom}
-
-    Enum.map(atom_to_num, fn {name_atom, fnum} ->
-      quote do
-        def value(unquote(name_atom)), do: unquote(fnum)
-      end
-    end) ++
-      [
-        quote do
-          def value(v) when is_integer(v), do: v
-        end
-      ] ++
-      Enum.map(num_to_atom, fn {fnum, name_atom} ->
-        quote do
-          def key(unquote(fnum)), do: unquote(name_atom)
-        end
-      end) ++
-      [
-        quote do
-          def key(int) when is_integer(int), do: int
-        end,
-        quote do
-          def mapping(), do: unquote(Macro.escape(atom_to_num))
-        end,
-        quote do
-          def __reverse_mapping__(), do: unquote(Macro.escape(reverse_mapping))
-        end
-      ]
-  end
-
-  defp maybe_def_enum_functions(_, _), do: nil
-
   defp def_extension_functions() do
     quote do
       def put_extension(%{} = map, extension_mod, field, value) do
@@ -212,8 +164,11 @@ defmodule Protobuf.DSL do
       Map.new(fields, fn {name, fnum, opts} -> {fnum, field_props(syntax, name, fnum, opts)} end)
 
     # The "reverse" of field props, that is, a map from atom name to field number.
-    field_tags =
-      Map.new(field_props, fn {fnum, %FieldProps{name_atom: name_atom}} -> {name_atom, fnum} end)
+    # We calculate this from "fields" instead of just reversing "field_props" because
+    # enum fields can have aliases, that is, names that have the same integer tag. "field_props"
+    # is a map with field tags as keys, so fields with the same "field_tags" have been
+    # squashed together.
+    field_tags = Map.new(fields, fn {name, fnum, _opts} -> {name, fnum} end)
 
     repeated_fields =
       for {_fnum, %FieldProps{repeated?: true, name_atom: name}} <- field_props,
