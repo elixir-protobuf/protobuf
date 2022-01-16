@@ -141,6 +141,42 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
     assert Map.fetch!(mod.__message_props__().field_props, 1).type == Google.Protobuf.Timestamp
   end
 
+  @tag :skip
+  test "extensions defined and used in the same protoc call", %{tmp_dir: tmp_dir} do
+    proto_path = Path.join(tmp_dir, "extensions.proto")
+
+    File.write!(proto_path, """
+    syntax = "proto3";
+
+    package my_pkg;
+
+    import "google/protobuf/descriptor.proto";
+
+    extend google.protobuf.MessageOptions {
+      string notes = 51800;
+    }
+
+    message MessageWithCustomOptions {
+      option (notes) = "This message is cool";
+    }
+    """)
+
+    protoc!([
+      "--proto_path=#{tmp_dir}",
+      "--proto_path=#{Mix.Project.deps_paths().google_protobuf}/src",
+      "--elixir_out=#{tmp_dir}",
+      "--elixir_opt=gen_descriptors=true",
+      "--plugin=./protoc-gen-elixir",
+      proto_path
+    ])
+
+    assert [message_mod, extension_mod] =
+             compile_file_and_clean_modules_on_exit("#{tmp_dir}/extensions.pb.ex")
+
+    assert %Google.Protobuf.MessageOptions{} = options = message_mod.descriptor().options
+    assert options.__pb_extensions__ == %{{extension_mod, :notes} => "This messge is cool"}
+  end
+
   defp protoc!(args) do
     {output, exit_code} = System.cmd("protoc", args, stderr_to_stdout: true)
 
