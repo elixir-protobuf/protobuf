@@ -1,6 +1,6 @@
 defmodule <%= @module %>.Service do
   @moduledoc false
-  use GRPC.Service, name: <%= inspect(@service_name) %>
+  use GRPC.Service, name: <%= inspect(@service_name) %>, protoc_gen_elixir_version: "<%= @version %>"
 
   <%= if @descriptor_fun_body do %>
   def descriptor do

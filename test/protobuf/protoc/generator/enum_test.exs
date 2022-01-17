@@ -3,6 +3,7 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
 
   alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator.Enum, as: Generator
+  alias Protobuf.Protoc.Generator.Util
   alias Protobuf.TestHelpers
 
   test "generate/2 generates enum type messages" do
@@ -28,7 +29,7 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
     assert inspect(compiled_mod) == module
 
     assert msg =~ "defmodule #{module} do\n"
-    assert msg =~ "use Protobuf, enum: true\n"
+    assert msg =~ "use Protobuf, enum: true, protoc_gen_elixir_version: \"#{Util.version()}\"\n"
 
     refute msg =~ "defstruct "
 
@@ -67,7 +68,7 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
     assert inspect(compiled_mod) == module
 
     assert msg =~ "defmodule #{module} do\n"
-    assert msg =~ "use Protobuf, enum: true\n"
+    assert msg =~ "use Protobuf, enum: true, protoc_gen_elixir_version: \"#{Util.version()}\"\n"
 
     refute msg =~ "defstruct "
 

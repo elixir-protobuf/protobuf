@@ -36,7 +36,12 @@ defmodule Protobuf.Protoc.Generator.Extension do
 
       extends ->
         msg_name = Util.mod_name(ctx, ns ++ [Macro.camelize(@ext_postfix)])
-        use_options = Util.options_to_str(%{syntax: ctx.syntax})
+
+        use_options =
+          Util.options_to_str(%{
+            syntax: ctx.syntax,
+            protoc_gen_elixir_version: "\"#{Util.version()}\""
+          })
 
         {msg_name,
          Util.format(
