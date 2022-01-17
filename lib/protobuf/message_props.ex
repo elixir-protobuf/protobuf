@@ -19,7 +19,7 @@ defmodule Protobuf.MessageProps do
           enum?: boolean(),
           extendable?: boolean(),
           map?: boolean(),
-          extension_range: [{non_neg_integer(), non_neg_integer()}]
+          extension_range: [{non_neg_integer(), non_neg_integer()}] | nil
         }
 
   defstruct ordered_tags: [],
