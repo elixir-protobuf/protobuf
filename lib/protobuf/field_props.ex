@@ -7,7 +7,7 @@ defmodule Protobuf.FieldProps do
           name_atom: atom,
           json_name: String.t(),
           wire_type: 0..5,
-          type: atom,
+          type: atom | {:enum, atom},
           default: any,
           oneof: non_neg_integer | nil,
           required?: boolean,
