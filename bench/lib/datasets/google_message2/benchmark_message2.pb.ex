@@ -1,6 +1,6 @@
 defmodule Benchmarks.Proto2.GoogleMessage2.Group1 do
   @moduledoc false
-  use Protobuf, syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
 
   field :field11, 11, required: true, type: :float
   field :field26, 26, optional: true, type: :float
@@ -22,7 +22,7 @@ end
 
 defmodule Benchmarks.Proto2.GoogleMessage2 do
   @moduledoc false
-  use Protobuf, syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
 
   field :field1, 1, optional: true, type: :string
   field :field3, 3, optional: true, type: :int64
@@ -58,7 +58,7 @@ end
 
 defmodule Benchmarks.Proto2.GoogleMessage2GroupedMessage do
   @moduledoc false
-  use Protobuf, syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
 
   field :field1, 1, optional: true, type: :float
   field :field2, 2, optional: true, type: :float

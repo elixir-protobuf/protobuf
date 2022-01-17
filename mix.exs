@@ -136,10 +136,14 @@ defmodule Protobuf.Mixfile do
   # These files are necessary to bootstrap the protoc-gen-elixir plugin that we generate. They
   # are committed to version control.
   defp gen_bootstrap_protos(_args) do
-    proto_src = path_in_protobuf_source(["src", "google", "protobuf"])
+    proto_src = path_in_protobuf_source(["src"])
 
-    protoc!("-I \"#{proto_src}\"", "./lib/google", ["descriptor.proto", "compiler/plugin.proto"])
-    protoc!("-I src", "./lib", ["elixirpb.proto"])
+    protoc!("-I \"#{proto_src}\"", "./lib", [
+      "google/protobuf/descriptor.proto",
+      "google/protobuf/compiler/plugin.proto"
+    ])
+
+    protoc!("-I src -I \"#{proto_src}\"", "./lib", ["elixirpb.proto"])
   end
 
   defp gen_test_protos(_args) do
