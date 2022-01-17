@@ -1,6 +1,6 @@
 defmodule Benchmarks.Proto3.GoogleMessage1 do
   @moduledoc false
-  use Protobuf, syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto3
 
   field :field1, 1, type: :string
   field :field9, 9, type: :string
@@ -47,7 +47,7 @@ end
 
 defmodule Benchmarks.Proto3.GoogleMessage1SubMessage do
   @moduledoc false
-  use Protobuf, syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto3
 
   field :field1, 1, type: :int32
   field :field2, 2, type: :int32
