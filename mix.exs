@@ -18,7 +18,8 @@ defmodule Protobuf.Mixfile do
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.html": :test,
-        conformance_test: :test
+        conformance_test: :test,
+        "escript.build": :prod
       ],
       deps: deps(),
       escript: escript(),
