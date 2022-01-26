@@ -228,6 +228,7 @@ defmodule Protobuf.DSL do
     |> parse_field_opts_to_field_props(opts)
     |> verify_no_default_in_proto3(syntax)
     |> wrap_enum_type()
+    |> cal_proto3_optional(syntax)
     |> cal_label(syntax)
     |> cal_json_name()
     |> cal_embedded()
@@ -239,6 +240,7 @@ defmodule Protobuf.DSL do
   defp parse_field_opts_to_field_props(%FieldProps{} = props, opts) do
     Enum.reduce(opts, props, fn
       {:optional, optional?}, acc -> %FieldProps{acc | optional?: optional?}
+      {:proto3_optional, proto3_optional?}, acc -> %FieldProps{acc | proto3_optional?: proto3_optional?}
       {:required, required?}, acc -> %FieldProps{acc | required?: required?}
       {:enum, enum?}, acc -> %FieldProps{acc | enum?: enum?}
       {:map, map?}, acc -> %FieldProps{acc | map?: map?}
@@ -252,6 +254,12 @@ defmodule Protobuf.DSL do
       {:json_name, json_name}, acc -> %FieldProps{acc | json_name: json_name}
     end)
   end
+
+  defp cal_proto3_optional(%FieldProps{optional?: true} = props, :proto3) do
+    %FieldProps{props | proto3_optional?: true}
+  end
+
+  defp cal_proto3_optional(props, _syntax), do: props
 
   defp cal_label(%FieldProps{} = props, :proto3) do
     if props.required? do
@@ -377,6 +385,7 @@ defmodule Protobuf.DSL do
   def field_default(_syntax, %FieldProps{default: default}) when not is_nil(default), do: default
   def field_default(_syntax, %FieldProps{repeated?: true}), do: []
   def field_default(_syntax, %FieldProps{map?: true}), do: %{}
+  def field_default(:proto3, %FieldProps{proto3_optional?: true}), do: nil
   def field_default(:proto3, props), do: type_default(props.type)
   def field_default(_syntax, _props), do: nil
 

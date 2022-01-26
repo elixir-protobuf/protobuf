@@ -70,7 +70,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   defp gen_fields(syntax, fields) do
     Enum.map(fields, fn %{opts_str: opts_str} = f ->
       label_str =
-        if syntax == :proto3 && f[:label] != "repeated", do: "", else: "#{f[:label]}: true, "
+        if syntax == :proto3 && f[:proto3_optional] == false && f[:label] != "repeated", do: "", else: "#{f[:label]}: true, "
 
       ":#{f[:name]}, #{f[:number]}, #{label_str}type: #{f[:type]}#{opts_str}"
     end)
@@ -91,7 +91,8 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp get_fields(ctx, desc) do
-    oneofs = Enum.map(desc.oneof_decl, & &1.name)
+    oneofs = get_real_oneofs(desc.oneof_decl)
+    
     nested_maps = nested_maps(ctx, desc)
     for field <- desc.field, do: get_field(ctx, field, nested_maps, oneofs)
   end
@@ -111,7 +112,7 @@ defmodule Protobuf.Protoc.Generator.Message do
 
     opts =
       case field_desc.oneof_index do
-        _ when oneofs == [] -> opts
+        _ when oneofs == [] or field_desc.proto3_optional == true -> opts
         nil -> opts
         index -> Keyword.put(opts, :oneof, index)
       end
@@ -134,10 +135,18 @@ defmodule Protobuf.Protoc.Generator.Message do
       opts: Map.new(opts),
       opts_str: opts_str,
       map: map,
-      oneof: field_desc.oneof_index
+      proto3_optional: field_desc.proto3_optional || false
     }
   end
 
+  defp get_real_oneofs(oneof_decl) do
+    Enum.flat_map(oneof_decl, fn oneof ->
+      case !String.starts_with?(oneof.name, "_") do
+        true -> [oneof.name]
+        _ -> []
+      end
+    end)
+  end
   # To avoid unnecessarily changing the files that users of this library generated with previous
   # versions, we try to guarantee an order of field options in the generated files.
   ordered_opts = [

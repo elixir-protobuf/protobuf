@@ -10,7 +10,9 @@ defmodule <%= @module %> do
   <% end %>
 
   <%= for {%Google.Protobuf.OneofDescriptorProto{name: name}, index} <- Enum.with_index(@oneofs) do %>
+  <%= if !String.starts_with?(name, "_") do %>
   oneof :<%= name %>, <%= index %><% end %>
+  <% end %>
 
   <%= for f <- @fields do %>
   field <%= f %><% end %>
