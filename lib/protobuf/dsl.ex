@@ -228,7 +228,6 @@ defmodule Protobuf.DSL do
     |> parse_field_opts_to_field_props(opts)
     |> verify_no_default_in_proto3(syntax)
     |> wrap_enum_type()
-    |> cal_proto3_optional(syntax)
     |> cal_label(syntax)
     |> cal_json_name()
     |> cal_embedded()
@@ -254,12 +253,6 @@ defmodule Protobuf.DSL do
       {:json_name, json_name}, acc -> %FieldProps{acc | json_name: json_name}
     end)
   end
-
-  defp cal_proto3_optional(%FieldProps{optional?: true} = props, :proto3) do
-    %FieldProps{props | proto3_optional?: true}
-  end
-
-  defp cal_proto3_optional(props, _syntax), do: props
 
   defp cal_label(%FieldProps{} = props, :proto3) do
     if props.required? do

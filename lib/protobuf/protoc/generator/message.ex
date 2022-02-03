@@ -69,11 +69,18 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   defp gen_fields(syntax, fields) do
     Enum.map(fields, fn %{opts_str: opts_str} = f ->
-      label_str =
-        if syntax == :proto3 && f[:proto3_optional] == false && f[:label] != "repeated", do: "", else: "#{f[:label]}: true, "
-
-      ":#{f[:name]}, #{f[:number]}, #{label_str}type: #{f[:type]}#{opts_str}"
+      field(syntax, f, opts_str)
     end)
+  end
+
+  defp field(:proto3, %{proto3_optional: true, label: "optional"} = f, opts_str) do
+    ":#{f[:name]}, #{f[:number]}, proto3_optional: true, type: #{f[:type]}#{opts_str}"
+  end
+
+  defp field(syntax, f, opts_str) do
+    label_str = if syntax == :proto3 && f[:label] != "repeated", do: "", else: "#{f[:label]}: true, "
+
+    ":#{f[:name]}, #{f[:number]}, #{label_str}type: #{f[:type]}#{opts_str}"
   end
 
   defp msg_opts_str(%{syntax: syntax}, opts) do
@@ -92,7 +99,7 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   defp get_fields(ctx, desc) do
     oneofs = get_real_oneofs(desc.oneof_decl)
-    
+
     nested_maps = nested_maps(ctx, desc)
     for field <- desc.field, do: get_field(ctx, field, nested_maps, oneofs)
   end
