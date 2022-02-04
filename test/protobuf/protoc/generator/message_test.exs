@@ -263,6 +263,29 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     assert msg =~ "field :a, 1, type: :bool, packed: false"
   end
 
+  test "generated supports [proto3_optional = true] in proto3" do
+    ctx = %Context{syntax: :proto3}
+
+    desc =
+      Google.Protobuf.DescriptorProto.new!(
+        name: "Foo",
+        field: [
+          Google.Protobuf.FieldDescriptorProto.new!(
+            name: "a",
+            json_name: "a",
+            number: 1,
+            type: :TYPE_INT32,
+            label: :LABEL_OPTIONAL,
+            proto3_optional: true
+          )
+        ]
+      )
+
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
+
+    assert msg =~ "field :a, 1, proto3_optional: true, type: :int32"
+  end
+
   test "generate/2 supports option :deprecated" do
     ctx = %Context{}
 

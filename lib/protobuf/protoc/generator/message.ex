@@ -142,6 +142,7 @@ defmodule Protobuf.Protoc.Generator.Message do
       opts: Map.new(opts),
       opts_str: opts_str,
       map: map,
+      oneof: field_desc.oneof_index,
       proto3_optional: field_desc.proto3_optional || false
     }
   end

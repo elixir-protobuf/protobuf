@@ -4,7 +4,7 @@ defmodule Protobuf.DSLTest do
   import ExUnit.CaptureIO
 
   alias Protobuf.{FieldProps, MessageProps}
-  alias TestMsg.{Foo, Foo2}
+  alias TestMsg.{Foo, Foo2, Proto3Optional}
 
   test "default syntax is proto2" do
     defmodule DefaultSyntax do
@@ -118,6 +118,12 @@ defmodule Protobuf.DSLTest do
     msg_props = Foo.__message_props__()
     field_props = msg_props.field_props
     assert %FieldProps{fnum: 8, name: "g", repeated?: true, packed?: false} = field_props[8]
+  end
+
+  test "proto3_optional? is false by default for proto3" do
+    msg_props = Proto3Optional.__message_props__()
+    field_props = msg_props.field_props
+    assert %FieldProps{fnum: 2, name: "b", proto3_optional?: false} = field_props[2]
   end
 
   test "packed? is false by default for proto2" do

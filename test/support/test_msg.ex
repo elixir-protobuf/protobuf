@@ -121,6 +121,14 @@ defmodule TestMsg do
     field :other, 5, optional: true, type: :string
   end
 
+  defmodule Proto3Optional do
+    @moduledoc false
+    use Protobuf, syntax: :proto3
+
+    field :a, 1, proto3_optional: true, type: :int32
+    field :b, 2, type: :string
+  end
+
   defmodule Parent do
     @moduledoc false
     use Protobuf, syntax: :proto3
