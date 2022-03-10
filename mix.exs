@@ -3,9 +3,9 @@ defmodule Protobuf.Mixfile do
 
   @source_url "https://github.com/elixir-protobuf/protobuf"
   @version (case File.read("VERSION") do
-    {:ok, version} -> String.trim(version)
-    {:error, _} -> "0.0.0-development"
-  end)
+              {:ok, version} -> String.trim(version)
+              {:error, _} -> "0.0.0-development"
+            end)
   @description "A pure Elixir implementation of Google Protobuf."
 
   def project do
