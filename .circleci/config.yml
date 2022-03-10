@@ -1,0 +1,52 @@
+version: 2.1
+jobs:
+  release:
+    docker:
+      - image: heathmont/elixir-ci:1.13.1-otp-24-alpine
+    environment:
+      MIX_ENV: test
+    resource_class: xlarge
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-test-{{ checksum "mix.lock" }}-{{ .Revision }}
+            - v1-test-{{ checksum "mix.lock" }}-
+            - v1-test-
+      - run:
+          name:       Hex auth
+          command:    mix hex.organization auth coingaming --key $HEX_API_KEY
+      - run:
+          name:       Fetch dependencies
+          command:    mix deps.get
+      - run:
+          name:       Compile dependencies
+          command:    mix deps.compile
+      - run:
+          name:       Compile protocols
+          command:    mix compile --warnings-as-errors
+      # - run:
+      #     name:       Style checks
+      #     command:    mix credo --strict
+      - run:
+          name:       Test
+          command:    mix test
+      # - run:
+      #     name:       Dialyzer type checks
+      #     command:    mix dialyzer --halt-exit-status
+      #     no_output_timeout: 15m
+      - save_cache:
+          key: v1-test-{{ checksum "mix.lock" }}-{{ .Revision }}
+          paths:
+            - deps
+            - ~/.mix
+      - run:
+          name:       Semantic Release
+          command:    npx semantic-release --extends @heathmont/semantic-release-elixir-hex
+
+workflows:
+  version: 2
+  release:
+    jobs:
+      - release:
+          context: global

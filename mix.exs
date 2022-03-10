@@ -2,7 +2,10 @@ defmodule Protobuf.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/elixir-protobuf/protobuf"
-  @version "0.9.0-dev"
+  @version (case File.read("VERSION") do
+    {:ok, version} -> String.trim(version)
+    {:error, _} -> "0.0.0-development"
+  end)
   @description "A pure Elixir implementation of Google Protobuf."
 
   def project do
@@ -43,7 +46,7 @@ defmodule Protobuf.Mixfile do
       {:jason, "~> 1.2", optional: true},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:ex_doc, ">= 0.0.0", only: [:dev, :test], runtime: false},
       {:stream_data, "~> 0.5.0", only: [:dev, :test]},
       {:excoveralls, "~> 0.14.4", only: :test},
       {:google_protobuf,
@@ -61,6 +64,7 @@ defmodule Protobuf.Mixfile do
 
   defp package do
     [
+      organization: "coingaming",
       maintainers: ["Bing Han", "Andrea Leopardi"],
       licenses: ["MIT"],
       files: ~w(
@@ -73,6 +77,7 @@ defmodule Protobuf.Mixfile do
         LICENSE
         priv/templates
         .formatter.exs
+        VERSION
       ),
       links: %{"GitHub" => @source_url}
     ]
