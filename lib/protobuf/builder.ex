@@ -49,10 +49,18 @@ defmodule Protobuf.Builder do
         %{^field_name => value} when not is_nil(value) ->
           case props.field_props[props.field_tags[field_name]] do
             %FieldProps{embedded?: true, repeated?: true, type: type} ->
-              %{acc | field_name => Enum.map(value, &type.new/1)}
+              if type.transform_module() do
+                acc
+              else
+                %{acc | field_name => Enum.map(value, &type.new/1)}
+              end
 
             %FieldProps{embedded?: true, repeated?: false, type: type} ->
-              %{acc | field_name => type.new(value)}
+              if type.transform_module() do
+                acc
+              else
+                %{acc | field_name => type.new(value)}
+              end
 
             _other ->
               acc
