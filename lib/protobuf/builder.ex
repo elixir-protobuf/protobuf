@@ -28,7 +28,7 @@ defmodule Protobuf.Builder do
       # strict.
       %{__struct__: _other_mod} when strict? ->
         raise ArgumentError,
-          message: "The __struct__ in the struct doesn't with the message module"
+          message: "The module in __struct__ doesn't match the message module"
 
       # If "attrs" is a struct but not the same struct as "mod", then we use it as attributes
       # to build our new struct:

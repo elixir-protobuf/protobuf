@@ -83,10 +83,26 @@ defmodule Protobuf do
   @doc """
   Builds and updates the struct with passed fields.
 
+  This function will:
+
+  * Recursively call `c:new/1` for embedded fields
+  * Create structs using `struct/2` for keyword lists and maps
+  * Create the correct struct if passed the wrong struct
+  * Call `c:new/1` for each element in the list for repeated fields
+
   ## Examples
 
       MyMessage.new(field1: "foo")
       #=> %MyMessage{field1: "foo", ...}
+
+      MyMessage.new(field1: [field2: "foo"])
+      #=> %MyMessage{field1: %MySubMessage{field2: "foo"}}
+
+      MyMessage.new(field1: %WrongStruct{field2: "foo"})
+      #=> %MyMessage{field1: %MySubMessage{field2: "foo"}}
+
+      MyMessage.new(repeated: [%{field1: "foo"}, %{field1: "bar"}])
+      #=> %MyMessage{repeated: [%MyRepeated{field1: "foo"}, %MyRepeated{field1: "bar"}]}
 
   """
   @callback new(Enum.t()) :: struct
