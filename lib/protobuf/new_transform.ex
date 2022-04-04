@@ -1,6 +1,6 @@
 defmodule Protobuf.NewTransform do
   @moduledoc """
-  For structs with a `Protobuf.TransformModule` set, the `new/1` function does not get called.
+  For structs with a `Protobuf.TransformModule` set, the `c:Protobuf.new/1` function does not get called.
   This transform module brings back the original behavior of calling `new/1` before the value
   is encoded.
   """
