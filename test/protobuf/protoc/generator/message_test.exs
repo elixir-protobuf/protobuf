@@ -701,9 +701,9 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
                        {field_number :: integer(), Protobuf.Wire.Types.wire_type(),
                         value :: term()}
                      ],
-                     first: {:a, integer()} | {:b, integer()},
+                     first: {:a, integer()} | {:b, integer()} | nil,
                      other: integer() | nil,
-                     second: {:c, integer()} | {:d, integer()}
+                     second: {:c, integer()} | {:d, integer()} | nil
                    }
                )
              )
