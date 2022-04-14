@@ -87,7 +87,8 @@ defmodule Protobuf.DSL.TypespecsTest do
       quoted = Typespecs.quoted_message_typespec(message_props)
 
       fields =
-        quote(do: [my_oneof_field: {:foo, integer()} | {:bar, boolean()}]) ++ @unknown_fields_spec
+        quote(do: [my_oneof_field: {:foo, integer()} | {:bar, boolean()} | nil]) ++
+          @unknown_fields_spec
 
       assert Macro.to_string(quoted) ==
                Macro.to_string(quote(do: %__MODULE__{unquote_splicing(fields)}))
