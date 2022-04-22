@@ -1,6 +1,8 @@
 defmodule Protobuf.Builder do
   @moduledoc false
 
+  require Logger
+
   alias Protobuf.FieldProps
 
   @spec new(module) :: %{required(:__struct__) => module} when module: module()
@@ -35,8 +37,11 @@ defmodule Protobuf.Builder do
       %{__struct__: _} ->
         new_from_enum(mod, Map.from_struct(attrs), strict?)
 
-      not_a_struct ->
+      not_a_struct when is_map(not_a_struct) or is_list(not_a_struct) ->
         new_from_enum(mod, not_a_struct, strict?)
+      not_a_map ->
+        Logger.warn("MyStruct.new/1 is depricated. And will be removed soon.\nUse struct/2 BIF instead")
+        not_a_map
     end
   end
 
