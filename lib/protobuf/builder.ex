@@ -26,9 +26,9 @@ defmodule Protobuf.Builder do
 
       # If "attrs" is a struct but not the same struct as "mod", then we raise if are being
       # strict.
-      %{__struct__: _other_mod} when strict? ->
+      %{__struct__: _} = struct when strict? ->
         raise ArgumentError,
-          message: "The module in __struct__ doesn't match the message module"
+          message: "Struct %#{inspect(mod)}{} was expected, but given #{inspect(struct)}"
 
       # If "attrs" is a struct but not the same struct as "mod", then we use it as attributes
       # to build our new struct:

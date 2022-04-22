@@ -6,7 +6,7 @@ defmodule Protobuf.TransformModule do
   you can add custom encoding and decoding logic for your message.
 
   The `c:Protobuf.new/1` function will not be called for structs that have a transform module, if
-  you still want to emulate this behavior you can use `Protobuf.NewTransform`.
+  you still want to emulate this behavior you can use `Protobuf.TransformModule.InferFieldsFromEnum`.
 
   As an example we can use this to implement a message that will be decoded as a string value:
 
