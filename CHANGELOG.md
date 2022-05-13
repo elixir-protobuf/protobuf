@@ -1,5 +1,40 @@
 # Changelog
 
+## v0.10.0
+
+### Enhancements
+
+  * Add `Protobuf.get_unknown_varints/1`, returns fields that could not be
+    decoded.
+  * Support JSON mapping for proto2 schemas.
+  * No longer warn when decoding unknown enum values.
+  * Validate options in `Protobuf.JSON.encode/2`.
+  * Raise `Protobuf.DecodeError` instead of `CaseClauseError` when trying to
+    decode an unknown wire type.
+  * Raise `Protobuf.DecodeError` instead of `MatchError` when trying to
+    decode invalid delimeted types.
+  * Include protoc-gen-elixir plugin version in generated files.
+
+### Bug fixes
+
+  * Encode fields in the order they are defined in the schema.
+  * Encode the value of oneof fields even when it's the default value.
+  * Camelization fixes in generated code using the `module_prefix` and
+    `package_prefix` options.
+  * Add `nil` to oneof typespec union.
+  * Skip calling `Type.new/1` for structs with transform modules.
+
+### Deprecations
+
+  * Warn if `@type t` is defined inside a module that calls `use Protobuf`. To
+    fix this warning the files can be regenerated with the latest version of
+    protobuf.
+
+### Breaking changes
+
+  * Raise an error if only `@type t` or `defstruct` is defined inside a module
+    that calls `use Protobuf`.
+
 ## v0.9.0
 
 ### Enhancements
