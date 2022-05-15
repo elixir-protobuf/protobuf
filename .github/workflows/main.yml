@@ -39,7 +39,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }} # to avoid rate limiting
 
       - name: Install OTP and Elixir
-        uses: erlef/setup-elixir@v1
+        uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
@@ -115,7 +115,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install OTP and Elixir
-        uses: erlef/setup-elixir@v1
+        uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
