@@ -1,6 +1,6 @@
 defmodule Benchmarks.GoogleMessage4.UnusedEnum do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :UNUSED_ENUM_VALUE1, 0
   field :UNUSED_ENUM_VALUE2, 1
@@ -8,7 +8,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum2593 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE2594, 0
   field :ENUM_VALUE2595, 1
@@ -22,7 +22,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum2834 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE2835, 0
   field :ENUM_VALUE2836, 1
@@ -31,7 +31,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum2806 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE2807, 0
   field :ENUM_VALUE2808, 1
@@ -52,7 +52,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum2851 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE2852, 0
   field :ENUM_VALUE2853, 0
@@ -179,7 +179,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum2602 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE2603, 0
   field :ENUM_VALUE2604, 1
@@ -197,7 +197,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum3071 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE3072, 1
   field :ENUM_VALUE3073, 2
@@ -231,7 +231,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum3805 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE3806, 0
   field :ENUM_VALUE3807, 1
@@ -249,7 +249,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum3783 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE3784, 0
   field :ENUM_VALUE3785, 1
@@ -275,7 +275,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum3851 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE3852, 0
   field :ENUM_VALUE3853, 1
@@ -299,7 +299,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5862 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5863, 1
   field :ENUM_VALUE5864, 2
@@ -308,7 +308,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5868 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5869, 0
   field :ENUM_VALUE5870, 1
@@ -318,7 +318,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5873 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5874, 0
   field :ENUM_VALUE5875, 1
@@ -327,7 +327,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5904 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5905, 0
   field :ENUM_VALUE5906, 1
@@ -335,7 +335,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5909 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5910, 0
   field :ENUM_VALUE5911, 1
@@ -343,7 +343,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5912 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5913, 0
   field :ENUM_VALUE5914, 1
@@ -351,7 +351,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5915 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5916, 0
   field :ENUM_VALUE5917, 1
@@ -361,7 +361,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5920 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5921, 0
   field :ENUM_VALUE5922, 1
@@ -369,7 +369,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5923 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5924, 0
   field :ENUM_VALUE5925, 1
@@ -379,7 +379,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5928 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5929, 0
   field :ENUM_VALUE5930, 1
@@ -387,7 +387,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5931 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5932, 0
   field :ENUM_VALUE5933, 1
@@ -396,7 +396,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5935 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5936, 0
   field :ENUM_VALUE5937, 1
@@ -405,7 +405,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5939 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5940, 0
   field :ENUM_VALUE5941, 1
@@ -417,7 +417,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5946 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5947, 0
   field :ENUM_VALUE5948, 1
@@ -433,7 +433,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5957 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5958, 0
   field :ENUM_VALUE5959, 1
@@ -443,7 +443,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum5962 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE5963, 0
   field :ENUM_VALUE5964, 1
@@ -451,7 +451,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum6025 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE6026, 0
   field :ENUM_VALUE6027, 1
@@ -479,7 +479,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum6111 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE6112, 1
   field :ENUM_VALUE6113, 2
@@ -499,7 +499,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum6065 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE6066, 0
   field :ENUM_VALUE6067, 1
@@ -520,7 +520,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum6130 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE6131, 0
   field :ENUM_VALUE6132, 1
@@ -528,7 +528,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum6579 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE6580, 0
   field :ENUM_VALUE6581, 2
@@ -542,7 +542,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum6588 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE6589, 0
   field :ENUM_VALUE6590, 1
@@ -582,7 +582,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum7288 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE7289, 0
   field :ENUM_VALUE7290, 1
@@ -592,7 +592,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum7512 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE7513, 0
   field :ENUM_VALUE7514, 1
@@ -606,7 +606,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum7922 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE7923, 1
   field :ENUM_VALUE7924, 2
@@ -617,7 +617,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum3476 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE3477, 0
   field :ENUM_VALUE3478, 1
@@ -807,7 +807,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum10325 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE10326, 0
   field :ENUM_VALUE10327, 1
@@ -822,14 +822,14 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum10335 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE10336, 0
 end
 
 defmodule Benchmarks.GoogleMessage4.Enum10337 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE10338, 0
   field :ENUM_VALUE10339, 1
@@ -837,7 +837,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum11901 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE11902, 0
   field :ENUM_VALUE11903, 1
@@ -847,7 +847,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum12735 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE12736, 0
   field :ENUM_VALUE12737, 1
@@ -857,7 +857,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Enum12871 do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :ENUM_VALUE12872, 1
   field :ENUM_VALUE12873, 2

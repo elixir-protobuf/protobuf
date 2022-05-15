@@ -88,15 +88,12 @@ jobs:
         run: |
           rm -rf ./google_protobuf
           if [[ -n "$(git status -uno --porcelain)" ]]; then
-            echo "Changes to the code seem to change the generated .pb.ex files."
-            echo "Make sure to run these tasks before merging:"
+            echo "CHANGES TO THE CODE SEEM TO CHANGE THE GENERATED .pb.ex FILES."
+            echo "MAKE SURE TO RUN THESE TASKS BEFORE MERGING:"
             echo ""
-            echo "  mix gen_bootstrap_protos"
-            echo "  mix gen_test_protos"
-            echo "  mix gen_bench_protos"
+            echo "  mix do gen_bootstrap_protos, gen_test_protos, gen_bench_protos"
             echo ""
-            echo "This is the git diff:"
-            git diff
+            echo "Run the above commands and `git diff` to verify the changes"
             exit 1
           else
             echo "Generated .pb.ex are up to date"

@@ -1,6 +1,6 @@
 defmodule Benchmarks.GoogleMessage4.GoogleMessage4 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field37503, 1, optional: true, type: :int32
   field :field37504, 2, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
@@ -22,7 +22,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message37489 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field37534, 3, optional: true, type: Benchmarks.GoogleMessage4.Message2517
   field :field37535, 4, optional: true, type: Benchmarks.GoogleMessage4.Message7330
@@ -49,7 +49,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message7319 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field7321, 1, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field7322, 7, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
@@ -57,7 +57,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message12717 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field12719, 1, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field12720, 2, optional: true, type: :string
@@ -72,7 +72,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message37331 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field37367, 4, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field37368, 1, required: true, type: Benchmarks.GoogleMessage4.Message37326
@@ -82,7 +82,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message8815 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field8819, 1, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field8820, 2, repeated: true, type: Benchmarks.GoogleMessage4.Message8768
@@ -91,7 +91,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message7330 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field7332, 1, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field7333, 2, optional: true, type: Benchmarks.GoogleMessage4.Message3069
@@ -103,7 +103,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message12960 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field12962, 1, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field12963, 2, optional: true, type: Benchmarks.GoogleMessage4.Message12948
@@ -111,12 +111,12 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message176.Message178 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 end
 
 defmodule Benchmarks.GoogleMessage4.Message176 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field408, 1, required: true, type: :string
   field :field409, 4, optional: true, type: :int32
@@ -181,7 +181,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message8817 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field8825, 1, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field8826, 2, repeated: true, type: Benchmarks.GoogleMessage4.Message8768
@@ -190,7 +190,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message8835 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field8837, 1, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field8838, 2, repeated: true, type: :string
@@ -199,7 +199,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message37333 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field37372, 3, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field37373, 1, required: true, type: Benchmarks.GoogleMessage4.Message37326
@@ -208,7 +208,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message13000 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field13015, 1, optional: true, type: :int64
   field :field13016, 2, repeated: true, type: Benchmarks.GoogleMessage4.Message12979
@@ -216,7 +216,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message37335 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field37376, 4, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field37377, 1, required: true, type: Benchmarks.GoogleMessage4.Message37326
@@ -226,7 +226,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message8848 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field8850, 1, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field8851, 2, optional: true, type: :string
@@ -235,7 +235,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message13035 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field13058, 1, optional: true, type: :int64
   field :field13059, 2, repeated: true, type: :int64
@@ -243,7 +243,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message8856 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field8858, 1, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field8859, 2, optional: true, type: :string
@@ -251,7 +251,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message12908 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field12912, 1, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field12913, 2, optional: true, type: :string
@@ -263,7 +263,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message12910 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field12920, 1, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field12921, 2, optional: true, type: Benchmarks.GoogleMessage4.Message12818
@@ -272,7 +272,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message37327 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field37347, 11, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field37348, 1, required: true, type: Benchmarks.GoogleMessage4.Message37326
@@ -289,7 +289,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message37329 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field37359, 6, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field37360, 1, required: true, type: Benchmarks.GoogleMessage4.Message37326
@@ -300,7 +300,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message2517 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field2519, 1, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field2520, 2, optional: true, type: Benchmarks.GoogleMessage4.Message2356
@@ -311,7 +311,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message12748 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field12754, 1, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field12755, 2, optional: true, type: :string
@@ -321,14 +321,14 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message12687 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field12701, 1, repeated: true, type: Benchmarks.GoogleMessage4.Message12686
 end
 
 defmodule Benchmarks.GoogleMessage4.Message11948 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field11954, 1, optional: true, type: :string
   field :field11955, 2, repeated: true, type: Benchmarks.GoogleMessage4.Message11949
@@ -337,14 +337,14 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message11976 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field12002, 1, repeated: true, type: Benchmarks.GoogleMessage4.Message11975
 end
 
 defmodule Benchmarks.GoogleMessage4.Message7320 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field7323, 1, optional: true, type: Benchmarks.GoogleMessage4.UnusedEmptyMessage
   field :field7324, 8, optional: true, type: Benchmarks.GoogleMessage4.Message7287
@@ -352,7 +352,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message3069.Message3070 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field3378, 4, required: true, type: Benchmarks.GoogleMessage4.Enum3071, enum: true
   field :field3379, 5, required: true, type: :bytes
@@ -360,7 +360,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message3069 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field3374, 1, optional: true, type: Benchmarks.GoogleMessage4.Message3061
   field :field3375, 2, optional: true, type: :bytes
@@ -371,14 +371,14 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message12948 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field12958, 1, repeated: true, type: Benchmarks.GoogleMessage4.Message12949
 end
 
 defmodule Benchmarks.GoogleMessage4.Message8768 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field8782, 1, optional: true, type: :string
   field :field8783, 2, optional: true, type: Benchmarks.GoogleMessage4.Message8572
@@ -391,7 +391,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message12979 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field12981, 1, required: true, type: :bytes
   field :field12982, 2, repeated: true, type: :string
@@ -404,7 +404,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message37173 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field37252, 1, optional: true, type: :string
   field :field37253, 2, optional: true, type: :int64
@@ -435,7 +435,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message12799 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field12809, 1, required: true, type: :string
   field :field12810, 2, repeated: true, type: :fixed64
@@ -449,7 +449,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message12870 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field12879, 1, required: true, type: :int32
   field :field12880, 7, optional: true, type: :int32
@@ -475,7 +475,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message3804 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field3818, 1, required: true, type: :int64
   field :field3819, 2, required: true, type: :bool
@@ -488,7 +488,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message12903 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field12905, 1, optional: true, type: :string
   field :field12906, 2, optional: true, type: Benchmarks.GoogleMessage4.Message8587
@@ -497,7 +497,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message37326 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field37345, 1, required: true, type: :string
   field :field37346, 2, optional: true, type: :string
@@ -505,7 +505,7 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message2356.Message2357 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field2399, 9, optional: true, type: :int64
   field :field2400, 10, optional: true, type: :int32
@@ -523,17 +523,17 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message2356.Message2358 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 end
 
 defmodule Benchmarks.GoogleMessage4.Message2356.Message2359 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 end
 
 defmodule Benchmarks.GoogleMessage4.Message2356 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field2368, 121, optional: true, type: Benchmarks.GoogleMessage4.Message1374
   field :field2369, 1, optional: true, type: :uint64
@@ -570,14 +570,14 @@ end
 
 defmodule Benchmarks.GoogleMessage4.Message0 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   extensions [{4, 2_147_483_647}]
 end
 
 defmodule Benchmarks.GoogleMessage4.Message971 do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.9.0-dev", syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
 
   field :field972, 1, optional: true, type: :string
   field :field973, 2, optional: true, type: :int32
