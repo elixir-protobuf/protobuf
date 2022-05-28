@@ -14,6 +14,7 @@ defmodule Protobuf.Encoder do
   @spec encode(struct()) :: binary()
   def encode(%mod{} = struct) do
     struct
+    |> transform_module(mod)
     |> encode_with_message_props(mod.__message_props__())
     |> IO.iodata_to_binary()
   end
