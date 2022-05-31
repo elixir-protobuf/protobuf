@@ -273,6 +273,32 @@ defmodule TestMsg do
     end
   end
 
+  defmodule ContainsIntegerStringTransformModule do
+    use Protobuf, syntax: :proto3
+
+    field :field, 1, type: :int32
+
+    def transform_module(), do: TestMsg.TransformIntegerStrings
+  end
+
+  defmodule TransformIntegerStrings do
+    @behaviour Protobuf.TransformModule
+
+    @impl true
+    def encode(
+          %ContainsIntegerStringTransformModule{field: str},
+          ContainsIntegerStringTransformModule
+        )
+        when is_binary(str) do
+      %ContainsIntegerStringTransformModule{field: String.to_integer(str)}
+    end
+
+    @impl true
+    def decode(%ContainsIntegerStringTransformModule{} = value, _) do
+      value
+    end
+  end
+
   defmodule Ext.EnumFoo do
     @moduledoc false
     use Protobuf, enum: true, syntax: :proto2
