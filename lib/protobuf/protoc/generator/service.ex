@@ -13,7 +13,8 @@ defmodule Protobuf.Protoc.Generator.Service do
     [:assigns]
   )
 
-  @spec generate(Context.t(), Google.Protobuf.ServiceDescriptorProto.t()) :: String.t()
+  @spec generate(Context.t(), Google.Protobuf.ServiceDescriptorProto.t()) ::
+          {String.t(), String.t()}
   def generate(%Context{} = ctx, %Google.Protobuf.ServiceDescriptorProto{} = desc) do
     # service can't be nested
     mod_name = Util.mod_name(ctx, [Macro.camelize(desc.name)])
