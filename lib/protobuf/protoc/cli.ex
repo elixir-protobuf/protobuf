@@ -42,7 +42,7 @@ defmodule Protobuf.Protoc.CLI do
     :io.setopts(:standard_io, encoding: :latin1)
 
     # Read the standard input that protoc feeds us.
-    bin = IO.binread(:stdio, :all)
+    bin = binread_all!(:stdio)
 
     request = Protobuf.Decoder.decode(bin, Google.Protobuf.Compiler.CodeGeneratorRequest)
 
@@ -186,5 +186,22 @@ defmodule Protobuf.Protoc.CLI do
       |> Enum.join(".")
 
     Map.put(types, "." <> mapping_name, %{type_name: type_name})
+  end
+
+  if Version.match?(System.version(), "~> 1.13") do
+    defp binread_all!(device) do
+      case IO.binread(device, :eof) do
+        data when is_binary(data) -> data
+        :eof -> _previous_behavior = ""
+        other -> raise "reading from #{inspect(device)} failed: #{inspect(other)}"
+      end
+    end
+  else
+    defp binread_all!(device) do
+      case IO.binread(device, :all) do
+        data when is_binary(data) -> data
+        other -> raise "reading from #{inspect(device)} failed: #{inspect(other)}"
+      end
+    end
   end
 end
