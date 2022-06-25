@@ -18,6 +18,7 @@ jobs:
             elixir: 1.12.3
             lint: true
             integration: true
+            coverage: true
           - otp: 23.3
             elixir: 1.11.4
           - otp: 23.3
@@ -27,6 +28,7 @@ jobs:
 
     env:
       MIX_ENV: test
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout this repo
@@ -35,7 +37,7 @@ jobs:
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
-          version: '3.17.3'
+          version: "3.17.3"
           repo-token: ${{ secrets.GITHUB_TOKEN }} # to avoid rate limiting
 
       - name: Install OTP and Elixir
@@ -67,8 +69,13 @@ jobs:
         run: mix format --check-formatted
         if: ${{ matrix.lint }}
 
-      - name: Run tests
-        run: mix test
+      - name: Run tests with coverage
+        run: mix coveralls.github
+        if: ${{ matrix.coverage }}
+
+      - name: Run tests without coverage
+        run: mix test --trace
+        if: ${{ !matrix.coverage }}
 
       - name: Compile .proto files to Elixir with protoc
         if: ${{ matrix.integration }}
