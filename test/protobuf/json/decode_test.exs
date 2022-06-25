@@ -681,6 +681,30 @@ defmodule Protobuf.JSON.DecodeTest do
                 )}
     end
 
+    test "Google.Protobuf.FloatValue" do
+      data = %{
+        "optionalFloatWrapper" => 3.14
+      }
+
+      assert decode(data, TestAllTypesProto3) ==
+               {:ok,
+                TestAllTypesProto3.new(
+                  optional_float_wrapper: Google.Protobuf.FloatValue.new!(value: 3.14)
+                )}
+    end
+
+    test "Google.Protobuf.DoubleValue" do
+      data = %{
+        "optionalDoubleWrapper" => 3.14444
+      }
+
+      assert decode(data, TestAllTypesProto3) ==
+               {:ok,
+                TestAllTypesProto3.new(
+                  optional_double_wrapper: Google.Protobuf.DoubleValue.new!(value: 3.14444)
+                )}
+    end
+
     test "Google.Protobuf.StringValue" do
       data = %{
         "optionalStringWrapper" => "my string"
@@ -689,7 +713,87 @@ defmodule Protobuf.JSON.DecodeTest do
       assert decode(data, TestAllTypesProto3) ==
                {:ok,
                 TestAllTypesProto3.new(
-                  optional_string_wrapper: Google.Protobuf.UInt64Value.new!(value: "my string")
+                  optional_string_wrapper: Google.Protobuf.StringValue.new!(value: "my string")
+                )}
+    end
+
+    test "Google.Protobuf.BytesValue" do
+      data = %{
+        "optionalBytesWrapper" => Base.url_encode64(<<1, 2, 3>>)
+      }
+
+      assert decode(data, TestAllTypesProto3) ==
+               {:ok,
+                TestAllTypesProto3.new(
+                  optional_bytes_wrapper: Google.Protobuf.BytesValue.new!(value: <<1, 2, 3>>)
+                )}
+    end
+
+    test "Google.Protobuf.FieldMask with empty field mask" do
+      cases = [
+        {"", []},
+        {"helloWorld1", ["hello_world1"]},
+        {"fooBar,baz2Bong", ["foo_bar", "baz2_bong"]}
+      ]
+
+      for {json, expected_paths} <- cases do
+        data = %{"optionalFieldMask" => json}
+
+        assert decode(data, TestAllTypesProto3) ==
+                 {:ok,
+                  TestAllTypesProto3.new(
+                    optional_field_mask: Google.Protobuf.FieldMask.new!(paths: expected_paths)
+                  )}
+      end
+
+      # Error with bad type.
+      data = %{"optionalFieldMask" => 1}
+      assert {:error, %Protobuf.JSON.DecodeError{} = error} = decode(data, TestAllTypesProto3)
+
+      assert Exception.message(error) ==
+               "JSON map expected for module Google.Protobuf.FieldMask, got: 1"
+
+      # Error with bad mask.
+      data = %{"optionalFieldMask" => "goodMask,badmask!"}
+      assert {:error, %Protobuf.JSON.DecodeError{} = error} = decode(data, TestAllTypesProto3)
+      assert Exception.message(error) == ~s(invalid characters in field mask: "badmask!")
+    end
+
+    test "Google.Protobuf.ListValue" do
+      data = %{
+        "repeatedListValue" => [[1, "two", 3.14, true, nil], [%{"foo" => "bar"}, []]]
+      }
+
+      assert decode(data, TestAllTypesProto3) ==
+               {:ok,
+                TestAllTypesProto3.new(
+                  repeated_list_value: [
+                    Google.Protobuf.ListValue.new!(
+                      values: [
+                        Google.Protobuf.Value.new!(kind: {:number_value, 1.0}),
+                        Google.Protobuf.Value.new!(kind: {:string_value, "two"}),
+                        Google.Protobuf.Value.new!(kind: {:number_value, 3.14}),
+                        Google.Protobuf.Value.new!(kind: {:bool_value, true}),
+                        Google.Protobuf.Value.new!(kind: {:null_value, :NULL_VALUE})
+                      ]
+                    ),
+                    Google.Protobuf.ListValue.new!(
+                      values: [
+                        Google.Protobuf.Value.new!(
+                          kind:
+                            {:struct_value,
+                             Google.Protobuf.Struct.new!(
+                               fields: %{
+                                 "foo" => Google.Protobuf.Value.new!(kind: {:string_value, "bar"})
+                               }
+                             )}
+                        ),
+                        Google.Protobuf.Value.new!(
+                          kind: {:list_value, Google.Protobuf.ListValue.new!(values: [])}
+                        )
+                      ]
+                    )
+                  ]
                 )}
     end
 

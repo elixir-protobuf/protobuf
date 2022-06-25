@@ -5,7 +5,8 @@
     "test",
     "generated",
     "conformance",
-    "lib/google/compiler/plugin.pb.ex",
-    "lib/google/descriptor.pb.ex"
+    "lib/elixirpb.pb.ex",
+    "lib/google/protobuf/compiler/plugin.pb.ex",
+    "lib/google/protobuf/descriptor.pb.ex"
   ]
 }

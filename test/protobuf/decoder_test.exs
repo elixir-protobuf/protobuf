@@ -203,6 +203,14 @@ defmodule Protobuf.DecoderTest do
              %TestMsg.ContainsTransformModule{field: nil}
   end
 
+  test "raises an error on unknown wire types" do
+    payload = Protobuf.Encoder.encode_fnum(_fnum = 1, _wire_type = 6)
+
+    assert_raise Protobuf.DecodeError, "cannot decode binary data, unknown wire type: 6", fn ->
+      Decoder.decode(payload, TestMsg.Oneof)
+    end
+  end
+
   describe "groups" do
     test "skips all groups and their fields" do
       a = <<8, 42>>
