@@ -72,11 +72,12 @@ jobs:
           elixir-version: ${{ matrix.elixir }}
 
       - name: Get and compile dependencies
-        run: mix deps.get && mix deps.compile
+        run: mix do deps.get, deps.compile
 
       - name: Compile project
         run: mix compile
 
       - name: Run mix protobuf.conformance with the runner from Protobuf's main branch
-        run: |
-          mix conformance_test --runner=./protobuf/conformance/conformance-test-runner --verbose
+        run: mix conformance_test --verbose
+        env:
+          PROTOBUF_ROOT: ./protobuf

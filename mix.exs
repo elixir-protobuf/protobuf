@@ -198,7 +198,8 @@ defmodule Protobuf.Mixfile do
   end
 
   defp path_in_protobuf_source(path) do
-    Path.join([Mix.Project.deps_paths().google_protobuf | List.wrap(path)])
+    protobuf_root = System.get_env("PROTOBUF_ROOT") || Mix.Project.deps_paths().google_protobuf
+    Path.join([protobuf_root | List.wrap(path)])
   end
 
   defp benchmark_proto_files do
@@ -239,32 +240,26 @@ defmodule Protobuf.Mixfile do
   end
 
   defp run_conformance_tests(args) do
-    {options, _args} = OptionParser.parse!(args, strict: [runner: :string, verbose: :boolean])
+    {options, _args} = OptionParser.parse!(args, switches: [verbose: :boolean])
 
-    runner =
-      options
-      |> Keyword.get_lazy(:runner, fn ->
-        path = path_in_protobuf_source("conformance/conformance-test-runner")
+    runner = path_in_protobuf_source("conformance/conformance-test-runner")
 
-        if File.exists?(path) do
-          Mix.shell().info([:faint, "Using default conformance runner: ", :reset, path])
-          path
-        else
-          Mix.raise("""
-          No --runner option was passed and we didn't find the default runner we use,
-          which should be in: #{path}
+    if not File.exists?(runner) do
+      Mix.raise("""
+      No conformance runner found at: #{runner}
 
-          If you want to build the conformance runner locally from the Google Protobuf
-          dependency of this library, run:
+      If you want to build the conformance runner locally from the Google Protobuf
+      dependency of this library, run:
 
-              mix build_conformance_runner
+          mix build_conformance_runner
 
-          """)
-        end
-      end)
-      |> Path.expand()
+      If you have the protocolbuffers/protobuf repository cloned somewhere and want
+      to use its conformance runner, you'll need to export the PROTOBUF_ROOT environment
+      variable.
+      """)
+    end
 
-    verbose? = Keyword.get(options, :verbose, false)
+    runner = Path.expand(runner)
 
     args = [
       "--enforce_recommended",
@@ -273,7 +268,7 @@ defmodule Protobuf.Mixfile do
       "./conformance/runner.sh"
     ]
 
-    args = if verbose?, do: ["--verbose"] ++ args, else: args
+    args = if Keyword.get(options, :verbose, false), do: ["--verbose"] ++ args, else: args
     cmd!("#{runner} #{Enum.join(args, " ")}")
   end
 
