@@ -3,17 +3,20 @@ defmodule Protobuf.Builder do
 
   alias Protobuf.FieldProps
 
-  @spec new(module) :: %{required(:__struct__) => module} when module: module()
+  @spec new(module) :: %{required(:__struct__) => module, optional(atom()) => any()}
+        when module: module()
   def new(mod) when is_atom(mod) do
     struct(mod)
   end
 
-  @spec new(module, Enum.t()) :: %{required(:__struct__) => module} when module: module()
+  @spec new(module, Enum.t()) :: %{required(:__struct__) => module, optional(atom()) => any()}
+        when module: module()
   def new(mod, attrs) when is_atom(mod) do
     new_maybe_strict(mod, attrs, _strict? = false)
   end
 
-  @spec new!(module, Enum.t()) :: %{required(:__struct__) => module} when module: module()
+  @spec new!(module, Enum.t()) :: %{required(:__struct__) => module, optional(atom()) => any()}
+        when module: module()
   def new!(mod, attrs) when is_atom(mod) do
     new_maybe_strict(mod, attrs, _strict? = true)
   end
