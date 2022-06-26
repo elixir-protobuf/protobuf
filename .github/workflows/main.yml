@@ -57,6 +57,20 @@ jobs:
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: mix deps.get
 
+      # Don't cache PLTs based on mix.lock hash, as Dialyzer can incrementally update even old ones
+      # Cache key based on Elixir & Erlang version (also useful when running in matrix)
+      - name: Cache Dialyzer's PLT
+        uses: actions/cache@v2
+        id: cache-plt
+        with:
+          path: priv/plts
+          key: ${{ runner.os }}-otp${{ matrix.otp }}-elixir${{ matrix.elixir }}-plt
+
+      # Create PLTs if no cache was found
+      - name: Create PLTs
+        if: steps.cache-plt.outputs.cache-hit != 'true'
+        run: mix dialyzer --plt
+
       - name: Check for unused dependencies
         run: mix deps.unlock --check-unused
         if: ${{ matrix.lint }}
@@ -76,6 +90,9 @@ jobs:
       - name: Run tests without coverage
         run: mix test --trace
         if: ${{ !matrix.coverage }}
+
+      - name: Run Dialyzer
+        run: mix dialyzer
 
       - name: Compile .proto files to Elixir with protoc
         if: ${{ matrix.integration }}
