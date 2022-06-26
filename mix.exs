@@ -12,7 +12,7 @@ defmodule Protobuf.Mixfile do
       elixir: "~> 1.6",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
-      dialyzer: [plt_add_apps: [:mix, :jason]],
+      dialyzer: [plt_add_apps: [:mix, :jason], flags: [:no_improper_lists]],
       elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
