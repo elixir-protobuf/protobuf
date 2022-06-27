@@ -3,14 +3,14 @@ defmodule Protobuf.DSL.Enum do
 
   alias Protobuf.{FieldProps, MessageProps}
 
-  @callback value(atom()) :: non_neg_integer()
-  @callback value(tag) :: tag when tag: non_neg_integer()
+  @callback value(atom()) :: integer()
+  @callback value(tag) :: tag when tag: integer()
 
-  @callback key(non_neg_integer()) :: atom() | non_neg_integer()
+  @callback key(integer()) :: atom() | integer()
 
-  @callback mapping() :: %{optional(atom()) => tag} when tag: non_neg_integer()
+  @callback mapping() :: %{optional(atom()) => tag} when tag: integer()
 
-  @callback __reverse_mapping__() :: %{optional(tag) => atom()} when tag: non_neg_integer()
+  @callback __reverse_mapping__() :: %{optional(tag) => atom()} when tag: integer()
 
   @spec quoted_enum_functions(MessageProps.t()) :: Macro.t()
   def quoted_enum_functions(%MessageProps{enum?: true} = message_props) do
