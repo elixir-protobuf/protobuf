@@ -208,7 +208,8 @@ defmodule Protobuf.Encoder do
 
               nil ->
                 raise Protobuf.EncodeError,
-                  message: "#{inspect(field_name)} wasn't found in #{inspect(struct.__struct__)}##{field}"
+                  message:
+                    "#{inspect(field_name)} wasn't found in #{inspect(struct.__struct__)}##{field}"
             end
 
           if oneof != index do
