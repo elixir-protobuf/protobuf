@@ -201,7 +201,16 @@ defmodule Protobuf.Encoder do
     Enum.reduce(oneof, %{}, fn {field, index}, acc ->
       case Map.fetch(struct, field) do
         {:ok, {field_name, value}} when is_atom(field_name) ->
-          %FieldProps{oneof: oneof} = field_props[field_tags[field_name]]
+          oneof =
+            case field_props[field_tags[field_name]] do
+              %FieldProps{oneof: oneof} ->
+                oneof
+
+              nil ->
+                raise Protobuf.EncodeError,
+                  message:
+                    "#{inspect(field_name)} wasn't found in #{inspect(struct.__struct__)}##{field}"
+            end
 
           if oneof != index do
             raise Protobuf.EncodeError,
