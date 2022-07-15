@@ -57,7 +57,10 @@ defmodule Protobuf.Protoc.CLI do
         Protobuf.Protoc.Generator.generate(ctx, desc)
       end)
 
-    Google.Protobuf.Compiler.CodeGeneratorResponse.new(file: files, supported_features: supported_features())
+    Google.Protobuf.Compiler.CodeGeneratorResponse.new(
+      file: files,
+      supported_features: supported_features()
+    )
     |> Protobuf.encode_to_iodata()
     |> IO.binwrite()
   end
@@ -71,7 +74,6 @@ defmodule Protobuf.Protoc.CLI do
     # This is backwards compatible with proto2 optional fields.
     Google.Protobuf.Compiler.CodeGeneratorResponse.Feature.value(:FEATURE_PROTO3_OPTIONAL)
   end
-
 
   # Made public for testing.
   @doc false

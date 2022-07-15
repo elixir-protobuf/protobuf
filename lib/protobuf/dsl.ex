@@ -238,19 +238,44 @@ defmodule Protobuf.DSL do
 
   defp parse_field_opts_to_field_props(%FieldProps{} = props, opts) do
     Enum.reduce(opts, props, fn
-      {:optional, optional?}, acc -> %FieldProps{acc | optional?: optional?}
-      {:proto3_optional, proto3_optional?}, acc -> %FieldProps{acc | proto3_optional?: proto3_optional?}
-      {:required, required?}, acc -> %FieldProps{acc | required?: required?}
-      {:enum, enum?}, acc -> %FieldProps{acc | enum?: enum?}
-      {:map, map?}, acc -> %FieldProps{acc | map?: map?}
-      {:repeated, repeated?}, acc -> %FieldProps{acc | repeated?: repeated?}
-      {:embedded, embedded}, acc -> %FieldProps{acc | embedded?: embedded}
-      {:deprecated, deprecated?}, acc -> %FieldProps{acc | deprecated?: deprecated?}
-      {:packed, packed?}, acc -> %FieldProps{acc | packed?: packed?}
-      {:type, type}, acc -> %FieldProps{acc | type: type}
-      {:default, default}, acc -> %FieldProps{acc | default: default}
-      {:oneof, oneof}, acc -> %FieldProps{acc | oneof: oneof}
-      {:json_name, json_name}, acc -> %FieldProps{acc | json_name: json_name}
+      {:optional, optional?}, acc ->
+        %FieldProps{acc | optional?: optional?}
+
+      {:proto3_optional, proto3_optional?}, acc ->
+        %FieldProps{acc | proto3_optional?: proto3_optional?}
+
+      {:required, required?}, acc ->
+        %FieldProps{acc | required?: required?}
+
+      {:enum, enum?}, acc ->
+        %FieldProps{acc | enum?: enum?}
+
+      {:map, map?}, acc ->
+        %FieldProps{acc | map?: map?}
+
+      {:repeated, repeated?}, acc ->
+        %FieldProps{acc | repeated?: repeated?}
+
+      {:embedded, embedded}, acc ->
+        %FieldProps{acc | embedded?: embedded}
+
+      {:deprecated, deprecated?}, acc ->
+        %FieldProps{acc | deprecated?: deprecated?}
+
+      {:packed, packed?}, acc ->
+        %FieldProps{acc | packed?: packed?}
+
+      {:type, type}, acc ->
+        %FieldProps{acc | type: type}
+
+      {:default, default}, acc ->
+        %FieldProps{acc | default: default}
+
+      {:oneof, oneof}, acc ->
+        %FieldProps{acc | oneof: oneof}
+
+      {:json_name, json_name}, acc ->
+        %FieldProps{acc | json_name: json_name}
     end)
   end
 
