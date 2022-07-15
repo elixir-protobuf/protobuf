@@ -78,7 +78,8 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp field(syntax, f, opts_str) do
-    label_str = if syntax == :proto3 && f[:label] != "repeated", do: "", else: "#{f[:label]}: true, "
+    label_str =
+      if syntax == :proto3 && f[:label] != "repeated", do: "", else: "#{f[:label]}: true, "
 
     ":#{f[:name]}, #{f[:number]}, #{label_str}type: #{f[:type]}#{opts_str}"
   end
@@ -118,10 +119,10 @@ defmodule Protobuf.Protoc.Generator.Message do
     opts = if map, do: Keyword.put(opts, :map, true), else: opts
 
     opts =
-      case field_desc.oneof_index do
-        _ when oneofs == [] or field_desc.proto3_optional == true -> opts
-        nil -> opts
-        index -> Keyword.put(opts, :oneof, index)
+      cond do
+        field_desc.oneof_index == nil -> opts
+        oneofs == [] or field_desc.proto3_optional -> opts
+        true -> Keyword.put(opts, :oneof, field_desc.oneof_index)
       end
 
     opts_str =
@@ -155,6 +156,7 @@ defmodule Protobuf.Protoc.Generator.Message do
       end
     end)
   end
+
   # To avoid unnecessarily changing the files that users of this library generated with previous
   # versions, we try to guarantee an order of field options in the generated files.
   ordered_opts = [
