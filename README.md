@@ -1,6 +1,7 @@
 # protobuf-elixir
 
 [![CI](https://github.com/elixir-protobuf/protobuf/actions/workflows/main.yml/badge.svg)](https://github.com/elixir-protobuf/protobuf/actions/workflows/main.yml)
+[![Coverage Status](https://coveralls.io/repos/github/elixir-protobuf/protobuf/badge.svg?branch=main)](https://coveralls.io/github/elixir-protobuf/protobuf?branch=main)
 
 A pure Elixir implementation of [Google Protobuf](https://developers.google.com/protocol-buffers/).
 

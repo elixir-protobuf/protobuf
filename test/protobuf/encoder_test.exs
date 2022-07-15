@@ -254,9 +254,30 @@ defmodule Protobuf.EncoderTest do
     assert TestMsg.ContainsTransformModule.decode(Encoder.encode(msg)) == msg
   end
 
+  test "encodes with transformer module when encoding struct contains a transformer module" do
+    msg = TestMsg.ContainsIntegerStringTransformModule.new(field: "42")
+    assert msg == %TestMsg.ContainsIntegerStringTransformModule{field: "42"}
+
+    encoded = TestMsg.ContainsIntegerStringTransformModule.encode(msg)
+    assert encoded == "\b*"
+
+    assert %TestMsg.ContainsIntegerStringTransformModule{field: 42} ==
+             TestMsg.ContainsIntegerStringTransformModule.decode(encoded)
+  end
+
   test "encoding skips transformer module when field is not set" do
     msg = %TestMsg.ContainsTransformModule{field: nil}
     assert Encoder.encode(msg) == <<>>
     assert TestMsg.ContainsTransformModule.decode(Encoder.encode(msg)) == msg
+  end
+
+  test "NewTransform calls new/2 before encoding" do
+    msg = TestMsg.ContainsNewTransformModule.new(field: [field: 123])
+    assert msg == %TestMsg.ContainsNewTransformModule{field: [field: 123]}
+
+    assert TestMsg.ContainsNewTransformModule.decode(Encoder.encode(msg)) ==
+             %TestMsg.ContainsNewTransformModule{
+               field: %TestMsg.WithNewTransformModule{field: 123}
+             }
   end
 end

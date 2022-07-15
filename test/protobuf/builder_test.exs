@@ -1,7 +1,7 @@
 defmodule Protobuf.BuilderTest do
   use ExUnit.Case, async: true
 
-  alias TestMsg.{Foo, Foo2, Link, Proto3Optional}
+  alias TestMsg.{Foo, Foo2, Link, ContainsTransformModule, Proto3Optional}
 
   test "new/2 uses default values for proto3" do
     assert Foo.new().a == 0
@@ -71,5 +71,9 @@ defmodule Protobuf.BuilderTest do
     assert_raise Protobuf.EncodeError, fn ->
       Foo.encode(foo)
     end
+  end
+
+  test "new/2 ignores structs with transform modules" do
+    assert ContainsTransformModule.new(field: 123) == %ContainsTransformModule{field: 123}
   end
 end

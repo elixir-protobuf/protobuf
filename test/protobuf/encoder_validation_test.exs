@@ -124,6 +124,14 @@ defmodule Protobuf.EncoderTest.Validation do
     end
   end
 
+  test "oneof field is non-existent" do
+    msg = TestMsg.OneofProto3.new(first: {:x, "foo"})
+
+    assert_raise Protobuf.EncodeError, ~r/:x wasn't found in TestMsg.OneofProto3#first/, fn ->
+      Protobuf.Encoder.encode(msg)
+    end
+  end
+
   test "repeated field is not list" do
     msg = TestMsg.Foo.new(g: 1)
 

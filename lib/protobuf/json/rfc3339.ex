@@ -102,7 +102,7 @@ defmodule Protobuf.JSON.RFC3339 do
         end
 
       {:error, reason} ->
-        {:error, reason}
+        {:error, inspect(reason)}
     end
   end
 

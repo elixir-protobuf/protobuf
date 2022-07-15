@@ -10,7 +10,7 @@ on:
     inputs: {}
   # Every day at 9am.
   schedule:
-    - cron: '0 9 * * *'
+    - cron: "0 9 * * *"
 
 jobs:
   latest-conformance-test:
@@ -30,13 +30,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Update and install dependencies to build protoc locally
-        # Dependencies from https://github.com/protocolbuffers/protobuf/blob/master/src/README.md
+        # Dependencies from https://github.com/protocolbuffers/protobuf/blob/main/src/README.md
         run: sudo apt-get update && sudo apt-get install -y git autoconf automake libtool curl make g++ unzip jq
 
-      - name: Get SHA of Protobuf repo's master branch
+      - name: Get SHA of Protobuf repo's main branch
         id: get-protobuf-sha
         run: |
-          echo ::set-output name=sha::$( curl -u "u:${{github.token}}" https://api.github.com/repos/protocolbuffers/protobuf/git/ref/heads/master | jq .object.sha | tr -d '"' )
+          echo ::set-output name=sha::$( curl -u "u:${{github.token}}" https://api.github.com/repos/protocolbuffers/protobuf/git/ref/heads/main | jq .object.sha | tr -d '"' )
 
       - name: Checkout Protobuf repo
         uses: actions/checkout@v2
@@ -66,17 +66,18 @@ jobs:
         run: echo "$PWD/protobuf/src" >> $GITHUB_PATH
 
       - name: Install OTP and Elixir
-        uses: erlef/setup-elixir@v1
+        uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
 
       - name: Get and compile dependencies
-        run: mix deps.get && mix deps.compile
+        run: mix do deps.get, deps.compile
 
       - name: Compile project
         run: mix compile
 
-      - name: Run mix protobuf.conformance with the runner from Protobuf's master branch
-        run: |
-          mix conformance_test --runner=./protobuf/conformance/conformance-test-runner --verbose
+      - name: Run mix protobuf.conformance with the runner from Protobuf's main branch
+        run: mix conformance_test --verbose
+        env:
+          PROTOBUF_ROOT: ./protobuf

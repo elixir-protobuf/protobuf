@@ -238,6 +238,102 @@ defmodule Protobuf.JSON.EncodeTest do
     assert encode(message, emit_unpopulated: true) == %{decoded | "h" => [bar, bar]}
   end
 
+  describe "Google.Protobuf.* value wrappers" do
+    test "Google.Protobuf.BoolValue" do
+      message =
+        TestAllTypesProto3.new!(
+          optional_bool_wrapper: Google.Protobuf.BoolValue.new!(value: true)
+        )
+
+      assert encode(message) == %{"optionalBoolWrapper" => true}
+    end
+
+    test "Google.Protobuf.StringValue" do
+      message =
+        TestAllTypesProto3.new!(
+          optional_string_wrapper: Google.Protobuf.StringValue.new!(value: "foo")
+        )
+
+      assert encode(message) == %{"optionalStringWrapper" => "foo"}
+    end
+
+    test "Google.Protobuf.FloatValue" do
+      message =
+        TestAllTypesProto3.new!(
+          optional_float_wrapper: Google.Protobuf.FloatValue.new!(value: 3.14)
+        )
+
+      assert encode(message) == %{"optionalFloatWrapper" => 3.14}
+    end
+
+    test "Google.Protobuf.DoubleValue" do
+      message =
+        TestAllTypesProto3.new!(
+          optional_double_wrapper: Google.Protobuf.DoubleValue.new!(value: 3.14)
+        )
+
+      assert encode(message) == %{"optionalDoubleWrapper" => 3.14}
+    end
+
+    test "Google.Protobuf.Int32Value" do
+      message =
+        TestAllTypesProto3.new!(
+          optional_int32_wrapper: Google.Protobuf.Int32Value.new!(value: -3)
+        )
+
+      assert encode(message) == %{"optionalInt32Wrapper" => -3}
+    end
+
+    test "Google.Protobuf.UInt32Value" do
+      message =
+        TestAllTypesProto3.new!(
+          optional_uint32_wrapper: Google.Protobuf.UInt32Value.new!(value: 3)
+        )
+
+      assert encode(message) == %{"optionalUint32Wrapper" => 3}
+    end
+
+    test "Google.Protobuf.Int64Value" do
+      message =
+        TestAllTypesProto3.new!(
+          optional_int64_wrapper: Google.Protobuf.Int64Value.new!(value: -3)
+        )
+
+      assert encode(message) == %{"optionalInt64Wrapper" => -3}
+    end
+
+    test "Google.Protobuf.UInt64Value" do
+      message =
+        TestAllTypesProto3.new!(
+          optional_uint64_wrapper: Google.Protobuf.UInt64Value.new!(value: 3)
+        )
+
+      assert encode(message) == %{"optionalUint64Wrapper" => 3}
+    end
+  end
+
+  describe "Google.Protobuf.BytesValue" do
+    test "encodes with base 64" do
+      message =
+        TestAllTypesProto3.new!(
+          optional_bytes_wrapper: Google.Protobuf.BytesValue.new!(value: <<1, 2, 3>>)
+        )
+
+      assert encode(message) == %{"optionalBytesWrapper" => Base.url_encode64(<<1, 2, 3>>)}
+    end
+  end
+
+  describe "Google.Protobuf.FieldMask" do
+    test "encodes with base 64" do
+      message =
+        TestAllTypesProto3.new!(
+          optional_field_mask: Google.Protobuf.FieldMask.new!(paths: ["foo_bar", "baz_bong"])
+        )
+
+      assert encode(message) == %{"optionalFieldMask" => "fooBar,bazBong"}
+    end
+  end
+
   describe "Google.Protobuf.Duration" do
     test "encodes as a string" do
       cases = [
@@ -284,6 +380,16 @@ defmodule Protobuf.JSON.EncodeTest do
   end
 
   describe "Google.Protobuf.Timestamp" do
+    test "encodes the timestamp as a string" do
+      {:ok, datetime, _offset = 0} = DateTime.from_iso8601("2000-01-01T00:00:00Z")
+      unix_seconds = DateTime.to_unix(datetime, :second)
+
+      timestamp = Google.Protobuf.Timestamp.new!(seconds: unix_seconds, nanos: 0)
+      message = TestAllTypesProto3.new!(optional_timestamp: timestamp)
+
+      assert encode(message) == %{"optionalTimestamp" => "2000-01-01T00:00:00Z"}
+    end
+
     test "returns an error if the timestamp is outside of the allowed range" do
       {:ok, datetime, _offset = 0} = DateTime.from_iso8601("0000-01-01T00:00:00Z")
       unix_seconds = DateTime.to_unix(datetime, :second)
@@ -293,6 +399,40 @@ defmodule Protobuf.JSON.EncodeTest do
 
       assert catch_throw(encode(message)) ==
                {:invalid_timestamp, timestamp, "timestamp is outside of allowed range"}
+    end
+  end
+
+  describe "Google.Protobuf.Value" do
+    test "encodes correctly" do
+      cases = [
+        {{:string_value, "foo"}, "foo"},
+        {{:bool_value, true}, true},
+        {{:number_value, 3.14}, 3.14},
+        {{:number_value, 1}, 1},
+        {{:null_value, :NULL_VALUE}, nil}
+      ]
+
+      for {kind, json} <- cases do
+        value = Google.Protobuf.Value.new!(kind: kind)
+        message = TestAllTypesProto3.new!(optional_value: value)
+        assert encode(message) == %{"optionalValue" => json}
+      end
+    end
+  end
+
+  describe "Google.Protobuf.ListValue" do
+    test "encodes correctly" do
+      value = Google.Protobuf.ListValue.new!(values: [])
+      message = TestAllTypesProto3.new!(repeated_list_value: [value])
+      assert encode(message) == %{"repeatedListValue" => [[]]}
+    end
+  end
+
+  describe "Google.Protobuf.Struct" do
+    test "encodes correctly" do
+      value = Google.Protobuf.Struct.new!(fields: %{"foo" => Google.Protobuf.Empty.new!([])})
+      message = TestAllTypesProto3.new!(optional_struct: value)
+      assert encode(message) == %{"optionalStruct" => %{"foo" => %{}}}
     end
   end
 end

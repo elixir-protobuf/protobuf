@@ -6,6 +6,10 @@ defmodule Protobuf.Protoc.Generator.Extension do
 
   require EEx
 
+  @opaque extension() ::
+            {namespace :: [String.t(), ...],
+             [ext_field :: Google.Protobuf.FieldDescriptorProto.t()]}
+
   @ext_postfix "PbExtension"
 
   EEx.function_from_file(
@@ -15,13 +19,14 @@ defmodule Protobuf.Protoc.Generator.Extension do
     [:assigns]
   )
 
-  @spec generate(Context.t(), Google.Protobuf.FileDescriptorProto.t(), %{}) ::
+  @spec generate(Context.t(), Google.Protobuf.FileDescriptorProto.t(), [extension()]) ::
           nil | {module_name :: String.t(), file_contents :: String.t()}
   def generate(
         %Context{namespace: ns} = ctx,
         %Google.Protobuf.FileDescriptorProto{} = desc,
         nested_extensions
-      ) do
+      )
+      when is_list(nested_extensions) do
     extends = Enum.map(desc.extension, &generate_extend(ctx, &1, _ns = ""))
 
     nested_extends =
@@ -64,9 +69,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
     "#{extendee}, :#{name}, #{f.number}, #{f.label}: true, type: #{f.type}#{f.opts_str}"
   end
 
-  @spec get_nested_extensions(Context.t(), [Google.Protobuf.DescriptorProto.t()]) ::
-          [{namespace, [ext_field]}]
-        when namespace: [String.t(), ...], ext_field: Google.Protobuf.FieldDescriptorProto.t()
+  @spec get_nested_extensions(Context.t(), [Google.Protobuf.DescriptorProto.t()]) :: [extension()]
   def get_nested_extensions(%Context{} = ctx, descs) when is_list(descs) do
     get_nested_extensions(ctx.namespace, descs, _acc = [])
   end

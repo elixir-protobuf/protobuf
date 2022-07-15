@@ -29,6 +29,7 @@ defmodule Protobuf.Protoc.Generator do
         module_definitions
         |> Enum.map(fn {_mod_name, contents} -> [contents, ?\n] end)
         |> IO.iodata_to_binary()
+        |> Generator.Util.format()
 
       [
         Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(

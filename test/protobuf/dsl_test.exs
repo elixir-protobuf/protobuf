@@ -305,4 +305,17 @@ defmodule Protobuf.DSLTest do
       )
     end
   end
+
+  test "raises a compilation error if syntax is proto3 and the first enum has tag other than 0" do
+    assert_raise RuntimeError, "the first enum value must have tag 0 in proto3, got: 1", fn ->
+      Code.eval_quoted(
+        quote do
+          defmodule MessageWithProto3BadEnumTag do
+            use Protobuf, syntax: :proto3, enum: true
+            field :NOT_ZERO, 1
+          end
+        end
+      )
+    end
+  end
 end

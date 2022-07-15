@@ -3,17 +3,20 @@ defmodule Protobuf.Builder do
 
   alias Protobuf.FieldProps
 
-  @spec new(module) :: %{required(:__struct__) => module} when module: module()
+  @spec new(module) :: %{required(:__struct__) => module, optional(atom()) => any()}
+        when module: module()
   def new(mod) when is_atom(mod) do
     struct(mod)
   end
 
-  @spec new(module, Enum.t()) :: %{required(:__struct__) => module} when module: module()
+  @spec new(module, Enum.t()) :: %{required(:__struct__) => module, optional(atom()) => any()}
+        when module: module()
   def new(mod, attrs) when is_atom(mod) do
     new_maybe_strict(mod, attrs, _strict? = false)
   end
 
-  @spec new!(module, Enum.t()) :: %{required(:__struct__) => module} when module: module()
+  @spec new!(module, Enum.t()) :: %{required(:__struct__) => module, optional(atom()) => any()}
+        when module: module()
   def new!(mod, attrs) when is_atom(mod) do
     new_maybe_strict(mod, attrs, _strict? = true)
   end
@@ -26,9 +29,9 @@ defmodule Protobuf.Builder do
 
       # If "attrs" is a struct but not the same struct as "mod", then we raise if are being
       # strict.
-      %{__struct__: _other_mod} when strict? ->
+      %{__struct__: _} = struct when strict? ->
         raise ArgumentError,
-          message: "The __struct__ in the struct doesn't with the message module"
+          message: "Struct %#{inspect(mod)}{} was expected, but given #{inspect(struct)}"
 
       # If "attrs" is a struct but not the same struct as "mod", then we use it as attributes
       # to build our new struct:
@@ -49,10 +52,18 @@ defmodule Protobuf.Builder do
         %{^field_name => value} when not is_nil(value) ->
           case props.field_props[props.field_tags[field_name]] do
             %FieldProps{embedded?: true, repeated?: true, type: type} ->
-              %{acc | field_name => Enum.map(value, &type.new/1)}
+              if type.transform_module() do
+                acc
+              else
+                %{acc | field_name => Enum.map(value, &type.new/1)}
+              end
 
             %FieldProps{embedded?: true, repeated?: false, type: type} ->
-              %{acc | field_name => type.new(value)}
+              if type.transform_module() do
+                acc
+              else
+                %{acc | field_name => type.new(value)}
+              end
 
             _other ->
               acc
