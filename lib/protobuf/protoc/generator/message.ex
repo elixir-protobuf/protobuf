@@ -150,10 +150,7 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   defp get_real_oneofs(oneof_decl) do
     Enum.flat_map(oneof_decl, fn oneof ->
-      case !String.starts_with?(oneof.name, "_") do
-        true -> [oneof.name]
-        _ -> []
-      end
+      if String.starts_with?(oneof.name, "_"), do: [], else: [oneof.name]
     end)
   end
 
