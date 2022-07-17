@@ -69,11 +69,19 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   defp gen_fields(syntax, fields) do
     Enum.map(fields, fn %{opts_str: opts_str} = f ->
-      label_str =
-        if syntax == :proto3 && f[:label] != "repeated", do: "", else: "#{f[:label]}: true, "
-
-      ":#{f[:name]}, #{f[:number]}, #{label_str}type: #{f[:type]}#{opts_str}"
+      field(syntax, f, opts_str)
     end)
+  end
+
+  defp field(:proto3, %{proto3_optional: true, label: "optional"} = f, opts_str) do
+    ":#{f[:name]}, #{f[:number]}, proto3_optional: true, type: #{f[:type]}#{opts_str}"
+  end
+
+  defp field(syntax, f, opts_str) do
+    label_str =
+      if syntax == :proto3 && f[:label] != "repeated", do: "", else: "#{f[:label]}: true, "
+
+    ":#{f[:name]}, #{f[:number]}, #{label_str}type: #{f[:type]}#{opts_str}"
   end
 
   defp msg_opts_str(%{syntax: syntax}, opts) do
@@ -91,7 +99,8 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp get_fields(ctx, desc) do
-    oneofs = Enum.map(desc.oneof_decl, & &1.name)
+    oneofs = get_real_oneofs(desc.oneof_decl)
+
     nested_maps = nested_maps(ctx, desc)
     for field <- desc.field, do: get_field(ctx, field, nested_maps, oneofs)
   end
@@ -110,10 +119,10 @@ defmodule Protobuf.Protoc.Generator.Message do
     opts = if map, do: Keyword.put(opts, :map, true), else: opts
 
     opts =
-      case field_desc.oneof_index do
-        _ when oneofs == [] -> opts
-        nil -> opts
-        index -> Keyword.put(opts, :oneof, index)
+      cond do
+        field_desc.oneof_index == nil -> opts
+        oneofs == [] or field_desc.proto3_optional -> opts
+        true -> Keyword.put(opts, :oneof, field_desc.oneof_index)
       end
 
     opts_str =
@@ -134,8 +143,15 @@ defmodule Protobuf.Protoc.Generator.Message do
       opts: Map.new(opts),
       opts_str: opts_str,
       map: map,
-      oneof: field_desc.oneof_index
+      oneof: field_desc.oneof_index,
+      proto3_optional: field_desc.proto3_optional || false
     }
+  end
+
+  defp get_real_oneofs(oneof_decl) do
+    Enum.flat_map(oneof_decl, fn oneof ->
+      if String.starts_with?(oneof.name, "_"), do: [], else: [oneof.name]
+    end)
   end
 
   # To avoid unnecessarily changing the files that users of this library generated with previous

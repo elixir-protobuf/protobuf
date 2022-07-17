@@ -57,13 +57,22 @@ defmodule Protobuf.Protoc.CLI do
         Protobuf.Protoc.Generator.generate(ctx, desc)
       end)
 
-    Google.Protobuf.Compiler.CodeGeneratorResponse.new(file: files)
+    Google.Protobuf.Compiler.CodeGeneratorResponse.new(
+      file: files,
+      supported_features: supported_features()
+    )
     |> Protobuf.encode_to_iodata()
     |> IO.binwrite()
   end
 
   def main(_args) do
     raise "invalid arguments. See protoc-gen-elixir --help."
+  end
+
+  def supported_features() do
+    # The only available feature is proto3 with optional fields.
+    # This is backwards compatible with proto2 optional fields.
+    Google.Protobuf.Compiler.CodeGeneratorResponse.Feature.value(:FEATURE_PROTO3_OPTIONAL)
   end
 
   # Made public for testing.

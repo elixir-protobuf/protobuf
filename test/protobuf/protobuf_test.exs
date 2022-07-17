@@ -12,6 +12,11 @@ defmodule Protobuf.ProtobufTest do
       bin = Protobuf.encode(TestMsg.Foo.new(a: 42))
       assert bin == <<8, 42>>
     end
+
+    test "encodes a struct with proto3 optional field" do
+      bin = Protobuf.encode(TestMsg.Proto3Optional.new(b: "A"))
+      assert bin == <<18, 1, 65>>
+    end
   end
 
   describe "encode_to_iodata/1" do

@@ -1,12 +1,17 @@
 defmodule Protobuf.BuilderTest do
   use ExUnit.Case, async: true
 
-  alias TestMsg.{Foo, Foo2, Link, ContainsTransformModule}
+  alias TestMsg.{Foo, Foo2, Link, ContainsTransformModule, Proto3Optional}
 
   test "new/2 uses default values for proto3" do
     assert Foo.new().a == 0
     assert Foo.new().c == ""
     assert Foo.new().e == nil
+  end
+
+  test "new/2 uses nil for proto3 optional field" do
+    assert Proto3Optional.new().a == nil
+    assert Proto3Optional.new().b == ""
   end
 
   test "new/2 use nil for proto2" do
