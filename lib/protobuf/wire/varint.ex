@@ -43,7 +43,7 @@ defmodule Protobuf.Wire.Varint do
       iex> Protobuf.Wire.Varint.encode(1_234_567)
       [<<135>>, <<173>>, 75]
   """
-  use Bitwise
+  import Bitwise
 
   @max_bits 64
   @mask64 bsl(1, @max_bits) - 1

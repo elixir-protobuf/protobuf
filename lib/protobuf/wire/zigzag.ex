@@ -1,7 +1,7 @@
 defmodule Protobuf.Wire.Zigzag do
   @moduledoc false
 
-  use Bitwise, skip_operators: true
+  import Bitwise
 
   @spec encode(integer) :: integer
   def encode(n) when n >= 0, do: n * 2
