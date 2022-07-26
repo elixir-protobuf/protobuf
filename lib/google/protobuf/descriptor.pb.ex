@@ -67,6 +67,15 @@ defmodule Google.Protobuf.MethodOptions.IdempotencyLevel do
   field :IDEMPOTENT, 2
 end
 
+defmodule Google.Protobuf.GeneratedCodeInfo.Annotation.Semantic do
+  @moduledoc false
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
+
+  field :NONE, 0
+  field :SET, 1
+  field :ALIAS, 2
+end
+
 defmodule Google.Protobuf.FileDescriptorSet do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.1-dev", syntax: :proto2
@@ -90,6 +99,7 @@ defmodule Google.Protobuf.FileDescriptorProto do
   field :options, 8, optional: true, type: Google.Protobuf.FileOptions
   field :source_code_info, 9, optional: true, type: Google.Protobuf.SourceCodeInfo
   field :syntax, 12, optional: true, type: :string
+  field :edition, 13, optional: true, type: :string
 end
 
 defmodule Google.Protobuf.DescriptorProto.ExtensionRange do
@@ -279,6 +289,7 @@ defmodule Google.Protobuf.FieldOptions do
     enum: true
 
   field :lazy, 5, optional: true, type: :bool, default: false
+  field :unverified_lazy, 15, optional: true, type: :bool, default: false
   field :deprecated, 3, optional: true, type: :bool, default: false
   field :weak, 10, optional: true, type: :bool, default: false
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
@@ -390,6 +401,11 @@ defmodule Google.Protobuf.GeneratedCodeInfo.Annotation do
   field :source_file, 2, optional: true, type: :string
   field :begin, 3, optional: true, type: :int32
   field :end, 4, optional: true, type: :int32
+
+  field :semantic, 5,
+    optional: true,
+    type: Google.Protobuf.GeneratedCodeInfo.Annotation.Semantic,
+    enum: true
 end
 
 defmodule Google.Protobuf.GeneratedCodeInfo do
