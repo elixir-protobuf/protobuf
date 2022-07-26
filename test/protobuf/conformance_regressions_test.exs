@@ -93,6 +93,17 @@ defmodule Protobuf.ConformanceRegressionsTest do
     end
   end
 
+  # Fails on OTP 25.
+  test "memory leak and infinite loop regression" do
+    mod = ProtobufTestMessages.Proto2.TestAllTypesProto2
+
+    problematic_payload =
+      <<224, 4, 0, 224, 4, 185, 96, 224, 4, 255, 255, 255, 255, 255, 255, 255, 255, 127, 224, 4,
+        128, 128, 128, 128, 128, 128, 128, 128, 128, 1>>
+
+    assert %^mod{} = mod.decode(problematic_payload)
+  end
+
   defp url_to_message(%{message_type: type_url}) do
     case type_url do
       "protobuf_test_messages.proto3.TestAllTypesProto3" ->
