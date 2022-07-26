@@ -26,7 +26,8 @@ defmodule Protobuf.JSON.Encode do
         Integer.to_string(seconds) <> "s"
 
       %{seconds: seconds, nanos: nanos} ->
-        "#{seconds}.#{Utils.format_nanoseconds(nanos)}s"
+        sign = if seconds < 0 or nanos < 0, do: "-", else: ""
+        "#{sign}#{abs(seconds)}.#{Utils.format_nanoseconds(nanos)}s"
     end
   end
 

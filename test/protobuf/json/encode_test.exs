@@ -341,7 +341,8 @@ defmodule Protobuf.JSON.EncodeTest do
         %{string: "123.001s", seconds: 123, nanos: 1_000_000},
         %{string: "0.000000001s", seconds: 0, nanos: 1},
         %{string: "-1s", seconds: -1, nanos: 0},
-        %{string: "-1.100s", seconds: -1, nanos: -100_000_000}
+        %{string: "-1.100s", seconds: -1, nanos: -100_000_000},
+        %{string: "-0.500s", seconds: 0, nanos: -500_000_000}
       ]
 
       for %{string: expected_string, seconds: seconds, nanos: nanos} <- cases do

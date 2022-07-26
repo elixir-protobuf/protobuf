@@ -49,7 +49,7 @@ defmodule Protobuf.Mixfile do
       {:excoveralls, "~> 0.14.4", only: :test},
       {:google_protobuf,
        github: "protocolbuffers/protobuf",
-       tag: "v3.19.1",
+       branch: "main",
        app: false,
        compile: false,
        only: [:dev, :test]}

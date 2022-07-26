@@ -52,13 +52,16 @@ defmodule Protobuf.JSON.Decode do
   # these built-in types **do not ship with our library**.
 
   def from_json_data(string, Google.Protobuf.Duration = mod) when is_binary(string) do
+    # We need to check the sign from the raw string itself and can't rely on Integer.parse/1. This
+    # is because if seconds is 0, then we couldn't determine whether it was "0" or "-0". For
+    # example, "-0.5s".
+    sign = if String.starts_with?(string, "-"), do: -1, else: 1
+
     case Integer.parse(string) do
       {seconds, "s"} when seconds in @duration_seconds_range ->
         mod.new!(seconds: seconds)
 
       {seconds, "." <> nanos_with_s} when seconds in @duration_seconds_range ->
-        sign = if seconds < 0, do: -1, else: 1
-
         case Utils.parse_nanoseconds(nanos_with_s) do
           {nanos, "s"} -> mod.new!(seconds: seconds, nanos: nanos * sign)
           :error -> throw({:bad_duration, string, nanos_with_s})

@@ -804,19 +804,18 @@ defmodule Protobuf.JSON.DecodeTest do
         %{string: "123.000s", seconds: 123, nanos: 0},
         %{string: "0.000000001s", seconds: 0, nanos: 1},
         %{string: "-1s", seconds: -1, nanos: 0},
-        %{string: "-1.1s", seconds: -1, nanos: -100_000_000}
+        %{string: "-1.1s", seconds: -1, nanos: -100_000_000},
+        %{string: "-0.5s", seconds: 0, nanos: -500_000_000}
       ]
 
       for %{string: string, seconds: expected_seconds, nanos: expected_nanos} <- cases do
         data = %{"optionalDuration" => string}
 
         expected_duration =
-          TestAllTypesProto3.new(
-            optional_duration:
-              Google.Protobuf.Duration.new!(seconds: expected_seconds, nanos: expected_nanos)
-          )
+          Google.Protobuf.Duration.new!(seconds: expected_seconds, nanos: expected_nanos)
 
-        assert decode(data, TestAllTypesProto3) == {:ok, expected_duration}
+        assert {:ok, decoded} = decode(data, TestAllTypesProto3)
+        assert decoded.optional_duration == expected_duration
       end
 
       # Errors
