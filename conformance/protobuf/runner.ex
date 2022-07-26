@@ -1,7 +1,7 @@
 defmodule Conformance.Protobuf.Runner do
   @moduledoc false
 
-  @stdin_read_timeout 5000
+  @stdin_read_timeout 3000
 
   @spec main() :: :ok
   def main() do
@@ -51,7 +51,12 @@ defmodule Conformance.Protobuf.Runner do
 
   defp read_bytes(device, count, timeout) do
     task = Task.async(fn -> IO.binread(device, count) end)
-    Task.await(task, timeout)
+
+    case Task.yield(task, timeout) || Task.shutdown(task) do
+      {:ok, bytes} -> bytes
+      {:exit, reason} -> raise "failed to read bytes from stdio: #{inspect(reason)}"
+      nil -> raise "failed to read bytes from stdio, timed out"
+    end
   end
 
   defp handle_encoded_request(encoded_request) do
