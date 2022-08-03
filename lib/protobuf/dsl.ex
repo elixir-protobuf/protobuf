@@ -414,7 +414,9 @@ defmodule Protobuf.DSL do
   defp type_default(:sint32), do: 0
   defp type_default(:sint64), do: 0
   defp type_default(:bool), do: false
-  defp type_default({:enum, mod}), do: Code.ensure_compiled!(mod) && mod.key(0)
+  defp type_default({:enum, mod}) do
+    if {:module, mod} == Code.ensure_compiled(mod), do: mod.key(0)
+  end
   defp type_default(:fixed32), do: 0
   defp type_default(:sfixed32), do: 0
   defp type_default(:fixed64), do: 0
