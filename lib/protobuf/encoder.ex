@@ -77,6 +77,10 @@ defmodule Protobuf.Encoder do
   defp skip_field?(_syntax, val, _prop) when is_map(val), do: map_size(val) == 0
   defp skip_field?(:proto2, nil, %FieldProps{optional?: optional?}), do: optional?
   defp skip_field?(:proto2, value, %FieldProps{default: value, oneof: nil}), do: true
+
+  defp skip_field?(:proto3, val, %FieldProps{proto3_optional?: true}),
+    do: is_nil(val)
+
   defp skip_field?(:proto3, nil, _prop), do: true
   defp skip_field?(:proto3, 0, %FieldProps{oneof: nil}), do: true
   defp skip_field?(:proto3, 0.0, %FieldProps{oneof: nil}), do: true
@@ -176,6 +180,7 @@ defmodule Protobuf.Encoder do
   defp apply_or_map(val, _repeated? = false, func), do: func.(val)
 
   defp skip_enum?(:proto2, _value, _prop), do: false
+  defp skip_enum?(:proto3, _value, %FieldProps{proto3_optional?: true}), do: false
   defp skip_enum?(_syntax, _value, %FieldProps{enum?: false}), do: false
 
   defp skip_enum?(_syntax, _value, %FieldProps{enum?: true, oneof: oneof}) when not is_nil(oneof),
