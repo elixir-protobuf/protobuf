@@ -74,25 +74,15 @@ end
 
     ```elixir
     defmodule Helloworld.HelloRequest do
-      use Protobuf, syntax: :proto3
-
-      @type t :: %__MODULE__{
-        name: String.t()
-      }
-
-      defstruct [:name]
+      @moduledoc false
+      use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
       field :name, 1, type: :string
     end
-
+    
     defmodule Helloworld.HelloReply do
-      use Protobuf, syntax: :proto3
-
-      @type t :: %__MODULE__{
-        message: String.t()
-      }
-
-      defstruct [:message]
+      @moduledoc false
+      use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
       field :message, 1, type: :string
     end
