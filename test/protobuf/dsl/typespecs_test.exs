@@ -29,8 +29,7 @@ defmodule Protobuf.DSL.TypespecsTest do
           integer() | :FOO | :BAR | :BAZ
         end
 
-      assert Typespecs.quoted_enum_typespec(message_props) ==
-               clean_meta(expected, [:import, :context])
+      assert Typespecs.quoted_enum_typespec(message_props) == clean_meta(expected)
     end
 
     property "works for any number of possible enum values" do
@@ -194,8 +193,7 @@ defmodule Protobuf.DSL.TypespecsTest do
     end
   end
 
-  defp clean_meta(expr, vars) do
-    cleaner = &Keyword.drop(&1, vars)
-    Macro.prewalk(expr, &Macro.update_meta(&1, cleaner))
+  defp clean_meta(expr) do
+    Macro.prewalk(expr, &Macro.update_meta(&1, fn _ -> [] end))
   end
 end

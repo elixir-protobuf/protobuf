@@ -15,6 +15,7 @@ defmodule Protobuf.Mixfile do
       dialyzer: [plt_add_apps: [:mix, :jason], flags: [:no_improper_lists]],
       elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: [tool: ExCoveralls],
+      test_elixirc_options: [debug_info: true],
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.html": :test,
