@@ -64,7 +64,7 @@ end
     $ mix escript.install hex protobuf
     ```
 
-3. Generate Elixir code using `protoc`:
+3. Generate Elixir code for [helloworld.proto](https://raw.githubusercontent.com/grpc/grpc/master/examples/protos/helloworld.proto) using `protoc`:
 
     ```bash
     $ protoc --elixir_out=./lib helloworld.proto
