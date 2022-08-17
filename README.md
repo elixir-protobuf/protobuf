@@ -22,7 +22,7 @@ The package can be installed by adding `:protobuf` to your list of dependencies 
 ```elixir
 def deps do
   [
-    {:protobuf, "~> 0.8.0"},
+    {:protobuf, "~> 0.10.0"},
     # Only for files generated from Google's protos.
     # Can be ignored if you don't use Google's protos.
     # Or you can generate the code by yourself.
