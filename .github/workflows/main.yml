@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Test (Elixir ${{matrix.elixir}} | Erlang/OTP ${{matrix.otp}})
+    name: Test (Elixir ${{ matrix.elixir }} | Erlang/OTP ${{ matrix.otp }})
     runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
@@ -51,7 +51,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: deps
-          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}-elixir-${{ matrix.elixir }}-erlang-${{ matrix.elixir }}
 
       - name: Install dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
