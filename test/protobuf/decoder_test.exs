@@ -145,7 +145,12 @@ defmodule Protobuf.DecoderTest do
 
   test "decodes nil for proto3" do
     assert Decoder.decode(<<18, 1, 65>>, TestMsg.Proto3Optional) ==
-             TestMsg.Proto3Optional.new(a: nil, b: "A")
+             TestMsg.Proto3Optional.new(a: nil, b: "A", c: nil)
+  end
+
+  test "decodes default values for proto3 optional" do
+    assert Decoder.decode(<<8, 0, 18, 1, 65, 24, 0>>, TestMsg.Proto3Optional) ==
+             TestMsg.Proto3Optional.new(a: 0, b: "A", c: :UNKNOWN)
   end
 
   test "decodes unpacked binary with SignedInt32Repeated for proto2" do

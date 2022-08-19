@@ -161,6 +161,16 @@ defmodule Protobuf.EncoderTest do
     assert TestMsg.OneofProto3.decode(<<48, 0>>) == msg
   end
 
+  test "encodes proto3 optional fields zero values" do
+    msg = TestMsg.Proto3Optional.new(a: 0, c: :UNKNOWN)
+    assert Encoder.encode(msg) == <<8, 0, 24, 0>>
+  end
+
+  test "skips a proto3 optional field with a nil value" do
+    msg = TestMsg.Proto3Optional.new(a: nil, c: nil)
+    assert Encoder.encode(msg) == <<>>
+  end
+
   test "encodes map with oneof" do
     msg = Google.Protobuf.Struct.new(fields: %{"valid" => %{kind: {:bool_value, true}}})
     bin = Google.Protobuf.Struct.encode(msg)

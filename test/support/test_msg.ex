@@ -127,6 +127,7 @@ defmodule TestMsg do
 
     field :a, 1, proto3_optional: true, type: :int32
     field :b, 2, type: :string
+    field :c, 3, proto3_optional: true, type: EnumFoo, enum: true
   end
 
   defmodule Parent do
