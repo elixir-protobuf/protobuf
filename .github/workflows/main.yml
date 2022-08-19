@@ -158,7 +158,7 @@ jobs:
       - name: Update and install OS dependencies to build protoc locally
         if: steps.cache-deps-with-built-protoc.outputs.cache-hit != 'true'
         # Dependencies from https://github.com/protocolbuffers/protobuf/blob/master/src/README.md
-        run: sudo apt-get update && sudo apt-get install -y git autoconf automake libtool curl make g++ unzip
+        run: sudo apt-get update && sudo apt-get install -y git cmake curl make g++
 
       # This builds protoc inside deps (not inside _build), so we can cache that whole directory.
       - name: Build protoc and the conformance runner from the local Protobuf dependency
@@ -167,7 +167,7 @@ jobs:
 
       # We always need to do this, even if the cache hits.
       - name: Add protoc to the PATH
-        run: echo "$PWD/deps/google_protobuf/src" >> $GITHUB_PATH
+        run: echo "$PWD/deps/google_protobuf" >> $GITHUB_PATH
 
       - name: Run conformance tests
         run: |
