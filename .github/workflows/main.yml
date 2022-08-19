@@ -101,7 +101,6 @@ jobs:
         run: |
           mix gen_test_protos
           mix gen_bootstrap_protos
-          mix gen_bench_protos
 
       - name: Run integration tests
         if: ${{ matrix.integration }}
