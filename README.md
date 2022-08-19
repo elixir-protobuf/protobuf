@@ -22,7 +22,7 @@ The package can be installed by adding `:protobuf` to your list of dependencies 
 ```elixir
 def deps do
   [
-    {:protobuf, "~> 0.8.0"},
+    {:protobuf, "~> 0.10.0"},
     # Only for files generated from Google's protos.
     # Can be ignored if you don't use Google's protos.
     # Or you can generate the code by yourself.
@@ -64,7 +64,7 @@ end
     $ mix escript.install hex protobuf
     ```
 
-3. Generate Elixir code using `protoc`:
+3. Generate Elixir code for [helloworld.proto](https://raw.githubusercontent.com/grpc/grpc/master/examples/protos/helloworld.proto) using `protoc`:
 
     ```bash
     $ protoc --elixir_out=./lib helloworld.proto
@@ -74,25 +74,15 @@ end
 
     ```elixir
     defmodule Helloworld.HelloRequest do
-      use Protobuf, syntax: :proto3
-
-      @type t :: %__MODULE__{
-        name: String.t()
-      }
-
-      defstruct [:name]
+      @moduledoc false
+      use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
       field :name, 1, type: :string
     end
-
+    
     defmodule Helloworld.HelloReply do
-      use Protobuf, syntax: :proto3
-
-      @type t :: %__MODULE__{
-        message: String.t()
-      }
-
-      defstruct [:message]
+      @moduledoc false
+      use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
       field :message, 1, type: :string
     end
