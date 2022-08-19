@@ -50,6 +50,7 @@ defmodule Protobuf.Mixfile do
       {:google_protobuf,
        github: "protocolbuffers/protobuf",
        branch: "main",
+       submodules: true,
        app: false,
        compile: false,
        only: [:dev, :test]}
@@ -274,6 +275,12 @@ defmodule Protobuf.Mixfile do
 
   defp build_conformance_runner(_args) do
     File.cd!(Mix.Project.deps_paths().google_protobuf, fn ->
+      bazel =
+        System.find_executable("bazel") ||
+          Mix.raise("""
+          'bazel' executable not found. See https://github.com/protocolbuffers/protobuf/blob/main/src/README.md
+          """)
+
       cmd!("./autogen.sh")
       cmd!("./configure")
       cmd!("make -C ./src protoc")

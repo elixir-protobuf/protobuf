@@ -66,6 +66,8 @@ jobs:
           NUM_CPUS=$(getconf _NPROCESSORS_ONLN)
           make -j "${NUM_CPUS}" protoc conformance_test_runner
 
+          ls -la
+
       - name: Add protoc to $GITHUB_PATH
         run: echo "$PWD/protobuf/src" >> $GITHUB_PATH
 
