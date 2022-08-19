@@ -15,9 +15,13 @@ defmodule Protobuf.JSON.Encode do
 
   @doc false
   @spec to_encodable(struct, keyword) :: map | {:error, EncodeError.t()}
-  def to_encodable(struct, opts)
+  def to_encodable(%mod{} = struct, opts) do
+    struct
+    |> transform_module(mod)
+    |> encodable(opts)
+  end
 
-  def to_encodable(%mod{} = struct, _opts) when mod == Google.Protobuf.Duration do
+  def encodable(%mod{} = struct, _opts) when mod == Google.Protobuf.Duration do
     case struct do
       %{seconds: seconds} when seconds not in @duration_seconds_range ->
         throw({:bad_duration, :seconds_outside_of_range, seconds})
@@ -31,7 +35,7 @@ defmodule Protobuf.JSON.Encode do
     end
   end
 
-  def to_encodable(%mod{} = struct, _opts) when mod == Google.Protobuf.Timestamp do
+  def encodable(%mod{} = struct, _opts) when mod == Google.Protobuf.Timestamp do
     %{seconds: seconds, nanos: nanos} = struct
 
     case Protobuf.JSON.RFC3339.encode(seconds, nanos) do
@@ -40,31 +44,31 @@ defmodule Protobuf.JSON.Encode do
     end
   end
 
-  def to_encodable(%mod{}, _opts) when mod == Google.Protobuf.Empty do
+  def encodable(%mod{}, _opts) when mod == Google.Protobuf.Empty do
     %{}
   end
 
-  def to_encodable(%mod{kind: kind}, opts) when mod == Google.Protobuf.Value do
+  def encodable(%mod{kind: kind}, opts) when mod == Google.Protobuf.Value do
     case kind do
       {:string_value, string} -> string
       {:number_value, number} -> number
       {:bool_value, bool} -> bool
       {:null_value, :NULL_VALUE} -> nil
-      {:list_value, list} -> to_encodable(list, opts)
-      {:struct_value, struct} -> to_encodable(struct, opts)
+      {:list_value, list} -> encodable(list, opts)
+      {:struct_value, struct} -> encodable(struct, opts)
       _other -> throw({:bad_encoding, kind})
     end
   end
 
-  def to_encodable(%mod{values: values}, opts) when mod == Google.Protobuf.ListValue do
-    Enum.map(values, &to_encodable(&1, opts))
+  def encodable(%mod{values: values}, opts) when mod == Google.Protobuf.ListValue do
+    Enum.map(values, &encodable(&1, opts))
   end
 
-  def to_encodable(%mod{fields: fields}, opts) when mod == Google.Protobuf.Struct do
-    Map.new(fields, fn {key, val} -> {key, to_encodable(val, opts)} end)
+  def encodable(%mod{fields: fields}, opts) when mod == Google.Protobuf.Struct do
+    Map.new(fields, fn {key, val} -> {key, encodable(val, opts)} end)
   end
 
-  def to_encodable(%mod{value: value}, _opts)
+  def encodable(%mod{value: value}, _opts)
       when mod in [
              Google.Protobuf.Int32Value,
              Google.Protobuf.UInt32Value,
@@ -78,11 +82,11 @@ defmodule Protobuf.JSON.Encode do
     value
   end
 
-  def to_encodable(%mod{value: value}, _opts) when mod == Google.Protobuf.BytesValue do
+  def encodable(%mod{value: value}, _opts) when mod == Google.Protobuf.BytesValue do
     Base.encode64(value)
   end
 
-  def to_encodable(%mod{paths: paths}, _opts) when mod == Google.Protobuf.FieldMask do
+  def encodable(%mod{paths: paths}, _opts) when mod == Google.Protobuf.FieldMask do
     Enum.map_join(paths, ",", fn path ->
       cond do
         String.contains?(path, "__") ->
@@ -98,7 +102,7 @@ defmodule Protobuf.JSON.Encode do
     end)
   end
 
-  def to_encodable(%mod{} = struct, opts) do
+  def encodable(%mod{} = struct, opts) do
     message_props = mod.__message_props__()
     regular = encode_regular_fields(struct, message_props, opts)
     oneofs = encode_oneof_fields(struct, message_props, opts)
@@ -180,8 +184,12 @@ defmodule Protobuf.JSON.Encode do
     end
   end
 
-  defp encode_value(value, %{embedded?: true} = prop, opts) do
-    maybe_repeat(prop, value, &to_encodable(&1, opts))
+  defp encode_value(value, %{embedded?: true, type: type} = prop, opts) do
+    maybe_repeat(prop, value, fn value ->
+      value
+      |> transform_module(type)
+      |> encodable(opts)
+    end)
   end
 
   defp encode_float(value) when is_float(value), do: value
@@ -218,4 +226,12 @@ defmodule Protobuf.JSON.Encode do
   defp default?(_prop, value) when value in [nil, 0, false, [], "", 0.0, %{}], do: true
   defp default?(%{type: {:enum, enum}}, key) when is_atom(key), do: enum.value(key) == 0
   defp default?(_prop, _value), do: false
+
+  defp transform_module(message, module) do
+    if transform_module = module.transform_module() do
+      transform_module.encode(message, module)
+    else
+      message
+    end
+  end
 end

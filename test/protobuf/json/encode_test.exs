@@ -2,7 +2,18 @@ defmodule Protobuf.JSON.EncodeTest do
   use ExUnit.Case, async: true
 
   alias ProtobufTestMessages.Proto3.TestAllTypesProto3
-  alias TestMsg.{Foo, Foo.Bar, Maps, OneofProto3, Parent, Parent.Child, Scalars}
+
+  alias TestMsg.{
+    ContainsTransformModule,
+    Foo,
+    Foo.Bar,
+    Maps,
+    OneofProto3,
+    Parent,
+    Parent.Child,
+    Scalars,
+    WithTransformModule
+  }
 
   def encode(struct, opts \\ []) do
     Protobuf.JSON.Encode.to_encodable(struct, opts)
@@ -236,6 +247,14 @@ defmodule Protobuf.JSON.EncodeTest do
 
     message = Foo.new(h: [Bar.new(), Bar.new()])
     assert encode(message, emit_unpopulated: true) == %{decoded | "h" => [bar, bar]}
+  end
+
+  test "encodes with transformer module" do
+    assert Protobuf.JSON.encode!(ContainsTransformModule.new(field: 123)) ==
+             ~S|{"field":{"field":123}}|
+
+    assert Protobuf.JSON.encode!(ContainsTransformModule.new(field: 0)) == ~S|{}|
+    assert Protobuf.JSON.encode!(ContainsTransformModule.new(field: nil)) == ~S|{}|
   end
 
   describe "Google.Protobuf.* value wrappers" do
