@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.11.0
+
+### Enhancements
+
+  * Improve formatting in generated code.
+  * Fix JSON encoding of field masks.
+  * Fix return value of `Protobuf.JSON.RFC3339.encode/2`.
+  * Improve error message when encoding oneoff.
+  * Add support for proto3 optional field.
+
+### Bug fixes
+
+  * Fix encoding root structs with transform module.
+  * Fix a bug with negative durations in JSON.
+  * Fix enum default value for structs where module is not available.
+  * Support transform module in JSON encoder.
+
 ## v0.10.0
 
 ### Enhancements
