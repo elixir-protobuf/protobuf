@@ -50,6 +50,7 @@ defmodule Protobuf.Mixfile do
       {:google_protobuf,
        github: "protocolbuffers/protobuf",
        branch: "main",
+       submodules: true,
        app: false,
        compile: false,
        only: [:dev, :test]}
@@ -242,7 +243,7 @@ defmodule Protobuf.Mixfile do
   defp run_conformance_tests(args) do
     {options, _args} = OptionParser.parse!(args, switches: [verbose: :boolean])
 
-    runner = path_in_protobuf_source("conformance/conformance-test-runner")
+    runner = path_in_protobuf_source("conformance_test_runner")
 
     if not File.exists?(runner) do
       Mix.raise("""
@@ -274,10 +275,8 @@ defmodule Protobuf.Mixfile do
 
   defp build_conformance_runner(_args) do
     File.cd!(Mix.Project.deps_paths().google_protobuf, fn ->
-      cmd!("./autogen.sh")
-      cmd!("./configure")
-      cmd!("make -C ./src protoc")
-      cmd!("make -C ./conformance conformance-test-runner")
+      cmd!("cmake . -Dprotobuf_BUILD_CONFORMANCE=ON")
+      cmd!("cmake --build . --parallel 10")
     end)
   end
 
