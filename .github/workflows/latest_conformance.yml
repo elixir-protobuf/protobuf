@@ -31,7 +31,7 @@ jobs:
 
       - name: Update and install dependencies to build protoc locally
         # Dependencies from https://github.com/protocolbuffers/protobuf/blob/main/src/README.md
-        run: sudo apt-get update && sudo apt-get install -y git autoconf automake libtool curl make g++ unzip jq
+        run: sudo apt-get update && sudo apt-get install -y git cmake curl make g++ jq
 
       - name: Get SHA of Protobuf repo's main branch
         id: get-protobuf-sha
@@ -43,6 +43,7 @@ jobs:
         with:
           ref: ${{ steps.get-protobuf-sha.outputs.sha }}
           repository: protocolbuffers/protobuf
+          submodules: true
           path: protobuf
 
       - name: Cache built Protobuf source
@@ -56,11 +57,14 @@ jobs:
         if: steps.cache-protobuf-source.outputs.cache-hit != 'true'
         working-directory: protobuf
         run: |
-          ./autogen.sh
-          ./configure
+          cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -Dprotobuf_BUILD_TESTS=OFF \
+            -Dprotobuf_INSTALL=OFF \
+            -Dprotobuf_BUILD_CONFORMANCE=ON \
+            .
           NUM_CPUS=$(getconf _NPROCESSORS_ONLN)
-          make -C ./src -j "${NUM_CPUS}" protoc
-          make -C ./conformance conformance-test-runner
+          make -j "${NUM_CPUS}" protoc conformance_test_runner
 
       - name: Add protoc to $GITHUB_PATH
         run: echo "$PWD/protobuf/src" >> $GITHUB_PATH
