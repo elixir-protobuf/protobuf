@@ -2,7 +2,18 @@ defmodule Protobuf.JSON.DecodeTest do
   use ExUnit.Case, async: true
 
   alias ProtobufTestMessages.Proto3.TestAllTypesProto3
-  alias TestMsg.{Foo, Foo.Bar, Maps, OneofProto3, Parent, Parent.Child, Scalars}
+
+  alias TestMsg.{
+    ContainsTransformModule,
+    Foo,
+    Foo.Bar,
+    Maps,
+    OneofProto3,
+    Parent,
+    Parent.Child,
+    Scalars,
+    WithTransformModule
+  }
 
   def decode(data, module) do
     Protobuf.JSON.from_decoded(data, module)
@@ -618,6 +629,24 @@ defmodule Protobuf.JSON.DecodeTest do
     }
 
     assert decode(data, Foo) == {:ok, Foo.new(e: Bar.new())}
+  end
+
+  test "decodes with transformer module" do
+    assert Protobuf.JSON.decode!(~S|{"field":123}|, WithTransformModule) == 123
+    assert Protobuf.JSON.decode!(~S|{"field":0}|, WithTransformModule) == 0
+    assert Protobuf.JSON.decode!(~S|{}|, WithTransformModule) == 0
+
+    assert Protobuf.JSON.decode!(~S|{"field":{"field":123}}|, ContainsTransformModule) ==
+             %ContainsTransformModule{field: 123}
+
+    assert Protobuf.JSON.decode!(~S|{"field":{"field":0}}|, ContainsTransformModule) ==
+             %ContainsTransformModule{field: 0}
+
+    assert Protobuf.JSON.decode!(~S|{"field":{}}|, ContainsTransformModule) ==
+             %ContainsTransformModule{field: 0}
+
+    assert Protobuf.JSON.decode!(~S|{}|, ContainsTransformModule) ==
+             %ContainsTransformModule{field: nil}
   end
 
   describe "Google types" do

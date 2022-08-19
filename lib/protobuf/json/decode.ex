@@ -172,6 +172,7 @@ defmodule Protobuf.JSON.Decode do
     module
     |> struct(regular)
     |> struct(oneofs)
+    |> transform_module(module)
   end
 
   def from_json_data(data, module) when is_atom(module), do: throw({:bad_message, data, module})
@@ -385,6 +386,14 @@ defmodule Protobuf.JSON.Decode do
       Base.url_decode64(bytes, padding: false)
     else
       Base.decode64(bytes, padding: false)
+    end
+  end
+
+  defp transform_module(message, module) do
+    if transform_module = module.transform_module() do
+      transform_module.decode(message, module)
+    else
+      message
     end
   end
 end
