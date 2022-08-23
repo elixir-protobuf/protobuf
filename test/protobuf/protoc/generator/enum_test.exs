@@ -109,4 +109,24 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
     assert module == "ValueType"
     assert msg =~ "defmodule ValueType do"
   end
+
+  describe "generate/2 include_docs" do
+    test "includes docs when flag is true" do
+      ctx = %Context{include_docs?: true}
+      desc = Google.Protobuf.EnumDescriptorProto.new(name: "valueType")
+
+      {_module, msg} = Generator.generate(ctx, desc)
+
+      assert msg =~ "@moduledoc nil\n"
+    end
+
+    test "does not include docs by default" do
+      ctx = %Context{}
+      desc = Google.Protobuf.EnumDescriptorProto.new(name: "valueType")
+
+      {_module, msg} = Generator.generate(ctx, desc)
+
+      assert msg =~ "@moduledoc false\n"
+    end
+  end
 end
