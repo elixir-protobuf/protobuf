@@ -1,5 +1,5 @@
 defmodule <%= @module %>.Service do
-  @moduledoc false
+  @moduledoc <%= inspect(@module_doc) %>
   use GRPC.Service, name: <%= inspect(@service_name) %>, protoc_gen_elixir_version: "<%= @version %>"
 
   <%= if @descriptor_fun_body do %>
