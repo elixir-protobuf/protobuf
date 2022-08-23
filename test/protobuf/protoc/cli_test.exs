@@ -42,7 +42,8 @@ defmodule Protobuf.Protoc.CLITest do
           "gen_descriptors" => "true",
           "one_file_per_module" => "true",
           "package_prefix" => "elixir.protobuf",
-          "transform_module" => "My.Transform.Module"
+          "transform_module" => "My.Transform.Module",
+          "include_docs" => "true"
         }
         |> Enum.shuffle()
         |> Enum.map_join(",", fn {key, val} -> "#{key}=#{val}" end)
@@ -54,7 +55,8 @@ defmodule Protobuf.Protoc.CLITest do
                gen_descriptors?: true,
                one_file_per_module?: true,
                package_prefix: "elixir.protobuf",
-               transform_module: My.Transform.Module
+               transform_module: My.Transform.Module,
+               include_docs?: true
              }
     end
 
@@ -69,6 +71,10 @@ defmodule Protobuf.Protoc.CLITest do
 
       assert_raise RuntimeError, ~r/invalid value for one_file_per_module option/, fn ->
         parse_params(%Context{}, "one_file_per_module=false")
+      end
+
+      assert_raise RuntimeError, ~r/invalid value for include_docs option/, fn ->
+        parse_params(%Context{}, "include_docs=false")
       end
 
       assert_raise RuntimeError, ~r/package_prefix can't be empty/, fn ->
