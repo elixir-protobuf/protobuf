@@ -2,7 +2,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
   use ExUnit.Case, async: true
 
   # TODO: Remove when we depend on Elixir 1.11+.
-  import Protobuf.TestHelpers, only: [tmp_dir: 1], warn: false
+  import Protobuf.TestHelpers, only: [tmp_dir: 1, fetch_docs_from_bytecode: 2], warn: false
 
   if Version.match?(System.version(), ">= 1.11.0") do
     @moduletag :tmp_dir
@@ -68,6 +68,32 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
 
       assert %Google.Protobuf.DescriptorProto{} = descriptor = mod.descriptor()
       assert descriptor.name == "User"
+    end
+
+    test "include_docs option", %{tmp_dir: tmp_dir, proto_path: proto_path} do
+      protoc!([
+        "--proto_path=#{tmp_dir}",
+        "--elixir_out=#{tmp_dir}",
+        "--elixir_opt=include_docs=true",
+        "--plugin=./protoc-gen-elixir",
+        proto_path
+      ])
+
+      modules_and_docs =
+        "#{tmp_dir}/user.pb.ex"
+        |> Code.compile_file()
+        |> Enum.map(fn {module, bytecode} -> {mod, fetch_docs_from_bytecode(module, bytecode)} end)
+
+      on_exit(fn ->
+        for {module, _} <- modules_and_docs do
+          :code.delete(module)
+          :code.purge(module)
+        end
+      end)
+
+      for {_module, docs} <- modules_and_docs do
+        assert {:docs_v1, _, :elixir, _, :none, _, _} = docs
+      end
     end
 
     test "package_prefix mypkg", %{tmp_dir: tmp_dir, proto_path: proto_path} do
