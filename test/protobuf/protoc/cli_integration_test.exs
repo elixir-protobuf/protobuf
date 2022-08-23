@@ -82,7 +82,8 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
       modules_and_docs = get_docs_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
 
       assert [{Foo.User, docs}] = modules_and_docs
-      assert {:docs_v1, _, :elixir, _, :none, _, _} = docs
+      assert {:docs_v1, _, :elixir, _, module_doc, _, _} = docs
+      assert module_doc != :hidden
     end
 
     test "hides docs when include_docs is not true", %{tmp_dir: tmp_dir, proto_path: proto_path} do
