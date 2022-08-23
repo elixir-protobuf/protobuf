@@ -39,6 +39,8 @@ defmodule Protobuf.Protoc.Generator.Message do
         nil
       end
 
+    module_doc = if ctx.include_docs?, do: nil, else: false
+
     ctx = %Context{ctx | namespace: new_ns}
     {nested_enums, nested_msgs} = Enum.unzip(gen_nested_msgs(ctx, desc))
 
@@ -52,7 +54,8 @@ defmodule Protobuf.Protoc.Generator.Message do
            fields: gen_fields(ctx.syntax, fields),
            descriptor_fun_body: descriptor_fun_body,
            transform_module: ctx.transform_module,
-           extensions: extensions
+           extensions: extensions,
+           module_doc: module_doc
          )
        )}
 
