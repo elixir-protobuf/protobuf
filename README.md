@@ -156,6 +156,18 @@ conventions. For example, a `MyPackage.MyMessage` message will end up in the
 $ protoc --elixir_out=one_file_per_module=true:./lib *.proto
 ```
 
+### Include documentation
+
+You can use the `include_docs=true` option to set the visibility of the
+generated modules documentation.
+
+With `include_docs=true`, the generated modules will not have the
+`@module false` attribute.
+
+```
+$ protoc --elixir_out=./lib --elixir_opt=include_docs=true *.proto
+```
+
 ### gRPC Support
 
 If you write [services](https://developers.google.com/protocol-buffers/docs/proto#services) in
