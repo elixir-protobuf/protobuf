@@ -82,7 +82,9 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
       modules_and_docs =
         "#{tmp_dir}/user.pb.ex"
         |> Code.compile_file()
-        |> Enum.map(fn {module, bytecode} -> {mod, fetch_docs_from_bytecode(module, bytecode)} end)
+        |> Enum.map(fn {module, bytecode} ->
+          {module, fetch_docs_from_bytecode(module, bytecode)}
+        end)
 
       on_exit(fn ->
         for {module, _} <- modules_and_docs do
