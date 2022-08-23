@@ -32,15 +32,13 @@ defmodule Protobuf.Protoc.Generator.Enum do
         nil
       end
 
-    module_doc = if ctx.include_docs?, do: nil, else: false
-
     content =
       enum_template(
         module: msg_name,
         use_options: use_options,
         fields: desc.value,
         descriptor_fun_body: descriptor_fun_body,
-        module_doc: module_doc
+        module_doc?: ctx.include_docs?
       )
 
     {msg_name, Util.format(content)}

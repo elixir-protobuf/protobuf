@@ -1,5 +1,7 @@
 defmodule <%= @module %> do
-  @moduledoc <%= inspect(@module_doc) %>
+  <%= unless @module_doc? do %>
+  @moduledoc false
+  <% end %>
   use Protobuf<%= @use_options %>
 
   <%= if @descriptor_fun_body do %>

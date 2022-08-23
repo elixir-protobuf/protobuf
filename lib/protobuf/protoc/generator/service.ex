@@ -28,8 +28,6 @@ defmodule Protobuf.Protoc.Generator.Service do
         nil
       end
 
-    module_doc = if ctx.include_docs?, do: nil, else: false
-
     {mod_name,
      Util.format(
        service_template(
@@ -38,7 +36,7 @@ defmodule Protobuf.Protoc.Generator.Service do
          methods: methods,
          descriptor_fun_body: descriptor_fun_body,
          version: Util.version(),
-         module_doc: module_doc
+         module_doc?: ctx.include_docs?
        )
      )}
   end

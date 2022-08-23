@@ -64,16 +64,16 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
   end
 
   describe "generate/2 include_docs" do
-    test "includes docs when flag is true" do
+    test "does not include `@moduledoc false` when flag is true" do
       ctx = %Context{include_docs?: true}
       desc = Google.Protobuf.ServiceDescriptorProto.new(name: "ServiceFoo")
 
       {_module, msg} = Generator.generate(ctx, desc)
 
-      assert msg =~ "@moduledoc nil\n"
+      refute msg =~ "@moduledoc"
     end
 
-    test "does not include docs by default" do
+    test "includes `@moduledoc false` by default" do
       ctx = %Context{}
       desc = Google.Protobuf.ServiceDescriptorProto.new(name: "ServiceFoo")
 

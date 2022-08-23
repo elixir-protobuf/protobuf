@@ -843,16 +843,16 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   describe "generate/2 include_docs" do
-    test "includes docs when flag is true" do
+    test "does not include `@moduledoc false` when flag is true" do
       ctx = %Context{include_docs?: true}
       desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
 
       {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
-      assert msg =~ "@moduledoc nil\n"
+      refute msg =~ "@moduledoc\n"
     end
 
-    test "does not include docs by default" do
+    test "includes `@moduledoc false` by default" do
       ctx = %Context{}
       desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
 
