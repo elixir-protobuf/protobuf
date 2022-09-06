@@ -2,7 +2,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
   use ExUnit.Case, async: true
 
   # TODO: Remove when we depend on Elixir 1.11+.
-  import Protobuf.TestHelpers, only: [tmp_dir: 1], warn: false
+  import Protobuf.TestHelpers, only: [tmp_dir: 1, fetch_docs_from_bytecode: 1], warn: false
 
   if Version.match?(System.version(), ">= 1.11.0") do
     @moduletag :tmp_dir
@@ -68,6 +68,36 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
 
       assert %Google.Protobuf.DescriptorProto{} = descriptor = mod.descriptor()
       assert descriptor.name == "User"
+    end
+
+    test "include_docs option", %{tmp_dir: tmp_dir, proto_path: proto_path} do
+      protoc!([
+        "--proto_path=#{tmp_dir}",
+        "--elixir_out=#{tmp_dir}",
+        "--elixir_opt=include_docs=true",
+        "--plugin=./protoc-gen-elixir",
+        proto_path
+      ])
+
+      modules_and_docs = get_docs_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
+
+      assert [{Foo.User, docs}] = modules_and_docs
+      assert {:docs_v1, _, :elixir, _, module_doc, _, _} = docs
+      assert module_doc != :hidden
+    end
+
+    test "hides docs when include_docs is not true", %{tmp_dir: tmp_dir, proto_path: proto_path} do
+      protoc!([
+        "--proto_path=#{tmp_dir}",
+        "--elixir_out=#{tmp_dir}",
+        "--plugin=./protoc-gen-elixir",
+        proto_path
+      ])
+
+      modules_and_docs = get_docs_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
+
+      assert [{Foo.User, docs}] = modules_and_docs
+      assert {:docs_v1, _, :elixir, _, :hidden, _, _} = docs
     end
 
     test "package_prefix mypkg", %{tmp_dir: tmp_dir, proto_path: proto_path} do
@@ -205,5 +235,23 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
     end)
 
     modules
+  end
+
+  defp get_docs_and_clean_modules_on_exit(path) do
+    modules_and_docs =
+      path
+      |> Code.compile_file()
+      |> Enum.map(fn {mod, bytecode} ->
+        {mod, fetch_docs_from_bytecode(bytecode)}
+      end)
+
+    on_exit(fn ->
+      Enum.each(modules_and_docs, fn {mod, _bytecode} ->
+        :code.delete(mod)
+        :code.purge(mod)
+      end)
+    end)
+
+    modules_and_docs
   end
 end

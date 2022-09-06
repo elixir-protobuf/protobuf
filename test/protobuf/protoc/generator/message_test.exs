@@ -841,4 +841,24 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   after
     TestHelpers.purge_modules([FooBar.AbCd.Foo])
   end
+
+  describe "generate/2 include_docs" do
+    test "does not include `@moduledoc false` when flag is true" do
+      ctx = %Context{include_docs?: true}
+      desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
+
+      {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
+
+      refute msg =~ "@moduledoc\n"
+    end
+
+    test "includes `@moduledoc false` by default" do
+      ctx = %Context{}
+      desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
+
+      {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
+
+      assert msg =~ "@moduledoc false\n"
+    end
+  end
 end

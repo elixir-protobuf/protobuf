@@ -164,7 +164,8 @@ defmodule Protobuf.Mixfile do
     )
 
     protoc!(
-      "-I test/protobuf/protoc/proto -I #{path_in_protobuf_source("src")} --elixir_opt=gen_descriptors=true",
+      "-I test/protobuf/protoc/proto -I #{path_in_protobuf_source("src")} " <>
+        "--elixir_opt=gen_descriptors=true --elixir_opt=include_docs=true",
       "./generated",
       ["test/protobuf/protoc/proto/custom_options.proto"]
     )

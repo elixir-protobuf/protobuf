@@ -1,5 +1,6 @@
 defmodule Google.Protobuf.Compiler.CodeGeneratorResponse.Feature do
   @moduledoc false
+
   use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :FEATURE_NONE, 0
@@ -8,6 +9,7 @@ end
 
 defmodule Google.Protobuf.Compiler.Version do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :major, 1, optional: true, type: :int32
@@ -18,6 +20,7 @@ end
 
 defmodule Google.Protobuf.Compiler.CodeGeneratorRequest do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :file_to_generate, 1, repeated: true, type: :string
@@ -28,6 +31,7 @@ end
 
 defmodule Google.Protobuf.Compiler.CodeGeneratorResponse.File do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :name, 1, optional: true, type: :string
@@ -38,6 +42,7 @@ end
 
 defmodule Google.Protobuf.Compiler.CodeGeneratorResponse do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :error, 1, optional: true, type: :string

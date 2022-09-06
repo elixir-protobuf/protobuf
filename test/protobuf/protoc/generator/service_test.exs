@@ -62,4 +62,24 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
     assert msg =~ "rpc :MethodC, Foo.Input2, stream(Foo.Output2)\n"
     assert msg =~ "rpc :MethodD, stream(Foo.Input3), stream(Foo.Output3)\n"
   end
+
+  describe "generate/2 include_docs" do
+    test "does not include `@moduledoc false` when flag is true" do
+      ctx = %Context{include_docs?: true}
+      desc = Google.Protobuf.ServiceDescriptorProto.new(name: "ServiceFoo")
+
+      {_module, msg} = Generator.generate(ctx, desc)
+
+      refute msg =~ "@moduledoc"
+    end
+
+    test "includes `@moduledoc false` by default" do
+      ctx = %Context{}
+      desc = Google.Protobuf.ServiceDescriptorProto.new(name: "ServiceFoo")
+
+      {_module, msg} = Generator.generate(ctx, desc)
+
+      assert msg =~ "@moduledoc false\n"
+    end
+  end
 end

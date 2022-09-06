@@ -38,6 +38,9 @@ defmodule Protobuf.Protoc.Context do
             # (according to Elixir conventions) if this is true
             one_file_per_module?: false,
 
+            # Include visible module docs in the generated protobuf modules
+            include_docs?: false,
+
             # Elixirpb.FileOptions
             custom_file_options: %{}
 

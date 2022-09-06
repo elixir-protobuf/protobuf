@@ -52,7 +52,8 @@ defmodule Protobuf.Protoc.Generator.Message do
            fields: gen_fields(ctx.syntax, fields),
            descriptor_fun_body: descriptor_fun_body,
            transform_module: ctx.transform_module,
-           extensions: extensions
+           extensions: extensions,
+           module_doc?: ctx.include_docs?
          )
        )}
 

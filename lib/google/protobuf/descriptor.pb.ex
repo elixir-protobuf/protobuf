@@ -1,5 +1,6 @@
 defmodule Google.Protobuf.FieldDescriptorProto.Type do
   @moduledoc false
+
   use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :TYPE_DOUBLE, 1
@@ -24,6 +25,7 @@ end
 
 defmodule Google.Protobuf.FieldDescriptorProto.Label do
   @moduledoc false
+
   use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :LABEL_OPTIONAL, 1
@@ -33,6 +35,7 @@ end
 
 defmodule Google.Protobuf.FileOptions.OptimizeMode do
   @moduledoc false
+
   use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :SPEED, 1
@@ -42,6 +45,7 @@ end
 
 defmodule Google.Protobuf.FieldOptions.CType do
   @moduledoc false
+
   use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :STRING, 0
@@ -51,6 +55,7 @@ end
 
 defmodule Google.Protobuf.FieldOptions.JSType do
   @moduledoc false
+
   use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :JS_NORMAL, 0
@@ -60,6 +65,7 @@ end
 
 defmodule Google.Protobuf.MethodOptions.IdempotencyLevel do
   @moduledoc false
+
   use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :IDEMPOTENCY_UNKNOWN, 0
@@ -69,6 +75,7 @@ end
 
 defmodule Google.Protobuf.GeneratedCodeInfo.Annotation.Semantic do
   @moduledoc false
+
   use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :NONE, 0
@@ -78,6 +85,7 @@ end
 
 defmodule Google.Protobuf.FileDescriptorSet do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :file, 1, repeated: true, type: Google.Protobuf.FileDescriptorProto
@@ -85,6 +93,7 @@ end
 
 defmodule Google.Protobuf.FileDescriptorProto do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :name, 1, optional: true, type: :string
@@ -104,6 +113,7 @@ end
 
 defmodule Google.Protobuf.DescriptorProto.ExtensionRange do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :start, 1, optional: true, type: :int32
@@ -113,6 +123,7 @@ end
 
 defmodule Google.Protobuf.DescriptorProto.ReservedRange do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :start, 1, optional: true, type: :int32
@@ -121,6 +132,7 @@ end
 
 defmodule Google.Protobuf.DescriptorProto do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :name, 1, optional: true, type: :string
@@ -137,6 +149,7 @@ end
 
 defmodule Google.Protobuf.ExtensionRangeOptions do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
@@ -146,6 +159,7 @@ end
 
 defmodule Google.Protobuf.FieldDescriptorProto do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :name, 1, optional: true, type: :string
@@ -163,6 +177,7 @@ end
 
 defmodule Google.Protobuf.OneofDescriptorProto do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :name, 1, optional: true, type: :string
@@ -171,6 +186,7 @@ end
 
 defmodule Google.Protobuf.EnumDescriptorProto.EnumReservedRange do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :start, 1, optional: true, type: :int32
@@ -179,6 +195,7 @@ end
 
 defmodule Google.Protobuf.EnumDescriptorProto do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :name, 1, optional: true, type: :string
@@ -194,6 +211,7 @@ end
 
 defmodule Google.Protobuf.EnumValueDescriptorProto do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :name, 1, optional: true, type: :string
@@ -203,6 +221,7 @@ end
 
 defmodule Google.Protobuf.ServiceDescriptorProto do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :name, 1, optional: true, type: :string
@@ -212,6 +231,7 @@ end
 
 defmodule Google.Protobuf.MethodDescriptorProto do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :name, 1, optional: true, type: :string
@@ -224,6 +244,7 @@ end
 
 defmodule Google.Protobuf.FileOptions do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :java_package, 1, optional: true, type: :string
@@ -259,6 +280,7 @@ end
 
 defmodule Google.Protobuf.MessageOptions do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :message_set_wire_format, 1, optional: true, type: :bool, default: false
@@ -272,6 +294,7 @@ end
 
 defmodule Google.Protobuf.FieldOptions do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :ctype, 1,
@@ -299,6 +322,7 @@ end
 
 defmodule Google.Protobuf.OneofOptions do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
@@ -308,6 +332,7 @@ end
 
 defmodule Google.Protobuf.EnumOptions do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :allow_alias, 2, optional: true, type: :bool
@@ -319,6 +344,7 @@ end
 
 defmodule Google.Protobuf.EnumValueOptions do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :deprecated, 1, optional: true, type: :bool, default: false
@@ -329,6 +355,7 @@ end
 
 defmodule Google.Protobuf.ServiceOptions do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :deprecated, 33, optional: true, type: :bool, default: false
@@ -339,6 +366,7 @@ end
 
 defmodule Google.Protobuf.MethodOptions do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :deprecated, 33, optional: true, type: :bool, default: false
@@ -356,6 +384,7 @@ end
 
 defmodule Google.Protobuf.UninterpretedOption.NamePart do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :name_part, 1, required: true, type: :string
@@ -364,6 +393,7 @@ end
 
 defmodule Google.Protobuf.UninterpretedOption do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :name, 2, repeated: true, type: Google.Protobuf.UninterpretedOption.NamePart
@@ -377,6 +407,7 @@ end
 
 defmodule Google.Protobuf.SourceCodeInfo.Location do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :path, 1, repeated: true, type: :int32, packed: true, deprecated: false
@@ -388,6 +419,7 @@ end
 
 defmodule Google.Protobuf.SourceCodeInfo do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :location, 1, repeated: true, type: Google.Protobuf.SourceCodeInfo.Location
@@ -395,6 +427,7 @@ end
 
 defmodule Google.Protobuf.GeneratedCodeInfo.Annotation do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :path, 1, repeated: true, type: :int32, packed: true, deprecated: false
@@ -410,6 +443,7 @@ end
 
 defmodule Google.Protobuf.GeneratedCodeInfo do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :annotation, 1, repeated: true, type: Google.Protobuf.GeneratedCodeInfo.Annotation

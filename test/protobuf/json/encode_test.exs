@@ -11,8 +11,7 @@ defmodule Protobuf.JSON.EncodeTest do
     OneofProto3,
     Parent,
     Parent.Child,
-    Scalars,
-    WithTransformModule
+    Scalars
   }
 
   def encode(struct, opts \\ []) do

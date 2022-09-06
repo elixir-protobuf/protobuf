@@ -37,7 +37,8 @@ defmodule Protobuf.Protoc.Generator.Enum do
         module: msg_name,
         use_options: use_options,
         fields: desc.value,
-        descriptor_fun_body: descriptor_fun_body
+        descriptor_fun_body: descriptor_fun_body,
+        module_doc?: ctx.include_docs?
       )
 
     {msg_name, Util.format(content)}
