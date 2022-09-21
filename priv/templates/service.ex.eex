@@ -11,7 +11,7 @@ defmodule <%= @module %>.Service do
   end
   <% end %>
 
-  <%= for {method_name, input, output} <- @methods do %>
+  <%= for {method_name, input, output, _} <- @methods do %>
   rpc :<%= method_name %>, <%= input %>, <%= output %>
   <% end %>
 end
@@ -21,4 +21,28 @@ defmodule <%= @module %>.Stub do
   @moduledoc false
   <% end %>
   use GRPC.Stub, service: <%= @module %>.Service
+
+  @type option :: {:timeout, integer() | :infinity},
+                  {:deadline, integer() | :infinity},
+                  {:metadata, map()} |
+                  {:return_headers, boolean()}
+  
+  @type unary_response(t) :: {:ok, t} | {:ok, map()} | {:error, GRPC.RPCError.t()}
+  @type client_streaming_response() :: GRPC.Client.Stream.t()
+  @type server_streaming_response(t) :: {:ok, Enumerable.t(t)} | {:ok, Enumerable.t(t), map()} | {:error, GRPC.RPCError.t()}
+
+  <%= for {method_name, input, _output, args} <- @methods do %>
+  <%= case args do %>
+  <% %{client_streaming: true} -> %>
+  @callback <%= Macro.underscore(to_string(method_name)) %>(GRPC.Channel.t(), <%= input %>.t()) :: client_streaming_response()
+  @callback <%= Macro.underscore(to_string(method_name)) %>(GRPC.Channel.t(), <%= input %>.t(), [option]) :: client_streaming_response()
+
+  <% %{server_streaming: true} -> %>
+  @callback <%= Macro.underscore(to_string(method_name)) %>(GRPC.Channel.t(), <%= input %>.t()) :: server_streaming_response(<%= Protobuf.Protoc.Generator.Util.type_from_type_name(@ctx, args.output_type) %>.t())
+  @callback <%= Macro.underscore(to_string(method_name)) %>(GRPC.Channel.t(), <%= input %>.t(), [option]) :: server_streaming_response(<%= Protobuf.Protoc.Generator.Util.type_from_type_name(@ctx, args.output_type) %>.t())
+  <% _ -> %>
+  @callback <%= Macro.underscore(to_string(method_name)) %>(GRPC.Channel.t(), <%= input %>.t()) :: unary_response(<%= Protobuf.Protoc.Generator.Util.type_from_type_name(@ctx, args.output_type) %>.t())
+  @callback <%= Macro.underscore(to_string(method_name)) %>(GRPC.Channel.t(), <%= input %>.t(), [option]) :: unary_response(<%= Protobuf.Protoc.Generator.Util.type_from_type_name(@ctx, args.output_type) %>.t())
+  <% end %>
+  <% end %>
 end

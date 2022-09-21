@@ -36,7 +36,8 @@ defmodule Protobuf.Protoc.Generator.Service do
          methods: methods,
          descriptor_fun_body: descriptor_fun_body,
          version: Util.version(),
-         module_doc?: ctx.include_docs?
+         module_doc?: ctx.include_docs?,
+         ctx: ctx
        )
      )}
   end
@@ -47,7 +48,13 @@ defmodule Protobuf.Protoc.Generator.Service do
     output =
       service_arg(Util.type_from_type_name(ctx, method.output_type), method.server_streaming)
 
-    {method.name, input, output}
+    {method.name, input, output,
+     %{
+       client_streaming: method.client_streaming,
+       server_streaming: method.server_streaming,
+       input_type: method.input_type,
+       output_type: method.output_type
+     }}
   end
 
   defp service_arg(type, _streaming? = true), do: "stream(#{type})"
