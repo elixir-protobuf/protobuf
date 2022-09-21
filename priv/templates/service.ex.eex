@@ -27,7 +27,7 @@ defmodule <%= @module %>.Stub do
                   {:metadata, map()} |
                   {:return_headers, boolean()}
   
-  @type unary_response(t) :: {:ok, t} | {:ok, map()} | {:error, GRPC.RPCError.t()}
+  @type unary_response(t) :: {:ok, t} | {:ok, t, map()} | {:error, GRPC.RPCError.t()}
   @type client_streaming_response() :: GRPC.Client.Stream.t()
   @type server_streaming_response(t) :: {:ok, Enumerable.t(t)} | {:ok, Enumerable.t(t), map()} | {:error, GRPC.RPCError.t()}
 
