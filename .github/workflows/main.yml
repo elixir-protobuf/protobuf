@@ -14,11 +14,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - otp: 24.0
-            elixir: 1.12.3
+          - otp: 25.0
+            elixir: 1.14.0
             lint: true
             integration: true
             coverage: true
+          - otp: 25.0
+            elixir: 1.13.4
+          - otp: 24.0
+            elixir: 1.12.3
           - otp: 23.3
             elixir: 1.11.4
           - otp: 23.3

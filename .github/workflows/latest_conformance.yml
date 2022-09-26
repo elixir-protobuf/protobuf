@@ -20,7 +20,7 @@ jobs:
       matrix:
         include:
           - otp: 24.0
-            elixir: 1.12.1
+            elixir: 1.14.0
 
     env:
       MIX_ENV: test
