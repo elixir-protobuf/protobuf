@@ -150,7 +150,7 @@ defmodule Protobuf.JSON.Encode do
   end
 
   defp encode_value(value, %{type: type} = prop, _opts) when type in @int64_types do
-    maybe_repeat(prop, value, &Integer.to_string/1)
+    maybe_repeat(prop, value, & &1)
   end
 
   defp encode_value(value, %{type: :bytes} = prop, _opts) do
