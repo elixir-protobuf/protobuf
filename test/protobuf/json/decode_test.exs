@@ -424,9 +424,12 @@ defmodule Protobuf.JSON.DecodeTest do
       msg = "Field 'mapbi' has an invalid map key (bool: true)"
       assert decode(data, Maps) == error(msg)
 
-      data = %{"mapsi" => %{'chars' => 1}}
-      msg = "Field 'mapsi' has an invalid map key (string: 'chars')"
-      assert decode(data, Maps) == error(msg)
+      data = %{"mapsi" => %{~c"chars" => 1}}
+
+      assert decode(data, Maps) in [
+               error("Field 'mapsi' has an invalid map key (string: 'chars')"),
+               error("Field 'mapsi' has an invalid map key (string: ~c\"chars\")")
+             ]
     end
 
     test "non-map is invalid" do
