@@ -18,6 +18,11 @@ defmodule Protobuf.Protoc.Generator.Enum do
   def generate(%Context{namespace: ns} = ctx, %Google.Protobuf.EnumDescriptorProto{} = desc) do
     msg_name = Util.mod_name(ctx, ns ++ [Macro.camelize(desc.name)])
 
+    full_name =
+      [ctx.package | ns ++ [Macro.camelize(desc.name)]]
+      |> Enum.reject(&is_nil/1)
+      |> Enum.join(".")
+
     use_options =
       Util.options_to_str(%{
         syntax: ctx.syntax,
@@ -35,6 +40,8 @@ defmodule Protobuf.Protoc.Generator.Enum do
     content =
       enum_template(
         module: msg_name,
+        package: ctx.package,
+        full_name: full_name,
         use_options: use_options,
         fields: desc.value,
         descriptor_fun_body: descriptor_fun_body,

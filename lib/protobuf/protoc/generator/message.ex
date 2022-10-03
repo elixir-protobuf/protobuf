@@ -31,6 +31,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     msg_name = Util.mod_name(ctx, new_ns)
     fields = get_fields(ctx, desc)
     extensions = get_extensions(desc)
+    full_name = [ctx.package | new_ns] |> Enum.reject(&is_nil/1) |> Enum.join(".")
 
     descriptor_fun_body =
       if ctx.gen_descriptors? do
@@ -47,6 +48,8 @@ defmodule Protobuf.Protoc.Generator.Message do
        Util.format(
          message_template(
            module: msg_name,
+           package: ctx.package,
+           full_name: full_name,
            use_options: msg_opts_str(ctx, desc.options),
            oneofs: desc.oneof_decl,
            fields: gen_fields(ctx.syntax, fields),
