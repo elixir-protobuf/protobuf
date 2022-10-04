@@ -1,6 +1,5 @@
 defmodule Protobuf.AnyTest do
   use ExUnit.Case, async: true
-  require Google.Protobuf.Any
 
   test "packs a message into an Any protobuf" do
     message = Google.Protobuf.Duration.new(%{seconds: 42})

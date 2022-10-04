@@ -17,19 +17,13 @@ defmodule Protobuf.Any do
     parts =
       name
       |> String.split(".")
-      |> Enum.map(fn x ->
-        if String.match?(x, ~r/A-Z/) do
-          x
-        else
-          Macro.camelize(x)
-        end
-      end)
+      |> Enum.map(&Macro.camelize/1)
 
     mod =
       if prefix do
-        Module.concat([prefix] ++ parts)
+        Module.safe_concat([prefix] ++ parts)
       else
-        Module.concat(parts)
+        Module.safe_concat(parts)
       end
 
     mod.decode(value)
