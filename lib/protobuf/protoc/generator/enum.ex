@@ -40,7 +40,6 @@ defmodule Protobuf.Protoc.Generator.Enum do
     content =
       enum_template(
         module: msg_name,
-        package: ctx.package,
         full_name: full_name,
         use_options: use_options,
         fields: desc.value,

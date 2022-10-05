@@ -48,7 +48,6 @@ defmodule Protobuf.Protoc.Generator.Message do
        Util.format(
          message_template(
            module: msg_name,
-           package: ctx.package,
            full_name: full_name,
            use_options: msg_opts_str(ctx, desc.options),
            oneofs: desc.oneof_decl,
