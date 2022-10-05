@@ -35,7 +35,7 @@ defmodule Protobuf.Any do
   Pack a protocol buffer message into a `Google.Protobuf.Any` message.
 
   This sets the correct `type_url` of the pattern: `type.googleapis.com/<package>.<message name>`
-  and the `value` of the `Any` as the serialized original message.any()
+  and the `value` of the `Any` as the serialized original message.
 
   ## Example
 
@@ -43,7 +43,7 @@ defmodule Protobuf.Any do
       Google.Protobuf.Any.new(%{
         type_url: "type.googleapis.com/some.package.My.Message",
         value: Some.Pacakge.My.Message.encode(data)
-      })
+      }) = Protobuf.Any.pack(data)
   """
   @spec pack(struct()) :: Google.Protobuf.Any.t()
   def pack(%mod{} = data) do
@@ -56,16 +56,23 @@ defmodule Protobuf.Any do
   @doc """
   Unpack a `Google.Protobuf.Any` message.
 
-  Utilizes the `type_url` to determine the type, and deserializes the binary data into that type.any()
+  Utilizes the `type_url` to determine the type, and deserializes the binary data into that type.
 
   ## Example
 
       any = %Google.Protobuf.Any{type_url: "type.googleapis.com/some.package.My.Message", value: <binary_data>}
       %Some.Package.My.Message{} = Protobuf.Any.unpack(any)
 
-  Note: Since the module for the message is determined via a string (type_url) that maps the package message name
-  to a generated protocol buffer. `Module.safe_concat` is used which _requires_ that the message type is known and compiled into the application.
+  Note: Since the module for the message is determined via a string (type_url) that is user input that maps the package message name
+  to a generated protocol buffer module. `Module.safe_concat` is used to prevent arbitrary atom creation, which _requires_ that the message type is known and compiled into the application.
   If the inferred type is unknown there will be an Argument error raised.
+
+  If you generated the protocol buffers with a module prefix, you can use the `prefix` option to unpack this correctly.
+
+  ## Example
+      any = %Google.Protobuf.Any{type_url: "type.googleapis.com/some.package.My.Message", value: <binary_data>}
+      %Prefixed.Some.Package.My.Message{} = Protobuf.Any.unpack(any, prefix: Prefixed)
+
   """
   @spec unpack(Google.Protobuf.Any.t()) :: struct()
   @spec unpack(Google.Protobuf.Any.t(), [option()]) :: struct()
