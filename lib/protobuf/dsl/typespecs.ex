@@ -80,7 +80,8 @@ defmodule Protobuf.DSL.Typespecs do
       prop.repeated? ->
         quote do: [unquote(spec)]
 
-      prop.embedded? or (prop.optional? and is_nil(prop.oneof) and syntax != :proto3) ->
+      prop.embedded? or (prop.optional? and is_nil(prop.oneof) and syntax != :proto3) or
+          (prop.proto3_optional? and syntax == :proto3) ->
         quote do: unquote(spec) | nil
 
       true ->
