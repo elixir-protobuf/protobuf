@@ -44,6 +44,7 @@ defmodule Protobuf.Any do
         type_url: "type.googleapis.com/some.package.My.Message",
         value: Some.Pacakge.My.Message.encode(data)
       }) = Protobuf.Any.pack(data)
+      ```
   """
   @spec pack(struct()) :: Google.Protobuf.Any.t()
   def pack(%mod{} = data) do
