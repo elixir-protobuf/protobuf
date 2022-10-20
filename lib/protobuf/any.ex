@@ -10,22 +10,22 @@ defmodule Protobuf.Any do
 
   Given a message type of
 
-      ```protobuf
-      message ErrorStatus {
-        string message = 1;
-        repeated google.protobuf.Any details = 2;
-      }
-      ```
+  ```protobuf
+  message ErrorStatus {
+    string message = 1;
+    repeated google.protobuf.Any details = 2;
+  }
+  ```
 
   Use the `Protobuf.Any.pack` function to set the information.
 
-      ```elixir
-      details = some_list_of_protobuf_messages()
-      ErrorStatus.new(%{
-        message: "There was an error",
-        details: Enum.map(details, &Protobuf.Any.pack/1)
-      })
-      ```
+  ```elixir
+  details = some_list_of_protobuf_messages()
+  ErrorStatus.new(%{
+    message: "There was an error",
+    details: Enum.map(details, &Protobuf.Any.pack/1)
+  })
+  ```
 
   """
   @type_url_prefix "type.googleapis.com/"
@@ -39,12 +39,12 @@ defmodule Protobuf.Any do
 
   ## Example
 
-      ```elixir
-      Google.Protobuf.Any.new(%{
-        type_url: "type.googleapis.com/some.package.My.Message",
-        value: Some.Package.My.Message.encode(data)
-      }) = Protobuf.Any.pack(data)
-      ```
+  ```elixir
+  Google.Protobuf.Any.new(%{
+    type_url: "type.googleapis.com/some.package.My.Message",
+    value: Some.Package.My.Message.encode(data)
+  }) = Protobuf.Any.pack(data)
+  ```
   """
   @spec pack(struct()) :: Google.Protobuf.Any.t()
   def pack(%mod{} = data) do

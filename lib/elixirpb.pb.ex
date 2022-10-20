@@ -3,6 +3,8 @@ defmodule Elixirpb.FileOptions do
 
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
+  def full_name, do: "elixirpb.FileOptions"
+
   field :module_prefix, 1, optional: true, type: :string
 end
 
