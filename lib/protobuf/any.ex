@@ -42,7 +42,7 @@ defmodule Protobuf.Any do
       ```elixir
       Google.Protobuf.Any.new(%{
         type_url: "type.googleapis.com/some.package.My.Message",
-        value: Some.Pacakge.My.Message.encode(data)
+        value: Some.Package.My.Message.encode(data)
       }) = Protobuf.Any.pack(data)
       ```
   """
