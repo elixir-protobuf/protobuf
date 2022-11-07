@@ -80,7 +80,7 @@ defmodule Protobuf.JSON.Decode do
   end
 
   def from_json_data(map, Google.Protobuf.Empty = mod) when map == %{} do
-    mod.new!()
+    mod.new!([])
   end
 
   def from_json_data(int, Google.Protobuf.Int32Value = mod),

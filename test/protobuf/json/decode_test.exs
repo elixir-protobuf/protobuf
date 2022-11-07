@@ -653,6 +653,13 @@ defmodule Protobuf.JSON.DecodeTest do
   end
 
   describe "Google types" do
+    test "Google.Protobuf.Empty" do
+      data = %{}
+
+      assert decode(data, Google.Protobuf.Empty) ==
+               {:ok, Google.Protobuf.Empty.new!([])}
+    end
+
     test "Google.Protobuf.BoolValue" do
       data = %{
         "optionalBoolWrapper" => true
