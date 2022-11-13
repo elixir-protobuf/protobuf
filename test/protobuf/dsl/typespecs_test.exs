@@ -178,6 +178,20 @@ defmodule Protobuf.DSL.TypespecsTest do
                Macro.to_string(quote(do: %__MODULE__{unquote_splicing(fields)}))
     end
 
+    test "with a proto3_optional field" do
+      message_props = %MessageProps{
+        field_props: %{1 => %FieldProps{name_atom: :foo, type: :int32, proto3_optional?: true}},
+        syntax: :proto3
+      }
+
+      quoted = Typespecs.quoted_message_typespec(message_props)
+
+      fields = quote(do: [foo: integer() | nil]) ++ @unknown_fields_spec
+
+      assert Macro.to_string(quoted) ==
+               Macro.to_string(quote(do: %__MODULE__{unquote_splicing(fields)}))
+    end
+
     test "with extensions" do
       message_props = %MessageProps{
         field_props: %{},
