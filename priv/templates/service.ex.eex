@@ -4,7 +4,7 @@ defmodule <%= @module %>.Service do
   <% end %>
   use GRPC.Service, name: <%= inspect(@service_name) %>, protoc_gen_elixir_version: "<%= @version %>"
 
-  def full_name, do: "<%= @service_name %>"
+  def full_name, do: <%= inspect(@service_name) %>
 
   <%= if @descriptor_fun_body do %>
   def descriptor do
