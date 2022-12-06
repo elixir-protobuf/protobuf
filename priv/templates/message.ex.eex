@@ -4,7 +4,7 @@ defmodule <%= @module %> do
   <% end %>
   use Protobuf<%= @use_options %>
 
-  def full_name, do: "<%= @full_name %>"
+  def full_name, do: <%= inspect(@full_name) %>
 
   <%= if @descriptor_fun_body do %>
   def descriptor do
