@@ -49,7 +49,7 @@ defmodule Protobuf.Any do
   @spec pack(struct()) :: Google.Protobuf.Any.t()
   def pack(%mod{} = data) do
     Google.Protobuf.Any.new(%{
-      type_url: "#{@type_url_prefix}#{mod.full_name()}",
+      type_url: "#{@type_url_prefix}#{mod.fully_qualified_name()}",
       value: mod.encode(data)
     })
   end

@@ -3,7 +3,7 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorResponse.Feature do
 
   use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
-  def full_name, do: "google.protobuf.compiler.CodeGeneratorResponse.Feature"
+  def fully_qualified_name, do: "google.protobuf.compiler.CodeGeneratorResponse.Feature"
 
   field :FEATURE_NONE, 0
   field :FEATURE_PROTO3_OPTIONAL, 1
@@ -14,7 +14,7 @@ defmodule Google.Protobuf.Compiler.Version do
 
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
-  def full_name, do: "google.protobuf.compiler.Version"
+  def fully_qualified_name, do: "google.protobuf.compiler.Version"
 
   field :major, 1, optional: true, type: :int32
   field :minor, 2, optional: true, type: :int32
@@ -27,7 +27,7 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorRequest do
 
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
-  def full_name, do: "google.protobuf.compiler.CodeGeneratorRequest"
+  def fully_qualified_name, do: "google.protobuf.compiler.CodeGeneratorRequest"
 
   field :file_to_generate, 1, repeated: true, type: :string
   field :parameter, 2, optional: true, type: :string
@@ -40,7 +40,7 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorResponse.File do
 
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
-  def full_name, do: "google.protobuf.compiler.CodeGeneratorResponse.File"
+  def fully_qualified_name, do: "google.protobuf.compiler.CodeGeneratorResponse.File"
 
   field :name, 1, optional: true, type: :string
   field :insertion_point, 2, optional: true, type: :string
@@ -53,7 +53,7 @@ defmodule Google.Protobuf.Compiler.CodeGeneratorResponse do
 
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
-  def full_name, do: "google.protobuf.compiler.CodeGeneratorResponse"
+  def fully_qualified_name, do: "google.protobuf.compiler.CodeGeneratorResponse"
 
   field :error, 1, optional: true, type: :string
   field :supported_features, 2, optional: true, type: :uint64

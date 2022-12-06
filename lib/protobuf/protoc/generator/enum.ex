@@ -18,7 +18,7 @@ defmodule Protobuf.Protoc.Generator.Enum do
   def generate(%Context{namespace: ns} = ctx, %Google.Protobuf.EnumDescriptorProto{} = desc) do
     msg_name = Util.mod_name(ctx, ns ++ [Macro.camelize(desc.name)])
 
-    full_name =
+    fully_qualified_name =
       [ctx.package | ns ++ [Macro.camelize(desc.name)]]
       |> Enum.reject(&is_nil/1)
       |> Enum.join(".")
@@ -40,7 +40,7 @@ defmodule Protobuf.Protoc.Generator.Enum do
     content =
       enum_template(
         module: msg_name,
-        full_name: full_name,
+        fully_qualified_name: fully_qualified_name,
         use_options: use_options,
         fields: desc.value,
         descriptor_fun_body: descriptor_fun_body,
