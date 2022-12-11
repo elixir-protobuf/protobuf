@@ -47,10 +47,8 @@ defmodule Conformance.Protobuf.Runner do
             raise "failed to read #{len} bytes from stdio: #{inspect(reason)}"
 
           encoded_request when byte_size(encoded_request) == len ->
-            response =
-              Conformance.ConformanceResponse.new!(
-                result: handle_encoded_request(encoded_request)
-              )
+            mod = Conformance.ConformanceResponse
+            response = mod.new!(result: handle_encoded_request(encoded_request))
 
             encoded_response = Protobuf.encode(response)
 
