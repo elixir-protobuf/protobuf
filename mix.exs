@@ -27,7 +27,8 @@ defmodule Protobuf.Mixfile do
       description: @description,
       package: package(),
       docs: docs(),
-      aliases: aliases()
+      aliases: aliases(),
+      xref: [exclude: [Google.Protobuf.Any]]
     ]
   end
 
