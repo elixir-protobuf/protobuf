@@ -91,16 +91,6 @@ defmodule Protobuf.ConformanceRegressionsTest do
              |> Protobuf.JSON.encode!()
              |> Jason.decode!() == %{"oneofNullValue" => nil}
     end
-
-    test "Recommended.Proto3.JsonInput.IgnoreUnknownEnumStringValueInOptionalField.ProtobufOutput",
-         %{message_mod: message_mod} do
-      json = "{\n      \"optional_nested_enum\": \"UNKNOWN_ENUM_VALUE\"\n    }"
-
-      assert json
-             |> Protobuf.JSON.decode!(message_mod)
-             |> Protobuf.JSON.encode!()
-             |> Jason.decode!() == %{}
-    end
   end
 
   # Fails on OTP 25.
