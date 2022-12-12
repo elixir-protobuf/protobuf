@@ -4,6 +4,8 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
   # TODO: Remove when we depend on Elixir 1.11+.
   import Protobuf.TestHelpers, only: [tmp_dir: 1, fetch_docs_from_bytecode: 1], warn: false
 
+  alias Protobuf.TestHelpers
+
   if Version.match?(System.version(), ">= 1.11.0") do
     @moduletag :tmp_dir
   else
@@ -228,10 +230,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
       |> Enum.map(fn {mod, _bytecode} -> mod end)
 
     on_exit(fn ->
-      Enum.each(modules, fn mod ->
-        :code.delete(mod)
-        :code.purge(mod)
-      end)
+      TestHelpers.clean_modules(modules)
     end)
 
     modules
@@ -246,10 +245,9 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
       end)
 
     on_exit(fn ->
-      Enum.each(modules_and_docs, fn {mod, _bytecode} ->
-        :code.delete(mod)
-        :code.purge(mod)
-      end)
+      modules_and_docs
+      |> Enum.map(fn {mod, _bytecode} -> mod end)
+      |> TestHelpers.clean_modules()
     end)
 
     modules_and_docs
