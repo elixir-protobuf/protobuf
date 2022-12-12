@@ -885,4 +885,53 @@ defmodule Protobuf.JSON.DecodeTest do
                )
     end
   end
+
+  describe "Google.Protobuf.Any" do
+    test "with Int32Value inside" do
+      data = %{
+        "optionalAny" => %{
+          "@type" => "type.googleapis.com/google.protobuf.Int32Value",
+          "value" => 1234
+        }
+      }
+
+      assert {:ok, decoded} = decode(data, TestAllTypesProto3)
+
+      assert decoded.optional_any ==
+               Google.Protobuf.Any.new!(
+                 type_url: "type.googleapis.com/google.protobuf.Int32Value",
+                 value:
+                   Google.Protobuf.Int32Value.encode(Google.Protobuf.Int32Value.new!(value: 1234))
+               )
+    end
+
+    test "with nested Any with Int32Value inside" do
+      data = %{
+        "optionalAny" => %{
+          "@type" => "type.googleapis.com/google.protobuf.Any",
+          "value" => %{
+            "@type" => "type.googleapis.com/google.protobuf.Int32Value",
+            "value" => 1234
+          }
+        }
+      }
+
+      assert {:ok, decoded} = decode(data, TestAllTypesProto3)
+
+      assert decoded.optional_any ==
+               Google.Protobuf.Any.new!(
+                 type_url: "type.googleapis.com/google.protobuf.Any",
+                 value:
+                   Google.Protobuf.Any.encode(
+                     Google.Protobuf.Any.new(
+                       type_url: "type.googleapis.com/google.protobuf.Int32Value",
+                       value:
+                         Google.Protobuf.Int32Value.encode(
+                           Google.Protobuf.Int32Value.new!(value: 1234)
+                         )
+                     )
+                   )
+               )
+    end
+  end
 end

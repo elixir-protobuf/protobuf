@@ -164,6 +164,32 @@ defmodule Protobuf.JSON.Decode do
     end
   end
 
+  def from_json_data(%{"@type" => type_url} = data, Google.Protobuf.Any = mod) do
+    data = Map.delete(data, "@type")
+    message_mod = Protobuf.Any.type_url_to_module(type_url)
+
+    encoded =
+      case Map.fetch(data, "value") do
+        # Types with a built-in JSON representation (like google.protobuf.Timestamp) have a
+        # "value" field with the JSON representation itself.
+        # See: https://developers.google.com/protocol-buffers/docs/proto3#json
+        {:ok, value} ->
+          value
+          |> from_json_data(message_mod)
+          |> message_mod.encode()
+
+        # When a message doesn't have a built-in JSON representation (like
+        # google.protobuf.Timestamp), then it's encoded as a JSON object and then a @type field is
+        # added with the type_url for that message.
+        :error ->
+          data
+          |> from_json_data(message_mod)
+          |> message_mod.encode()
+      end
+
+    mod.new!(type_url: type_url, value: encoded)
+  end
+
   def from_json_data(data, module) when is_map(data) and is_atom(module) do
     message_props = module.__message_props__()
     regular = decode_regular_fields(data, message_props)

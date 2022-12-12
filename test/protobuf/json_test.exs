@@ -43,4 +43,23 @@ defmodule Protobuf.JSONTest do
       end
     end
   end
+
+  test "going back and forth with the Any type" do
+    data = """
+    {
+      "optionalAny": {
+        "@type": "type.googleapis.com/protobuf_test_messages.proto3.TestAllTypesProto3",
+        "optionalInt32": 12345
+      }
+    }
+    """
+
+    assert {:ok, decoded} =
+             Protobuf.JSON.decode(data, ProtobufTestMessages.Proto3.TestAllTypesProto3)
+
+    assert %Google.Protobuf.Any{} = decoded.optional_any
+    assert decoded.optional_any.type_url =~ "TestAllTypesProto3"
+
+    assert Protobuf.JSON.to_encodable(decoded) == {:ok, Jason.decode!(data)}
+  end
 end
