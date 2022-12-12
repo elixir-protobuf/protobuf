@@ -230,7 +230,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
       |> Enum.map(fn {mod, _bytecode} -> mod end)
 
     on_exit(fn ->
-      TestHelpers.clean_modules(modules)
+      TestHelpers.purge_modules(modules)
     end)
 
     modules
@@ -247,7 +247,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
     on_exit(fn ->
       modules_and_docs
       |> Enum.map(fn {mod, _bytecode} -> mod end)
-      |> TestHelpers.clean_modules()
+      |> TestHelpers.purge_modules()
     end)
 
     modules_and_docs
