@@ -79,4 +79,13 @@ defmodule Protobuf.Protoc.GeneratorIntegrationTest do
                {:ok, "message_with_custom_options"}
     end
   end
+
+  test "maps without packages" do
+    input = NoPackageMessage.new(number_mapping: %{321 => 123, 1337 => 1})
+
+    output = NoPackageMessage.encode(input)
+    assert NoPackageMessage.__message_props__().field_props[1].map?
+    assert NoPackageMessage.NumberMappingEntry.__message_props__().map?
+    assert NoPackageMessage.decode(output) == input
+  end
 end

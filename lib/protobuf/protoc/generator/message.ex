@@ -196,7 +196,11 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   # Map of protobuf are actually nested(one level) messages
   defp nested_maps(ctx, desc) do
-    fully_qualified_name = Enum.join([ctx.package | ctx.namespace] ++ [desc.name], ".")
+    fully_qualified_name =
+      ([ctx.package | ctx.namespace] ++ [desc.name])
+      |> Enum.reject(&is_nil/1)
+      |> Enum.join(".")
+
     prefix = "." <> fully_qualified_name
 
     Enum.reduce(desc.nested_type, %{}, fn desc, acc ->

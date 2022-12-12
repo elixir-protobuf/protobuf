@@ -177,6 +177,12 @@ defmodule Protobuf.Mixfile do
       "./generated",
       ["test/protobuf/protoc/proto/custom_options.proto"]
     )
+
+    protoc!(
+      "-I test/protobuf/protoc/proto",
+      "./generated",
+      ["test/protobuf/protoc/proto/no_package.proto"]
+    )
   end
 
   defp gen_bench_protos(_args) do
