@@ -44,14 +44,20 @@ defmodule Protobuf.Mixfile do
   defp deps do
     [
       {:jason, "~> 1.2", optional: true},
+
+      # Dev and test dependencies
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:stream_data, "~> 0.5.0", only: [:dev, :test]},
       {:excoveralls, "~> 0.14.4", only: :test},
+
+      # We use this as a dependency because we're sneaky. It's not a Mix dependency at all,
+      # it's the repo where the Protobuf source is. But this allows us to download it
+      # and make sure it's there for tests without Git submodules or anything like that.
       {:google_protobuf,
        github: "protocolbuffers/protobuf",
-       branch: "main",
+       ref: "1f58f1d7b83ec333ab6076bf2e76797dd8de3e45",
        submodules: true,
        app: false,
        compile: false,
