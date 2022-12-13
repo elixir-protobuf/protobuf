@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+message NoPackageMessage {
+  map<uint32, uint32> number_mapping = 1;
+}
