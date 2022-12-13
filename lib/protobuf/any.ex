@@ -121,4 +121,44 @@ defmodule Protobuf.Any do
 
     Module.safe_concat(parts).decode(value)
   end
+
+  @doc """
+  Returns the module for a given `type_url`.
+
+  `type_url` must be in the form: `#{@type_url_prefix}<package>.<message name>`. The
+  returned module is determined by joining the package name and message name. See
+  the examples.
+
+  > #### Existing modules {: .warning}
+  >
+  > The module for the message is determined via an **arbitrary string**
+  >
+  > Because of this, this function uses `Module.safe_concat/1` is used to prevent arbitrary
+  > atom creation, which _requires_ that the message type is known and compiled into the
+  > application.
+  > If the inferred type is unknown, this function will raise an error.
+
+  ## Examples
+
+      iex> Protobuf.Any.type_url_to_module("type.googleapis.com/google.protobuf.Duration")
+      Google.Protobuf.Duration
+
+      iex> Protobuf.Any.type_url_to_module("bad_type_url")
+      ** (ArgumentError) type_url must be in the form: #{@type_url_prefix}<package>.<message name>
+
+  """
+  @spec type_url_to_module(String.t()) :: module()
+  def type_url_to_module(type_url) when is_binary(type_url) do
+    case type_url do
+      @type_url_prefix <> package_and_message ->
+        package_and_message
+        |> String.split(".")
+        |> Enum.map(&Macro.camelize/1)
+        |> Module.safe_concat()
+
+      _other ->
+        raise ArgumentError,
+              "type_url must be in the form: #{@type_url_prefix}<package>.<message name>"
+    end
+  end
 end

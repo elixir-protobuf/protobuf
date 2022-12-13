@@ -13,6 +13,26 @@ defmodule Protobuf.JSON.Encode do
 
   @duration_seconds_range -315_576_000_000..315_576_000_000
 
+  @built_in_google_messages [
+    Google.Protobuf.FieldMask,
+    Google.Protobuf.Duration,
+    Google.Protobuf.Timestamp,
+    Google.Protobuf.BytesValue,
+    Google.Protobuf.Struct,
+    Google.Protobuf.ListValue,
+    Google.Protobuf.Value,
+    Google.Protobuf.Empty,
+    Google.Protobuf.Int32Value,
+    Google.Protobuf.UInt32Value,
+    Google.Protobuf.UInt64Value,
+    Google.Protobuf.Int64Value,
+    Google.Protobuf.FloatValue,
+    Google.Protobuf.DoubleValue,
+    Google.Protobuf.BoolValue,
+    Google.Protobuf.StringValue,
+    Google.Protobuf.Any
+  ]
+
   @doc false
   @spec to_encodable(struct, keyword) :: map | {:error, EncodeError.t()}
   def to_encodable(%mod{} = struct, opts) do
@@ -100,6 +120,21 @@ defmodule Protobuf.JSON.Encode do
           String.downcase(first) <> rest
       end
     end)
+  end
+
+  def encodable(%mod{} = struct, opts) when mod == Google.Protobuf.Any do
+    message_mod = Protobuf.Any.type_url_to_module(struct.type_url)
+
+    value_to_encode =
+      struct.value
+      |> message_mod.decode()
+      |> encodable(opts)
+
+    if message_mod in @built_in_google_messages do
+      %{"@type" => struct.type_url, "value" => value_to_encode}
+    else
+      Map.put(value_to_encode, "@type", struct.type_url)
+    end
   end
 
   def encodable(%mod{} = struct, opts) do

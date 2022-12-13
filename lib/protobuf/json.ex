@@ -24,7 +24,7 @@ defmodule Protobuf.JSON do
   | `enum`                       | String                      | Yes       |
   | `map<K,V>`                   | Object (`{…}`)              | Yes       |
   | `repeated V`                 | Array of `[v, …]`           | Yes       |
-  | `Any`                        | Object (`{…}`)              | No        |
+  | `Any`                        | Object (`{…}`)              | Yes       |
   | `Timestamp`                  | RFC3339 datetime            | Yes       |
   | `Duration`                   | String (`seconds.fraction`) | Yes       |
   | `Struct`                     | Object (`{…}`)              | Yes       |
