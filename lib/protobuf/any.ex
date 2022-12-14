@@ -13,7 +13,7 @@ defmodule Protobuf.Any do
   You can build and decode the `Any` type yourself.
 
       encoded_any = Google.Protobuf.Any.new!(
-        type_url: "types.googleapis.com/google.protobuf.Duration",
+        type_url: "type.googleapis.com/google.protobuf.Duration",
         value: Google.Protobuf.Duration.encode(%Google.Protobuf.Duration{seconds: 1})
       )
 
@@ -26,7 +26,7 @@ defmodule Protobuf.Any do
   @doc """
   Returns the module for a given `type_url`.
 
-  `type_url` must be in the form: `types.googleapis.com/<package>.<message name>`. The
+  `type_url` must be in the form: `type.googleapis.com/<package>.<message name>`. The
   returned module is determined by joining the package name and message name. See
   the examples.
 
@@ -45,13 +45,13 @@ defmodule Protobuf.Any do
       Google.Protobuf.Duration
 
       iex> Protobuf.Any.type_url_to_module("bad_type_url")
-      ** (ArgumentError) type_url must be in the form: types.googleapis.com/<package>.<message name>, got: "bad_type_url"
+      ** (ArgumentError) type_url must be in the form: type.googleapis.com/<package>.<message name>, got: "bad_type_url"
 
   """
   @spec type_url_to_module(String.t()) :: module()
   def type_url_to_module(type_url) when is_binary(type_url) do
     case type_url do
-      "types.googleapis.com/" <> package_and_message ->
+      "type.googleapis.com/" <> package_and_message ->
         package_and_message
         |> String.split(".")
         |> Enum.map(&Macro.camelize/1)
@@ -59,7 +59,7 @@ defmodule Protobuf.Any do
 
       _other ->
         raise ArgumentError,
-              "type_url must be in the form: types.googleapis.com/<package>.<message name>, " <>
+              "type_url must be in the form: type.googleapis.com/<package>.<message name>, " <>
                 "got: #{inspect(type_url)}"
     end
   end
