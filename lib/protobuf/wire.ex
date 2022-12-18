@@ -126,7 +126,7 @@ defmodule Protobuf.Wire do
     do: encode_from_wire_type(wire_64bits(), <<n::64-signed-little>>)
 
   def encode(type, value) do
-    raise Protobuf.TypeEncodeError,
+    raise Protobuf.EncodeError,
       message: "#{inspect(value)} is invalid for type #{inspect(type)}"
   end
 

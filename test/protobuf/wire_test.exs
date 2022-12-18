@@ -1,6 +1,7 @@
 defmodule Protobuf.WireTest do
   use ExUnit.Case, async: true
 
+  alias Protobuf.EncodeError
   alias Protobuf.Wire
 
   describe "encode/2" do
@@ -55,11 +56,11 @@ defmodule Protobuf.WireTest do
     end
 
     test "wrong enum" do
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode({:enum, TestMsg.EnumFoo}, "invalid")
       end
 
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode({:enum, TestMsg.EnumFoo}, 0.1)
       end
     end
@@ -135,101 +136,101 @@ defmodule Protobuf.WireTest do
     end
 
     test "wrong uint32" do
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:uint32, 12_345_678_901_234_567_890)
       end
 
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:uint32, -1)
       end
     end
 
     test "wrong uint64" do
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:uint64, 184_467_440_737_095_516_150)
       end
 
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:uint64, -1)
       end
     end
 
     test "wrong fixed32" do
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:fixed32, 12_345_678_901_234_567_890)
       end
 
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:fixed32, -1)
       end
     end
 
     test "wrong fixed64" do
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:fixed64, 184_467_440_737_095_516_150)
       end
 
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:fixed64, -1)
       end
     end
 
     test "wrong int32" do
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:int32, 2_147_483_648)
       end
 
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:int32, -2_147_483_649)
       end
     end
 
     test "wrong int64" do
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:int64, 184_467_440_737_095_516_150)
       end
 
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:int64, -184_467_440_737_095_516_150)
       end
     end
 
     test "wrong sint32" do
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:sint32, 2_147_483_648)
       end
 
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:sint32, -2_147_483_649)
       end
     end
 
     test "wrong sint64" do
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:sint64, 184_467_440_737_095_516_150)
       end
 
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:sint64, -184_467_440_737_095_516_150)
       end
     end
 
     test "wrong sfixed32" do
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:sfixed32, 2_147_483_648)
       end
 
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:sfixed32, -2_147_483_649)
       end
     end
 
     test "wrong sfixed64" do
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:sfixed64, 184_467_440_737_095_516_150)
       end
 
-      assert_raise Protobuf.TypeEncodeError, fn ->
+      assert_raise EncodeError, fn ->
         encode(:sfixed64, -184_467_440_737_095_516_150)
       end
     end
