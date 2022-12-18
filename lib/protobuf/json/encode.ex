@@ -243,7 +243,7 @@ defmodule Protobuf.JSON.Encode do
   defp encode_float_types(:negative_infinity, _type), do: "-Infinity"
   defp encode_float_types(:infinity, _type), do: "Infinity"
   defp encode_float_types(:nan, _type), do: "NaN"
-  defp encode_float_types(value, type), do: raise_invalid_type_exception(value, type)
+  defp encode_float_types(value, type), do: throw({:invalid_type, type, value})
 
   # TODO: maybe define a helper for all enums messages, with strict validation.
   defp encode_enum(Google.Protobuf.NullValue, key, _opts) when key in [0, :NULL_VALUE] do
@@ -251,32 +251,33 @@ defmodule Protobuf.JSON.Encode do
   end
 
   defp encode_enum(enum, key, opts) when is_atom(key) do
-
-    if opts[:use_enum_numbers], do: enum.value(key), else: key
+    case enum.mapping() do
+      %{^key => tag} -> if opts[:use_enum_numbers], do: tag, else: key
+      _other -> throw({:unknown_enum_value, key, enum})
+    end
   end
 
   defp encode_enum(enum, num, opts) when is_integer(num) do
-    enum.__message_props__() |> IO.inspect(label: "enum")
     if opts[:use_enum_numbers], do: num, else: safe_enum_key(enum, num)
   end
 
-  defp encode_enum(_enum, key, _opts), do: raise_invalid_type_exception(key, :enum)
+  defp encode_enum(_enum, key, _opts), do: throw({:invalid_type, :enum, key})
 
   defp encode_int32_types(value, _type) when is_integer(value), do: value
-  defp encode_int32_types(value, type), do: raise_invalid_type_exception(value, type)
+  defp encode_int32_types(value, type), do: throw({:invalid_type, type, value})
 
   defp encode_int64_types(value, _type) when is_integer(value), do: Integer.to_string(value)
-  defp encode_int64_types(value, type), do: raise_invalid_type_exception(value, type)
+  defp encode_int64_types(value, type), do: throw({:invalid_type, type, value})
 
   defp encode_bool(value) when is_boolean(value), do: value
-  defp encode_bool(value), do: raise_invalid_type_exception(value, :bool)
+  defp encode_bool(value), do: throw({:invalid_type, :bool, value})
 
   defp encode_bytes(value) when is_binary(value), do: Base.encode64(value)
-  defp encode_bytes(value), do: raise_invalid_type_exception(value, :bytes)
+  defp encode_bytes(value), do: throw({:invalid_type, :bytes, value})
 
   defp encode_string(value) when is_binary(value), do: value
   defp encode_string(value) when is_atom(value), do: value
-  defp encode_string(value), do: raise_invalid_type_exception(value, :string)
+  defp encode_string(value), do: throw({:invalid_type, :string, value})
 
   # proto3 allows unknown enum values, that is why we can't call enum.key(num) here.
   defp safe_enum_key(enum, num) do
@@ -301,9 +302,5 @@ defmodule Protobuf.JSON.Encode do
     else
       message
     end
-  end
-
-  defp raise_invalid_type_exception(value, type) do
-    raise Protobuf.EncodeError, message: "#{inspect(value)} is invalid for type #{inspect(type)}"
   end
 end

@@ -454,4 +454,43 @@ defmodule Protobuf.JSON.EncodeTest do
       assert encode(message) == %{"optionalStruct" => %{"foo" => %{}}}
     end
   end
+
+  describe "encoding performs validation" do
+    test "with scalar types" do
+      cases = [
+        %{key: :int32_map, wrong_value: "not int32", expected_type: :int32},
+        %{key: :sint32_map, wrong_value: "not sint32", expected_type: :sint32},
+        %{key: :sfixed32_map, wrong_value: "not sfixed32", expected_type: :sfixed32},
+        %{key: :fixed32_map, wrong_value: "not fixed32", expected_type: :fixed32},
+        %{key: :uint32_map, wrong_value: "not uint32", expected_type: :uint32},
+        %{key: :int64_map, wrong_value: "not int64", expected_type: :int64},
+        %{key: :sint64_map, wrong_value: "not sint64", expected_type: :sint64},
+        %{key: :sfixed64_map, wrong_value: "not sfixed64", expected_type: :sfixed64},
+        %{key: :fixed64_map, wrong_value: "not fixed64", expected_type: :fixed64},
+        %{key: :uint64_map, wrong_value: "not uint64", expected_type: :uint64},
+        %{key: :float_map, wrong_value: "not float", expected_type: :float},
+        %{key: :double_map, wrong_value: "not double", expected_type: :double},
+        %{key: :string_map, wrong_value: %{levels: %{level_1: 0.4}}, expected_type: :string},
+        %{key: :bool_map, wrong_value: "not bool", expected_type: :bool},
+        %{key: :bytes_map, wrong_value: 42, expected_type: :bytes},
+        %{key: :enum_map, wrong_value: "not an map enum value", expected_type: :enum}
+      ]
+
+      for %{key: key, wrong_value: wrong_value, expected_type: expected_type} <- cases do
+        message = My.Test.MapInput.new!(%{key => %{value: wrong_value}})
+
+        assert {:invalid_type, ^expected_type, ^wrong_value} = catch_throw(encode(message))
+      end
+    end
+
+    test "with enums" do
+      message = My.Test.MapInput.new!(enum_map: %{value: :NOT_VALID})
+
+      assert {:unknown_enum_value, :NOT_VALID, My.Test.MapEnum} =
+               catch_throw(encode(message, use_enum_numbers: false))
+
+      assert {:unknown_enum_value, :NOT_VALID, My.Test.MapEnum} =
+               catch_throw(encode(message, use_enum_numbers: true))
+    end
+  end
 end
