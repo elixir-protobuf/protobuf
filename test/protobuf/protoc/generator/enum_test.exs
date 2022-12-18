@@ -14,11 +14,11 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
       name: module,
       options: nil,
       value: [
-        Google.Protobuf.EnumValueDescriptorProto.new(name: "A", number: 0),
-        Google.Protobuf.EnumValueDescriptorProto.new(name: "B", number: 1),
-        Google.Protobuf.EnumValueDescriptorProto.new(name: "HAS_UNDERSCORES", number: 2),
-        Google.Protobuf.EnumValueDescriptorProto.new(name: "HAS_UNDERSCORES_X", number: 3),
-        Google.Protobuf.EnumValueDescriptorProto.new(name: "HAS_UNDERSCORES_", number: 4)
+        %Google.Protobuf.EnumValueDescriptorProto{name: "A", number: 0},
+        %Google.Protobuf.EnumValueDescriptorProto{name: "B", number: 1},
+        %Google.Protobuf.EnumValueDescriptorProto{name: "HAS_UNDERSCORES", number: 2},
+        %Google.Protobuf.EnumValueDescriptorProto{name: "HAS_UNDERSCORES_X", number: 3},
+        %Google.Protobuf.EnumValueDescriptorProto{name: "HAS_UNDERSCORES_", number: 4}
       ]
     }
 
@@ -53,11 +53,11 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
       name: module,
       options: nil,
       value: [
-        Google.Protobuf.EnumValueDescriptorProto.new(name: "A", number: 0),
-        Google.Protobuf.EnumValueDescriptorProto.new(name: "B", number: 1),
-        Google.Protobuf.EnumValueDescriptorProto.new(name: "HAS_UNDERSCORES", number: 2),
-        Google.Protobuf.EnumValueDescriptorProto.new(name: "HAS_UNDERSCORES_X", number: 3),
-        Google.Protobuf.EnumValueDescriptorProto.new(name: "HAS_UNDERSCORES_", number: 4)
+        %Google.Protobuf.EnumValueDescriptorProto{name: "A", number: 0},
+        %Google.Protobuf.EnumValueDescriptorProto{name: "B", number: 1},
+        %Google.Protobuf.EnumValueDescriptorProto{name: "HAS_UNDERSCORES", number: 2},
+        %Google.Protobuf.EnumValueDescriptorProto{name: "HAS_UNDERSCORES_X", number: 3},
+        %Google.Protobuf.EnumValueDescriptorProto{name: "HAS_UNDERSCORES_", number: 4}
       ]
     }
 
@@ -99,8 +99,8 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
       name: "valueType",
       options: nil,
       value: [
-        Google.Protobuf.EnumValueDescriptorProto.new(name: "VALUE_TYPE_UNDEFINED", number: 0),
-        Google.Protobuf.EnumValueDescriptorProto.new(name: "VALUE_TYPE_INTEGER", number: 1)
+        %Google.Protobuf.EnumValueDescriptorProto{name: "VALUE_TYPE_UNDEFINED", number: 0},
+        %Google.Protobuf.EnumValueDescriptorProto{name: "VALUE_TYPE_INTEGER", number: 1}
       ]
     }
 
@@ -113,7 +113,7 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
   describe "generate/2 include_docs" do
     test "does not include `@moduledoc false` when flag is true" do
       ctx = %Context{include_docs?: true}
-      desc = Google.Protobuf.EnumDescriptorProto.new(name: "valueType")
+      desc = %Google.Protobuf.EnumDescriptorProto{name: "valueType"}
 
       {_module, msg} = Generator.generate(ctx, desc)
 
@@ -122,7 +122,7 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
 
     test "includes `@moduledoc false` by default" do
       ctx = %Context{}
-      desc = Google.Protobuf.EnumDescriptorProto.new(name: "valueType")
+      desc = %Google.Protobuf.EnumDescriptorProto{name: "valueType"}
 
       {_module, msg} = Generator.generate(ctx, desc)
 

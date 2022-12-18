@@ -9,7 +9,7 @@ defmodule Protobuf.JSONTest do
   end
 
   test "encoding string field with invalid UTF-8 data" do
-    message = Scalars.new!(string: "   \xff   ")
+    message = %Scalars{string: "   \xff   "}
     assert {:error, %Jason.EncodeError{}} = Protobuf.JSON.encode(message)
   end
 

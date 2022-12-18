@@ -9,17 +9,16 @@ defmodule Protobuf.Protoc.GeneratorIntegrationTest do
       _my_field_name_2: 21
     }
 
-    reply = My.Test.Reply.new(found: [entry], compact_keys: [1, 2, 3])
+    reply = %My.Test.Reply{found: [entry], compact_keys: [1, 2, 3]}
 
-    input =
-      My.Test.Request.new(
-        key: [123],
-        hue: :GREEN,
-        hat: :FEZ,
-        deadline: 123.0,
-        name_mapping: %{321 => "name"},
-        msg_mapping: %{1234 => reply}
-      )
+    input = %My.Test.Request{
+      key: [123],
+      hue: :GREEN,
+      hat: :FEZ,
+      deadline: 123.0,
+      name_mapping: %{321 => "name"},
+      msg_mapping: %{1234 => reply}
+    }
 
     output = My.Test.Request.encode(input)
     assert My.Test.Request.__message_props__().field_props[14].map?
@@ -38,7 +37,7 @@ defmodule Protobuf.Protoc.GeneratorIntegrationTest do
       today: :MONDAY,
       maybe: true,
       delta: 123,
-      msg: My.Test.Reply.new()
+      msg: %My.Test.Reply{}
     ]
 
     Enum.each(unions, fn union ->
@@ -53,7 +52,7 @@ defmodule Protobuf.Protoc.GeneratorIntegrationTest do
   end
 
   test "extensions" do
-    assert "hello" == Protobuf.Protoc.ExtTest.Foo.new(a: "hello").a
+    assert "hello" == %Protobuf.Protoc.ExtTest.Foo{a: "hello"}.a
   end
 
   describe "custom options" do
@@ -81,7 +80,7 @@ defmodule Protobuf.Protoc.GeneratorIntegrationTest do
   end
 
   test "maps without packages" do
-    input = NoPackageMessage.new(number_mapping: %{321 => 123, 1337 => 1})
+    input = %NoPackageMessage{number_mapping: %{321 => 123, 1337 => 1}}
 
     output = NoPackageMessage.encode(input)
     assert NoPackageMessage.__message_props__().field_props[1].map?

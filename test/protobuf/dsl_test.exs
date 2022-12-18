@@ -188,7 +188,8 @@ defmodule Protobuf.DSLTest do
     refute msg_props.field_props[11].embedded?
   end
 
-  test "generates new function" do
+  # TODO: remove once we remove new/0 and new/1.
+  test "generates new/0 and new/1 functions" do
     assert %Foo{
              a: 0,
              c: "",

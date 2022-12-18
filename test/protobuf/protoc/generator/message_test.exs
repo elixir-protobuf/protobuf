@@ -8,7 +8,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
   test "generate/2 has right name" do
     ctx = %Context{}
-    desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
+    desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
     assert msg =~ "use Protobuf, protoc_gen_elixir_version: \"#{Util.version()}\"\n"
@@ -33,7 +33,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
   test "generate/2 has right syntax" do
     ctx = %Context{syntax: :proto3}
-    desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
+    desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
 
@@ -60,19 +60,19 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
   test "generate/2 has right name with package" do
     ctx = %Context{package: "pkg.name", module_prefix: "Pkg.Name"}
-    desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
+    desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Pkg.Name.Foo do\n"
   end
 
   test "generate/2 adds transform_module/1" do
     ctx = %Context{}
-    desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
+    desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     refute msg =~ "def transform_module()"
 
     ctx = %Context{transform_module: My.Transform.Module}
-    desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
+    desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "def transform_module(), do: My.Transform.Module\n"
   end
@@ -80,11 +80,10 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 has right options" do
     ctx = %Context{package: "pkg.name"}
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        options: Google.Protobuf.MessageOptions.new(map_entry: true)
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      options: %Google.Protobuf.MessageOptions{map_entry: true}
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "use Protobuf, map: true, protoc_gen_elixir_version: \"#{Util.version()}\"\n"
@@ -93,26 +92,25 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 has right fields" do
     ctx = %Context{}
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_INT32,
-            label: :LABEL_OPTIONAL
-          ),
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "b",
-            json_name: "b",
-            number: 2,
-            type: :TYPE_STRING,
-            label: :LABEL_REQUIRED
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_INT32,
+          label: :LABEL_OPTIONAL
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "b",
+          json_name: "b",
+          number: 2,
+          type: :TYPE_STRING,
+          label: :LABEL_REQUIRED
+        }
+      ]
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
@@ -123,19 +121,18 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 has right fields with right defaults" do
     ctx = %Context{}
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_BOOL,
-            label: :LABEL_REQUIRED
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_BOOL,
+          label: :LABEL_REQUIRED
+        }
+      ]
+    }
 
     {[], [{_mod, _msg}]} = Generator.generate(ctx, desc)
   end
@@ -143,33 +140,32 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 has right fields for proto3" do
     ctx = %Context{syntax: :proto3}
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_INT32,
-            label: :LABEL_OPTIONAL
-          ),
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "b",
-            json_name: "b",
-            number: 2,
-            type: :TYPE_STRING,
-            label: :LABEL_REQUIRED
-          ),
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "c",
-            json_name: "c",
-            number: 3,
-            type: :TYPE_INT32,
-            label: :LABEL_REPEATED
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_INT32,
+          label: :LABEL_OPTIONAL
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "b",
+          json_name: "b",
+          number: 2,
+          type: :TYPE_STRING,
+          label: :LABEL_REQUIRED
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "c",
+          json_name: "c",
+          number: 3,
+          type: :TYPE_INT32,
+          label: :LABEL_REPEATED
+        }
+      ]
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
@@ -201,28 +197,27 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 supports option :default" do
     ctx = %Context{}
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_INT32,
-            label: :LABEL_OPTIONAL,
-            default_value: "42"
-          ),
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "b",
-            json_name: "b",
-            number: 2,
-            type: :TYPE_BOOL,
-            label: :LABEL_OPTIONAL,
-            default_value: "false"
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_INT32,
+          label: :LABEL_OPTIONAL,
+          default_value: "42"
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "b",
+          json_name: "b",
+          number: 2,
+          type: :TYPE_BOOL,
+          label: :LABEL_OPTIONAL,
+          default_value: "false"
+        }
+      ]
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: :int32, default: 42\n"
@@ -232,20 +227,19 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 supports option :default and uses right default if field is required" do
     ctx = %Context{}
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_INT32,
-            label: :LABEL_REQUIRED,
-            default_value: "42"
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_INT32,
+          label: :LABEL_REQUIRED,
+          default_value: "42"
+        }
+      ]
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "field :a, 1, required: true, type: :int32, default: 42\n"
@@ -254,20 +248,19 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 supports option :packed" do
     ctx = %Context{}
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_INT32,
-            label: :LABEL_OPTIONAL,
-            options: Google.Protobuf.FieldOptions.new(packed: true)
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_INT32,
+          label: :LABEL_OPTIONAL,
+          options: %Google.Protobuf.FieldOptions{packed: true}
+        }
+      ]
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: :int32, packed: true, deprecated: false\n"
@@ -276,20 +269,19 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generated supports explicit option [packed = false] in proto3" do
     ctx = %Context{syntax: :proto3}
 
-    desc =
-      Google.Protobuf.DescriptorProto.new!(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new!(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_BOOL,
-            label: :LABEL_REQUIRED,
-            options: Google.Protobuf.FieldOptions.new!(packed: false)
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_BOOL,
+          label: :LABEL_REQUIRED,
+          options: %Google.Protobuf.FieldOptions{packed: false}
+        }
+      ]
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
@@ -299,20 +291,19 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generated supports [proto3_optional = true] in proto3" do
     ctx = %Context{syntax: :proto3}
 
-    desc =
-      Google.Protobuf.DescriptorProto.new!(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new!(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_INT32,
-            label: :LABEL_OPTIONAL,
-            proto3_optional: true
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_INT32,
+          label: :LABEL_OPTIONAL,
+          proto3_optional: true
+        }
+      ]
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
@@ -322,20 +313,19 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 supports option :deprecated" do
     ctx = %Context{}
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_INT32,
-            label: :LABEL_OPTIONAL,
-            options: Google.Protobuf.FieldOptions.new(deprecated: true)
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_INT32,
+          label: :LABEL_OPTIONAL,
+          options: %Google.Protobuf.FieldOptions{deprecated: true}
+        }
+      ]
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: :int32, deprecated: true\n"
@@ -349,28 +339,27 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       }
     }
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "bar",
-            json_name: "bar",
-            number: 1,
-            type: :TYPE_MESSAGE,
-            label: :LABEL_OPTIONAL,
-            type_name: ".Bar"
-          ),
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "baz",
-            json_name: "baz",
-            number: 2,
-            type: :TYPE_MESSAGE,
-            label: :LABEL_REPEATED,
-            type_name: ".Baz"
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "bar",
+          json_name: "bar",
+          number: 1,
+          type: :TYPE_MESSAGE,
+          label: :LABEL_OPTIONAL,
+          type_name: ".Bar"
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "baz",
+          json_name: "baz",
+          number: 2,
+          type: :TYPE_MESSAGE,
+          label: :LABEL_REPEATED,
+          type_name: ".Baz"
+        }
+      ]
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
@@ -404,43 +393,42 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       module_prefix: "FooBar.AbCd"
     }
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_MESSAGE,
-            label: :LABEL_REPEATED,
-            type_name: ".foo_bar.ab_cd.Foo.ProjectsEntry"
-          )
-        ],
-        nested_type: [
-          Google.Protobuf.DescriptorProto.new(
-            name: "ProjectsEntry",
-            options: Google.Protobuf.MessageOptions.new(map_entry: true),
-            field: [
-              Google.Protobuf.FieldDescriptorProto.new(
-                name: "key",
-                json_name: "key",
-                number: 1,
-                label: :LABEL_OPTIONAL,
-                type: :TYPE_INT32
-              ),
-              Google.Protobuf.FieldDescriptorProto.new(
-                name: "value",
-                json_name: "value",
-                number: 2,
-                label: :LABEL_OPTIONAL,
-                type: :TYPE_MESSAGE,
-                type_name: ".foo_bar.ab_cd.Bar"
-              )
-            ]
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_MESSAGE,
+          label: :LABEL_REPEATED,
+          type_name: ".foo_bar.ab_cd.Foo.ProjectsEntry"
+        }
+      ],
+      nested_type: [
+        %Google.Protobuf.DescriptorProto{
+          name: "ProjectsEntry",
+          options: %Google.Protobuf.MessageOptions{map_entry: true},
+          field: [
+            %Google.Protobuf.FieldDescriptorProto{
+              name: "key",
+              json_name: "key",
+              number: 1,
+              label: :LABEL_OPTIONAL,
+              type: :TYPE_INT32
+            },
+            %Google.Protobuf.FieldDescriptorProto{
+              name: "value",
+              json_name: "value",
+              number: 2,
+              label: :LABEL_OPTIONAL,
+              type: :TYPE_MESSAGE,
+              type_name: ".foo_bar.ab_cd.Bar"
+            }
+          ]
+        }
+      ]
+    }
 
     {[[]], [[{_, nested_msg}], {_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "field :a, 1, repeated: true, type: FooBar.AbCd.Foo.ProjectsEntry, map: true\n"
@@ -474,20 +462,19 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       }
     }
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_ENUM,
-            label: :LABEL_OPTIONAL,
-            type_name: ".foo_bar.ab_cd.EnumFoo"
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_ENUM,
+          label: :LABEL_OPTIONAL,
+          type_name: ".foo_bar.ab_cd.EnumFoo"
+        }
+      ]
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: FooBar.AbCd.EnumFoo, enum: true\n"
@@ -499,20 +486,19 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       dep_type_mapping: %{".other_pkg.EnumFoo" => %{type_name: "OtherPkg.EnumFoo"}}
     }
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_ENUM,
-            label: :LABEL_OPTIONAL,
-            type_name: ".other_pkg.EnumFoo"
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_ENUM,
+          label: :LABEL_OPTIONAL,
+          type_name: ".other_pkg.EnumFoo"
+        }
+      ]
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: OtherPkg.EnumFoo, enum: true\n"
@@ -524,20 +510,19 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       dep_type_mapping: %{".other_pkg.MsgFoo" => %{type_name: "OtherPkg.MsgFoo"}}
     }
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_MESSAGE,
-            label: :LABEL_OPTIONAL,
-            type_name: ".other_pkg.MsgFoo"
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_MESSAGE,
+          label: :LABEL_OPTIONAL,
+          type_name: ".other_pkg.MsgFoo"
+        }
+      ]
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "field :a, 1, optional: true, type: OtherPkg.MsgFoo\n"
@@ -564,13 +549,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 supports nested messages" do
     ctx = %Context{}
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        nested_type: [
-          Google.Protobuf.DescriptorProto.new(name: "Nested")
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      nested_type: [
+        %Google.Protobuf.DescriptorProto{name: "Nested"}
+      ]
+    }
 
     {[[]], [[{_mod, msg}], _]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo.Nested do\n"
@@ -582,23 +566,22 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       dep_type_mapping: %{".my_pkg.Nested" => %{type_name: "MyPkg.Foo.Nested"}}
     }
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_MESSAGE,
-            label: :LABEL_REQUIRED,
-            type_name: ".my_pkg.Nested"
-          )
-        ],
-        nested_type: [
-          Google.Protobuf.DescriptorProto.new(name: "Nested")
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_MESSAGE,
+          label: :LABEL_REQUIRED,
+          type_name: ".my_pkg.Nested"
+        }
+      ],
+      nested_type: [
+        %Google.Protobuf.DescriptorProto{name: "Nested"}
+      ]
+    }
 
     {[[]], [[{_, nested_msg}], {_, main_msg}]} = Generator.generate(ctx, desc)
     assert nested_msg =~ "defmodule MyPkg.Foo.Nested do\n"
@@ -629,24 +612,23 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 supports nested enum messages" do
     ctx = %Context{}
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        nested_type: [
-          Google.Protobuf.DescriptorProto.new(
-            enum_type: [
-              Google.Protobuf.EnumDescriptorProto.new(
-                name: "EnumFoo",
-                value: [
-                  Google.Protobuf.EnumValueDescriptorProto.new(name: "a", number: 0),
-                  Google.Protobuf.EnumValueDescriptorProto.new(name: "b", number: 1)
-                ]
-              )
-            ],
-            name: "Nested"
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      nested_type: [
+        %Google.Protobuf.DescriptorProto{
+          enum_type: [
+            %Google.Protobuf.EnumDescriptorProto{
+              name: "EnumFoo",
+              value: [
+                %Google.Protobuf.EnumValueDescriptorProto{name: "a", number: 0},
+                %Google.Protobuf.EnumValueDescriptorProto{name: "b", number: 1}
+              ]
+            }
+          ],
+          name: "Nested"
+        }
+      ]
+    }
 
     {[[{_mod, msg}]], _} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo.Nested.EnumFoo do\n"
@@ -661,55 +643,54 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   test "generate/2 supports oneof" do
     ctx = %Context{}
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        oneof_decl: [
-          Google.Protobuf.OneofDescriptorProto.new(name: "first"),
-          Google.Protobuf.OneofDescriptorProto.new(name: "second")
-        ],
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_INT32,
-            label: :LABEL_OPTIONAL,
-            oneof_index: 0
-          ),
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "b",
-            json_name: "b",
-            number: 2,
-            type: :TYPE_INT32,
-            label: :LABEL_OPTIONAL,
-            oneof_index: 0
-          ),
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "c",
-            json_name: "c",
-            number: 3,
-            type: :TYPE_INT32,
-            label: :LABEL_OPTIONAL,
-            oneof_index: 1
-          ),
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "d",
-            json_name: "d",
-            number: 4,
-            type: :TYPE_INT32,
-            label: :LABEL_OPTIONAL,
-            oneof_index: 1
-          ),
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "other",
-            json_name: "other",
-            number: 5,
-            type: :TYPE_INT32,
-            label: :LABEL_OPTIONAL
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      oneof_decl: [
+        %Google.Protobuf.OneofDescriptorProto{name: "first"},
+        %Google.Protobuf.OneofDescriptorProto{name: "second"}
+      ],
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_INT32,
+          label: :LABEL_OPTIONAL,
+          oneof_index: 0
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "b",
+          json_name: "b",
+          number: 2,
+          type: :TYPE_INT32,
+          label: :LABEL_OPTIONAL,
+          oneof_index: 0
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "c",
+          json_name: "c",
+          number: 3,
+          type: :TYPE_INT32,
+          label: :LABEL_OPTIONAL,
+          oneof_index: 1
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "d",
+          json_name: "d",
+          number: 4,
+          type: :TYPE_INT32,
+          label: :LABEL_OPTIONAL,
+          oneof_index: 1
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "other",
+          json_name: "other",
+          number: 5,
+          type: :TYPE_INT32,
+          label: :LABEL_OPTIONAL
+        }
+      ]
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
@@ -748,26 +729,25 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     test "is added when it differs from the original field name" do
       ctx = %Context{syntax: :proto3}
 
-      desc =
-        Google.Protobuf.DescriptorProto.new(
-          name: "Foo",
-          field: [
-            Google.Protobuf.FieldDescriptorProto.new(
-              name: "simple",
-              json_name: "simple",
-              number: 1,
-              type: :TYPE_INT32,
-              label: :LABEL_OPTIONAL
-            ),
-            Google.Protobuf.FieldDescriptorProto.new(
-              name: "the_field_name",
-              json_name: "theFieldName",
-              number: 2,
-              type: :TYPE_STRING,
-              label: :LABEL_OPTIONAL
-            )
-          ]
-        )
+      desc = %Google.Protobuf.DescriptorProto{
+        name: "Foo",
+        field: [
+          %Google.Protobuf.FieldDescriptorProto{
+            name: "simple",
+            json_name: "simple",
+            number: 1,
+            type: :TYPE_INT32,
+            label: :LABEL_OPTIONAL
+          },
+          %Google.Protobuf.FieldDescriptorProto{
+            name: "the_field_name",
+            json_name: "theFieldName",
+            number: 2,
+            type: :TYPE_STRING,
+            label: :LABEL_OPTIONAL
+          }
+        ]
+      }
 
       {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
@@ -778,19 +758,18 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     test "is omitted when syntax is not proto3" do
       ctx = %Context{}
 
-      desc =
-        Google.Protobuf.DescriptorProto.new(
-          name: "Foo",
-          field: [
-            Google.Protobuf.FieldDescriptorProto.new(
-              name: "the_field_name",
-              json_name: "theFieldName",
-              number: 1,
-              type: :TYPE_STRING,
-              label: :LABEL_REQUIRED
-            )
-          ]
-        )
+      desc = %Google.Protobuf.DescriptorProto{
+        name: "Foo",
+        field: [
+          %Google.Protobuf.FieldDescriptorProto{
+            name: "the_field_name",
+            json_name: "theFieldName",
+            number: 1,
+            type: :TYPE_STRING,
+            label: :LABEL_REQUIRED
+          }
+        ]
+      }
 
       {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
@@ -806,20 +785,19 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       }
     }
 
-    desc =
-      Google.Protobuf.DescriptorProto.new(
-        name: "Foo",
-        field: [
-          Google.Protobuf.FieldDescriptorProto.new(
-            name: "a",
-            json_name: "a",
-            number: 1,
-            type: :TYPE_ENUM,
-            label: :LABEL_REPEATED,
-            type_name: ".foo_bar.ab_cd.EnumFoo"
-          )
-        ]
-      )
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Foo",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "a",
+          json_name: "a",
+          number: 1,
+          type: :TYPE_ENUM,
+          label: :LABEL_REPEATED,
+          type_name: ".foo_bar.ab_cd.EnumFoo"
+        }
+      ]
+    }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
@@ -845,7 +823,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   describe "generate/2 include_docs" do
     test "does not include `@moduledoc false` when flag is true" do
       ctx = %Context{include_docs?: true}
-      desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
+      desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
 
       {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 
@@ -854,7 +832,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
     test "includes `@moduledoc false` by default" do
       ctx = %Context{}
-      desc = Google.Protobuf.DescriptorProto.new(name: "Foo")
+      desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
 
       {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
 

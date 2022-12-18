@@ -90,20 +90,19 @@ defmodule Protobuf.Protoc.CLITest do
   describe "find_types/2" do
     test "returns multiple files" do
       ctx = %Context{}
-      descs = [FileDescriptorProto.new(name: "file1"), FileDescriptorProto.new(name: "file2")]
+      descs = [%FileDescriptorProto{name: "file1"}, %FileDescriptorProto{name: "file2"}]
 
       assert %Context{global_type_mapping: %{"file1" => %{}, "file2" => %{}}} =
                find_types(ctx, descs, [])
     end
 
     test "merge message and enum" do
-      desc =
-        FileDescriptorProto.new(
-          name: "file1",
-          package: "pkg",
-          message_type: [DescriptorProto.new(name: "Msg")],
-          enum_type: [EnumDescriptorProto.new(name: "Enum")]
-        )
+      desc = %FileDescriptorProto{
+        name: "file1",
+        package: "pkg",
+        message_type: [%DescriptorProto{name: "Msg"}],
+        enum_type: [%EnumDescriptorProto{name: "Enum"}]
+      }
 
       assert %{
                "file1" => %{
@@ -114,18 +113,17 @@ defmodule Protobuf.Protoc.CLITest do
     end
 
     test "have nested message types" do
-      desc =
-        FileDescriptorProto.new(
-          name: "file1",
-          package: "pkg",
-          message_type: [
-            DescriptorProto.new(
-              name: "Msg",
-              nested_type: [DescriptorProto.new(name: "NestedMsg")],
-              enum_type: [EnumDescriptorProto.new(name: "NestedEnumMsg")]
-            )
-          ]
-        )
+      desc = %FileDescriptorProto{
+        name: "file1",
+        package: "pkg",
+        message_type: [
+          %DescriptorProto{
+            name: "Msg",
+            nested_type: [%DescriptorProto{name: "NestedMsg"}],
+            enum_type: [%EnumDescriptorProto{name: "NestedEnumMsg"}]
+          }
+        ]
+      }
 
       assert %{
                "file1" => %{
@@ -137,22 +135,21 @@ defmodule Protobuf.Protoc.CLITest do
     end
 
     test "have deeper nested message types" do
-      desc =
-        FileDescriptorProto.new(
-          name: "file1",
-          package: "pkg",
-          message_type: [
-            DescriptorProto.new(
-              name: "Msg",
-              nested_type: [
-                DescriptorProto.new(
-                  name: "NestedMsg",
-                  nested_type: [DescriptorProto.new(name: "NestedMsg2")]
-                )
-              ]
-            )
-          ]
-        )
+      desc = %FileDescriptorProto{
+        name: "file1",
+        package: "pkg",
+        message_type: [
+          %DescriptorProto{
+            name: "Msg",
+            nested_type: [
+              %DescriptorProto{
+                name: "NestedMsg",
+                nested_type: [%DescriptorProto{name: "NestedMsg2"}]
+              }
+            ]
+          }
+        ]
+      }
 
       assert %{
                "file1" => %{
@@ -164,20 +161,19 @@ defmodule Protobuf.Protoc.CLITest do
     end
 
     test "supports elixir_module_prefix" do
-      opts = Google.Protobuf.FileOptions.new()
-      custom_opts = Elixirpb.FileOptions.new(module_prefix: "FooBar.Prefix")
+      opts = %Google.Protobuf.FileOptions{}
+      custom_opts = %Elixirpb.FileOptions{module_prefix: "FooBar.Prefix"}
 
       opts =
         Google.Protobuf.FileOptions.put_extension(opts, Elixirpb.PbExtension, :file, custom_opts)
 
-      desc =
-        FileDescriptorProto.new(
-          name: "file1",
-          package: "pkg",
-          message_type: [DescriptorProto.new(name: "Msg")],
-          enum_type: [EnumDescriptorProto.new(name: "Enum")],
-          options: opts
-        )
+      desc = %FileDescriptorProto{
+        name: "file1",
+        package: "pkg",
+        message_type: [%DescriptorProto{name: "Msg"}],
+        enum_type: [%EnumDescriptorProto{name: "Enum"}],
+        options: opts
+      }
 
       assert %{
                "file1" => %{
@@ -192,11 +188,11 @@ defmodule Protobuf.Protoc.CLITest do
       files_to_generate = ["file1"]
 
       descs = [
-        FileDescriptorProto.new(
+        %FileDescriptorProto{
           name: "file1",
           package: "pkg",
-          message_type: [DescriptorProto.new(name: "Msg")]
-        )
+          message_type: [%DescriptorProto{name: "Msg"}]
+        }
       ]
 
       assert find_types(ctx, descs, files_to_generate).global_type_mapping == %{
@@ -209,16 +205,16 @@ defmodule Protobuf.Protoc.CLITest do
       files_to_generate = ["file_to_generate"]
 
       descs = [
-        FileDescriptorProto.new(
+        %FileDescriptorProto{
           name: "file_to_generate",
           package: "pkg",
-          message_type: [DescriptorProto.new(name: "Msg")]
-        ),
-        FileDescriptorProto.new(
+          message_type: [%DescriptorProto{name: "Msg"}]
+        },
+        %FileDescriptorProto{
           name: "not_in_files_to_generate",
           package: "other_pkg",
-          message_type: [DescriptorProto.new(name: "OtherMsg")]
-        )
+          message_type: [%DescriptorProto{name: "OtherMsg"}]
+        }
       ]
 
       assert find_types(ctx, descs, files_to_generate).global_type_mapping == %{

@@ -8,7 +8,7 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
     test "generates blank" do
       ctx = %Context{namespace: [""]}
 
-      desc = Google.Protobuf.FileDescriptorProto.new(extension: [])
+      desc = %Google.Protobuf.FileDescriptorProto{extension: []}
 
       assert Generator.generate(ctx, desc, []) == nil
     end
@@ -24,36 +24,35 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
         syntax: :proto2
       }
 
-      desc =
-        Google.Protobuf.FileDescriptorProto.new(
-          extension: [
-            Google.Protobuf.FieldDescriptorProto.new!(
-              extendee: ".ext.Foo1",
-              name: "foo",
-              json_name: "foo",
-              number: 1047,
-              label: :LABEL_OPTIONAL,
-              type: :TYPE_MESSAGE,
-              type_name: ".ext.Options"
-            ),
-            Google.Protobuf.FieldDescriptorProto.new!(
-              extendee: ".ext.Foo1",
-              name: "foo2",
-              json_name: "foo2",
-              number: 1049,
-              label: :LABEL_REPEATED,
-              type: :TYPE_UINT32
-            ),
-            Google.Protobuf.FieldDescriptorProto.new!(
-              extendee: ".ext.Foo2",
-              name: "bar",
-              json_name: "bar",
-              number: 1047,
-              label: :LABEL_OPTIONAL,
-              type: :TYPE_STRING
-            )
-          ]
-        )
+      desc = %Google.Protobuf.FileDescriptorProto{
+        extension: [
+          %Google.Protobuf.FieldDescriptorProto{
+            extendee: ".ext.Foo1",
+            name: "foo",
+            json_name: "foo",
+            number: 1047,
+            label: :LABEL_OPTIONAL,
+            type: :TYPE_MESSAGE,
+            type_name: ".ext.Options"
+          },
+          %Google.Protobuf.FieldDescriptorProto{
+            extendee: ".ext.Foo1",
+            name: "foo2",
+            json_name: "foo2",
+            number: 1049,
+            label: :LABEL_REPEATED,
+            type: :TYPE_UINT32
+          },
+          %Google.Protobuf.FieldDescriptorProto{
+            extendee: ".ext.Foo2",
+            name: "bar",
+            json_name: "bar",
+            number: 1047,
+            label: :LABEL_OPTIONAL,
+            type: :TYPE_STRING
+          }
+        ]
+      }
 
       assert {_mod_name, msg} = Generator.generate(ctx, desc, _nested_extensions = [])
       assert msg =~ "defmodule Ext.PbExtension do\n"
@@ -72,12 +71,12 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
         syntax: :proto2
       }
 
-      desc = Google.Protobuf.FileDescriptorProto.new(extension: [])
+      desc = %Google.Protobuf.FileDescriptorProto{extension: []}
 
       nested = [
         {["Parent"],
          [
-           Google.Protobuf.FieldDescriptorProto.new!(
+           %Google.Protobuf.FieldDescriptorProto{
              extendee: ".ext.Foo1",
              label: :LABEL_OPTIONAL,
              name: "foo",
@@ -85,7 +84,7 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
              number: 1048,
              type: :TYPE_ENUM,
              type_name: ".ext.EnumFoo"
-           )
+           }
          ]}
       ]
 
@@ -109,10 +108,10 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
       }
 
       descs = [
-        Google.Protobuf.DescriptorProto.new!(
+        %Google.Protobuf.DescriptorProto{
           name: "MyMsg",
           extension: [
-            Google.Protobuf.FieldDescriptorProto.new!(
+            %Google.Protobuf.FieldDescriptorProto{
               extendee: ".ext.Foo1",
               label: :LABEL_OPTIONAL,
               name: "foo1",
@@ -120,13 +119,13 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
               number: 1048,
               type: :TYPE_ENUM,
               type_name: ".ext.EnumFoo"
-            )
+            }
           ],
           nested_type: [
-            Google.Protobuf.DescriptorProto.new!(
+            %Google.Protobuf.DescriptorProto{
               name: "MyNestedMsg",
               extension: [
-                Google.Protobuf.FieldDescriptorProto.new!(
+                %Google.Protobuf.FieldDescriptorProto{
                   extendee: ".ext.Foo2",
                   label: :LABEL_OPTIONAL,
                   name: "foo2",
@@ -134,11 +133,11 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
                   number: 1048,
                   type: :TYPE_ENUM,
                   type_name: ".ext.EnumFoo"
-                )
+                }
               ]
-            )
+            }
           ]
-        )
+        }
       ]
 
       assert [nested1, nested2] = Generator.get_nested_extensions(ctx, descs)

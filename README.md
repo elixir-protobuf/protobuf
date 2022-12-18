@@ -79,7 +79,7 @@ end
 
       field :name, 1, type: :string
     end
-    
+
     defmodule Helloworld.HelloReply do
       @moduledoc false
       use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -91,17 +91,13 @@ end
 ### Encode and decode in your code
 
 ```elixir
-struct = Foo.new(a: 3.2, c: Foo.Bar.new())
+struct = %Foo{a: 3.2, c: %Foo.Bar{}}
 encoded = Foo.encode(struct)
 struct = Foo.decode(encoded)
 ```
 
-Note:
-
-- Use `YourModule.new(field: "value")` to ensure default values are set correctly for all fields
-  instead of using the struct directly, as in `%YourModule{field: "value"}`.
-- Validation is done during encoding. An error will be raised if the struct is invalid: when it
-  misses a required field or has a mistyped value.
+Validation is done during encoding. An error will be raised if the struct is invalid: when it
+misses a required field or has a mistyped value.
 
 ### Descriptor support
 

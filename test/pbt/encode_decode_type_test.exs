@@ -6,8 +6,8 @@ defmodule Protobuf.EncodeDecodeTypeTest.PropertyGenerator do
   end
 
   def encode(type, val) do
-    [{type, val}]
-    |> TestMsg.Scalars.new!()
+    TestMsg.Scalars
+    |> struct!([{type, val}])
     |> Protobuf.encode()
   end
 

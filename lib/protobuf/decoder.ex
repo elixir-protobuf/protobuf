@@ -14,7 +14,7 @@ defmodule Protobuf.Decoder do
     %MessageProps{repeated_fields: repeated_fields} = props = module.__message_props__()
 
     bin
-    |> build_message(module.new(), props)
+    |> build_message(struct(module), props)
     |> reverse_repeated(repeated_fields)
     |> Map.update!(:__unknown_fields__, &Enum.reverse/1)
     |> transform_module(module)
