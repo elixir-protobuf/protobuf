@@ -24,6 +24,18 @@ defmodule Protobuf.JSON.EncodeError do
     }
   end
 
+  def new({:unknown_enum_value, key, enum_mod}) when is_atom(key) and is_atom(enum_mod) do
+    %__MODULE__{
+      message: "unknown value #{key} for enum #{inspect(enum_mod)}"
+    }
+  end
+
+  def new({:invalid_type, type, value}) when is_atom(type) do
+    %__MODULE__{
+      message: "invalid value for type #{type}: #{inspect(value)}"
+    }
+  end
+
   def new({:bad_field_mask, mask}) do
     %__MODULE__{message: "unencodable field mask: #{inspect(mask)}"}
   end

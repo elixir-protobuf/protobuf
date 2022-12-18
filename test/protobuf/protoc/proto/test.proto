@@ -123,3 +123,27 @@ message Communique {
 message Options {
   optional string opt1 = 1 [deprecated = true];
 }
+
+message MapInput {
+  map<string, int32> int32_map = 1;
+  map<string, sint32> sint32_map = 2;
+  map<string, sfixed32> sfixed32_map = 3;
+  map<string, fixed32> fixed32_map = 4;
+  map<string, uint32> uint32_map = 5;
+  map<string, int64> int64_map = 6;
+  map<string, sint64> sint64_map = 7;
+  map<string, sfixed64> sfixed64_map = 8;
+  map<string, fixed64> fixed64_map = 9;
+  map<string, uint64> uint64_map = 10;
+  map<string, float> float_map = 11;
+  map<string, double> double_map = 12;
+  map<string, string> string_map = 13;
+  map<string, bool> bool_map = 14;
+  map<string, bytes> bytes_map = 15;
+  map<string, MapEnum> enum_map = 16;
+}
+
+enum MapEnum {
+  HELLO = 0;
+  WORLD = 2;
+}
