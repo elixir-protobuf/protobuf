@@ -1,8 +1,8 @@
 defmodule Protobuf.Decoder do
   @moduledoc false
 
-  import Protobuf.{Wire.Types, Wire.Varint}
   import Bitwise, only: [bsr: 2, band: 2]
+  import Protobuf.{Wire.Types, Wire.Varint}
 
   alias Protobuf.{DecodeError, FieldProps, MessageProps, Wire}
 

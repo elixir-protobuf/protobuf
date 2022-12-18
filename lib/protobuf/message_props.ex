@@ -3,8 +3,11 @@ defmodule Protobuf.MessageProps do
 
   alias Protobuf.FieldProps
 
+  # A struct containing information about a Protobuf message
+
   # A "field number".
   @type tag() :: integer()
+
   @type field_name() :: atom()
 
   @type t :: %__MODULE__{

@@ -1,17 +1,20 @@
 defmodule Protobuf.Builder do
   @moduledoc false
 
-  alias Protobuf.FieldProps
+  # TODO: Elixir already provides a slew of nice features to build structs from enums.
+  # The main ones are struct/1 and struct!/1. These provide the correct level of validation
+  # (raise on unknown keys, ignore unknown keys, etc). We should reduce the API surface
+  # of this library and use those instead. Protobuf defaults are, by design, compile-time
+  # values, which means that we can generate the right struct defaults.
+  # The only problem with removing new/2 and new!/2 is that we lose the ability to
+  # encode embedded messages from structs, but I (Andrea) think that's a reasonable
+  # tradeoff.
 
-  @spec new(module) :: %{required(:__struct__) => module, optional(atom()) => any()}
-        when module: module()
-  def new(mod) when is_atom(mod) do
-    struct(mod)
-  end
+  alias Protobuf.FieldProps
 
   @spec new(module, Enum.t()) :: %{required(:__struct__) => module, optional(atom()) => any()}
         when module: module()
-  def new(mod, attrs) when is_atom(mod) do
+  def new(mod, attrs \\ []) when is_atom(mod) do
     new_maybe_strict(mod, attrs, _strict? = false)
   end
 
