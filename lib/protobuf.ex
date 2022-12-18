@@ -78,8 +78,11 @@ defmodule Protobuf do
   @doc """
   Builds a blank struct with default values.
 
-  This is deprecated in favor of building the struct with `%MyMessage{...}` or using
-  `struct/1`.
+  > #### Deprecated {: .warning}
+  >
+  > This is deprecated in favor of building the struct with `%MyMessage{...}` or using
+  > `struct/1`.
+
   """
   @callback new() :: struct()
 
@@ -93,8 +96,9 @@ defmodule Protobuf do
     * Create the correct struct if passed the wrong struct
     * Call `c:new/1` for each element in the list for repeated fields
 
-  This is deprecated in favor of building the struct with `%MyMessage{...}` or using
-  `struct/2`.
+  > #### Deprecated {: .warning}
+  > This is deprecated in favor of building the struct with `%MyMessage{...}` or using
+  > `struct/2`.
 
   ## Examples
 
@@ -111,16 +115,18 @@ defmodule Protobuf do
       #=> %MyMessage{repeated: [%MyRepeated{field1: "foo"}, %MyRepeated{field1: "bar"}]}
 
   """
-  @callback new(Enum.t()) :: struct
+  @callback new(attributes :: Enum.t()) :: struct
 
   @doc """
   Similar to `c:new/1`, but use `struct!/2` to build the struct, so
   errors will be raised if unknown keys are passed.
 
-  This is deprecated in favor of building the struct with `%MyMessage{...}` or using
-  `struct!/2` directly.
+  > #### Deprecated {: .warning}
+  > This is deprecated in favor of building the struct with `%MyMessage{...}` or using
+  > `struct!/2` directly.
+
   """
-  @callback new!(Enum.t()) :: struct()
+  @callback new!(attributes :: Enum.t()) :: struct()
 
   @doc """
   Encodes the given struct into to a Protobuf binary.
