@@ -1,48 +1,49 @@
 defmodule Protobuf.Wire.Varint do
-  @moduledoc """
-  Varint encoding and decoding utilities.
+  @moduledoc false
 
-  https://developers.google.com/protocol-buffers/docs/encoding#varints
+  # Varint encoding and decoding utilities.
+  #
+  # https://developers.google.com/protocol-buffers/docs/encoding#varints
+  #
+  # For performance reasons, varint decoding must be built through a macro, so that binary
+  # match contexts are reused and no new large binaries get allocated. You can define your
+  # own varint decoders with the `decoder` macro, which generates function heads for up to
+  # 10-bytes long varint-encoded data.
+  #
+  #     defmodule VarintDecoders do
+  #       import Protobuf.Wire.Varint
+  #
+  #       decoder :def, :decode_and_sum, [:plus] do
+  #         {:ok, value + plus, rest}
+  #       end
+  #
+  #       def decode_all(<<bin::bits>>), do: decode_all(bin, [])
+  #
+  #       defp decode_all(<<>>, acc), do: acc
+  #
+  #       defdecoderp decode_all(acc) do
+  #         decode_all(rest, [value | acc])
+  #       end
+  #     end
+  #
+  #     iex> VarintDecoders.decode_and_sum(<<35>>, 7)
+  #     {:ok, 42, ""}
+  #
+  #     iex> VarintDecoders.decode_all("abcd asdf")
+  #     [102, 100, 115, 97, 32, 100, 99, 98, 97]
+  #
+  # Refer to [efficiency guide](http://www1.erlang.org/doc/efficiency_guide/binaryhandling.html)
+  # for more on efficient binary handling.
+  #
+  # Encoding on the other hand is simpler. It takes an integer and returns an iolist with its
+  # varint representation:
+  #
+  #     iex> Protobuf.Wire.Varint.encode(35)
+  #     [35]
+  #
+  #     iex> Protobuf.Wire.Varint.encode(1_234_567)
+  #     [<<135>>, <<173>>, 75]
 
-  For performance reasons, varint decoding must be built through a macro, so that binary
-  match contexts are reused and no new large binaries get allocated. You can define your
-  own varint decoders with the `decoder` macro, which generates function heads for up to
-  10-bytes long varint-encoded data.
-
-      defmodule VarintDecoders do
-        import Protobuf.Wire.Varint
-
-        decoder :def, :decode_and_sum, [:plus] do
-          {:ok, value + plus, rest}
-        end
-
-        def decode_all(<<bin::bits>>), do: decode_all(bin, [])
-
-        defp decode_all(<<>>, acc), do: acc
-
-        defdecoderp decode_all(acc) do
-          decode_all(rest, [value | acc])
-        end
-      end
-
-      iex> VarintDecoders.decode_and_sum(<<35>>, 7)
-      {:ok, 42, ""}
-
-      iex> VarintDecoders.decode_all("abcd asdf")
-      [102, 100, 115, 97, 32, 100, 99, 98, 97]
-
-  Refer to [efficiency guide](http://www1.erlang.org/doc/efficiency_guide/binaryhandling.html)
-  for more on efficient binary handling.
-
-  Encoding on the other hand is simpler. It takes an integer and returns an iolist with its
-  varint representation:
-
-      iex> Protobuf.Wire.Varint.encode(35)
-      [35]
-
-      iex> Protobuf.Wire.Varint.encode(1_234_567)
-      [<<135>>, <<173>>, 75]
-  """
   import Bitwise
 
   @max_bits 64
