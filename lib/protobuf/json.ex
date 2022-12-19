@@ -83,6 +83,20 @@ defmodule Protobuf.JSON do
 
   According to the specification, when duplicated JSON keys are found in maps, the library
   should raise a decoding error. It currently ignores duplicates and keeps the last occurrence.
+
+  ## `google.protobuf.Any`
+
+  The `google.protobuf.Any` type is supported. It can be used to encode and decode arbitrary
+  messages. When decoding, the "type URL" is used to determine the message type to decode
+  to. The type URL is expected to be in the format of
+  `type.googleapis.com/<package>.<message>`. For example, the type URL for the
+  `google.protobuf.Duration` message would be
+  `type.googleapis.com/google.protobuf.Duration`. To determine the Elixir module from the
+  type URL, the package and message names are split on `.` and transformed into a module
+  name. In the previous example, we'd end up with `Google.Protobuf.Duration`. Due to
+  arbitrary atom construction, we're forced to use `Module.safe_concat/1` to construct the
+  module name. This means that the module must exist before decoding. If the module doesn't
+  exist, decoding will raise an error.
   """
 
   alias Protobuf.JSON.{Encode, EncodeError, Decode, DecodeError}
