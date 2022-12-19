@@ -8,124 +8,25 @@ defmodule Protobuf.Any do
   See [Google's documentation for the `Any`a
   type](https://developers.google.com/protocol-buffers/docs/proto3#any).
 
-  Utilizing these functions allows you to pack and unpack any fields with any Protobuf
-  message.
-
   ## Examples
 
-  Imagine you have this Protobuf schema:
+  You can build and decode the `Any` type yourself.
 
-  ```protobuf
-  message ErrorStatus {
-    string message = 1;
-    repeated google.protobuf.Any details = 2;
-  }
-  ```
+      encoded_any = Google.Protobuf.Any.new!(
+        type_url: "type.googleapis.com/google.protobuf.Duration",
+        value: Google.Protobuf.Duration.encode(%Google.Protobuf.Duration{seconds: 1})
+      )
 
-  You can use `pack/1` to pack any message into an `Any` message.
-
-      details = some_list_of_protobuf_messages()
-
-      ErrorStatus.new(%{
-        message: "There was an error",
-        details: Enum.map(details, &Protobuf.Any.pack/1)
-      })
+      # Back to the original message:
+      decoded_any = decoded Google.Protobuf.Any.decode(encoded_any)
+      Google.Protobuf.Duration.decode(decoded_any.value)
 
   """
-
-  @type_url_prefix "type.googleapis.com/"
-  @type option() :: {:prefix, module()}
-
-  @doc """
-  Packs a Protobuf message into a `Google.Protobuf.Any` message.
-
-  This sets the correct `type_url` using the pattern:
-
-      type.googleapis.com/<package>.<message name>
-
-  This URL is obtained by calling the `fully_qualified_name/1` function
-  on the module for the `data` struct.
-
-  The `value` field of the `Google.Protobuf.Any` returned message is set to
-  the serialized original message.
-
-  ## Example
-
-      # This is the arbitrary message we want to pack.
-      encoded = MyPkg.MyMessage.encode(data)
-
-      any = Google.Protobuf.Any.new(%{
-        type_url: "type.googleapis.com/my_pkg.MyMessage",
-        value: encoded
-      })
-
-      any == Protobuf.Any.pack(data)
-      #=> true
-
-  """
-  @spec pack(struct()) :: Google.Protobuf.Any.t()
-  def pack(%mod{} = data) do
-    Google.Protobuf.Any.new(%{
-      type_url: "#{@type_url_prefix}#{mod.fully_qualified_name()}",
-      value: mod.encode(data)
-    })
-  end
-
-  @doc """
-  Unpacks a `Google.Protobuf.Any` message.
-
-  Uses the `type_url` to determine the type, and deserializes the binary data into that type.
-
-  > #### Existing modules {: .warning}
-  >
-  > The module for the message is determined via a **string** (the `type_url`),
-  > which is arbitrary user input that maps the package message name
-  > to a generated protocol buffer module.
-  >
-  > Because of this, this function uses `Module.safe_concat/1` is used to prevent arbitrary
-  > atom creation, which _requires_ that the message type is known and compiled into the
-  > application.
-  > If the inferred type is unknown, this function will raise an error.
-
-  ## Options
-
-  If you generated the protocol buffers with a module prefix, you can use
-  the `:prefix` option (a module) to unpack this correctly.
-
-  ## Example
-
-      any = %Google.Protobuf.Any{
-        type_url: "type.googleapis.com/my_pkg.MyMessage",
-        value: <<...>>
-      }
-
-      Protobuf.Any.unpack(any)
-      #=> %MyPkg.MyMessage{...}
-
-  """
-  @spec unpack(Google.Protobuf.Any.t(), keyword()) :: struct()
-  def unpack(
-        %{__struct__: Google.Protobuf.Any, type_url: @type_url_prefix <> name, value: value},
-        options \\ []
-      ) do
-    parts =
-      name
-      |> String.split(".")
-      |> Enum.map(&Macro.camelize/1)
-
-    parts =
-      case Keyword.fetch(options, :prefix) do
-        {:ok, prefix} -> [prefix] ++ parts
-        :error -> parts
-      end
-
-    Module.safe_concat(parts).decode(value)
-  end
 
   @doc """
   Returns the module for a given `type_url`.
 
-  `type_url` must be in the form: `#{@type_url_prefix}<package>.<message name>`. The
+  `type_url` must be in the form: `type.googleapis.com/<package>.<message name>`. The
   returned module is determined by joining the package name and message name. See
   the examples.
 
@@ -144,13 +45,13 @@ defmodule Protobuf.Any do
       Google.Protobuf.Duration
 
       iex> Protobuf.Any.type_url_to_module("bad_type_url")
-      ** (ArgumentError) type_url must be in the form: #{@type_url_prefix}<package>.<message name>
+      ** (ArgumentError) type_url must be in the form: type.googleapis.com/<package>.<message name>, got: "bad_type_url"
 
   """
   @spec type_url_to_module(String.t()) :: module()
   def type_url_to_module(type_url) when is_binary(type_url) do
     case type_url do
-      @type_url_prefix <> package_and_message ->
+      "type.googleapis.com/" <> package_and_message ->
         package_and_message
         |> String.split(".")
         |> Enum.map(&Macro.camelize/1)
@@ -158,7 +59,8 @@ defmodule Protobuf.Any do
 
       _other ->
         raise ArgumentError,
-              "type_url must be in the form: #{@type_url_prefix}<package>.<message name>"
+              "type_url must be in the form: type.googleapis.com/<package>.<message name>, " <>
+                "got: #{inspect(type_url)}"
     end
   end
 end

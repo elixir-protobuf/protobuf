@@ -4,8 +4,6 @@ defmodule <%= @module %>.Service do
   <% end %>
   use GRPC.Service, name: <%= inspect(@service_name) %>, protoc_gen_elixir_version: "<%= @version %>"
 
-  def fully_qualified_name, do: <%= inspect(@service_name) %>
-
   <%= if @descriptor_fun_body do %>
   def descriptor do
     # credo:disable-for-next-line
