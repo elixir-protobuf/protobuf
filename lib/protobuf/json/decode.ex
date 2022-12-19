@@ -59,11 +59,11 @@ defmodule Protobuf.JSON.Decode do
 
     case Integer.parse(string) do
       {seconds, "s"} when seconds in @duration_seconds_range ->
-        mod.new!(seconds: seconds)
+        struct!(mod, seconds: seconds)
 
       {seconds, "." <> nanos_with_s} when seconds in @duration_seconds_range ->
         case Utils.parse_nanoseconds(nanos_with_s) do
-          {nanos, "s"} -> mod.new!(seconds: seconds, nanos: nanos * sign)
+          {nanos, "s"} -> struct!(mod, seconds: seconds, nanos: nanos * sign)
           :error -> throw({:bad_duration, string, nanos_with_s})
         end
 
@@ -74,80 +74,80 @@ defmodule Protobuf.JSON.Decode do
 
   def from_json_data(string, Google.Protobuf.Timestamp = mod) when is_binary(string) do
     case Protobuf.JSON.RFC3339.decode(string) do
-      {:ok, seconds, nanos} -> mod.new!(seconds: seconds, nanos: nanos)
+      {:ok, seconds, nanos} -> struct!(mod, seconds: seconds, nanos: nanos)
       {:error, reason} -> throw({:bad_timestamp, string, reason})
     end
   end
 
   def from_json_data(map, Google.Protobuf.Empty = mod) when map == %{} do
-    mod.new!([])
+    struct!(mod)
   end
 
   def from_json_data(int, Google.Protobuf.Int32Value = mod),
-    do: mod.new!(value: decode_scalar(:int32, :unknown_name, int))
+    do: struct!(mod, value: decode_scalar(:int32, :unknown_name, int))
 
   def from_json_data(int, Google.Protobuf.UInt32Value = mod),
-    do: mod.new!(value: decode_scalar(:uint32, :unknown_name, int))
+    do: struct!(mod, value: decode_scalar(:uint32, :unknown_name, int))
 
   def from_json_data(int, Google.Protobuf.UInt64Value = mod),
-    do: mod.new!(value: decode_scalar(:uint64, :unknown_name, int))
+    do: struct!(mod, value: decode_scalar(:uint64, :unknown_name, int))
 
   def from_json_data(int, Google.Protobuf.Int64Value = mod),
-    do: mod.new!(value: decode_scalar(:int64, :unknown_name, int))
+    do: struct!(mod, value: decode_scalar(:int64, :unknown_name, int))
 
   def from_json_data(number, mod)
       when mod in [
              Google.Protobuf.FloatValue,
              Google.Protobuf.DoubleValue
            ] and (is_float(number) or is_integer(number)) do
-    mod.new!(value: number * 1.0)
+    struct!(mod, value: number * 1.0)
   end
 
   def from_json_data(bool, Google.Protobuf.BoolValue = mod) when is_boolean(bool) do
-    mod.new!(value: decode_scalar(:bool, :unknown_field, bool))
+    struct!(mod, value: decode_scalar(:bool, :unknown_field, bool))
   end
 
   def from_json_data(string, Google.Protobuf.StringValue = mod) when is_binary(string) do
-    mod.new!(value: decode_scalar(:string, :unknown_field, string))
+    struct!(mod, value: decode_scalar(:string, :unknown_field, string))
   end
 
   def from_json_data(bytes, Google.Protobuf.BytesValue = mod) when is_binary(bytes) do
-    mod.new!(value: decode_scalar(:bytes, :unknown_field, bytes))
+    struct!(mod, value: decode_scalar(:bytes, :unknown_field, bytes))
   end
 
   def from_json_data(list, Google.Protobuf.ListValue = mod) when is_list(list) do
-    mod.new!(values: Enum.map(list, &from_json_data(&1, Google.Protobuf.Value)))
+    struct!(mod, values: Enum.map(list, &from_json_data(&1, Google.Protobuf.Value)))
   end
 
   def from_json_data(struct, Google.Protobuf.Struct = mod) when is_map(struct) do
     fields =
       Map.new(struct, fn {key, val} -> {key, from_json_data(val, Google.Protobuf.Value)} end)
 
-    mod.new!(fields: fields)
+    struct!(mod, fields: fields)
   end
 
   def from_json_data(term, Google.Protobuf.Value = mod) do
     cond do
       is_nil(term) ->
-        mod.new!(kind: {:null_value, :NULL_VALUE})
+        struct!(mod, kind: {:null_value, :NULL_VALUE})
 
       is_binary(term) ->
-        mod.new!(kind: {:string_value, term})
+        struct!(mod, kind: {:string_value, term})
 
       is_integer(term) ->
-        mod.new!(kind: {:number_value, term * 1.0})
+        struct!(mod, kind: {:number_value, term * 1.0})
 
       is_float(term) ->
-        mod.new!(kind: {:number_value, term})
+        struct!(mod, kind: {:number_value, term})
 
       is_boolean(term) ->
-        mod.new!(kind: {:bool_value, term})
+        struct!(mod, kind: {:bool_value, term})
 
       is_list(term) ->
-        mod.new!(kind: {:list_value, from_json_data(term, Google.Protobuf.ListValue)})
+        struct!(mod, kind: {:list_value, from_json_data(term, Google.Protobuf.ListValue)})
 
       is_map(term) ->
-        mod.new!(kind: {:struct_value, from_json_data(term, Google.Protobuf.Struct)})
+        struct!(mod, kind: {:struct_value, from_json_data(term, Google.Protobuf.Struct)})
 
       true ->
         throw({:bad_message, term, mod})
@@ -158,8 +158,8 @@ defmodule Protobuf.JSON.Decode do
     paths = String.split(data, ",")
 
     cond do
-      data == "" -> mod.new!(paths: [])
-      paths = Enum.map(paths, &convert_field_mask_to_underscore/1) -> mod.new!(paths: paths)
+      data == "" -> struct!(mod, paths: [])
+      paths = Enum.map(paths, &convert_field_mask_to_underscore/1) -> struct!(mod, paths: paths)
       true -> throw({:bad_field_mask, data})
     end
   end
@@ -187,7 +187,7 @@ defmodule Protobuf.JSON.Decode do
           |> message_mod.encode()
       end
 
-    mod.new!(type_url: type_url, value: encoded)
+    struct!(mod, type_url: type_url, value: encoded)
   end
 
   def from_json_data(data, module) when is_map(data) and is_atom(module) do

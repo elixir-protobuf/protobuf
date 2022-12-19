@@ -57,10 +57,10 @@ defmodule Protobuf.Protoc.CLI do
         Protobuf.Protoc.Generator.generate(ctx, desc)
       end)
 
-    Google.Protobuf.Compiler.CodeGeneratorResponse.new(
+    %Google.Protobuf.Compiler.CodeGeneratorResponse{
       file: files,
       supported_features: supported_features()
-    )
+    }
     |> Protobuf.encode_to_iodata()
     |> IO.binwrite()
   end

@@ -29,7 +29,7 @@ defmodule Protobuf.ExtensionTest do
 
   test "simple types work" do
     bin = <<186, 65, 3, 97, 98, 99>>
-    msg = Ext.Foo2.new()
+    msg = %Ext.Foo2{}
     msg = Ext.Foo2.put_extension(msg, Ext.PbExtension, :bar, "abc")
     assert bin == Ext.Foo2.encode(msg)
 
@@ -40,8 +40,8 @@ defmodule Protobuf.ExtensionTest do
 
   test "nested types work" do
     bin = <<186, 65, 5, 10, 3, 97, 98, 99>>
-    msg = Ext.Foo1.new()
-    ext_msg = Ext.Options.new(a: "abc")
+    msg = %Ext.Foo1{}
+    ext_msg = %Ext.Options{a: "abc"}
     msg = Ext.Foo1.put_extension(msg, Ext.PbExtension, :foo, ext_msg)
     assert bin == Ext.Foo2.encode(msg)
 
@@ -52,7 +52,7 @@ defmodule Protobuf.ExtensionTest do
 
   test "enum types work" do
     bin = <<192, 65, 2>>
-    msg = Ext.Foo1.new()
+    msg = %Ext.Foo1{}
     msg = Ext.Foo1.put_extension(msg, Ext.PbExtension, :"Parent.foo", :B)
     assert bin == Ext.Foo1.encode(msg)
 

@@ -11,7 +11,7 @@ defmodule Protobuf.UnknownFieldsTest do
 
     check all unknown_fields <- unknown_fields_generator, max_runs: 20 do
       decoded =
-        TestAllTypesProto3.new!([])
+        %TestAllTypesProto3{}
         |> Map.put(:__unknown_fields__, unknown_fields)
         |> Protobuf.encode()
         |> Protobuf.decode(TestAllTypesProto3)

@@ -12,14 +12,15 @@ defmodule Protobuf.Any do
 
   You can build and decode the `Any` type yourself.
 
-      encoded_any = Google.Protobuf.Any.new!(
-        type_url: "type.googleapis.com/google.protobuf.Duration",
-        value: Google.Protobuf.Duration.encode(%Google.Protobuf.Duration{seconds: 1})
-      )
-
-      # Back to the original message:
-      decoded_any = decoded Google.Protobuf.Any.decode(encoded_any)
-      Google.Protobuf.Duration.decode(decoded_any.value)
+      iex> value = %Google.Protobuf.Duration{seconds: 1}
+      iex> any = %Google.Protobuf.Any{
+      ...>   type_url: "type.googleapis.com/google.protobuf.Duration",
+      ...>   value: Google.Protobuf.Duration.encode(value)
+      ...> }
+      iex> encoded_any = Google.Protobuf.Any.encode(any)
+      iex> decoded_any = Google.Protobuf.Any.decode(encoded_any)
+      iex> Google.Protobuf.Duration.decode(decoded_any.value) == value
+      true
 
   """
 

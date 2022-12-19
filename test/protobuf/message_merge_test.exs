@@ -19,8 +19,8 @@ defmodule Protobuf.MessageMergeTest do
                 val2 <- gen,
                 val2 != default,
                 max_runs: @max_runs do
-        msg1 = TestAllTypesProto3.new!([{field, val1}])
-        msg2 = TestAllTypesProto3.new!([{field, val2}])
+        msg1 = struct!(TestAllTypesProto3, [{field, val1}])
+        msg2 = struct!(TestAllTypesProto3, [{field, val2}])
 
         decoded = concat_and_decode([msg1, msg2])
 
@@ -33,8 +33,8 @@ defmodule Protobuf.MessageMergeTest do
     check all list1 <- list_of(integer()),
               list2 <- list_of(integer()),
               max_runs: @max_runs do
-      msg1 = TestAllTypesProto3.new!(repeated_int32: list1)
-      msg2 = TestAllTypesProto3.new!(repeated_int32: list2)
+      msg1 = %TestAllTypesProto3{repeated_int32: list1}
+      msg2 = %TestAllTypesProto3{repeated_int32: list2}
 
       decoded = concat_and_decode([msg1, msg2])
 
@@ -49,8 +49,8 @@ defmodule Protobuf.MessageMergeTest do
   test "oneof fields with the same tag are merged"
 
   test "the latest oneof field takes precedence if the two have different tags" do
-    msg1 = TestAllTypesProto3.new!(oneof_field: {:oneof_nested_message, TestAllTypesProto3.new()})
-    msg2 = TestAllTypesProto3.new!(oneof_field: {:oneof_string, "foo"})
+    msg1 = %TestAllTypesProto3{oneof_field: {:oneof_nested_message, %TestAllTypesProto3{}}}
+    msg2 = %TestAllTypesProto3{oneof_field: {:oneof_string, "foo"}}
 
     decoded = concat_and_decode([msg1, msg2])
 

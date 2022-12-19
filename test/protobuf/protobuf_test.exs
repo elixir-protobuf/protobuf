@@ -9,19 +9,19 @@ defmodule Protobuf.ProtobufTest do
 
   describe "encode/1" do
     test "encodes a struct" do
-      bin = Protobuf.encode(TestMsg.Foo.new(a: 42))
+      bin = Protobuf.encode(%TestMsg.Foo{a: 42})
       assert bin == <<8, 42>>
     end
 
     test "encodes a struct with proto3 optional field" do
-      bin = Protobuf.encode(TestMsg.Proto3Optional.new(b: "A"))
+      bin = Protobuf.encode(%TestMsg.Proto3Optional{b: "A"})
       assert bin == <<18, 1, 65>>
     end
   end
 
   describe "encode_to_iodata/1" do
     test "encodes a struct as iodata" do
-      iodata = Protobuf.encode_to_iodata(TestMsg.Foo.new(a: 42))
+      iodata = Protobuf.encode_to_iodata(%TestMsg.Foo{a: 42})
       assert IO.iodata_to_binary(iodata) == <<8, 42>>
     end
   end
@@ -29,7 +29,7 @@ defmodule Protobuf.ProtobufTest do
   describe "decode/2" do
     test "decodes a struct" do
       struct = Protobuf.decode(<<8, 42>>, TestMsg.Foo)
-      assert struct == TestMsg.Foo.new(a: 42)
+      assert struct == %TestMsg.Foo{a: 42}
     end
   end
 

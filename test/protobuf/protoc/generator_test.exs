@@ -9,10 +9,10 @@ defmodule Protobuf.Protoc.GeneratorTest do
   describe "generate/2" do
     test "returns a list of Google.Protobuf.Compiler.CodeGeneratorResponse.File structs" do
       ctx = %Context{global_type_mapping: %{"name.proto" => %{}}}
-      desc = Google.Protobuf.FileDescriptorProto.new(name: "name.proto")
+      desc = %Google.Protobuf.FileDescriptorProto{name: "name.proto"}
 
       assert Generator.generate(ctx, desc) ==
-               [CodeGeneratorResponse.File.new(name: "name.pb.ex", content: "")]
+               [%CodeGeneratorResponse.File{name: "name.pb.ex", content: ""}]
     end
 
     test "uses the package prefix" do
@@ -23,11 +23,10 @@ defmodule Protobuf.Protoc.GeneratorTest do
         }
       }
 
-      desc =
-        Google.Protobuf.FileDescriptorProto.new(
-          name: "name.proto",
-          message_type: [Google.Protobuf.DescriptorProto.new(name: "Foo")]
-        )
+      desc = %Google.Protobuf.FileDescriptorProto{
+        name: "name.proto",
+        message_type: [%Google.Protobuf.DescriptorProto{name: "Foo"}]
+      }
 
       assert [%CodeGeneratorResponse.File{} = file] = Generator.generate(ctx, desc)
 
@@ -45,12 +44,11 @@ defmodule Protobuf.Protoc.GeneratorTest do
         }
       }
 
-      desc =
-        Google.Protobuf.FileDescriptorProto.new(
-          name: "name.proto",
-          package: "lib",
-          message_type: [Google.Protobuf.DescriptorProto.new(name: "Foo")]
-        )
+      desc = %Google.Protobuf.FileDescriptorProto{
+        name: "name.proto",
+        package: "lib",
+        message_type: [%Google.Protobuf.DescriptorProto{name: "Foo"}]
+      }
 
       assert [%CodeGeneratorResponse.File{} = file] = Generator.generate(ctx, desc)
 
@@ -66,19 +64,18 @@ defmodule Protobuf.Protoc.GeneratorTest do
         global_type_mapping: %{"name.proto" => %{}}
       }
 
-      desc =
-        Google.Protobuf.FileDescriptorProto.new(
-          name: "name.proto",
-          message_type: [Google.Protobuf.DescriptorProto.new(name: "MyMessage")],
-          enum_type: [
-            Google.Protobuf.EnumDescriptorProto.new(
-              name: "MyEnum",
-              value: [
-                Google.Protobuf.EnumValueDescriptorProto.new(name: :MY_ENUM_NOT_SET, number: 0)
-              ]
-            )
-          ]
-        )
+      desc = %Google.Protobuf.FileDescriptorProto{
+        name: "name.proto",
+        message_type: [%Google.Protobuf.DescriptorProto{name: "MyMessage"}],
+        enum_type: [
+          %Google.Protobuf.EnumDescriptorProto{
+            name: "MyEnum",
+            value: [
+              %Google.Protobuf.EnumValueDescriptorProto{name: :MY_ENUM_NOT_SET, number: 0}
+            ]
+          }
+        ]
+      }
 
       assert [%CodeGeneratorResponse.File{} = file] = Generator.generate(ctx, desc)
 
@@ -97,20 +94,19 @@ defmodule Protobuf.Protoc.GeneratorTest do
         one_file_per_module?: true
       }
 
-      desc =
-        Google.Protobuf.FileDescriptorProto.new(
-          name: "name.proto",
-          package: "foo",
-          message_type: [Google.Protobuf.DescriptorProto.new(name: "MyMessage.Nested")],
-          enum_type: [
-            Google.Protobuf.EnumDescriptorProto.new(
-              name: "MyEnum",
-              value: [
-                Google.Protobuf.EnumValueDescriptorProto.new(name: :MY_ENUM_NOT_SET, number: 0)
-              ]
-            )
-          ]
-        )
+      desc = %Google.Protobuf.FileDescriptorProto{
+        name: "name.proto",
+        package: "foo",
+        message_type: [%Google.Protobuf.DescriptorProto{name: "MyMessage.Nested"}],
+        enum_type: [
+          %Google.Protobuf.EnumDescriptorProto{
+            name: "MyEnum",
+            value: [
+              %Google.Protobuf.EnumValueDescriptorProto{name: :MY_ENUM_NOT_SET, number: 0}
+            ]
+          }
+        ]
+      }
 
       assert [
                %CodeGeneratorResponse.File{} = enum_file,
@@ -128,12 +124,11 @@ defmodule Protobuf.Protoc.GeneratorTest do
         package_prefix: "prfx"
       }
 
-      desc =
-        Google.Protobuf.FileDescriptorProto.new(
-          name: "name.proto",
-          package: "foo",
-          message_type: [Google.Protobuf.DescriptorProto.new(name: "MyMessage.Nested")]
-        )
+      desc = %Google.Protobuf.FileDescriptorProto{
+        name: "name.proto",
+        package: "foo",
+        message_type: [%Google.Protobuf.DescriptorProto{name: "MyMessage.Nested"}]
+      }
 
       assert [%CodeGeneratorResponse.File{} = file] = Generator.generate(ctx, desc)
 
@@ -147,12 +142,11 @@ defmodule Protobuf.Protoc.GeneratorTest do
         module_prefix: "My.Prefix"
       }
 
-      desc =
-        Google.Protobuf.FileDescriptorProto.new(
-          name: "name.proto",
-          package: "foo",
-          message_type: [Google.Protobuf.DescriptorProto.new(name: "MyMessage.Nested")]
-        )
+      desc = %Google.Protobuf.FileDescriptorProto{
+        name: "name.proto",
+        package: "foo",
+        message_type: [%Google.Protobuf.DescriptorProto{name: "MyMessage.Nested"}]
+      }
 
       assert [%CodeGeneratorResponse.File{} = file] = Generator.generate(ctx, desc)
 
@@ -166,12 +160,11 @@ defmodule Protobuf.Protoc.GeneratorTest do
         global_type_mapping: %{"name.proto" => %{}, "my_dep" => %{}}
       }
 
-      desc =
-        Google.Protobuf.FileDescriptorProto.new(
-          name: "name.proto",
-          dependency: ["my_dep"],
-          service: [Google.Protobuf.ServiceDescriptorProto.new(name: "my_service")]
-        )
+      desc = %Google.Protobuf.FileDescriptorProto{
+        name: "name.proto",
+        dependency: ["my_dep"],
+        service: [%Google.Protobuf.ServiceDescriptorProto{name: "my_service"}]
+      }
 
       # We can't compile the generated service module because we haven't loaded GRPC.Service here.
       assert [%CodeGeneratorResponse.File{} = file] = Generator.generate(ctx, desc)

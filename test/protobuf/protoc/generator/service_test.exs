@@ -24,30 +24,30 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
     desc = %Google.Protobuf.ServiceDescriptorProto{
       name: "ServiceFoo",
       method: [
-        Google.Protobuf.MethodDescriptorProto.new(
+        %Google.Protobuf.MethodDescriptorProto{
           name: "MethodA",
           input_type: ".foo.Input0",
           output_type: ".foo.Output0"
-        ),
-        Google.Protobuf.MethodDescriptorProto.new(
+        },
+        %Google.Protobuf.MethodDescriptorProto{
           name: "MethodB",
           input_type: ".foo.Input1",
           output_type: ".foo.Output1",
           client_streaming: true
-        ),
-        Google.Protobuf.MethodDescriptorProto.new(
+        },
+        %Google.Protobuf.MethodDescriptorProto{
           name: "MethodC",
           input_type: ".foo.Input2",
           output_type: ".foo.Output2",
           server_streaming: true
-        ),
-        Google.Protobuf.MethodDescriptorProto.new(
+        },
+        %Google.Protobuf.MethodDescriptorProto{
           name: "MethodD",
           input_type: ".foo.Input3",
           output_type: ".foo.Output3",
           client_streaming: true,
           server_streaming: true
-        )
+        }
       ]
     }
 
@@ -66,7 +66,7 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
   describe "generate/2 include_docs" do
     test "does not include `@moduledoc false` when flag is true" do
       ctx = %Context{include_docs?: true}
-      desc = Google.Protobuf.ServiceDescriptorProto.new(name: "ServiceFoo")
+      desc = %Google.Protobuf.ServiceDescriptorProto{name: "ServiceFoo"}
 
       {_module, msg} = Generator.generate(ctx, desc)
 
@@ -75,7 +75,7 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
 
     test "includes `@moduledoc false` by default" do
       ctx = %Context{}
-      desc = Google.Protobuf.ServiceDescriptorProto.new(name: "ServiceFoo")
+      desc = %Google.Protobuf.ServiceDescriptorProto{name: "ServiceFoo"}
 
       {_module, msg} = Generator.generate(ctx, desc)
 

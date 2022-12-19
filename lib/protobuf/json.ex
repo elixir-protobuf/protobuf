@@ -49,7 +49,7 @@ defmodule Protobuf.JSON do
 
   With `encode/1` you can turn any `Protobuf` message struct into a JSON string:
 
-      iex> message = Car.new(color: :RED, top_speed: 125.3)
+      iex> message = %Car{color: :RED, top_speed: 125.3}
       iex> Protobuf.JSON.encode(message)
       {:ok, "{\\"color\\":\\"RED\\",\\"topSpeed\\":125.3}"}
 
@@ -101,7 +101,7 @@ defmodule Protobuf.JSON do
 
   ## Examples
 
-      iex> Car.new(top_speed: 80.0) |> Protobuf.JSON.encode!()
+      iex> Protobuf.JSON.encode!(%Car{top_speed: 80.0})
       ~S|{"topSpeed":80.0}|
 
   """
@@ -143,13 +143,13 @@ defmodule Protobuf.JSON do
 
   Encoding is as simple as:
 
-      iex> Car.new(color: :RED, top_speed: 125.3) |> Protobuf.JSON.encode()
+      iex> Protobuf.JSON.encode(%Car{color: :RED, top_speed: 125.3})
       {:ok, ~S|{"color":"RED","topSpeed":125.3}|}
 
-      iex> Car.new(color: :GREEN) |> Protobuf.JSON.encode()
+      iex> Protobuf.JSON.encode(%Car{color: :GREEN})
       {:ok, "{}"}
 
-      iex> Car.new() |> Protobuf.JSON.encode(emit_unpopulated: true)
+      iex> Protobuf.JSON.encode(%Car{}, emit_unpopulated: true)
       {:ok, ~S|{"color":"GREEN","topSpeed":0.0}|}
 
   """
@@ -174,13 +174,13 @@ defmodule Protobuf.JSON do
 
   ## Examples
 
-      iex> Car.new(color: :RED, top_speed: 125.3) |> Protobuf.JSON.to_encodable()
+      iex> Protobuf.JSON.to_encodable(%Car{color: :RED, top_speed: 125.3})
       {:ok, %{"color" => :RED, "topSpeed" => 125.3}}
 
-      iex> Car.new(color: :GREEN) |> Protobuf.JSON.to_encodable()
+      iex> Protobuf.JSON.to_encodable(%Car{color: :GREEN})
       {:ok, %{}}
 
-      iex> Car.new() |> Protobuf.JSON.to_encodable(emit_unpopulated: true)
+      iex> Protobuf.JSON.to_encodable(%Car{}, emit_unpopulated: true)
       {:ok, %{"color" => :GREEN, "topSpeed" => 0.0}}
 
   """

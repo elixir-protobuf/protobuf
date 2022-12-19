@@ -14,17 +14,13 @@ defmodule Protobuf.JSON.EncodeTest do
     Scalars
   }
 
-  def encode(struct, opts \\ []) do
-    Protobuf.JSON.Encode.to_encodable(struct, opts)
-  end
-
   test "encodes strings and booleans as they are" do
-    message = Scalars.new!(string: "エリクサー", bool: true)
+    message = %Scalars{string: "エリクサー", bool: true}
     assert encode(message) == %{"string" => "エリクサー", "bool" => true}
   end
 
   test "encodes 32-bit integers as they are" do
-    message = Scalars.new!(int32: 42, uint32: 42, sint32: 42, fixed32: 42, sfixed32: 42)
+    message = %Scalars{int32: 42, uint32: 42, sint32: 42, fixed32: 42, sfixed32: 42}
 
     encoded = %{
       "int32" => 42,
@@ -36,7 +32,7 @@ defmodule Protobuf.JSON.EncodeTest do
 
     assert encode(message) == encoded
 
-    message = Scalars.new!(int32: -42, uint32: -42, sint32: -42, fixed32: -42, sfixed32: -42)
+    message = %Scalars{int32: -42, uint32: -42, sint32: -42, fixed32: -42, sfixed32: -42}
 
     encoded = %{
       "int32" => -42,
@@ -50,7 +46,7 @@ defmodule Protobuf.JSON.EncodeTest do
   end
 
   test "encodes 64-bit integers as strings" do
-    message = Scalars.new!(int64: 42, uint64: 42, sint64: 42, fixed64: 42, sfixed64: 42)
+    message = %Scalars{int64: 42, uint64: 42, sint64: 42, fixed64: 42, sfixed64: 42}
 
     encoded = %{
       "int64" => "42",
@@ -62,7 +58,7 @@ defmodule Protobuf.JSON.EncodeTest do
 
     assert encode(message) == encoded
 
-    message = Scalars.new!(int64: -42, uint64: -42, sint64: -42, fixed64: -42, sfixed64: -42)
+    message = %Scalars{int64: -42, uint64: -42, sint64: -42, fixed64: -42, sfixed64: -42}
 
     encoded = %{
       "int64" => "-42",
@@ -76,79 +72,79 @@ defmodule Protobuf.JSON.EncodeTest do
   end
 
   test "encodes floats and doubles as JSON numbers" do
-    message = Scalars.new!(float: 1.234, double: 1.23456789)
+    message = %Scalars{float: 1.234, double: 1.23456789}
     assert encode(message) == %{"float" => 1.234, "double" => 1.23456789}
 
-    message = Scalars.new!(float: 1.23e3, double: 1.23e-300)
+    message = %Scalars{float: 1.23e3, double: 1.23e-300}
     assert encode(message) == %{"float" => 1230.0, "double" => 1.23e-300}
   end
 
   test "encodes non-numeric floats and doubles" do
-    message = Scalars.new!(float: :nan, double: :nan)
+    message = %Scalars{float: :nan, double: :nan}
     assert encode(message) == %{"float" => "NaN", "double" => "NaN"}
 
-    message = Scalars.new!(float: :infinity, double: :infinity)
+    message = %Scalars{float: :infinity, double: :infinity}
     assert encode(message) == %{"float" => "Infinity", "double" => "Infinity"}
 
-    message = Scalars.new!(float: :negative_infinity, double: :negative_infinity)
+    message = %Scalars{float: :negative_infinity, double: :negative_infinity}
     assert encode(message) == %{"float" => "-Infinity", "double" => "-Infinity"}
   end
 
   test "encodes bytes in Base64 with padding" do
-    message = Scalars.new!(bytes: "abcde")
+    message = %Scalars{bytes: "abcde"}
     assert encode(message) == %{"bytes" => "YWJjZGU="}
 
-    message = Scalars.new!(bytes: <<0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF>>)
+    message = %Scalars{bytes: <<0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF>>}
     assert encode(message) == %{"bytes" => "/////////w=="}
   end
 
   test "encodes enums" do
-    message = Foo.new!(j: 2, m: :C)
+    message = %Foo{j: 2, m: :C}
     assert encode(message) == %{"j" => :B, "m" => :C}
 
-    message = Foo.new!(j: 0, m: :UNKNOWN)
+    message = %Foo{j: 0, m: :UNKNOWN}
     assert encode(message) == %{}
 
     # proto3 accepts numeric unknown values
-    message = Foo.new!(j: -999)
+    message = %Foo{j: -999}
     assert encode(message) == %{"j" => -999}
   end
 
   test "encodes all enums as numbers when use_enum_numbers is on" do
-    message = Foo.new!(j: 2, m: :C)
+    message = %Foo{j: 2, m: :C}
     assert encode(message, use_enum_numbers: true) == %{"j" => 2, "m" => 4}
   end
 
   test "encodes oneof fields" do
-    message = OneofProto3.new!(first: {:a, 1}, second: {:d, "d"}, other: "other")
+    message = %OneofProto3{first: {:a, 1}, second: {:d, "d"}, other: "other"}
     assert encode(message) == %{"a" => 1, "d" => "d", "other" => "other"}
   end
 
   test "skips unset oneof fields" do
-    message = OneofProto3.new!(first: {:a, 1}, other: "other")
+    message = %OneofProto3{first: {:a, 1}, other: "other"}
     assert encode(message) == %{"a" => 1, "other" => "other"}
   end
 
   test "always emits set oneof fields, even if to their default values" do
-    message = OneofProto3.new!(first: {:a, 0}, second: {:d, ""})
+    message = %OneofProto3{first: {:a, 0}, second: {:d, ""}}
 
     assert encode(message) == %{"a" => 0, "d" => ""}
     assert encode(message, emit_unpopulated: true) == %{"a" => 0, "d" => "", "other" => ""}
   end
 
   test "encodes embedded" do
-    message = Foo.new!(e: Bar.new!(a: 12, b: "abc"), f: 2)
+    message = %Foo{e: %Bar{a: 12, b: "abc"}, f: 2}
     assert encode(message) == %{"e" => %{"a" => 12, "b" => "abc"}, "f" => 2}
 
-    message = Parent.new!(child: Child.new!(parent: Parent.new()))
+    message = %Parent{child: %Child{parent: %Parent{}}}
     assert encode(message) == %{"child" => %{"parent" => %{}}}
 
-    message = Parent.new!(child: nil)
+    message = %Parent{child: nil}
     assert encode(message) == %{}
   end
 
   test "encodes repeated" do
-    message = Foo.new!(g: [1, 2], h: [Bar.new(a: 1), Bar.new(b: "b")], o: [:UNKNOWN, 1, :B])
+    message = %Foo{g: [1, 2], h: [%Bar{a: 1}, %Bar{b: "b"}], o: [:UNKNOWN, 1, :B]}
 
     encoded = %{
       "g" => [1, 2],
@@ -160,17 +156,17 @@ defmodule Protobuf.JSON.EncodeTest do
   end
 
   test "encodes maps" do
-    message = Foo.new!(l: %{"foo" => 123, "bar" => 456})
+    message = %Foo{l: %{"foo" => 123, "bar" => 456}}
     assert encode(message) == %{"l" => %{"foo" => 123, "bar" => 456}}
   end
 
   test "skips empty maps" do
-    message = Foo.new!(l: %{})
+    message = %Foo{l: %{}}
     assert encode(message) == %{}
   end
 
   test "map values are always emitted, even when equal to their default" do
-    message = Foo.new!(l: %{"foo" => 123, "bar" => 0})
+    message = %Foo{l: %{"foo" => 123, "bar" => 0}}
     assert encode(message) == %{"l" => %{"foo" => 123, "bar" => 0}}
   end
 
@@ -178,7 +174,7 @@ defmodule Protobuf.JSON.EncodeTest do
     mapii = %{-1 => -1, 0 => 0, 1 => 1, 0b11 => 3, 0xFF => 255}
     mapbi = %{true => 1, false => 0}
     mapsi = %{"" => 0, "ok" => 999_999_999}
-    message = Maps.new!(mapii: mapii, mapbi: mapbi, mapsi: mapsi)
+    message = %Maps{mapii: mapii, mapbi: mapbi, mapsi: mapsi}
 
     encoded = %{
       "mapii" => %{"-1" => -1, "0" => 0, "1" => 1, "3" => 3, "255" => 255},
@@ -190,7 +186,7 @@ defmodule Protobuf.JSON.EncodeTest do
   end
 
   test "nil map values remain nil" do
-    message = Foo.new!(l: %{"foo" => nil})
+    message = %Foo{l: %{"foo" => nil}}
     assert encode(message) == %{"l" => %{"foo" => nil}}
   end
 
@@ -204,12 +200,12 @@ defmodule Protobuf.JSON.EncodeTest do
     end
 
     test "use :json_name or fall back to :name by default" do
-      message = Naming.new!(simple: 1, camel_case: 2, custom: 3)
+      message = %Naming{simple: 1, camel_case: 2, custom: 3}
       assert encode(message) == %{"simple" => 1, "camelCase" => 2, "customName" => 3}
     end
 
     test "are :name when :use_proto_names is on" do
-      message = Naming.new!(simple: 1, camel_case: 2, custom: 3)
+      message = %Naming{simple: 1, camel_case: 2, custom: 3}
       encoded = %{"simple" => 1, "camel_case" => 2, "custom" => 3}
       assert encode(message, use_proto_names: true) == encoded
     end
@@ -238,93 +234,85 @@ defmodule Protobuf.JSON.EncodeTest do
 
     bar = %{"a" => 0, "b" => ""}
 
-    message = Foo.new()
+    message = %Foo{}
     assert encode(message, emit_unpopulated: true) == decoded
 
-    message = Foo.new(e: Bar.new())
+    message = %Foo{e: %Bar{}}
     assert encode(message, emit_unpopulated: true) == %{decoded | "e" => bar}
 
-    message = Foo.new(h: [Bar.new(), Bar.new()])
+    message = %Foo{h: [%Bar{}, %Bar{}]}
     assert encode(message, emit_unpopulated: true) == %{decoded | "h" => [bar, bar]}
   end
 
   test "encodes with transformer module" do
-    assert Protobuf.JSON.encode!(ContainsTransformModule.new(field: 123)) ==
+    assert Protobuf.JSON.encode!(%ContainsTransformModule{field: 123}) ==
              ~S|{"field":{"field":123}}|
 
-    assert Protobuf.JSON.encode!(ContainsTransformModule.new(field: 0)) == ~S|{}|
-    assert Protobuf.JSON.encode!(ContainsTransformModule.new(field: nil)) == ~S|{}|
+    assert Protobuf.JSON.encode!(%ContainsTransformModule{field: 0}) == ~S|{}|
+    assert Protobuf.JSON.encode!(%ContainsTransformModule{field: nil}) == ~S|{}|
   end
 
   describe "Google.Protobuf.* value wrappers" do
     test "Google.Protobuf.BoolValue" do
-      message =
-        TestAllTypesProto3.new!(
-          optional_bool_wrapper: Google.Protobuf.BoolValue.new!(value: true)
-        )
+      message = %TestAllTypesProto3{
+        optional_bool_wrapper: %Google.Protobuf.BoolValue{value: true}
+      }
 
       assert encode(message) == %{"optionalBoolWrapper" => true}
     end
 
     test "Google.Protobuf.StringValue" do
-      message =
-        TestAllTypesProto3.new!(
-          optional_string_wrapper: Google.Protobuf.StringValue.new!(value: "foo")
-        )
+      message = %TestAllTypesProto3{
+        optional_string_wrapper: %Google.Protobuf.StringValue{value: "foo"}
+      }
 
       assert encode(message) == %{"optionalStringWrapper" => "foo"}
     end
 
     test "Google.Protobuf.FloatValue" do
-      message =
-        TestAllTypesProto3.new!(
-          optional_float_wrapper: Google.Protobuf.FloatValue.new!(value: 3.14)
-        )
+      message = %TestAllTypesProto3{
+        optional_float_wrapper: %Google.Protobuf.FloatValue{value: 3.14}
+      }
 
       assert encode(message) == %{"optionalFloatWrapper" => 3.14}
     end
 
     test "Google.Protobuf.DoubleValue" do
-      message =
-        TestAllTypesProto3.new!(
-          optional_double_wrapper: Google.Protobuf.DoubleValue.new!(value: 3.14)
-        )
+      message = %TestAllTypesProto3{
+        optional_double_wrapper: %Google.Protobuf.DoubleValue{value: 3.14}
+      }
 
       assert encode(message) == %{"optionalDoubleWrapper" => 3.14}
     end
 
     test "Google.Protobuf.Int32Value" do
-      message =
-        TestAllTypesProto3.new!(
-          optional_int32_wrapper: Google.Protobuf.Int32Value.new!(value: -3)
-        )
+      message = %TestAllTypesProto3{
+        optional_int32_wrapper: %Google.Protobuf.Int32Value{value: -3}
+      }
 
       assert encode(message) == %{"optionalInt32Wrapper" => -3}
     end
 
     test "Google.Protobuf.UInt32Value" do
-      message =
-        TestAllTypesProto3.new!(
-          optional_uint32_wrapper: Google.Protobuf.UInt32Value.new!(value: 3)
-        )
+      message = %TestAllTypesProto3{
+        optional_uint32_wrapper: %Google.Protobuf.UInt32Value{value: 3}
+      }
 
       assert encode(message) == %{"optionalUint32Wrapper" => 3}
     end
 
     test "Google.Protobuf.Int64Value" do
-      message =
-        TestAllTypesProto3.new!(
-          optional_int64_wrapper: Google.Protobuf.Int64Value.new!(value: -3)
-        )
+      message = %TestAllTypesProto3{
+        optional_int64_wrapper: %Google.Protobuf.Int64Value{value: -3}
+      }
 
       assert encode(message) == %{"optionalInt64Wrapper" => -3}
     end
 
     test "Google.Protobuf.UInt64Value" do
-      message =
-        TestAllTypesProto3.new!(
-          optional_uint64_wrapper: Google.Protobuf.UInt64Value.new!(value: 3)
-        )
+      message = %TestAllTypesProto3{
+        optional_uint64_wrapper: %Google.Protobuf.UInt64Value{value: 3}
+      }
 
       assert encode(message) == %{"optionalUint64Wrapper" => 3}
     end
@@ -332,10 +320,9 @@ defmodule Protobuf.JSON.EncodeTest do
 
   describe "Google.Protobuf.BytesValue" do
     test "encodes with base 64" do
-      message =
-        TestAllTypesProto3.new!(
-          optional_bytes_wrapper: Google.Protobuf.BytesValue.new!(value: <<1, 2, 3>>)
-        )
+      message = %TestAllTypesProto3{
+        optional_bytes_wrapper: %Google.Protobuf.BytesValue{value: <<1, 2, 3>>}
+      }
 
       assert encode(message) == %{"optionalBytesWrapper" => Base.url_encode64(<<1, 2, 3>>)}
     end
@@ -343,10 +330,9 @@ defmodule Protobuf.JSON.EncodeTest do
 
   describe "Google.Protobuf.FieldMask" do
     test "encodes with base 64" do
-      message =
-        TestAllTypesProto3.new!(
-          optional_field_mask: Google.Protobuf.FieldMask.new!(paths: ["foo_bar", "baz_bong"])
-        )
+      message = %TestAllTypesProto3{
+        optional_field_mask: %Google.Protobuf.FieldMask{paths: ["foo_bar", "baz_bong"]}
+      }
 
       assert encode(message) == %{"optionalFieldMask" => "fooBar,bazBong"}
     end
@@ -364,10 +350,9 @@ defmodule Protobuf.JSON.EncodeTest do
       ]
 
       for %{string: expected_string, seconds: seconds, nanos: nanos} <- cases do
-        message =
-          TestAllTypesProto3.new!(
-            optional_duration: Google.Protobuf.Duration.new!(seconds: seconds, nanos: nanos)
-          )
+        message = %TestAllTypesProto3{
+          optional_duration: %Google.Protobuf.Duration{seconds: seconds, nanos: nanos}
+        }
 
         assert encode(message) == %{"optionalDuration" => expected_string}
       end
@@ -376,10 +361,9 @@ defmodule Protobuf.JSON.EncodeTest do
     test "returns an error if the seconds of the duration are too big" do
       max_duration = 315_576_000_000
 
-      message =
-        TestAllTypesProto3.new!(
-          optional_duration: Google.Protobuf.Duration.new!(seconds: max_duration + 1, nanos: 0)
-        )
+      message = %TestAllTypesProto3{
+        optional_duration: %Google.Protobuf.Duration{seconds: max_duration + 1, nanos: 0}
+      }
 
       assert catch_throw(encode(message)) ==
                {:bad_duration, :seconds_outside_of_range, max_duration + 1}
@@ -388,10 +372,9 @@ defmodule Protobuf.JSON.EncodeTest do
     test "returns an error if the seconds of the duration are too small" do
       max_duration = 315_576_000_000
 
-      message =
-        TestAllTypesProto3.new!(
-          optional_duration: Google.Protobuf.Duration.new!(seconds: -max_duration - 1, nanos: 0)
-        )
+      message = %TestAllTypesProto3{
+        optional_duration: %Google.Protobuf.Duration{seconds: -max_duration - 1, nanos: 0}
+      }
 
       assert catch_throw(encode(message)) ==
                {:bad_duration, :seconds_outside_of_range, -max_duration - 1}
@@ -403,8 +386,8 @@ defmodule Protobuf.JSON.EncodeTest do
       {:ok, datetime, _offset = 0} = DateTime.from_iso8601("2000-01-01T00:00:00Z")
       unix_seconds = DateTime.to_unix(datetime, :second)
 
-      timestamp = Google.Protobuf.Timestamp.new!(seconds: unix_seconds, nanos: 0)
-      message = TestAllTypesProto3.new!(optional_timestamp: timestamp)
+      timestamp = %Google.Protobuf.Timestamp{seconds: unix_seconds, nanos: 0}
+      message = %TestAllTypesProto3{optional_timestamp: timestamp}
 
       assert encode(message) == %{"optionalTimestamp" => "2000-01-01T00:00:00Z"}
     end
@@ -413,8 +396,8 @@ defmodule Protobuf.JSON.EncodeTest do
       {:ok, datetime, _offset = 0} = DateTime.from_iso8601("0000-01-01T00:00:00Z")
       unix_seconds = DateTime.to_unix(datetime, :second)
 
-      timestamp = Google.Protobuf.Timestamp.new!(seconds: unix_seconds, nanos: 0)
-      message = TestAllTypesProto3.new!(optional_timestamp: timestamp)
+      timestamp = %Google.Protobuf.Timestamp{seconds: unix_seconds, nanos: 0}
+      message = %TestAllTypesProto3{optional_timestamp: timestamp}
 
       assert catch_throw(encode(message)) ==
                {:invalid_timestamp, timestamp, "timestamp is outside of allowed range"}
@@ -432,8 +415,8 @@ defmodule Protobuf.JSON.EncodeTest do
       ]
 
       for {kind, json} <- cases do
-        value = Google.Protobuf.Value.new!(kind: kind)
-        message = TestAllTypesProto3.new!(optional_value: value)
+        value = %Google.Protobuf.Value{kind: kind}
+        message = %TestAllTypesProto3{optional_value: value}
         assert encode(message) == %{"optionalValue" => json}
       end
     end
@@ -441,16 +424,16 @@ defmodule Protobuf.JSON.EncodeTest do
 
   describe "Google.Protobuf.ListValue" do
     test "encodes correctly" do
-      value = Google.Protobuf.ListValue.new!(values: [])
-      message = TestAllTypesProto3.new!(repeated_list_value: [value])
+      value = %Google.Protobuf.ListValue{values: []}
+      message = %TestAllTypesProto3{repeated_list_value: [value]}
       assert encode(message) == %{"repeatedListValue" => [[]]}
     end
   end
 
   describe "Google.Protobuf.Struct" do
     test "encodes correctly" do
-      value = Google.Protobuf.Struct.new!(fields: %{"foo" => Google.Protobuf.Empty.new!([])})
-      message = TestAllTypesProto3.new!(optional_struct: value)
+      value = %Google.Protobuf.Struct{fields: %{"foo" => %Google.Protobuf.Empty{}}}
+      message = %TestAllTypesProto3{optional_struct: value}
       assert encode(message) == %{"optionalStruct" => %{"foo" => %{}}}
     end
   end
@@ -477,14 +460,14 @@ defmodule Protobuf.JSON.EncodeTest do
       ]
 
       for %{key: key, wrong_value: wrong_value, expected_type: expected_type} <- cases do
-        message = My.Test.MapInput.new!(%{key => %{value: wrong_value}})
+        message = struct!(My.Test.MapInput, %{key => %{value: wrong_value}})
 
         assert {:invalid_type, ^expected_type, ^wrong_value} = catch_throw(encode(message))
       end
     end
 
     test "with enums" do
-      message = My.Test.MapInput.new!(enum_map: %{value: :NOT_VALID})
+      message = %My.Test.MapInput{enum_map: %{value: :NOT_VALID}}
 
       assert {:unknown_enum_value, :NOT_VALID, My.Test.MapEnum} =
                catch_throw(encode(message, use_enum_numbers: false))
@@ -492,5 +475,9 @@ defmodule Protobuf.JSON.EncodeTest do
       assert {:unknown_enum_value, :NOT_VALID, My.Test.MapEnum} =
                catch_throw(encode(message, use_enum_numbers: true))
     end
+  end
+
+  defp encode(struct, opts \\ []) do
+    Protobuf.JSON.Encode.to_encodable(struct, opts)
   end
 end

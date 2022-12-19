@@ -15,11 +15,7 @@ defmodule Protobuf.Protoc.Generator do
     if ctx.one_file_per_module? do
       Enum.map(module_definitions, fn {mod_name, content} ->
         file_name = Macro.underscore(mod_name) <> ".pb.ex"
-
-        Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(
-          name: file_name,
-          content: content
-        )
+        %Google.Protobuf.Compiler.CodeGeneratorResponse.File{name: file_name, content: content}
       end)
     else
       # desc.name is the filename, ending in ".proto".
@@ -31,12 +27,7 @@ defmodule Protobuf.Protoc.Generator do
         |> IO.iodata_to_binary()
         |> Generator.Util.format()
 
-      [
-        Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(
-          name: file_name,
-          content: content
-        )
-      ]
+      [%Google.Protobuf.Compiler.CodeGeneratorResponse.File{name: file_name, content: content}]
     end
   end
 

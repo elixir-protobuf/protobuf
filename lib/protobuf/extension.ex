@@ -29,9 +29,10 @@ defmodule Protobuf.Extension do
         extend Foo, :my_custom, 1047, optional: true, type: :string
       end
 
-      foo = Foo.new()
+      foo = %Foo{}
       Foo.put_extension(foo, Ext.PbExtension, :my_custom, "Custom field")
       Foo.get_extension(foo, Ext.PbExtension, :my_custom)
+
   """
 
   @doc "The actual function for `put_extension`"

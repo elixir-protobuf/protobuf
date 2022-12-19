@@ -79,7 +79,7 @@ defmodule Protobuf.EncoderTest.Validation do
   end
 
   test "field is invalid" do
-    msg = TestMsg.Foo.new(a: "abc")
+    msg = %TestMsg.Foo{a: "abc"}
 
     assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#a.*Protobuf.EncodeError/, fn ->
       Protobuf.Encoder.encode(msg)
@@ -87,7 +87,7 @@ defmodule Protobuf.EncoderTest.Validation do
   end
 
   test "proto2 invalid when required field is nil" do
-    msg = TestMsg.Foo2.new(a: nil)
+    msg = %TestMsg.Foo2{a: nil}
 
     assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo2#a.*Protobuf.EncodeError/, fn ->
       Protobuf.Encoder.encode(msg)
@@ -95,13 +95,13 @@ defmodule Protobuf.EncoderTest.Validation do
   end
 
   test "proto2 valid optional field is nil" do
-    msg = TestMsg.Foo2.new(a: 1, c: nil)
+    msg = %TestMsg.Foo2{a: 1, c: nil}
 
     assert Protobuf.Encoder.encode(msg)
   end
 
   test "oneof invalid format" do
-    msg = TestMsg.Oneof.new(first: 1)
+    msg = %TestMsg.Oneof{first: 1}
 
     assert_raise Protobuf.EncodeError, ~r/TestMsg.Oneof#first should be {key, val}/, fn ->
       Protobuf.Encoder.encode(msg)
@@ -109,7 +109,7 @@ defmodule Protobuf.EncoderTest.Validation do
   end
 
   test "oneof field doesn't match" do
-    msg = TestMsg.Oneof.new(first: {:c, 42})
+    msg = %TestMsg.Oneof{first: {:c, 42}}
 
     assert_raise Protobuf.EncodeError, ~r/:c doesn't belong to TestMsg.Oneof#first/, fn ->
       Protobuf.Encoder.encode(msg)
@@ -117,7 +117,7 @@ defmodule Protobuf.EncoderTest.Validation do
   end
 
   test "oneof field is invalid" do
-    msg = TestMsg.Oneof.new(first: {:a, "abc"})
+    msg = %TestMsg.Oneof{first: {:a, "abc"}}
 
     assert_raise Protobuf.EncodeError, ~r/TestMsg.Oneof#a.*Protobuf.EncodeError/, fn ->
       Protobuf.Encoder.encode(msg)
@@ -125,7 +125,7 @@ defmodule Protobuf.EncoderTest.Validation do
   end
 
   test "oneof field is non-existent" do
-    msg = TestMsg.OneofProto3.new(first: {:x, "foo"})
+    msg = %TestMsg.OneofProto3{first: {:x, "foo"}}
 
     assert_raise Protobuf.EncodeError, ~r/:x wasn't found in TestMsg.OneofProto3#first/, fn ->
       Protobuf.Encoder.encode(msg)
@@ -133,14 +133,14 @@ defmodule Protobuf.EncoderTest.Validation do
   end
 
   test "repeated field is not list" do
-    msg = TestMsg.Foo.new(g: 1)
+    msg = %TestMsg.Foo{g: 1}
 
     assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#g.*Protocol.UndefinedError/, fn ->
       Protobuf.Encoder.encode(msg)
     end
 
-    msg = TestMsg.Foo.new()
-    msg = %{msg | h: TestMsg.Foo.Bar.new()}
+    msg = %TestMsg.Foo{}
+    msg = %{msg | h: %TestMsg.Foo.Bar{}}
 
     assert_raise Protobuf.EncodeError, ~r/TestMsg.Foo#h.*Protocol.UndefinedError/, fn ->
       Protobuf.Encoder.encode(msg)
@@ -148,9 +148,9 @@ defmodule Protobuf.EncoderTest.Validation do
   end
 
   test "build embedded field map when encode" do
-    msg = TestMsg.Foo.new()
-    msg = %{msg | e: %{a: 1}}
-    msg1 = TestMsg.Foo.new(e: %{a: 1})
+    msg = %TestMsg.Foo{}
+    msg = %TestMsg.Foo{msg | e: %{a: 1}}
+    msg1 = %TestMsg.Foo{e: %{a: 1}}
 
     assert Protobuf.Encoder.encode(msg) == Protobuf.Encoder.encode(msg1)
   end

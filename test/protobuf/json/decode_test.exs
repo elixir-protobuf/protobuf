@@ -26,7 +26,7 @@ defmodule Protobuf.JSON.DecodeTest do
   describe "strings" do
     test "utf-8 is valid" do
       data = %{"string" => "エリクサー"}
-      decoded = Scalars.new!(string: "エリクサー")
+      decoded = %Scalars{string: "エリクサー"}
       assert decode(data, Scalars) == {:ok, decoded}
     end
 
@@ -46,7 +46,7 @@ defmodule Protobuf.JSON.DecodeTest do
   describe "booleans" do
     test "actual boolean is valid" do
       data = %{"bool" => true}
-      decoded = Scalars.new!(bool: true)
+      decoded = %Scalars{bool: true}
       assert decode(data, Scalars) == {:ok, decoded}
     end
 
@@ -66,53 +66,53 @@ defmodule Protobuf.JSON.DecodeTest do
   describe "integers" do
     test "integer value is valid" do
       data = %{"int32" => 999}
-      decoded = Scalars.new!(int32: 999)
+      decoded = %Scalars{int32: 999}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"sint32" => 999}
-      decoded = Scalars.new!(sint32: 999)
+      decoded = %Scalars{sint32: 999}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"fixed64" => 999}
-      decoded = Scalars.new!(fixed64: 999)
+      decoded = %Scalars{fixed64: 999}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"sfixed64" => 999}
-      decoded = Scalars.new!(sfixed64: 999)
+      decoded = %Scalars{sfixed64: 999}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"int32" => -999}
-      decoded = Scalars.new!(int32: -999)
+      decoded = %Scalars{int32: -999}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"sint32" => -999}
-      decoded = Scalars.new!(sint32: -999)
+      decoded = %Scalars{sint32: -999}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"fixed64" => -999}
-      decoded = Scalars.new!(fixed64: -999)
+      decoded = %Scalars{fixed64: -999}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"sfixed64" => -999}
-      decoded = Scalars.new!(sfixed64: -999)
+      decoded = %Scalars{sfixed64: -999}
       assert decode(data, Scalars) == {:ok, decoded}
     end
 
     test "string value is valid" do
       data = %{"fixed32" => "999"}
-      decoded = Scalars.new!(fixed32: 999)
+      decoded = %Scalars{fixed32: 999}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"sfixed32" => "-999"}
-      decoded = Scalars.new!(sfixed32: -999)
+      decoded = %Scalars{sfixed32: -999}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"int64" => "\u0031\u0032"}
-      decoded = Scalars.new!(int64: 12)
+      decoded = %Scalars{int64: 12}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"sint64" => "\u0031\u0032"}
-      decoded = Scalars.new!(sint64: 12)
+      decoded = %Scalars{sint64: 12}
       assert decode(data, Scalars) == {:ok, decoded}
     end
 
@@ -219,7 +219,7 @@ defmodule Protobuf.JSON.DecodeTest do
       ]
 
       for int_type <- int_types do
-        decoded = Scalars.new!([{int_type, 100_000}])
+        decoded = struct!(Scalars, [{int_type, 100_000}])
         assert decode(%{Atom.to_string(int_type) => 1.0e5}, Scalars) == {:ok, decoded}
       end
     end
@@ -228,43 +228,43 @@ defmodule Protobuf.JSON.DecodeTest do
   describe "floating point" do
     test "float value is valid" do
       data = %{"float" => 1.234, "double" => 5.6789}
-      decoded = Scalars.new!(float: 1.234, double: 5.6789)
+      decoded = %Scalars{float: 1.234, double: 5.6789}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"float" => -1.234, "double" => -5.6789}
-      decoded = Scalars.new!(float: -1.234, double: -5.6789)
+      decoded = %Scalars{float: -1.234, double: -5.6789}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"float" => 1.23e3, "double" => 1.23e-2}
-      decoded = Scalars.new!(float: 1230.0, double: 0.0123)
+      decoded = %Scalars{float: 1230.0, double: 0.0123}
       assert decode(data, Scalars) == {:ok, decoded}
     end
 
     test "constants are valid" do
       data = %{"float" => "NaN", "double" => "NaN"}
-      decoded = Scalars.new!(float: :nan, double: :nan)
+      decoded = %Scalars{float: :nan, double: :nan}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"float" => "Infinity", "double" => "Infinity"}
-      decoded = Scalars.new!(float: :infinity, double: :infinity)
+      decoded = %Scalars{float: :infinity, double: :infinity}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"float" => "-Infinity", "double" => "-Infinity"}
-      decoded = Scalars.new!(float: :negative_infinity, double: :negative_infinity)
+      decoded = %Scalars{float: :negative_infinity, double: :negative_infinity}
       assert decode(data, Scalars) == {:ok, decoded}
     end
 
     test "string value is valid" do
       data = %{"float" => "1.234", "double" => "5.6789"}
-      decoded = Scalars.new!(float: 1.234, double: 5.6789)
+      decoded = %Scalars{float: 1.234, double: 5.6789}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"float" => "-1.234", "double" => "-5.6789"}
-      decoded = Scalars.new!(float: -1.234, double: -5.6789)
+      decoded = %Scalars{float: -1.234, double: -5.6789}
       assert decode(data, Scalars) == {:ok, decoded}
 
       data = %{"float" => "1.23e3", "double" => "1.23e-2"}
-      decoded = Scalars.new!(float: 1230.0, double: 0.0123)
+      decoded = %Scalars{float: 1230.0, double: 0.0123}
       assert decode(data, Scalars) == {:ok, decoded}
     end
 
@@ -300,25 +300,25 @@ defmodule Protobuf.JSON.DecodeTest do
   describe "bytes" do
     test "Base64 encoded string with padding is valid" do
       data = %{"bytes" => "dGhpcyB3b3Jrcw=="}
-      decoded = Scalars.new!(bytes: "this works")
+      decoded = %Scalars{bytes: "this works"}
       assert decode(data, Scalars) == {:ok, decoded}
     end
 
     test "Base64 encoded string without padding is valid" do
       data = %{"bytes" => "dGhpcyB3b3Jrcw"}
-      decoded = Scalars.new!(bytes: "this works")
+      decoded = %Scalars{bytes: "this works"}
       assert decode(data, Scalars) == {:ok, decoded}
     end
 
     test "Base64 URL-encoded string with padding is valid" do
       data = %{"bytes" => "cGx1cyBzaWduICsgc2xhc2ggLw=="}
-      decoded = Scalars.new!(bytes: "plus sign + slash /")
+      decoded = %Scalars{bytes: "plus sign + slash /"}
       assert decode(data, Scalars) == {:ok, decoded}
     end
 
     test "Base64 URL-encoded string without padding is valid" do
       data = %{"bytes" => "cGx1cyBzaWduICsgc2xhc2ggLw"}
-      decoded = Scalars.new!(bytes: "plus sign + slash /")
+      decoded = %Scalars{bytes: "plus sign + slash /"}
       assert decode(data, Scalars) == {:ok, decoded}
     end
 
@@ -342,19 +342,19 @@ defmodule Protobuf.JSON.DecodeTest do
   describe "enums" do
     test "known integer value is valid" do
       data = %{"j" => 4}
-      decoded = Foo.new!(j: :E)
+      decoded = %Foo{j: :E}
       assert decode(data, Foo) == {:ok, decoded}
     end
 
     test "known string value is valid" do
       data = %{"j" => "C"}
-      decoded = Foo.new!(j: :C)
+      decoded = %Foo{j: :C}
       assert decode(data, Foo) == {:ok, decoded}
     end
 
     test "unknown integer value is valid" do
       data = %{"j" => 999}
-      decoded = Foo.new!(j: 999)
+      decoded = %Foo{j: 999}
       assert decode(data, Foo) == {:ok, decoded}
     end
 
@@ -400,7 +400,7 @@ defmodule Protobuf.JSON.DecodeTest do
       mapii = %{-1 => -1, 0 => 0, 1 => 1, 999_999_999 => 999_999_999}
       mapbi = %{true => 1, false => 0}
       mapsi = %{"" => 0, "三" => 3, "meaning" => 42}
-      decoded = Maps.new!(mapii: mapii, mapbi: mapbi, mapsi: mapsi)
+      decoded = %Maps{mapii: mapii, mapbi: mapbi, mapsi: mapsi}
 
       assert decode(data, Maps) == {:ok, decoded}
     end
@@ -462,21 +462,21 @@ defmodule Protobuf.JSON.DecodeTest do
   describe "embedded" do
     test "decodes embedded messages" do
       data = %{"e" => %{"a" => 12, "b" => "abc"}, "f" => 2}
-      decoded = Foo.new!(e: Bar.new!(a: 12, b: "abc"), f: 2)
+      decoded = %Foo{e: %Bar{a: 12, b: "abc"}, f: 2}
       assert decode(data, Foo) == {:ok, decoded}
     end
 
     test "empty map is valid" do
-      assert decode(%{}, Parent) == {:ok, Parent.new()}
+      assert decode(%{}, Parent) == {:ok, %Parent{}}
 
       data = %{"child" => %{"parent" => %{}}}
-      decoded = Parent.new!(child: Child.new!(parent: Parent.new()))
+      decoded = %Parent{child: %Child{parent: %Parent{}}}
       assert decode(data, Parent) == {:ok, decoded}
     end
 
     test "null value is ignored" do
       data = %{"child" => nil}
-      decoded = Parent.new()
+      decoded = %Parent{}
       assert decode(data, Parent) == {:ok, decoded}
     end
 
@@ -502,19 +502,19 @@ defmodule Protobuf.JSON.DecodeTest do
   describe "oneofs" do
     test "decodes oneof fields" do
       data = %{"a" => 1, "d" => "d", "other" => "other"}
-      decoded = OneofProto3.new!(first: {:a, 1}, second: {:d, "d"}, other: "other")
+      decoded = %OneofProto3{first: {:a, 1}, second: {:d, "d"}, other: "other"}
       assert decode(data, OneofProto3) == {:ok, decoded}
     end
 
     test "unset" do
       data = %{}
-      decoded = OneofProto3.new()
+      decoded = %OneofProto3{}
       assert decode(data, OneofProto3) == {:ok, decoded}
     end
 
     test "set to default value" do
       data = %{"a" => 0, "d" => ""}
-      decoded = OneofProto3.new(first: {:a, 0}, second: {:d, ""})
+      decoded = %OneofProto3{first: {:a, 0}, second: {:d, ""}}
       assert decode(data, OneofProto3) == {:ok, decoded}
 
       defmodule BooleanOneof do
@@ -523,9 +523,11 @@ defmodule Protobuf.JSON.DecodeTest do
         field :bool, 1, type: :bool, oneof: 0
       end
 
+      mod = BooleanOneof
+
       data = %{"bool" => false}
-      decoded = BooleanOneof.new(zero: {:bool, false})
-      assert decode(data, BooleanOneof) == {:ok, decoded}
+      decoded = struct!(mod, zero: {:bool, false})
+      assert decode(data, mod) == {:ok, decoded}
     end
 
     test "multiple non-null fields set in a single oneof is invalid" do
@@ -536,11 +538,11 @@ defmodule Protobuf.JSON.DecodeTest do
 
     test "multiple fields set in a single oneof, one being non-null, is valid" do
       data = %{"a" => 42, "b" => nil}
-      decoded = OneofProto3.new(first: {:a, 42})
+      decoded = %OneofProto3{first: {:a, 42}}
       assert decode(data, OneofProto3) == {:ok, decoded}
 
       data = %{"a" => nil, "b" => "valid"}
-      decoded = OneofProto3.new(first: {:b, "valid"})
+      decoded = %OneofProto3{first: {:b, "valid"}}
       assert decode(data, OneofProto3) == {:ok, decoded}
     end
   end
@@ -553,8 +555,7 @@ defmodule Protobuf.JSON.DecodeTest do
         "o" => ["UNKNOWN", 1, "B", 999]
       }
 
-      decoded =
-        Foo.new!(g: [1, 2], h: [Bar.new(a: 1), Bar.new(b: "b")], o: [:UNKNOWN, :A, :B, 999])
+      decoded = %Foo{g: [1, 2], h: [%Bar{a: 1}, %Bar{b: "b"}], o: [:UNKNOWN, :A, :B, 999]}
 
       assert decode(data, Foo) == {:ok, decoded}
     end
@@ -582,7 +583,7 @@ defmodule Protobuf.JSON.DecodeTest do
 
   test "unknown fields are ignored" do
     data = %{"a" => 1, "unknown" => 2, false => true, "e" => %{"a" => 2, 3 => 4}}
-    decoded = Foo.new!(a: 1, e: Bar.new!(a: 2))
+    decoded = %Foo{a: 1, e: %Bar{a: 2}}
     assert decode(data, Foo) == {:ok, decoded}
   end
 
@@ -607,7 +608,7 @@ defmodule Protobuf.JSON.DecodeTest do
       "p" => nil
     }
 
-    assert decode(data, Foo) == {:ok, Foo.new(e: Bar.new())}
+    assert decode(data, Foo) == {:ok, %Foo{e: %Bar{}}}
   end
 
   test "recognizes default values" do
@@ -631,7 +632,7 @@ defmodule Protobuf.JSON.DecodeTest do
       "p" => ""
     }
 
-    assert decode(data, Foo) == {:ok, Foo.new(e: Bar.new())}
+    assert decode(data, Foo) == {:ok, %Foo{e: %Bar{}}}
   end
 
   test "decodes with transformer module" do
@@ -657,7 +658,7 @@ defmodule Protobuf.JSON.DecodeTest do
       data = %{}
 
       assert decode(data, Google.Protobuf.Empty) ==
-               {:ok, Google.Protobuf.Empty.new!([])}
+               {:ok, %Google.Protobuf.Empty{}}
     end
 
     test "Google.Protobuf.BoolValue" do
@@ -667,9 +668,9 @@ defmodule Protobuf.JSON.DecodeTest do
 
       assert decode(data, TestAllTypesProto3) ==
                {:ok,
-                TestAllTypesProto3.new(
-                  optional_bool_wrapper: Google.Protobuf.BoolValue.new!(value: true)
-                )}
+                %TestAllTypesProto3{
+                  optional_bool_wrapper: %Google.Protobuf.BoolValue{value: true}
+                }}
     end
 
     test "Google.Protobuf.Int32Value" do
@@ -679,9 +680,9 @@ defmodule Protobuf.JSON.DecodeTest do
 
       assert decode(data, TestAllTypesProto3) ==
                {:ok,
-                TestAllTypesProto3.new(
-                  optional_int32_wrapper: Google.Protobuf.Int32Value.new!(value: 100)
-                )}
+                %TestAllTypesProto3{
+                  optional_int32_wrapper: %Google.Protobuf.Int32Value{value: 100}
+                }}
     end
 
     test "Google.Protobuf.UInt32Value" do
@@ -691,9 +692,9 @@ defmodule Protobuf.JSON.DecodeTest do
 
       assert decode(data, TestAllTypesProto3) ==
                {:ok,
-                TestAllTypesProto3.new(
-                  optional_uint32_wrapper: Google.Protobuf.UInt32Value.new!(value: 100)
-                )}
+                %TestAllTypesProto3{
+                  optional_uint32_wrapper: %Google.Protobuf.UInt32Value{value: 100}
+                }}
     end
 
     test "Google.Protobuf.Int64Value" do
@@ -703,9 +704,9 @@ defmodule Protobuf.JSON.DecodeTest do
 
       assert decode(data, TestAllTypesProto3) ==
                {:ok,
-                TestAllTypesProto3.new(
-                  optional_int64_wrapper: Google.Protobuf.Int64Value.new!(value: 100)
-                )}
+                %TestAllTypesProto3{
+                  optional_int64_wrapper: %Google.Protobuf.Int64Value{value: 100}
+                }}
     end
 
     test "Google.Protobuf.UInt64Value" do
@@ -715,9 +716,9 @@ defmodule Protobuf.JSON.DecodeTest do
 
       assert decode(data, TestAllTypesProto3) ==
                {:ok,
-                TestAllTypesProto3.new(
-                  optional_uint64_wrapper: Google.Protobuf.UInt64Value.new!(value: 100)
-                )}
+                %TestAllTypesProto3{
+                  optional_uint64_wrapper: %Google.Protobuf.UInt64Value{value: 100}
+                }}
     end
 
     test "Google.Protobuf.FloatValue" do
@@ -727,9 +728,9 @@ defmodule Protobuf.JSON.DecodeTest do
 
       assert decode(data, TestAllTypesProto3) ==
                {:ok,
-                TestAllTypesProto3.new(
-                  optional_float_wrapper: Google.Protobuf.FloatValue.new!(value: 3.14)
-                )}
+                %TestAllTypesProto3{
+                  optional_float_wrapper: %Google.Protobuf.FloatValue{value: 3.14}
+                }}
     end
 
     test "Google.Protobuf.DoubleValue" do
@@ -739,9 +740,9 @@ defmodule Protobuf.JSON.DecodeTest do
 
       assert decode(data, TestAllTypesProto3) ==
                {:ok,
-                TestAllTypesProto3.new(
-                  optional_double_wrapper: Google.Protobuf.DoubleValue.new!(value: 3.14444)
-                )}
+                %TestAllTypesProto3{
+                  optional_double_wrapper: %Google.Protobuf.DoubleValue{value: 3.14444}
+                }}
     end
 
     test "Google.Protobuf.StringValue" do
@@ -751,9 +752,9 @@ defmodule Protobuf.JSON.DecodeTest do
 
       assert decode(data, TestAllTypesProto3) ==
                {:ok,
-                TestAllTypesProto3.new(
-                  optional_string_wrapper: Google.Protobuf.StringValue.new!(value: "my string")
-                )}
+                %TestAllTypesProto3{
+                  optional_string_wrapper: %Google.Protobuf.StringValue{value: "my string"}
+                }}
     end
 
     test "Google.Protobuf.BytesValue" do
@@ -763,9 +764,9 @@ defmodule Protobuf.JSON.DecodeTest do
 
       assert decode(data, TestAllTypesProto3) ==
                {:ok,
-                TestAllTypesProto3.new(
-                  optional_bytes_wrapper: Google.Protobuf.BytesValue.new!(value: <<1, 2, 3>>)
-                )}
+                %TestAllTypesProto3{
+                  optional_bytes_wrapper: %Google.Protobuf.BytesValue{value: <<1, 2, 3>>}
+                }}
     end
 
     test "Google.Protobuf.FieldMask with empty field mask" do
@@ -780,9 +781,9 @@ defmodule Protobuf.JSON.DecodeTest do
 
         assert decode(data, TestAllTypesProto3) ==
                  {:ok,
-                  TestAllTypesProto3.new(
-                    optional_field_mask: Google.Protobuf.FieldMask.new!(paths: expected_paths)
-                  )}
+                  %TestAllTypesProto3{
+                    optional_field_mask: %Google.Protobuf.FieldMask{paths: expected_paths}
+                  }}
       end
 
       # Error with bad type.
@@ -805,35 +806,35 @@ defmodule Protobuf.JSON.DecodeTest do
 
       assert decode(data, TestAllTypesProto3) ==
                {:ok,
-                TestAllTypesProto3.new(
+                %TestAllTypesProto3{
                   repeated_list_value: [
-                    Google.Protobuf.ListValue.new!(
+                    %Google.Protobuf.ListValue{
                       values: [
-                        Google.Protobuf.Value.new!(kind: {:number_value, 1.0}),
-                        Google.Protobuf.Value.new!(kind: {:string_value, "two"}),
-                        Google.Protobuf.Value.new!(kind: {:number_value, 3.14}),
-                        Google.Protobuf.Value.new!(kind: {:bool_value, true}),
-                        Google.Protobuf.Value.new!(kind: {:null_value, :NULL_VALUE})
+                        %Google.Protobuf.Value{kind: {:number_value, 1.0}},
+                        %Google.Protobuf.Value{kind: {:string_value, "two"}},
+                        %Google.Protobuf.Value{kind: {:number_value, 3.14}},
+                        %Google.Protobuf.Value{kind: {:bool_value, true}},
+                        %Google.Protobuf.Value{kind: {:null_value, :NULL_VALUE}}
                       ]
-                    ),
-                    Google.Protobuf.ListValue.new!(
+                    },
+                    %Google.Protobuf.ListValue{
                       values: [
-                        Google.Protobuf.Value.new!(
+                        %Google.Protobuf.Value{
                           kind:
                             {:struct_value,
-                             Google.Protobuf.Struct.new!(
+                             %Google.Protobuf.Struct{
                                fields: %{
-                                 "foo" => Google.Protobuf.Value.new!(kind: {:string_value, "bar"})
+                                 "foo" => %Google.Protobuf.Value{kind: {:string_value, "bar"}}
                                }
-                             )}
-                        ),
-                        Google.Protobuf.Value.new!(
-                          kind: {:list_value, Google.Protobuf.ListValue.new!(values: [])}
-                        )
+                             }}
+                        },
+                        %Google.Protobuf.Value{
+                          kind: {:list_value, %Google.Protobuf.ListValue{values: []}}
+                        }
                       ]
-                    )
+                    }
                   ]
-                )}
+                }}
     end
 
     test "Google.Protobuf.Duration" do
@@ -850,8 +851,10 @@ defmodule Protobuf.JSON.DecodeTest do
       for %{string: string, seconds: expected_seconds, nanos: expected_nanos} <- cases do
         data = %{"optionalDuration" => string}
 
-        expected_duration =
-          Google.Protobuf.Duration.new!(seconds: expected_seconds, nanos: expected_nanos)
+        expected_duration = %Google.Protobuf.Duration{
+          seconds: expected_seconds,
+          nanos: expected_nanos
+        }
 
         assert {:ok, decoded} = decode(data, TestAllTypesProto3)
         assert decoded.optional_duration == expected_duration
@@ -898,11 +901,11 @@ defmodule Protobuf.JSON.DecodeTest do
       assert {:ok, decoded} = decode(data, TestAllTypesProto3)
 
       assert decoded.optional_any ==
-               Google.Protobuf.Any.new!(
+               %Google.Protobuf.Any{
                  type_url: "type.googleapis.com/google.protobuf.Int32Value",
                  value:
-                   Google.Protobuf.Int32Value.encode(Google.Protobuf.Int32Value.new!(value: 1234))
-               )
+                   Google.Protobuf.Int32Value.encode(%Google.Protobuf.Int32Value{value: 1234})
+               }
     end
 
     test "with nested Any with Int32Value inside" do
@@ -919,19 +922,15 @@ defmodule Protobuf.JSON.DecodeTest do
       assert {:ok, decoded} = decode(data, TestAllTypesProto3)
 
       assert decoded.optional_any ==
-               Google.Protobuf.Any.new!(
+               %Google.Protobuf.Any{
                  type_url: "type.googleapis.com/google.protobuf.Any",
                  value:
-                   Google.Protobuf.Any.encode(
-                     Google.Protobuf.Any.new(
-                       type_url: "type.googleapis.com/google.protobuf.Int32Value",
-                       value:
-                         Google.Protobuf.Int32Value.encode(
-                           Google.Protobuf.Int32Value.new!(value: 1234)
-                         )
-                     )
-                   )
-               )
+                   Google.Protobuf.Any.encode(%Google.Protobuf.Any{
+                     type_url: "type.googleapis.com/google.protobuf.Int32Value",
+                     value:
+                       Google.Protobuf.Int32Value.encode(%Google.Protobuf.Int32Value{value: 1234})
+                   })
+               }
     end
   end
 end

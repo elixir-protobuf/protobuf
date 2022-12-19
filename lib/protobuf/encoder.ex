@@ -144,7 +144,8 @@ defmodule Protobuf.Encoder do
   defp encode_from_type(mod, msg) do
     case msg do
       %{__struct__: ^mod} -> encode_to_iodata(msg)
-      _ -> encode_to_iodata(mod.new(msg))
+      %_{} -> encode_to_iodata(struct(mod, Map.from_struct(msg)))
+      _ -> encode_to_iodata(struct(mod, msg))
     end
   end
 
