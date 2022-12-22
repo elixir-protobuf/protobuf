@@ -1,4 +1,4 @@
-name: Conformance
+name: Latest conformance
 
 # This workflow *only* tries to run the conformance checks. It is triggered periodically on a cron
 # to catch when new conformance tests are added and they don't pass. It uses the latest version of
@@ -15,7 +15,7 @@ on:
 jobs:
   latest-conformance-test:
     name: Run conformance tests on latest protoc
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         include:
