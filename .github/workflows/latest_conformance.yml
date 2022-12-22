@@ -1,4 +1,4 @@
-name: Conformance
+name: Latest conformance
 
 # This workflow *only* tries to run the conformance checks. It is triggered periodically on a cron
 # to catch when new conformance tests are added and they don't pass. It uses the latest version of
