@@ -15,7 +15,7 @@ on:
 jobs:
   latest-conformance-test:
     name: Run conformance tests on latest protoc
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         include:
