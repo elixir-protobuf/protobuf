@@ -22,6 +22,8 @@ defmodule Protobuf.MessageProps do
           enum?: boolean(),
           extendable?: boolean(),
           map?: boolean(),
+
+          # See Protobuf.DSL.extensions/1.
           extension_range: [{non_neg_integer(), non_neg_integer()}] | nil
         }
 

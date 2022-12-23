@@ -67,7 +67,7 @@ message Reply {
 
 message OtherBase {
   optional string name = 1;
-  extensions 100 to max;
+  extensions 100 to 110, 199;
 }
 
 message ReplyExtensions {

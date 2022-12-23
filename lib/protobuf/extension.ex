@@ -35,6 +35,25 @@ defmodule Protobuf.Extension do
 
   """
 
+  import Bitwise, only: [<<<: 2]
+
+  # TODO: replace bitshift with Integer.pow/2 when we depend on Elixir 1.12+.
+  # 2^29, see https://developers.google.com/protocol-buffers/docs/proto#extensions
+  @max 1 <<< 29
+
+  @doc """
+  Returns the maximum extension number.
+
+  ## Examples
+
+      iex> Protobuf.Extension.max()
+      #{inspect(@max)}
+
+  """
+  @doc since: "0.12.0"
+  @spec max() :: pos_integer()
+  def max, do: @max
+
   @doc "The actual function for `put_extension`"
   @spec put(module, map, module, atom, any) :: map
   def put(mod, struct, extension_mod, field, value) do
@@ -107,27 +126,5 @@ defmodule Protobuf.Extension do
             nil
         end
     end
-  end
-
-  @doc false
-  def __cal_extensions__() do
-    for mod <- get_all_modules(),
-        String.ends_with?(Atom.to_string(mod), ".PbExtension"),
-        Code.ensure_loaded?(mod),
-        function_exported?(mod, :__protobuf_info__, 1),
-        %{extensions: extensions} = mod.__protobuf_info__(:extension_props) do
-      Enum.each(extensions, fn {_, ext} ->
-        fnum = ext.field_props.fnum
-        fnum_key = {Protobuf.Extension, ext.extendee, fnum}
-        :persistent_term.put(fnum_key, mod)
-      end)
-    end
-  end
-
-  defp get_all_modules do
-    Enum.flat_map(Application.loaded_applications(), fn {app, _desc, _vsn} ->
-      {:ok, modules} = :application.get_key(app, :modules)
-      modules
-    end)
   end
 end

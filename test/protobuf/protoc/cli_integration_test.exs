@@ -175,6 +175,78 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
     assert Map.fetch!(mod.__message_props__().field_props, 1).type == Google.Protobuf.Timestamp
   end
 
+  test "TODO", %{tmp_dir: tmp_dir} do
+    proto_path_base = Path.join(tmp_dir, "base.proto")
+    proto_path_ext1 = Path.join(tmp_dir, "ext1.proto")
+    proto_path_ext2 = Path.join(tmp_dir, "ext2.proto")
+
+    File.write!(proto_path_base, """
+    // base.proto
+    syntax = "proto2";
+    package bugs;
+
+    message Base {
+      optional string name = 1;
+      extensions 100 to max;
+    }
+    """)
+
+    File.write!(proto_path_ext1, """
+    // ext1.proto
+    syntax = "proto2";
+    import "base.proto";
+    package bugs;
+
+    extend Base {
+      optional string top_first_name = 111;
+    }
+
+    message Ext1 {
+      extend Base {
+        optional string first_name = 101;
+      }
+    }
+    """)
+
+    File.write!(proto_path_ext2, """
+    // ext2.proto
+    syntax = "proto2";
+    import "base.proto";
+    package bugs;
+
+    extend Base {
+      optional string top_last_name = 112;
+    }
+
+    message Ext2 {
+      extend Base {
+        optional string last_name = 102;
+      }
+    }
+    """)
+
+    protoc!([
+      "--proto_path=#{tmp_dir}",
+      "--elixir_out=#{tmp_dir}",
+      "--plugin=./protoc-gen-elixir",
+      proto_path_base,
+      proto_path_ext1,
+      proto_path_ext2
+    ])
+
+    assert [Bugs.Base] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/base.pb.ex")
+
+    assert [Bugs.Ext1, file_exts_mod1, Bugs.Ext1.PbExtension] =
+             compile_file_and_clean_modules_on_exit("#{tmp_dir}/ext1.pb.ex")
+
+    assert [Bugs.Ext2, file_exts_mod2, Bugs.Ext2.PbExtension] =
+             compile_file_and_clean_modules_on_exit("#{tmp_dir}/ext2.pb.ex")
+
+    assert ["Bugs", unique_part1, "PbExtension"] = Module.split(file_exts_mod1)
+    assert ["Bugs", unique_part2, "PbExtension"] = Module.split(file_exts_mod2)
+    assert unique_part1 != unique_part2
+  end
+
   @tag :skip
   test "extensions defined and used in the same protoc call", %{tmp_dir: tmp_dir} do
     proto_path = Path.join(tmp_dir, "extensions.proto")

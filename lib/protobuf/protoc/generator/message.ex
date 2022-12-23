@@ -1,7 +1,7 @@
 defmodule Protobuf.Protoc.Generator.Message do
   @moduledoc false
 
-  alias Google.Protobuf.FieldDescriptorProto
+  alias Google.Protobuf.{DescriptorProto, FieldDescriptorProto}
 
   alias Protobuf.Protoc.Context
   alias Protobuf.Protoc.Generator.Util
@@ -177,8 +177,14 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp get_extensions(desc) do
-    Enum.map(desc.extension_range, fn range ->
-      {range.start, range.end}
+    max = Protobuf.Extension.max()
+
+    Enum.map(desc.extension_range, fn %DescriptorProto.ExtensionRange{start: start, end: end_} ->
+      if end_ == max do
+        {Integer.to_string(start), "Protobuf.Extension.max()"}
+      else
+        {Integer.to_string(start), Integer.to_string(end_)}
+      end
     end)
   end
 

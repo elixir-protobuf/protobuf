@@ -3,8 +3,8 @@ defmodule Protobuf.ProtobufTest do
 
   test "load_extensions/0 is a noop" do
     Protobuf.load_extensions()
-    assert loaded_extensions() == 13
-    assert loaded_extensions() == 13
+    assert loaded_extensions() == 15
+    assert loaded_extensions() == 15
   end
 
   describe "encode/1" do
