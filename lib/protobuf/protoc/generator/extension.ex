@@ -74,10 +74,12 @@ defmodule Protobuf.Protoc.Generator.Extension do
       |> Enum.sort()
       |> :erlang.phash2()
       |> Integer.to_string()
-      |> then(&"Extensions#{&1}")
 
     module_name =
-      Util.mod_name(ctx, ctx.namespace ++ [unique_module_name_part, Macro.camelize(@ext_postfix)])
+      Util.mod_name(
+        ctx,
+        ctx.namespace ++ ["Extensions#{unique_module_name_part}", Macro.camelize(@ext_postfix)]
+      )
 
     module_contents =
       Util.format(
