@@ -87,38 +87,6 @@ defmodule Protobuf.Protoc.Generator.Extension do
     []
   end
 
-  # If the extensions we're compiling comes from a file, we need to make the extension's module
-  # name unique. This is because if we have ext1.proto and ext2.proto, both of which define
-  # extensions, then we'd end up with two modules named "<package>.PbExtension".
-  # We also need to make the "unique" part of the module name reproducible, because we want
-  # subsequent runs of protoc to generate the same output. The best thing I (Andrea) could
-  # think of is the hash of all sorted extensions contained in the file, so that if you
-  # don't change them (or only change their order) the module name stays the same.
-  defp generate_module(%Context{} = ctx, use_options, %FileDescriptorProto{} = file_desc) do
-    unique_module_name_part =
-      file_desc.extension
-      |> Enum.sort()
-      |> :erlang.phash2()
-      |> Integer.to_string()
-
-    module_name =
-      Util.mod_name(
-        ctx,
-        ctx.namespace ++ ["Extensions#{unique_module_name_part}", Macro.camelize(@ext_postfix)]
-      )
-
-    module_contents =
-      Util.format(
-        extension_template(
-          module: module_name,
-          use_options: use_options,
-          extends: Enum.map(file_desc.extension, &generate_extend_dsl(ctx, &1, _ns = ""))
-        )
-      )
-
-    [{module_name, module_contents}]
-  end
-
   defp generate_module(%Context{} = ctx, use_options, %DescriptorProto{} = desc) do
     ns = ctx.namespace ++ [Macro.camelize(desc.name)]
     module_name = Util.mod_name(ctx, ns ++ [Macro.camelize(@ext_postfix)])
