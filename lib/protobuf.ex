@@ -8,8 +8,6 @@ defmodule Protobuf do
       defmodule Foo do
         use Protobuf, syntax: :proto3
 
-        defstruct [:a, :b]
-
         field :a, 1, type: :int32
         field :b, 2, type: :string
       end
