@@ -16,8 +16,26 @@ defmodule Protobuf.Protoc.Generator.Extension do
     [:assigns]
   )
 
-  @spec generate(Context.t(), FileDescriptorProto.t()) ::
-          [{module_name :: String.t(), file_contents :: String.t()}]
+  def generate_package_level(%Context{} = ctx, mod_name, extensions)
+      when is_binary(mod_name) and is_list(extensions) do
+    use_options =
+      Util.options_to_str(%{
+        syntax: ctx.syntax,
+        protoc_gen_elixir_version: "\"#{Util.version()}\""
+      })
+
+    module_contents =
+      Util.format(
+        extension_template(use_options: use_options, module: mod_name, extends: extensions)
+      )
+
+    {mod_name, module_contents}
+  end
+
+  @spec generate(Context.t(), FileDescriptorProto.t()) :: {package_level_extensions, modules}
+        when package_level_extensions:
+               {module_name :: String.t(), extension_dsls :: [String.t()]} | nil,
+             modules: [{module_name :: String.t(), contents :: String.t()}]
   def generate(%Context{} = ctx, %FileDescriptorProto{} = file_desc) do
     use_options =
       Util.options_to_str(%{
@@ -25,10 +43,18 @@ defmodule Protobuf.Protoc.Generator.Extension do
         protoc_gen_elixir_version: "\"#{Util.version()}\""
       })
 
-    # There can be extension definitions in the file descriptor directly, which
-    # is why we call generate_module/3 with it too.
-    generate_module(ctx, use_options, file_desc) ++
-      get_extensions_from_messages(ctx, use_options, file_desc.message_type)
+    nested_modules = get_extensions_from_messages(ctx, use_options, file_desc.message_type)
+
+    {package_level_extensions(ctx, file_desc), nested_modules}
+  end
+
+  defp package_level_extensions(%Context{}, %FileDescriptorProto{extension: []}) do
+    nil
+  end
+
+  defp package_level_extensions(%Context{} = ctx, %FileDescriptorProto{extension: extensions}) do
+    namespace = Util.mod_name(ctx, ctx.namespace ++ [Macro.camelize(@ext_postfix)])
+    {namespace, Enum.map(extensions, &generate_extend_dsl(ctx, &1, _ns = ""))}
   end
 
   defp generate_extend_dsl(ctx, %FieldDescriptorProto{} = f, ns) do

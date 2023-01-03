@@ -10,7 +10,7 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
       ctx = %Context{namespace: [""]}
       desc = %FileDescriptorProto{extension: []}
 
-      assert Generator.generate(ctx, desc) == []
+      assert Generator.generate(ctx, desc) == {nil, []}
     end
 
     test "generates file-level extensions using the file's module" do
@@ -47,11 +47,14 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
         ]
       }
 
-      assert [{mod_name, msg}] = Generator.generate(ctx, desc)
-      assert ["Ext", "Extensions" <> unique_part, "PbExtension"] = String.split(mod_name, ".")
-      assert {_, ""} = Integer.parse(unique_part)
-      assert msg =~ "extend Ext.Foo1, :foo, 1047, optional: true, type: Ext.Options"
-      assert msg =~ "extend Ext.Bar1, :bar, 1048, optional: true, type: Ext.Options"
+      assert {{mod_name, msg}, []} = Generator.generate(ctx, desc)
+      assert mod_name == "Ext.PbExtension"
+
+      assert Enum.join(msg, "\n") =~
+               "Ext.Foo1, :foo, 1047, optional: true, type: Ext.Options"
+
+      assert Enum.join(msg, "\n") =~
+               "Ext.Bar1, :bar, 1048, optional: true, type: Ext.Options"
     end
 
     test "resolves type names" do
@@ -95,10 +98,11 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
         ]
       }
 
-      assert [{"Ext.Extensions" <> _, msg}] = Generator.generate(ctx, desc)
-      assert msg =~ "extend Ext.Foo1, :foo, 1047, optional: true, type: Ext.Options\n"
-      assert msg =~ "extend Ext.Foo1, :foo2, 1049, repeated: true, type: :uint32\n"
-      assert msg =~ "extend Ext.Foo2, :bar, 1047, optional: true, type: :string\n"
+      assert {{"Ext.PbExtension", msg}, []} = Generator.generate(ctx, desc)
+      msg = Enum.join(msg, "\n")
+      assert msg =~ "Ext.Foo1, :foo, 1047, optional: true, type: Ext.Options"
+      assert msg =~ "Ext.Foo1, :foo2, 1049, repeated: true, type: :uint32"
+      assert msg =~ "Ext.Foo2, :bar, 1047, optional: true, type: :string"
     end
 
     test "generates nested extensions when given" do
@@ -153,17 +157,17 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
         ]
       }
 
-      assert [
-               {"Ext.Extension" <> _ = unique_name, file_message},
-               {"Ext.MyMessage.PbExtension", my_message},
-               {"Ext.MyMessage.NestedMessage.PbExtension", nested_message}
-             ] = Generator.generate(ctx, desc)
+      assert {{"Ext.PbExtension", file_message},
+              [
+                {"Ext.MyMessage.PbExtension", my_message},
+                {"Ext.MyMessage.NestedMessage.PbExtension", nested_message}
+              ]} = Generator.generate(ctx, desc)
 
-      assert ["Ext", "Extensions" <> _, "PbExtension"] = String.split(unique_name, ".")
+      assert Enum.join(file_message, "\n") =~
+               "Ext.Foo, :file_level, 1048, optional: true, type: :string"
 
-      assert file_message =~ "extend Ext.Foo, :file_level, 1048, optional: true, type: :string"
-      assert my_message =~ "extend Ext.Foo, :in_msg, 1049, optional: true, type: :string"
-      assert nested_message =~ "extend Ext.Foo, :in_nested, 1050, optional: true, type: :string"
+      assert my_message =~ "Ext.Foo, :in_msg, 1049, optional: true, type: :string"
+      assert nested_message =~ "Ext.Foo, :in_nested, 1050, optional: true, type: :string"
     end
   end
 end
