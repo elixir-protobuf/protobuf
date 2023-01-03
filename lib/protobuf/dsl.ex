@@ -28,9 +28,50 @@ defmodule Protobuf.DSL do
 
   @doc """
   Define extensions range in the message module to allow extensions for this module.
+
+  Extension ranges are defined as a list of tuples `{start, end}`, where each tuple is
+  an **exclusive** range starting and `start` and ending at `end` (the equivalent
+  of `start..end-1` in Elixir).
+
+  To simulate the Protobuf `max` keyword, you can use `Protobuf.Extension.max/0`.
+
+  ## Examples
+
+  These Protobuf definition:
+
+  ```protobuf
+  message Foo {
+    extensions 1, 10 to 20, 100 to max;
+  }
+  ```
+
+  Would be translated in Elixir to:
+
+      extensions [{1, 2}, {10, 21}, {100, Protobuf.Extension.max()}]
+
   """
   defmacro extensions(ranges) do
     quote do
+      ranges = unquote(ranges)
+
+      if not is_list(ranges) do
+        raise ArgumentError, "expected a list of ranges, got: #{inspect(ranges)}"
+      end
+
+      Enum.each(ranges, fn
+        value when not is_tuple(value) or tuple_size(value) != 2 ->
+          raise ArgumentError, "expected a range, got: #{inspect(value)}"
+
+        {left, right} when not is_integer(left) or not is_integer(right) ->
+          raise ArgumentError, "expected an integer range, got: #{inspect({left, right})}"
+
+        {left, right} when left >= right ->
+          raise ArgumentError, "expected an ordered range, got: #{inspect({left, right})}"
+
+        other ->
+          :ok
+      end)
+
       @extensions unquote(ranges)
     end
   end

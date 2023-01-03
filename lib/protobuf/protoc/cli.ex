@@ -51,14 +51,33 @@ defmodule Protobuf.Protoc.CLI do
       |> parse_params(request.parameter || "")
       |> find_types(request.proto_file, request.file_to_generate)
 
-    files =
-      Enum.flat_map(request.file_to_generate, fn file ->
+    {files, package_level_extensions} =
+      Enum.flat_map_reduce(request.file_to_generate, %{}, fn file, acc ->
         desc = Enum.find(request.proto_file, &(&1.name == file))
-        Protobuf.Protoc.Generator.generate(ctx, desc)
+        {package_level_extensions, files} = Protobuf.Protoc.Generator.generate(ctx, desc)
+
+        acc =
+          case package_level_extensions do
+            {mod_name, extensions} -> Map.update(acc, mod_name, extensions, &(&1 ++ extensions))
+            nil -> acc
+          end
+
+        {files, acc}
       end)
 
+    ext_files =
+      for {mod_name, extensions} <- package_level_extensions do
+        {mod_name, contents} =
+          Protobuf.Protoc.Generator.Extension.generate_package_level(ctx, mod_name, extensions)
+
+        %Google.Protobuf.Compiler.CodeGeneratorResponse.File{
+          name: Macro.underscore(mod_name) <> ".pb.ex",
+          content: contents
+        }
+      end
+
     %Google.Protobuf.Compiler.CodeGeneratorResponse{
-      file: files,
+      file: files ++ ext_files,
       supported_features: supported_features()
     }
     |> Protobuf.encode_to_iodata()

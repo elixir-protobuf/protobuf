@@ -60,7 +60,7 @@ defmodule Protobuf.Protoc.Context do
       ) do
     custom_file_opts =
       Google.Protobuf.FileOptions.get_extension(options, Elixirpb.PbExtension, :file) ||
-        %Elixirpb.PbExtension{}
+        %Elixirpb.FileOptions{}
 
     %__MODULE__{
       ctx

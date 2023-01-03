@@ -3,6 +3,8 @@ defmodule Protobuf.ExtensionTest do
 
   alias TestMsg.Ext
 
+  doctest Protobuf.Extension
+
   test "extension persistent works" do
     assert Ext.PbExtension == :persistent_term.get({Protobuf.Extension, Ext.Foo1, 1047})
     assert Ext.PbExtension == :persistent_term.get({Protobuf.Extension, Ext.Foo1, 1048})

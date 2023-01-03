@@ -282,7 +282,25 @@ defmodule Protobuf do
   """
   @spec load_extensions() :: :ok
   def load_extensions() do
-    Protobuf.Extension.__cal_extensions__()
+    for mod <- get_all_modules(),
+        String.ends_with?(Atom.to_string(mod), ".PbExtension"),
+        Code.ensure_loaded?(mod),
+        function_exported?(mod, :__protobuf_info__, 1),
+        %{extensions: extensions} = mod.__protobuf_info__(:extension_props) do
+      Enum.each(extensions, fn {_, ext} ->
+        fnum = ext.field_props.fnum
+        fnum_key = {Protobuf.Extension, ext.extendee, fnum}
+        :persistent_term.put(fnum_key, mod)
+      end)
+    end
+
     :ok
+  end
+
+  defp get_all_modules do
+    Enum.flat_map(Application.loaded_applications(), fn {app, _desc, _vsn} ->
+      {:ok, modules} = :application.get_key(app, :modules)
+      modules
+    end)
   end
 end

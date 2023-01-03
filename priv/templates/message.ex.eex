@@ -24,6 +24,6 @@ defmodule <%= @module %> do
   <% end %>
 
   <%= if @extensions != [] do %>
-  extensions <%= inspect(@extensions, limit: :infinity) %>
+  extensions [<%= Enum.map_join(@extensions, ", ", fn {start, end_} -> "{#{start}, #{end_}}" end) %>]
   <% end %>
 end
