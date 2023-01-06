@@ -1,10 +1,66 @@
 defmodule Protobuf.DSL do
   @doc """
-  Define a field in the message module.
+  Define a field for the message.
+
+  Corresponds to Protobuf declarations such as:
+
+      string query = 1;
+
+  or more generally
+
+      <type> <name> = <field_number>;
+
+  ## Arguments
+
+    * `name` — must be an atom representing the name of the field.
+    * `field_number` — must be an integer representing the field number.
+    * `options` - a keyword list of options, see below.
+
+  ## Options
+
+    * `:proto3_optional` - boolean representing whether the field is optional with the `proto3`
+      syntax. See [the
+      documentation](https://developers.google.com/protocol-buffers/docs/proto3#oneof)
+
+    * `:type` - atom representing the type of the field.
+
+    * `:repeated` - boolean representing whether the field is repeated.
+
+    * `:optional` - boolean representing whether the field is optional.
+
+    * `:required` - boolean representing whether the field is required.
+
+    * `:enum` - boolean representing whether the field is a possible value of an enum.
+
+    * `:map` - boolean representing whether the field is a part of a map.
+
+    * `:default` - the default value of the field. Must be a valid Elixir term at compile time,
+      that can be encoded with Protobuf and matches with the type of the field.
+
+    * `:packed` - boolean representing whether the field is packed.
+
+    * `:deprecated` - boolean representing whether the field is deprecated.
+
+    * `:json_name` - if present, specifies the name of the field when using the JSON mapping (see
+      `Protobuf.JSON`). If not present, the default mapping will be used.
+
   """
-  defmacro field(name, fnum, options \\ []) do
-    quote do
-      @fields {unquote(name), unquote(fnum), unquote(options)}
+  defmacro field(name, field_number, options \\ []) do
+    quote bind_quoted: [name: name, fnum: field_number, options: options] do
+      if not is_atom(name) do
+        raise ArgumentError, "expected atom as the field name, got: #{inspect(name)}"
+      end
+
+      if not is_integer(fnum) do
+        raise ArgumentError,
+              "expected integer as the field number, got: #{inspect(fnum)}"
+      end
+
+      if not Keyword.keyword?(options) do
+        raise ArgumentError, "expected a keyword list as the options, got: #{inspect(options)}"
+      end
+
+      @fields {name, fnum, options}
     end
   end
 

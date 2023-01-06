@@ -16,6 +16,9 @@ defmodule Protobuf.Protoc.Generator.Extension do
     [:assigns]
   )
 
+  # Returns a tuple of {module_name, module_contents} with all the given extensions.
+  @spec generate_package_level(Context.t(), String.t(), [String.t()]) ::
+          {module_name :: String.t(), contents :: String.t()}
   def generate_package_level(%Context{} = ctx, mod_name, extensions)
       when is_binary(mod_name) and is_list(extensions) do
     use_options =
@@ -82,8 +85,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
     end)
   end
 
-  defp generate_module(%Context{}, _use_options, %mod{extension: []})
-       when mod in [FileDescriptorProto, DescriptorProto] do
+  defp generate_module(%Context{}, _use_options, %DescriptorProto{extension: []}) do
     []
   end
 
