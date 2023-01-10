@@ -336,6 +336,14 @@ defmodule Protobuf.JSON.EncodeTest do
 
       assert encode(message) == %{"optionalFieldMask" => "fooBar,bazBong"}
     end
+
+    test "encodes with a period in the path" do
+      message = %TestAllTypesProto3{
+        optional_field_mask: %Google.Protobuf.FieldMask{paths: ["foo.bar", "foo_bar.baz_bong"]}
+      }
+
+      assert encode(message) == %{"optionalFieldMask" => "foo.bar,fooBar.bazBong"}
+    end
   end
 
   describe "Google.Protobuf.Duration" do
