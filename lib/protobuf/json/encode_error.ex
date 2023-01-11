@@ -36,6 +36,12 @@ defmodule Protobuf.JSON.EncodeError do
     }
   end
 
+  def new({:non_numeric_float, nan}) when nan in [:nan, :infinity, :negative_infinity] do
+    %__MODULE__{
+      message: "cannot encode non-numeric float/double: #{inspect(nan)}"
+    }
+  end
+
   def new({:bad_field_mask, mask}) do
     %__MODULE__{message: "unencodable field mask: #{inspect(mask)}"}
   end

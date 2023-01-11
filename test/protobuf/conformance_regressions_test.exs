@@ -44,6 +44,15 @@ defmodule Protobuf.ConformanceRegressionsTest do
          %{proto_input: proto_input, message_mod: message_mod} do
       assert proto_input |> message_mod.decode() |> message_mod.encode() == proto_input
     end
+
+    @tag conformance_input: ~S(\222\023\t\021\000\000\000\000\000\000\370\177)
+    test "Recommended.Proto3.ValueRejectInfNumberValue.JsonOutput",
+         %{proto_input: proto_input, message_mod: message_mod} do
+      decoded = message_mod.decode(proto_input)
+      assert decoded.optional_value == %Google.Protobuf.Value{kind: {:number_value, :nan}}
+      assert {:error, error} = Protobuf.JSON.to_encodable(decoded)
+      assert Exception.message(error) == "cannot encode non-numeric float/double: :nan"
+    end
   end
 
   describe "proto2" do
