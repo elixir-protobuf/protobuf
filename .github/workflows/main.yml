@@ -119,7 +119,7 @@ jobs:
             echo "CHANGES TO THE CODE SEEM TO CHANGE THE GENERATED .pb.ex FILES."
             echo "MAKE SURE TO RUN THESE TASKS BEFORE MERGING:"
             echo ""
-            echo "  mix do gen_bootstrap_protos, gen_test_protos, gen_bench_protos"
+            echo "  mix do gen_bootstrap_protos, gen_test_protos"
             echo ""
             echo "Run the above commands and `git diff` to verify the changes"
             exit 1
