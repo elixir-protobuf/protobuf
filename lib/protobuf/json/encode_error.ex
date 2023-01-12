@@ -36,6 +36,15 @@ defmodule Protobuf.JSON.EncodeError do
     }
   end
 
+  def new({:non_numeric_float, nan}) when nan in [:nan, :infinity, :negative_infinity] do
+    message = """
+    cannot encode non-numeric float/double for Google.Protobuf.Value: #{inspect(nan)}
+    See https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Value
+    """
+
+    %__MODULE__{message: message}
+  end
+
   def new({:bad_field_mask, mask}) do
     %__MODULE__{message: "unencodable field mask: #{inspect(mask)}"}
   end

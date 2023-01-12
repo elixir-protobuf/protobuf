@@ -287,6 +287,7 @@ defmodule Google.Protobuf.MessageOptions do
   field :no_standard_descriptor_accessor, 2, optional: true, type: :bool, default: false
   field :deprecated, 3, optional: true, type: :bool, default: false
   field :map_entry, 7, optional: true, type: :bool
+  field :deprecated_legacy_json_field_conflicts, 11, optional: true, type: :bool, deprecated: true
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
   extensions [{1000, Protobuf.Extension.max()}]
@@ -315,6 +316,7 @@ defmodule Google.Protobuf.FieldOptions do
   field :unverified_lazy, 15, optional: true, type: :bool, default: false
   field :deprecated, 3, optional: true, type: :bool, default: false
   field :weak, 10, optional: true, type: :bool, default: false
+  field :debug_redact, 16, optional: true, type: :bool, default: false
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
   extensions [{1000, Protobuf.Extension.max()}]
@@ -337,6 +339,7 @@ defmodule Google.Protobuf.EnumOptions do
 
   field :allow_alias, 2, optional: true, type: :bool
   field :deprecated, 3, optional: true, type: :bool, default: false
+  field :deprecated_legacy_json_field_conflicts, 6, optional: true, type: :bool, deprecated: true
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
   extensions [{1000, Protobuf.Extension.max()}]

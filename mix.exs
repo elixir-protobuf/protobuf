@@ -57,7 +57,7 @@ defmodule Protobuf.Mixfile do
       # and make sure it's there for tests without Git submodules or anything like that.
       {:google_protobuf,
        github: "protocolbuffers/protobuf",
-       ref: "1f58f1d7b83ec333ab6076bf2e76797dd8de3e45",
+       ref: "d36a64116f19ce59acf3af49e66cadef4c2fb2df",
        submodules: true,
        app: false,
        compile: false,

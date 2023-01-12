@@ -77,6 +77,14 @@ defmodule Protobuf.JSON.EncodeTest do
 
     message = %Scalars{float: 1.23e3, double: 1.23e-300}
     assert encode(message) == %{"float" => 1230.0, "double" => 1.23e-300}
+
+    # NaN/Infinity/-Infinity
+    message = %Scalars{float: :nan, double: :nan}
+    assert encode(message) == %{"float" => "NaN", "double" => "NaN"}
+    message = %Scalars{float: :infinity, double: :infinity}
+    assert encode(message) == %{"float" => "Infinity", "double" => "Infinity"}
+    message = %Scalars{float: :negative_infinity, double: :negative_infinity}
+    assert encode(message) == %{"float" => "-Infinity", "double" => "-Infinity"}
   end
 
   test "encodes non-numeric floats and doubles" do
@@ -418,6 +426,20 @@ defmodule Protobuf.JSON.EncodeTest do
         value = %Google.Protobuf.Value{kind: kind}
         message = %TestAllTypesProto3{optional_value: value}
         assert encode(message) == %{"optionalValue" => json}
+      end
+    end
+
+    test "returns an error when trying to encode NaN/Infinity/-Infinity" do
+      cases = [
+        {:nan, {:non_numeric_float, :nan}},
+        {:infinity, {:non_numeric_float, :infinity}},
+        {:negative_infinity, {:non_numeric_float, :negative_infinity}}
+      ]
+
+      for {value, expected_error} <- cases do
+        value = %Google.Protobuf.Value{kind: {:number_value, value}}
+        message = %TestAllTypesProto3{optional_value: value}
+        assert catch_throw(encode(message)) == expected_error
       end
     end
   end

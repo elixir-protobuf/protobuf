@@ -73,10 +73,19 @@ defmodule Protobuf.JSON.Encode do
     %{}
   end
 
+  # We can't encode Google.Protobuf.Value as "NaN"/"Infinity"/"-Infinity" when
+  # the value is a number, because then we wouldn't be able to go back to the right
+  # number type. This is documented here:
+  # https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Value
+  # Also see:
+  # https://github.com/protocolbuffers/protobuf/commit/ca1cb1ba80ef18f5dccfb5b6ee7fa623ba6caab5
+  nans = [:nan, :infinity, :negative_infinity]
+
   def encodable(%mod{kind: kind}, opts) when mod == Google.Protobuf.Value do
     case kind do
       {:string_value, string} -> string
-      {:number_value, number} -> number
+      {:number_value, number} when is_number(number) -> number
+      {:number_value, val} when val in unquote(nans) -> throw({:non_numeric_float, val})
       {:bool_value, bool} -> bool
       {:null_value, :NULL_VALUE} -> nil
       {:list_value, list} -> encodable(list, opts)
