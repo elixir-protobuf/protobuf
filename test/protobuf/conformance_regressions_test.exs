@@ -51,7 +51,9 @@ defmodule Protobuf.ConformanceRegressionsTest do
       decoded = message_mod.decode(proto_input)
       assert decoded.optional_value == %Google.Protobuf.Value{kind: {:number_value, :nan}}
       assert {:error, error} = Protobuf.JSON.to_encodable(decoded)
-      assert Exception.message(error) == "cannot encode non-numeric float/double: :nan"
+
+      assert Exception.message(error) =~
+               "cannot encode non-numeric float/double for Google.Protobuf.Value: :nan"
     end
   end
 
