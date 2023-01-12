@@ -204,8 +204,10 @@ defmodule Protobuf.JSON.Decode do
   def from_json_data(data, module) when is_atom(module), do: throw({:bad_message, data, module})
 
   defp convert_field_mask_to_underscore(mask) do
-    if mask =~ ~r/^[a-zA-Z0-9]+$/ do
-      Macro.underscore(mask)
+    if mask =~ ~r/^[a-zA-Z0-9\.]+$/ do
+      String.split(mask, ".")
+      |> Enum.map(&Macro.underscore/1)
+      |> Enum.join(".")
     else
       throw({:bad_field_mask, mask})
     end

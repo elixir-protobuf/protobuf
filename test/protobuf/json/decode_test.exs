@@ -773,6 +773,7 @@ defmodule Protobuf.JSON.DecodeTest do
       cases = [
         {"", []},
         {"helloWorld1", ["hello_world1"]},
+        {"foo.bar,foo.baz2Bong,fooBar.bazBong", ["foo.bar", "foo.baz2_bong", "foo_bar.baz_bong"]},
         {"fooBar,baz2Bong", ["foo_bar", "baz2_bong"]}
       ]
 
