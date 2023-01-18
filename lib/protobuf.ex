@@ -241,9 +241,9 @@ defmodule Protobuf do
 
   In this case, this function will return the decoded unknown field:
 
-    message = User.decode(<<...>>)
-    Protobuf.get_unknown_fields(message)
-    #=> [{_field_number = 1, _wire_type = 3, "user@example.com}]
+      message = User.decode(<<...>>)
+      Protobuf.get_unknown_fields(message)
+      #=> [{_field_number = 1, _wire_type = 3, "user@example.com}]
 
   """
   @doc since: "0.10.0"
