@@ -109,12 +109,10 @@ defmodule Protobuf.Decoder do
         skip_delimited(rest, message, props, groups)
 
       wire_32bits() ->
-        <<_skip::bits-32, rest::bits>> = rest
-        skip_field(rest, message, props, groups)
+        rest |> skip_bits(32) |> skip_field(message, props, groups)
 
       wire_64bits() ->
-        <<_skip::bits-64, rest::bits>> = rest
-        skip_field(rest, message, props, groups)
+        rest |> skip_bits(64) |> skip_field(message, props, groups)
 
       wire_type ->
         message =
@@ -138,6 +136,13 @@ defmodule Protobuf.Decoder do
   defdecoderp skip_delimited(message, props, groups) do
     <<_skip::bytes-size(value), rest::bits>> = rest
     skip_field(rest, message, props, groups)
+  end
+
+  defp skip_bits(binary, length) do
+    case binary do
+      <<_::bits-size(length), rest::bits>> -> rest
+      _ -> raise DecodeError, message: "insufficient data for skipping #{length} bits"
+    end
   end
 
   defdecoderp decode_varint(field_number, message, props) do

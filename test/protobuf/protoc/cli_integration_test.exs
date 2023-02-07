@@ -102,6 +102,23 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
         assert [{Foo.User, docs}] = modules_and_docs
         assert {:docs_v1, _, :elixir, _, :hidden, _, _} = docs
       end
+
+      defp get_docs_and_clean_modules_on_exit(path) do
+        modules_and_docs =
+          path
+          |> Code.compile_file()
+          |> Enum.map(fn {mod, bytecode} ->
+            {mod, fetch_docs_from_bytecode(bytecode)}
+          end)
+
+        on_exit(fn ->
+          modules_and_docs
+          |> Enum.map(fn {mod, _bytecode} -> mod end)
+          |> TestHelpers.purge_modules()
+        end)
+
+        modules_and_docs
+      end
     end
 
     test "package_prefix mypkg", %{tmp_dir: tmp_dir, proto_path: proto_path} do
@@ -322,22 +339,5 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
     end)
 
     modules
-  end
-
-  defp get_docs_and_clean_modules_on_exit(path) do
-    modules_and_docs =
-      path
-      |> Code.compile_file()
-      |> Enum.map(fn {mod, bytecode} ->
-        {mod, fetch_docs_from_bytecode(bytecode)}
-      end)
-
-    on_exit(fn ->
-      modules_and_docs
-      |> Enum.map(fn {mod, _bytecode} -> mod end)
-      |> TestHelpers.purge_modules()
-    end)
-
-    modules_and_docs
   end
 end

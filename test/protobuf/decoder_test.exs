@@ -221,6 +221,13 @@ defmodule Protobuf.DecoderTest do
     end
   end
 
+  # Regression for #339
+  test "raises a nice error in some cases" do
+    assert_raise Protobuf.DecodeError, "insufficient data for skipping 32 bits", fn ->
+      Decoder.decode("{}", TestMsg.Oneof)
+    end
+  end
+
   describe "groups" do
     test "skips all groups and their fields" do
       a = <<8, 42>>
