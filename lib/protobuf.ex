@@ -2,8 +2,10 @@ defmodule Protobuf do
   @moduledoc """
   `protoc` should always be used to generate code instead of writing the code by hand.
 
-  By `use` this module, macros defined in `Protobuf.DSL` will be injected. Most of thee macros
-  are equal to definition in .proto files.
+  ## Usage
+
+  By `use`'ing this module, macros defined in `Protobuf.DSL` will be injected. Most of these
+  macros are equal to definition in `.proto` schemas.
 
       defmodule Foo do
         use Protobuf, syntax: :proto3
@@ -12,13 +14,13 @@ defmodule Protobuf do
         field :b, 2, type: :string
       end
 
-  Your Protobuf message(module) is just a normal Elixir struct. Some useful functions are also injected,
-  see "Callbacks" for details. Examples:
+  Your Protobuf message (module) is just a normal Elixir struct. The default values in the
+  struct match the correct ones for the Protobuf schema definition. You can construct
+  new messages by hand:
 
-      foo1 = Foo.new!(%{a: 1})
-      foo1.b == ""
-      bin = Foo.encode(foo1)
-      foo1 == Foo.decode(bin)
+      foo = %Foo{a: 1}
+      Protobuf.encode(foo)
+      #=> <<...>>
 
   Except functions in "Callbacks", some other functions may be defined:
 
@@ -26,7 +28,16 @@ defmodule Protobuf do
     * `put_extension(struct, extension_mod, field, value)`
     * `get_extension(struct, extension_mod, field, default \\ nil)`
 
+  ## Options
+
+  These are the options that you can pass to `use Protobuf`:
+
+    * `:syntax` - The syntax of the schema. Can be `:proto2` or `:proto3`. Defaults to `:proto2`.
+    * `:enum` - A boolean that tells whether this message is an enum. Defaults to `false`.
+    * `:map` - A boolean that tells whether this message is a map. Defaults to `false`.
+
   """
+
   defmacro __using__(opts) do
     quote location: :keep do
       import Protobuf.DSL, only: [field: 3, field: 2, oneof: 2, extend: 4, extensions: 1]
@@ -132,7 +143,6 @@ defmodule Protobuf do
   Errors may be raised if there's something wrong in the struct.
 
   If you want to encode to iodata instead of to a binary, use `encode_to_iodata/1`.
-
   """
   @callback encode(struct()) :: binary()
 
@@ -153,11 +163,6 @@ defmodule Protobuf do
 
   @doc """
   Decodes the given binary data interpreting it as the Protobuf message `module`.
-
-  It's preferrable to use the message's `c:decode/1` function. For a message `MyMessage`:
-
-      MyMessage.decode(<<...>>)
-      #=> %MyMessage{...}
 
   This function raises an error if anything goes wrong with decoding.
 
