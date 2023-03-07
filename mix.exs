@@ -71,6 +71,7 @@ defmodule Protobuf.Mixfile do
 
   defp package do
     [
+      organization: "fresha",
       maintainers: ["Bing Han", "Andrea Leopardi"],
       licenses: ["MIT"],
       files: ~w(
