@@ -75,7 +75,11 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   defp field(:proto3, %{proto3_optional: true, label: "optional"} = f, opts_str) do
-    ":#{f[:name]}, #{f[:number]}, proto3_optional: true, type: #{f[:type]}#{opts_str}"
+    if f.oneof do
+      ":#{f[:name]}, #{f[:number]}, proto3_optional: true, type: #{f[:type]}#{opts_str}, oneof: #{Integer.to_string(f.oneof)}"
+    else
+      ":#{f[:name]}, #{f[:number]}, proto3_optional: true, type: #{f[:type]}#{opts_str}"
+    end
   end
 
   defp field(syntax, f, opts_str) do
@@ -151,7 +155,8 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   defp get_real_oneofs(oneof_decl) do
     Enum.flat_map(oneof_decl, fn oneof ->
-      if String.starts_with?(oneof.name, "_"), do: [], else: [oneof.name]
+      #if String.starts_with?(oneof.name, "_"), do: [], else: [oneof.name]
+      [oneof.name]
     end)
   end
 

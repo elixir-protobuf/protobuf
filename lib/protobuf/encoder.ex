@@ -46,18 +46,31 @@ defmodule Protobuf.Encoder do
   end
 
   defp encode_fields(
-         [%FieldProps{name_atom: name, oneof: oneof} = prop | rest],
+         [%FieldProps{name_atom: name, oneof: oneof, proto3_optional?: p3o} = prop | rest],
          syntax,
          struct,
          oneofs,
          acc
        ) do
-    val =
-      if oneof do
-        oneofs[name]
-      else
+    val = case {oneof, p3o} do
+      {nil, _} ->
         Map.get(struct, name, nil)
-      end
+
+      {_oneof, false} ->
+        oneofs[name]
+
+      {_oneof, true} ->
+        from_oneof = oneofs[name]
+        from_struct = Map.get(struct, name, nil)
+
+        case {from_oneof, from_struct} do
+          {nil, nil} -> nil
+          {nil, val} -> val
+          {val, nil} -> val
+          {val, val} -> val
+          _ -> raise "proto3 optional must be specified through either legacy or new method, never both"
+        end
+    end
 
     acc =
       case encode_field(class_field(prop), val, syntax, prop) do

@@ -308,6 +308,13 @@ defmodule TestMsg do
     end
   end
 
+  defmodule Proto3OptionalCompat do
+    use Protobuf, syntax: :proto3
+
+    oneof :_a, 0
+    field :a, 1, proto3_optional: true, type: :int32, oneof: 0
+  end
+
   defmodule Ext.EnumFoo do
     @moduledoc false
     use Protobuf, enum: true, syntax: :proto2

@@ -173,12 +173,12 @@ defmodule Protobuf.Decoder do
   defp handle_value(<<rest::bits>>, field_number, wire_type, value, message, props) do
     case props.field_props do
       %{^field_number => %FieldProps{packed?: true, name_atom: name_atom} = prop} ->
-        new_message = update_in_message(message, name_atom, &value_for_packed(value, &1, prop))
+        new_message = update_in_message(message, name_atom, prop, &value_for_packed(value, &1, prop))
         build_message(rest, new_message, props)
 
       %{^field_number => %FieldProps{wire_type: ^wire_type} = prop} ->
         key = field_key(prop, props)
-        new_message = update_in_message(message, key, &value_for_field(value, &1, prop))
+        new_message = update_in_message(message, key, prop, &value_for_field(value, &1, prop))
         build_message(rest, new_message, props)
 
       # Repeated fields of primitive numeric types can be "packed". Their packed? flag will be
@@ -187,7 +187,7 @@ defmodule Protobuf.Decoder do
       # https://developers.google.com/protocol-buffers/docs/encoding#packed
       %{^field_number => %FieldProps{repeated?: true, name_atom: name_atom} = prop}
       when wire_type == wire_delimited() ->
-        new_message = update_in_message(message, name_atom, &value_for_packed(value, &1, prop))
+        new_message = update_in_message(message, name_atom, prop, &value_for_packed(value, &1, prop))
         build_message(rest, new_message, props)
 
       %{^field_number => %FieldProps{wire_type: expected, name: field}} ->
@@ -377,13 +377,25 @@ defmodule Protobuf.Decoder do
     key
   end
 
-  defp update_in_message(message, key, update_fun) do
+  defp update_in_message(message, key, field_props, update_fun) do
     current =
       case message do
         %_{^key => value} -> value
         %_{} -> nil
       end
 
-    Map.put(message, key, update_fun.(current))
+    updated = update_fun.(current)
+
+    message =
+      case field_props do
+        %{proto3_optional?: true, oneof: num, name_atom: name_atom} when is_number(num) ->
+          {^name_atom, value} = updated
+          Map.put(message, name_atom, value)
+
+        _ ->
+          message
+      end
+
+    Map.put(message, key, updated)
   end
 end

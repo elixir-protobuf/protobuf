@@ -454,7 +454,8 @@ defmodule Protobuf.DSL do
 
   defp gen_defstruct(%MessageProps{} = message_props) do
     regular_fields =
-      for {_fnum, %FieldProps{oneof: nil} = prop} <- message_props.field_props,
+      for {_fnum, %FieldProps{oneof: oneof, proto3_optional?: p3o} = prop} <- message_props.field_props,
+          oneof == nil or p3o,
           do: {prop.name_atom, field_default(message_props.syntax, prop)}
 
     oneof_fields =
