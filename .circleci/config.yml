@@ -9,6 +9,15 @@ workflows:
     jobs:
       - elixir-orb/test:
           executor: elixir-orb/elixir
+          pre-steps:
+            - run:
+                name: Install protobuf compiler
+                command: |
+                  archive=protoc-22.0-linux-x86_64
+                  curl -O -L https://github.com/protocolbuffers/protobuf/releases/download/v22.0/$archive.zip
+                  sudo unzip -d '/usr/local' $archive.zip 'bin/*' 'include/*'
+                  sudo chown -R $(whoami) /usr/local/bin/protoc /usr/local/include/google
+                  rm -rf $archive.zip
       - hold-for-dev-publish:
           type: approval
           requires:
