@@ -8,6 +8,7 @@ workflows:
   ci:
     jobs:
       - elixir-orb/test:
+          context: Hex
           executor: elixir-orb/elixir
           pre-steps:
             - run:
