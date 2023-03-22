@@ -51,19 +51,19 @@ defmodule Protobuf do
 
       @behaviour Protobuf
 
-      @deprecated "Build the struct by hand with %MyMessage{...} or use struct/1"
+      #@deprecated "Build the struct by hand with %MyMessage{...} or use struct/1"
       @impl unquote(__MODULE__)
       def new() do
         Protobuf.Builder.new(__MODULE__)
       end
 
-      @deprecated "Build the struct by hand with %MyMessage{...} or use struct/2"
+      #@deprecated "Build the struct by hand with %MyMessage{...} or use struct/2"
       @impl unquote(__MODULE__)
       def new(attrs) do
         Protobuf.Builder.new(__MODULE__, attrs)
       end
 
-      @deprecated "Build the struct by hand with %MyMessage{...} or use struct!/2"
+      #@deprecated "Build the struct by hand with %MyMessage{...} or use struct!/2"
       @impl unquote(__MODULE__)
       def new!(attrs) do
         Protobuf.Builder.new!(__MODULE__, attrs)
@@ -261,11 +261,17 @@ defmodule Protobuf do
     unknown_fields
   end
 
-  def get_unknown_fields(%mod{}) do
-    raise ArgumentError,
-          "can't retrieve unknown fields for struct #{inspect(mod)}, which " <>
-            "likely means that its definition was not compiled with :protobuf 0.10.0+, which is the " <>
-            "version that introduced implicit struct generation"
+  if Protobuf.Compat.is_compat?() do
+    def get_unknown_fields(%mod{}) do
+      []
+    end
+  else
+    def get_unknown_fields(%mod{}) do
+      raise ArgumentError,
+            "can't retrieve unknown fields for struct #{inspect(mod)}, which " <>
+              "likely means that its definition was not compiled with :protobuf 0.10.0+, which is the " <>
+              "version that introduced implicit struct generation"
+    end
   end
 
   @doc """

@@ -471,7 +471,13 @@ defmodule Protobuf.DSL do
 
     unknown_fields = {:__unknown_fields__, _default = []}
 
-    struct_fields = regular_fields ++ oneof_fields ++ extension_fields ++ [unknown_fields]
+    struct_fields = regular_fields ++ oneof_fields ++ extension_fields
+
+    struct_fields = if Protobuf.Compat.is_compat?() do
+      struct_fields
+    else
+      struct_fields ++ [unknown_fields]
+    end
 
     quote do
       defstruct unquote(Macro.escape(struct_fields))

@@ -16,8 +16,18 @@ defmodule Protobuf.Decoder do
     bin
     |> build_message(struct(module), props)
     |> reverse_repeated(repeated_fields)
-    |> Map.update!(:__unknown_fields__, &Enum.reverse/1)
+    |> reverse_unknown_fields()
     |> transform_module(module)
+  end
+
+  if Protobuf.Compat.is_compat?() do
+    defp reverse_unknown_fields(message) do
+      message
+    end
+  else
+    defp reverse_unknown_fields(message) do
+      Map.update!(message, :__unknown_fields__, &Enum.reverse/1)
+    end
   end
 
   defp transform_module(message, module) do
@@ -195,7 +205,7 @@ defmodule Protobuf.Decoder do
           message: "wrong wire_type for field #{field}: got #{wire_type}, expected #{expected}"
 
       %{} ->
-        %mod{__unknown_fields__: unknown_fields} = message
+        %mod{} = message
 
         new_message =
           case Protobuf.Extension.get_extension_props_by_tag(mod, field_number) do
@@ -207,8 +217,13 @@ defmodule Protobuf.Decoder do
             # Unknown field (the list is reversed after decoding the whole message so that the
             # order of the unknown fields is kept)
             _ ->
-              new_field = {field_number, wire_type, value}
-              %{message | __unknown_fields__: [new_field | unknown_fields]}
+              if Protobuf.Compat.is_compat?() do
+                message
+              else
+                %{__unknown_fields__: unknown_fields} = message
+                new_field = {field_number, wire_type, value}
+                %{message | __unknown_fields__: [new_field | unknown_fields]}
+              end
           end
 
         build_message(rest, new_message, props)

@@ -162,10 +162,16 @@ defmodule Protobuf.Encoder do
     end
   end
 
-  defp encode_unknown_fields(%_{__unknown_fields__: unknown_fields} = _message) do
-    Enum.map(unknown_fields, fn {fnum, wire_type, value} ->
-      [encode_fnum(fnum, wire_type), Wire.encode_from_wire_type(wire_type, value)]
-    end)
+  if Protobuf.Compat.is_compat?() do
+    defp encode_unknown_fields(%_{} = _message) do
+      []
+    end
+  else
+    defp encode_unknown_fields(%_{__unknown_fields__: unknown_fields} = _message) do
+      Enum.map(unknown_fields, fn {fnum, wire_type, value} ->
+        [encode_fnum(fnum, wire_type), Wire.encode_from_wire_type(wire_type, value)]
+      end)
+    end
   end
 
   defp transform_module(message, module) do

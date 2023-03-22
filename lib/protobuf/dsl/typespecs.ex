@@ -45,7 +45,13 @@ defmodule Protobuf.DSL.Typespecs do
        )}
     ]
 
-    field_specs = regular_fields ++ oneof_fields ++ extension_fields ++ unknown_fields
+    field_specs = regular_fields ++ oneof_fields ++ extension_fields
+
+    field_specs = if Protobuf.Compat.is_compat?() do
+      field_specs
+    else
+      field_specs ++ unknown_fields
+    end
 
     quote do: %__MODULE__{unquote_splicing(field_specs)}
   end
