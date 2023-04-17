@@ -47,7 +47,7 @@ defmodule Protobuf.Mixfile do
       {:stream_data, "~> 0.5.0", only: [:dev, :test]},
       {:excoveralls, "~> 0.14.4", only: :test},
       {:google_protobuf,
-       github: "protocolbuffers/protobuf",
+       git: "git@github.com:elixir-protobuf/protobuf.git",
        tag: "v3.19.1",
        app: false,
        compile: false,
