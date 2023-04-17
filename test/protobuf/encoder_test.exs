@@ -254,6 +254,12 @@ defmodule Protobuf.EncoderTest do
                255, 1, 202, 62, 3, 102, 111, 111>>
   end
 
+  test "raises on invalid UTF-8" do
+    assert_raise Protobuf.EncodeError, fn ->
+      Encoder.encode(%TestMsg.Scalars{string: <<255>>})
+    end
+  end
+
   test "encodes with transformer module" do
     msg = %TestMsg.ContainsTransformModule{field: 0}
     assert Encoder.encode(msg) == <<10, 0>>

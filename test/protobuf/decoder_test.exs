@@ -198,6 +198,12 @@ defmodule Protobuf.DecoderTest do
              %TestMsg.Oneof{first: {:b, ""}, second: {:c, 0}}
   end
 
+  test "raises on invalid UTF-8" do
+    assert_raise Protobuf.DecodeError, fn ->
+      Decoder.decode(<<10, 1, 255>>, TestMsg.Scalars)
+    end
+  end
+
   test "decodes with transformer module" do
     assert TestMsg.WithTransformModule.decode(<<8, 42>>) == 42
 
