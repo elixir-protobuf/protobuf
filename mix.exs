@@ -40,7 +40,7 @@ defmodule Protobuf.Mixfile do
 
   defp deps do
     [
-      {:jason, "1.2.0", optional: true},
+      {:jason,  git: "git@github.com:tclugao/jason.git", branch: "lugao_v1",  override: true},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
