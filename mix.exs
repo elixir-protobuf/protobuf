@@ -40,7 +40,7 @@ defmodule Protobuf.Mixfile do
 
   defp deps do
     [
-      {:jason, "~> 1.2", optional: true},
+      {:jason, "1.2.0", optional: true},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
