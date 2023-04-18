@@ -71,7 +71,16 @@ defmodule Protobuf.Wire do
   @spec encode(proto_type(), proto_value()) :: iodata()
   def encode(type, value)
 
-  def encode(type, binary) when is_binary(binary) and type in [:string, :bytes],
+  def encode(:string, binary) when is_binary(binary) do
+    unless String.valid?(binary) do
+      raise Protobuf.EncodeError,
+        message: "invalid UTF-8 data for type string: #{inspect(binary)}"
+    end
+
+    encode_from_wire_type(wire_delimited(), binary)
+  end
+
+  def encode(:bytes, binary) when is_binary(binary),
     do: encode_from_wire_type(wire_delimited(), binary)
 
   def encode(:int32, n) when n in @sint32_range, do: encode_from_wire_type(wire_varint(), n)
@@ -133,7 +142,16 @@ defmodule Protobuf.Wire do
   @spec decode(proto_type(), binary() | integer()) :: proto_value()
   def decode(type, value)
 
-  def decode(type, val) when type in [:string, :bytes], do: val
+  def decode(:string, binary) when is_binary(binary) do
+    unless String.valid?(binary) do
+      raise Protobuf.DecodeError,
+        message: "invalid UTF-8 data for type string: #{inspect(binary)}"
+    end
+
+    binary
+  end
+
+  def decode(:bytes, binary) when is_binary(binary), do: binary
 
   def decode(:int32, val) do
     <<n::signed-integer-32>> = <<val::32>>

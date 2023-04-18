@@ -99,6 +99,8 @@ defmodule Protobuf.WireTest do
 
     test "string" do
       assert encode(:string, "testing") == <<7, 116, 101, 115, 116, 105, 110, 103>>
+
+      assert_raise Protobuf.EncodeError, fn -> encode(:string, <<255>>) end
     end
 
     test "bytes" do
@@ -340,6 +342,8 @@ defmodule Protobuf.WireTest do
 
     test "string" do
       assert "testing" == Wire.decode(:string, <<116, 101, 115, 116, 105, 110, 103>>)
+
+      assert_raise Protobuf.DecodeError, fn -> Wire.decode(:string, <<255>>) end
     end
 
     test "bytes" do
