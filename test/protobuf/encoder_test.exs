@@ -255,7 +255,10 @@ defmodule Protobuf.EncoderTest do
   end
 
   test "raises on invalid UTF-8" do
-    message = "Got error when encoding TestMsg.Scalars#string: " <> "** (Protobuf.EncodeError) invalid UTF-8 data for type string: <<255>>"
+    message =
+      "Got error when encoding TestMsg.Scalars#string: " <>
+        "** (Protobuf.EncodeError) invalid UTF-8 data for type string: <<255>>"
+
     assert_raise Protobuf.EncodeError, message, fn ->
       Encoder.encode(%TestMsg.Scalars{string: <<255>>})
     end
