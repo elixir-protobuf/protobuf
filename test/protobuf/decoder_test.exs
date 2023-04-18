@@ -199,7 +199,7 @@ defmodule Protobuf.DecoderTest do
   end
 
   test "raises on invalid UTF-8" do
-    assert_raise Protobuf.DecodeError, fn ->
+    assert_raise Protobuf.DecodeError, "invalid UTF-8 data for type string: <<255>>", fn ->
       Decoder.decode(<<10, 1, 255>>, TestMsg.Scalars)
     end
   end
