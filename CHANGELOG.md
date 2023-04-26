@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.12.0
+
+### Enhancements
+
+  * Add `include_docs=true` protoc option to skip generating files with
+    `@moduledoc false`.
+  * Add support for the `google.protobuf.Any` type.
+  * Raise `Protobuf.EncodeError` instead of `Protobuf.TypeEncodeError` on
+    encode errors.
+  * Improve raised error for bad wire types.
+  * Raise when encoding/decoding invalid UTF-8 strings.
+
+### Bug fixes
+
+  * Fix typespecs for proto3 optional fields.
+  * Fix generated code for map fields outside of packages.
+  * Fix JSON encoding map validation.
+  * Remove `Protobuf.Wire.Varint` from public API.
+  * Fix conflicting PbExtension modules.
+  * Raise when trying to JSON encode `google.protobuf.Value`
+    values `NaN` or `Infinity`.
+  * Support `.` in FieldMask when decoding JSON.
+
+### Deprecations
+
+  * Deprecate the `new(!)/0,1` callbacks, create structs with `%Foo{}`
+    or `struct(!)/1,2` instead.
+
 ## v0.11.0
 
 ### Enhancements

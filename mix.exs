@@ -2,7 +2,7 @@ defmodule Protobuf.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/elixir-protobuf/protobuf"
-  @version "0.11.0"
+  @version "0.12.0"
   @description "A pure Elixir implementation of Google Protobuf."
 
   def project do
