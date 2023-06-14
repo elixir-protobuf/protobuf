@@ -2,6 +2,7 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
   use ExUnit.Case, async: true
 
   alias Protobuf.Protoc.Context
+  alias Protobuf.Protoc.Generator.Comment
   alias Protobuf.Protoc.Generator.Service, as: Generator
   alias Protobuf.Protoc.Generator.Util
 
@@ -64,13 +65,21 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
   end
 
   describe "generate/2 include_docs" do
-    test "does not include `@moduledoc false` when flag is true" do
-      ctx = %Context{include_docs?: true}
+    test "includes service comment for `@moduledoc` when flag is true" do
+      ctx = %Context{
+        comments: [%Comment{leading: "testing comment", path: []}],
+        include_docs?: true
+      }
+
       desc = %Google.Protobuf.ServiceDescriptorProto{name: "ServiceFoo"}
 
       {_module, msg} = Generator.generate(ctx, desc)
 
-      refute msg =~ "@moduledoc"
+      assert msg =~ """
+               @moduledoc \"\"\"
+               testing comment
+               \"\"\"
+             """
     end
 
     test "includes `@moduledoc false` by default" do

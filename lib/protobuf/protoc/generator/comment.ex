@@ -1,19 +1,17 @@
 defmodule Protobuf.Protoc.Generator.Comment do
   @moduledoc false
 
-  defstruct [
-    detached: [],
-    leading: nil,
-    path: [],
-    trailing: nil
-  ]
+  defstruct detached: [],
+            leading: nil,
+            path: [],
+            trailing: nil
 
   @type t :: %__MODULE__{
-    detached: [String.t()],
-    leading: String.t(),
-    path: [any()],
-    trailing: String.t()
-  }
+          detached: [String.t()],
+          leading: String.t(),
+          path: [any()],
+          trailing: String.t()
+        }
 
   @doc """
   Parses comment information from `Google.Protobuf.FileDescriptorProto`.
@@ -23,7 +21,8 @@ defmodule Protobuf.Protoc.Generator.Comment do
     file_descriptor_proto
     |> get_locations()
     |> Enum.reject(fn location ->
-      location.leading_comments == "" and location.trailing_comments == "" and Enum.empty?(location.leading_detached_comments)
+      location.leading_comments == "" and location.trailing_comments == "" and
+        Enum.empty?(location.leading_detached_comments)
     end)
     |> Enum.map(fn location ->
       %__MODULE__{

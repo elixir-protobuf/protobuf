@@ -58,7 +58,14 @@ defmodule Protobuf.Protoc.Generator do
 
     service_defmodules =
       if "grpc" in ctx.plugins do
-        Enum.map(desc.service, &Generator.Service.generate(ctx, &1))
+        desc.service
+        |> Enum.with_index()
+        |> Enum.map(fn {service, index} ->
+          Generator.Service.generate(
+            %{ctx | current_comment_path: ctx.current_comment_path ++ [6, index]},
+            service
+          )
+        end)
       else
         []
       end

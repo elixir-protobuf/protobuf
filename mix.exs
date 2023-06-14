@@ -160,7 +160,7 @@ defmodule Protobuf.Mixfile do
     proto_src = path_in_protobuf_source(["src"])
 
     protoc!(
-      "-I #{proto_src} -I src -I test/protobuf/protoc/proto",
+      "-I #{proto_src} -I src -I test/protobuf/protoc/proto --elixir_opt=include_docs=true",
       "./generated",
       ["test/protobuf/protoc/proto/extension.proto"]
     )
@@ -179,7 +179,7 @@ defmodule Protobuf.Mixfile do
     )
 
     protoc!(
-      "-I test/protobuf/protoc/proto",
+      "-I test/protobuf/protoc/proto --elixir_opt=include_docs=true",
       "./generated",
       ["test/protobuf/protoc/proto/no_package.proto"]
     )

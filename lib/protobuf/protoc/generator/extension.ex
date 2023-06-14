@@ -29,7 +29,12 @@ defmodule Protobuf.Protoc.Generator.Extension do
 
     module_contents =
       Util.format(
-        extension_template(comment: "", use_options: use_options, module: mod_name, extends: extensions)
+        extension_template(
+          comment: "",
+          use_options: use_options,
+          module: mod_name,
+          extends: extensions
+        )
       )
 
     {mod_name, module_contents}
