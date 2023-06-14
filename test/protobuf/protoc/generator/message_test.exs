@@ -2,7 +2,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   use ExUnit.Case, async: true
 
   alias Protobuf.Protoc.Context
-  alias Protobuf.Protoc.Generator.Comment
   alias Protobuf.Protoc.Generator.Message, as: Generator
   alias Protobuf.Protoc.Generator.Util
   alias Protobuf.TestHelpers
@@ -823,24 +822,20 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
 
   describe "generate/2 include_docs" do
     test "includes message comment for `@moduledoc` when flag is true" do
-      ctx = %Context{
-        comments: [%Comment{leading: "testing comment", path: []}],
-        include_docs?: true
-      }
+      test_pb = TestHelpers.read_generated_file("test.pb.ex")
 
-      desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
-
-      {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-
-      assert msg =~ """
+      assert test_pb =~ """
+             defmodule My.Test.Request do
                @moduledoc \"\"\"
-               testing comment
+               This is a message that might be sent somewhere.
+
+               Here is another line for a documentation example.
                \"\"\"
              """
     end
 
     test "includes `@moduledoc false` by default" do
-      ctx = %Context{}
+      ctx = %Context{include_docs?: false}
       desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
 
       {[], [{_mod, msg}]} = Generator.generate(ctx, desc)

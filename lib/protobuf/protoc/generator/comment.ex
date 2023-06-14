@@ -1,73 +1,58 @@
 defmodule Protobuf.Protoc.Generator.Comment do
   @moduledoc false
 
-  defstruct detached: [],
-            leading: nil,
-            path: [],
-            trailing: nil
-
-  @type t :: %__MODULE__{
-          detached: [String.t()],
-          leading: String.t(),
-          path: [any()],
-          trailing: String.t()
-        }
+  alias Protobuf.Protoc.Context
 
   @doc """
-  Parses comment information from `Google.Protobuf.FileDescriptorProto`.
+  Parses comment information from `Google.Protobuf.FileDescriptorProto`
+  into a map with path keys.
   """
-  @spec parse(Google.Protobuf.FileDescriptorProto.t()) :: [t()]
+  @spec parse(Google.Protobuf.FileDescriptorProto.t()) :: %{optional(String.t()) => String.t()}
   def parse(file_descriptor_proto) do
     file_descriptor_proto
     |> get_locations()
-    |> Enum.reject(fn location ->
-      location.leading_comments == "" and location.trailing_comments == "" and
-        Enum.empty?(location.leading_detached_comments)
-    end)
-    |> Enum.map(fn location ->
-      %__MODULE__{
-        detached: Enum.map(location.leading_detached_comments, &parse_detached/1),
-        leading: Map.get(location, :leading_comments, ""),
-        path: Map.get(location, :path, []),
-        trailing: Map.get(location, :trailing_comments, "")
-      }
+    |> Enum.reject(&empty_comment?/1)
+    |> Map.new(fn location ->
+      {Enum.join(location.path, "."), format_comment(location)}
     end)
   end
 
-  defp get_locations(file_descriptor_proto) do
-    cond do
-      Map.get(file_descriptor_proto, :source_code_info) == nil ->
-        []
+  defp get_locations(%{source_code_info: %{location: value}}) when is_list(value),
+    do: value
 
-      Map.get(file_descriptor_proto.source_code_info, :location) == nil ->
-        []
+  defp get_locations(_value), do: []
 
-      true ->
-        file_descriptor_proto.source_code_info.location
-    end
-  end
+  defp empty_comment?(%{leading_comments: value}) when not is_nil(value) and value != "",
+    do: false
 
-  defp parse_detached(str) do
-    str
-    |> String.replace("\n ", "\n")
+  defp empty_comment?(%{trailing_comments: value}) when not is_nil(value) and value != "",
+    do: false
+
+  defp empty_comment?(%{leading_detached_comments: value}), do: Enum.empty?(value)
+
+  defp format_comment(location) do
+    [location.leading_comments, location.trailing_comments | location.leading_detached_comments]
+    |> Enum.reject(&is_nil/1)
+    |> Enum.map(&String.replace(&1, ~r/^\s*\*/, "", global: true))
+    |> Enum.join("\n\n")
+    |> String.replace(~r/\n{3,}/, "\n")
     |> String.trim()
   end
 
   @doc """
-  Finds a comment via the path. Pretty formats the text for
-  immediate use.
+  Finds a comment via the context. Returns an empty string if the
+  comment is not found or if `include_docs?` is set to false.
   """
-  def get(comments, path) do
-    case Enum.find(comments, fn comment -> comment.path == path end) do
-      nil -> ""
-      comment -> pretty_text(comment)
-    end
-  end
+  @spec get(Context.t()) :: String.t()
+  def get(%{include_docs?: false}), do: ""
 
-  defp pretty_text(comment) do
-    [comment.leading, comment.trailing | comment.detached]
-    |> Enum.reject(&is_nil/1)
-    |> Enum.join("\n\n")
-    |> String.trim()
-  end
+  def get(%{comments: comments, current_comment_path: path}),
+    do: get(comments, path)
+
+  @doc """
+  Finds a comment via a map of comments and a path. Returns an
+  empty string if the comment is not found
+  """
+  @spec get(%{optional(String.t()) => String.t()}, String.t()) :: String.t()
+  def get(comments, path), do: Map.get(comments, path, "")
 end

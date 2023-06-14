@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+// This package holds interesting messages.
+package test;  // dotted package name
+
+import "test.proto";
+
+// An example test service that has
+// a test method. It expects a Request
+// and returns a Reply.
+service TestService {
+  rpc test (Request) returns (Reply);
+}

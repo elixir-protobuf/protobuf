@@ -2,6 +2,7 @@ defmodule Protobuf.Protoc.Generator.Service do
   @moduledoc false
 
   alias Protobuf.Protoc.Context
+  alias Protobuf.Protoc.Generator.Comment
   alias Protobuf.Protoc.Generator.Util
 
   require EEx
@@ -28,17 +29,10 @@ defmodule Protobuf.Protoc.Generator.Service do
         nil
       end
 
-    comment =
-      if ctx.include_docs? do
-        Protobuf.Protoc.Generator.Comment.get(ctx.comments, ctx.current_comment_path)
-      else
-        ""
-      end
-
     {mod_name,
      Util.format(
        service_template(
-         comment: comment,
+         comment: Comment.get(ctx),
          module: mod_name,
          service_name: name,
          package: ctx.package,

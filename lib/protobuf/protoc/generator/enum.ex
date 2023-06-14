@@ -2,6 +2,7 @@ defmodule Protobuf.Protoc.Generator.Enum do
   @moduledoc false
 
   alias Protobuf.Protoc.Context
+  alias Protobuf.Protoc.Generator.Comment
   alias Protobuf.Protoc.Generator.Util
 
   require EEx
@@ -32,16 +33,9 @@ defmodule Protobuf.Protoc.Generator.Enum do
         nil
       end
 
-    comment =
-      if ctx.include_docs? do
-        Protobuf.Protoc.Generator.Comment.get(ctx.comments, ctx.current_comment_path)
-      else
-        ""
-      end
-
     content =
       enum_template(
-        comment: comment,
+        comment: Comment.get(ctx),
         module: msg_name,
         use_options: use_options,
         fields: desc.value,

@@ -8,6 +8,8 @@ defmodule Protobuf.Protoc.Generator do
   @spec generate(Context.t(), %Google.Protobuf.FileDescriptorProto{}) ::
           {term(), [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()]}
   def generate(%Context{} = ctx, %Google.Protobuf.FileDescriptorProto{} = desc) do
+    # File.write!("file_descriptor.ex", inspect(desc, limit: :infinity, pretty: true, printable_limit: :infinity))
+
     {package_level_extensions, module_definitions} = generate_module_definitions(ctx, desc)
 
     files =
@@ -43,11 +45,13 @@ defmodule Protobuf.Protoc.Generator do
       }
       |> Protobuf.Protoc.Context.custom_file_options_from_file_desc(desc)
 
+    # File.write!("context.ex", inspect(ctx, limit: :infinity, pretty: true, printable_limit: :infinity))
+
     enum_defmodules =
       desc.enum_type
       |> Enum.with_index()
       |> Enum.map(fn {enum, index} ->
-        {%{ctx | current_comment_path: ctx.current_comment_path ++ [5, index]}, enum}
+        {Context.append_comment_path(ctx, "5.#{index}"), enum}
       end)
       |> Enum.map(fn {ctx, enum} -> Generator.Enum.generate(ctx, enum) end)
 
@@ -62,7 +66,7 @@ defmodule Protobuf.Protoc.Generator do
         |> Enum.with_index()
         |> Enum.map(fn {service, index} ->
           Generator.Service.generate(
-            %{ctx | current_comment_path: ctx.current_comment_path ++ [6, index]},
+            Context.append_comment_path(ctx, "6.#{index}"),
             service
           )
         end)

@@ -3,6 +3,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
 
   alias Google.Protobuf.{DescriptorProto, FieldDescriptorProto, FileDescriptorProto}
   alias Protobuf.Protoc.Context
+  alias Protobuf.Protoc.Generator.Comment
   alias Protobuf.Protoc.Generator.Util
 
   require EEx
@@ -30,7 +31,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
     module_contents =
       Util.format(
         extension_template(
-          comment: "",
+          comment: Comment.get(ctx),
           use_options: use_options,
           module: mod_name,
           extends: extensions
@@ -80,10 +81,15 @@ defmodule Protobuf.Protoc.Generator.Extension do
   end
 
   defp get_extensions_from_messages(%Context{} = ctx, use_options, descs) do
-    Enum.flat_map(descs, fn %DescriptorProto{} = desc ->
-      generate_module(ctx, use_options, desc) ++
+    descs
+    |> Enum.with_index()
+    |> Enum.flat_map(fn {desc, index} ->
+      generate_module(Context.append_comment_path(ctx, "7.#{index}"), use_options, desc) ++
         get_extensions_from_messages(
-          %Context{ctx | namespace: ctx.namespace ++ [Macro.camelize(desc.name)]},
+          %Context{
+            Context.append_comment_path(ctx, "6.#{index}")
+            | namespace: ctx.namespace ++ [Macro.camelize(desc.name)]
+          },
           use_options,
           desc.nested_type
         )
@@ -101,7 +107,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
     module_contents =
       Util.format(
         extension_template(
-          comment: "",
+          comment: Comment.get(ctx),
           module: module_name,
           use_options: use_options,
           extends: Enum.map(desc.extension, &generate_extend_dsl(ctx, &1, _ns = ""))

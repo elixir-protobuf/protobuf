@@ -49,6 +49,7 @@ defmodule Protobuf.Mixfile do
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:grpc, "~> 0.6", only: :test},
       {:stream_data, "~> 0.5.0", only: [:dev, :test]},
       {:excoveralls, "~> 0.14.4", only: :test},
 
@@ -166,9 +167,9 @@ defmodule Protobuf.Mixfile do
     )
 
     protoc!(
-      "-I test/protobuf/protoc/proto --elixir_opt=package_prefix=my,include_docs=true",
+      "-I test/protobuf/protoc/proto --elixir_opt=package_prefix=my,include_docs=true,plugins=grpc",
       "./generated",
-      ["test/protobuf/protoc/proto/test.proto"]
+      ["test/protobuf/protoc/proto/test.proto", "test/protobuf/protoc/proto/service.proto"]
     )
 
     protoc!(

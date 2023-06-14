@@ -4,6 +4,7 @@ defmodule Protobuf.Protoc.Generator.Message do
   alias Google.Protobuf.{DescriptorProto, FieldDescriptorProto}
 
   alias Protobuf.Protoc.Context
+  alias Protobuf.Protoc.Generator.Comment
   alias Protobuf.Protoc.Generator.Util
   alias Protobuf.Protoc.Generator.Enum, as: EnumGenerator
 
@@ -23,7 +24,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     descs
     |> Enum.with_index()
     |> Enum.map(fn {desc, index} ->
-      generate(%{ctx | current_comment_path: ctx.current_comment_path ++ [4, index]}, desc)
+      generate(Context.append_comment_path(ctx, "4.#{index}"), desc)
     end)
     |> Enum.unzip()
   end
@@ -45,18 +46,11 @@ defmodule Protobuf.Protoc.Generator.Message do
     ctx = %Context{ctx | namespace: new_ns}
     {nested_enums, nested_msgs} = Enum.unzip(gen_nested_msgs(ctx, desc))
 
-    comment =
-      if ctx.include_docs? do
-        Protobuf.Protoc.Generator.Comment.get(ctx.comments, ctx.current_comment_path)
-      else
-        ""
-      end
-
     msg =
       {msg_name,
        Util.format(
          message_template(
-           comment: comment,
+           comment: Comment.get(ctx),
            module: msg_name,
            use_options: msg_opts_str(ctx, desc.options),
            oneofs: desc.oneof_decl,
@@ -75,7 +69,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     desc.nested_type
     |> Enum.with_index()
     |> Enum.map(fn {msg_desc, index} ->
-      generate(%{ctx | current_comment_path: ctx.current_comment_path ++ [3, index]}, msg_desc)
+      generate(Context.append_comment_path(ctx, "3.#{index}"), msg_desc)
     end)
   end
 
@@ -83,10 +77,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     desc.enum_type
     |> Enum.with_index()
     |> Enum.map(fn {enum_desc, index} ->
-      EnumGenerator.generate(
-        %{ctx | current_comment_path: ctx.current_comment_path ++ [4, index]},
-        enum_desc
-      )
+      EnumGenerator.generate(Context.append_comment_path(ctx, "4.#{index}"), enum_desc)
     end)
   end
 
@@ -128,7 +119,7 @@ defmodule Protobuf.Protoc.Generator.Message do
 
     for {field, index} <- Enum.with_index(desc.field) do
       get_field(
-        %{ctx | current_comment_path: ctx.current_comment_path ++ [2, index]},
+        Context.append_comment_path(ctx, "2.#{index}"),
         field,
         nested_maps,
         oneofs
@@ -165,16 +156,9 @@ defmodule Protobuf.Protoc.Generator.Message do
 
     type = field_type_name(ctx, field_desc)
 
-    comment =
-      if ctx.include_docs? do
-        Protobuf.Protoc.Generator.Comment.get(ctx.comments, ctx.current_comment_path)
-      else
-        ""
-      end
-
     %{
       name: field_desc.name,
-      comment: comment,
+      comment: Comment.get(ctx),
       number: field_desc.number,
       label: label_name(field_desc.label),
       type: type,
