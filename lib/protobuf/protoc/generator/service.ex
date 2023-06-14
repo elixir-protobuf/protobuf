@@ -31,6 +31,7 @@ defmodule Protobuf.Protoc.Generator.Service do
     {mod_name,
      Util.format(
        service_template(
+         comment: "",
          module: mod_name,
          service_name: name,
          package: ctx.package,

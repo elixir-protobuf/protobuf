@@ -32,13 +32,20 @@ defmodule Protobuf.Protoc.Generator.Enum do
         nil
       end
 
+    comment =
+      if ctx.include_docs? do
+        Protobuf.Protoc.Generator.Comment.get(ctx.comments, ctx.current_comment_path)
+      else
+        ""
+      end
+
     content =
       enum_template(
+        comment: comment,
         module: msg_name,
         use_options: use_options,
         fields: desc.value,
-        descriptor_fun_body: descriptor_fun_body,
-        module_doc?: ctx.include_docs?
+        descriptor_fun_body: descriptor_fun_body
       )
 
     {msg_name, Util.format(content)}

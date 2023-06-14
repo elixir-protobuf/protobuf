@@ -29,7 +29,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
 
     module_contents =
       Util.format(
-        extension_template(use_options: use_options, module: mod_name, extends: extensions)
+        extension_template(comment: "", use_options: use_options, module: mod_name, extends: extensions)
       )
 
     {mod_name, module_contents}
@@ -96,6 +96,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
     module_contents =
       Util.format(
         extension_template(
+          comment: "",
           module: module_name,
           use_options: use_options,
           extends: Enum.map(desc.extension, &generate_extend_dsl(ctx, &1, _ns = ""))

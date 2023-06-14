@@ -36,13 +36,20 @@ defmodule Protobuf.Protoc.Generator do
     ctx =
       %Context{
         ctx
-        | syntax: syntax(desc.syntax),
+        | comments: Protobuf.Protoc.Generator.Comment.parse(desc),
+          syntax: syntax(desc.syntax),
           package: desc.package,
           dep_type_mapping: get_dep_type_mapping(ctx, desc.dependency, desc.name)
       }
       |> Protobuf.Protoc.Context.custom_file_options_from_file_desc(desc)
 
-    enum_defmodules = Enum.map(desc.enum_type, &Generator.Enum.generate(ctx, &1))
+    enum_defmodules =
+      desc.enum_type
+      |> Enum.with_index()
+      |> Enum.map(fn {enum, index} ->
+        {%{ctx | current_comment_path: ctx.current_comment_path ++ [5, index]}, enum}
+      end)
+      |> Enum.map(fn {ctx, enum} -> Generator.Enum.generate(ctx, enum) end)
 
     {nested_enum_defmodules, message_defmodules} =
       Generator.Message.generate_list(ctx, desc.message_type)

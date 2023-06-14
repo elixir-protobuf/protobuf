@@ -21,7 +21,10 @@ defmodule Protobuf.Protoc.Generator.Message do
            messages :: [{mod_name :: String.t(), contents :: String.t()}]}
   def generate_list(%Context{} = ctx, descs) when is_list(descs) do
     descs
-    |> Enum.map(fn desc -> generate(ctx, desc) end)
+    |> Enum.with_index()
+    |> Enum.map(fn {desc, index} ->
+      generate(%{ctx | current_comment_path: ctx.current_comment_path ++ [4, index]}, desc)
+    end)
     |> Enum.unzip()
   end
 
@@ -42,10 +45,18 @@ defmodule Protobuf.Protoc.Generator.Message do
     ctx = %Context{ctx | namespace: new_ns}
     {nested_enums, nested_msgs} = Enum.unzip(gen_nested_msgs(ctx, desc))
 
+    comment =
+      if ctx.include_docs? do
+        Protobuf.Protoc.Generator.Comment.get(ctx.comments, ctx.current_comment_path)
+      else
+        ""
+      end
+
     msg =
       {msg_name,
        Util.format(
          message_template(
+           comment: comment,
            module: msg_name,
            use_options: msg_opts_str(ctx, desc.options),
            oneofs: desc.oneof_decl,

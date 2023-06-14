@@ -1,5 +1,12 @@
 defmodule <%= @module %> do
+  <%= if @comment != "" do %>
+  @moduledoc """
+  <%= @comment %>
+  """
+  <% else %>
   @moduledoc false
+  <% end %>
+
   use Protobuf, <%= @use_options %>
 
   <% if @extends == [], do: raise("Fuck! #{@module}") %>

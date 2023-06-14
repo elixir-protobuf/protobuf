@@ -8,6 +8,9 @@ defmodule Protobuf.Protoc.Context do
 
             ### All files scope
 
+            # All parsed comments from the source file.
+            comments: [],
+
             # Mapping from file name to (mapping from type name to metadata, like elixir type name)
             # %{"example.proto" => %{".example.FooMsg" => %{type_name: "Example.FooMsg"}}}
             global_type_mapping: %{},
@@ -42,7 +45,10 @@ defmodule Protobuf.Protoc.Context do
             include_docs?: false,
 
             # Elixirpb.FileOptions
-            custom_file_options: %{}
+            custom_file_options: %{},
+
+            # Current path referencing comments from the File Descriptor
+            current_comment_path: []
 
   @spec custom_file_options_from_file_desc(t(), Google.Protobuf.FileDescriptorProto.t()) :: t()
   def custom_file_options_from_file_desc(ctx, desc)
