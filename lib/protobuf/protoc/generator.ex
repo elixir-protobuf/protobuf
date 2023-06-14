@@ -8,8 +8,6 @@ defmodule Protobuf.Protoc.Generator do
   @spec generate(Context.t(), %Google.Protobuf.FileDescriptorProto{}) ::
           {term(), [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()]}
   def generate(%Context{} = ctx, %Google.Protobuf.FileDescriptorProto{} = desc) do
-    # File.write!("file_descriptor.ex", inspect(desc, limit: :infinity, pretty: true, printable_limit: :infinity))
-
     {package_level_extensions, module_definitions} = generate_module_definitions(ctx, desc)
 
     files =
@@ -44,8 +42,6 @@ defmodule Protobuf.Protoc.Generator do
           dep_type_mapping: get_dep_type_mapping(ctx, desc.dependency, desc.name)
       }
       |> Protobuf.Protoc.Context.custom_file_options_from_file_desc(desc)
-
-    # File.write!("context.ex", inspect(ctx, limit: :infinity, pretty: true, printable_limit: :infinity))
 
     enum_defmodules =
       desc.enum_type
