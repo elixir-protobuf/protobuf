@@ -1,7 +1,6 @@
 defmodule Google.Protobuf do
   @moduledoc """
-  Utility functions for working with Google Protobuf structs easier
-  in Elixir.
+  Utility functions for working with Google Protobuf structs.
   """
 
   @doc """
