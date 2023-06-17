@@ -22,14 +22,14 @@ The package can be installed by adding `:protobuf` to your list of dependencies 
 ```elixir
 def deps do
   [
-    {:protobuf, "~> 0.10.0"},
-    # Only for files generated from Google's protos.
-    # Can be ignored if you don't use Google's protos.
-    # Or you can generate the code by yourself.
-    {:google_protos, "~> 0.1"}
+    {:protobuf, "~> 0.13.0"}
   ]
 end
 ```
+
+### Google Protos
+
+Since `:protobuf` version `0.13.0` we include all of the well known Google Protobuf modules. This conflicts with the deprecated `:google_protos` package. Please remove the `:google_protos` package from your dependencies.
 
 ## Features
 

@@ -2,7 +2,7 @@ defmodule Protobuf.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/elixir-protobuf/protobuf"
-  @version "0.12.0"
+  @version "0.13.0"
   @description "A pure Elixir implementation of Google Protobuf."
 
   def project do
@@ -99,7 +99,7 @@ defmodule Protobuf.Mixfile do
 
   defp aliases do
     [
-      gen_bootstrap_protos: [&build_escript/1, &gen_bootstrap_protos/1],
+      gen_bootstrap_protos: [&build_escript/1, &gen_bootstrap_protos/1, &gen_google_protos/1],
       gen_test_protos: [&build_escript/1, &create_generated_dir/1, &gen_test_protos/1],
       test: [
         &build_escript/1,
@@ -190,17 +190,24 @@ defmodule Protobuf.Mixfile do
     protoc!("-I \"#{proto_bench}\"", "./bench/lib", benchmark_proto_files())
   end
 
+  defp gen_google_protos(_args) do
+    proto_src = path_in_protobuf_source(["src"])
+
+    protoc!("-I \"#{proto_src}\"", "./lib", [
+      "google/protobuf/any.proto",
+      "google/protobuf/duration.proto",
+      "google/protobuf/empty.proto",
+      "google/protobuf/field_mask.proto",
+      "google/protobuf/struct.proto",
+      "google/protobuf/timestamp.proto",
+      "google/protobuf/wrappers.proto",
+    ])
+  end
+
   defp gen_google_test_protos(_args) do
     proto_root = path_in_protobuf_source(["src"])
 
     files = ~w(
-      google/protobuf/any.proto
-      google/protobuf/duration.proto
-      google/protobuf/empty.proto
-      google/protobuf/field_mask.proto
-      google/protobuf/struct.proto
-      google/protobuf/timestamp.proto
-      google/protobuf/wrappers.proto
       google/protobuf/test_messages_proto2.proto
       google/protobuf/test_messages_proto3.proto
     )
