@@ -193,15 +193,17 @@ defmodule Protobuf.Mixfile do
   defp gen_google_protos(_args) do
     proto_src = path_in_protobuf_source(["src"])
 
-    protoc!("-I \"#{proto_src}\"", "./lib", [
-      "google/protobuf/any.proto",
-      "google/protobuf/duration.proto",
-      "google/protobuf/empty.proto",
-      "google/protobuf/field_mask.proto",
-      "google/protobuf/struct.proto",
-      "google/protobuf/timestamp.proto",
-      "google/protobuf/wrappers.proto",
-    ])
+    files = ~w(
+      google/protobuf/any.proto
+      google/protobuf/duration.proto
+      google/protobuf/empty.proto
+      google/protobuf/field_mask.proto
+      google/protobuf/struct.proto
+      google/protobuf/timestamp.proto
+      google/protobuf/wrappers.proto
+    )
+
+    protoc!("-I \"#{proto_src}\"", "./lib", files)
   end
 
   defp gen_google_test_protos(_args) do
