@@ -175,7 +175,11 @@ defmodule Protobuf do
       #=> ** (Protobuf.DecodeError) ...
 
   """
-  @spec decode(binary(), message) :: %{required(:__struct__) => message} when message: module()
+  @spec decode(binary(), message) :: %{
+          required(:__struct__) => message,
+          optional(atom()) => any()
+        }
+        when message: module()
   defdelegate decode(data, module), to: Protobuf.Decoder
 
   @doc """
