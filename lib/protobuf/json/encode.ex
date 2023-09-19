@@ -162,8 +162,22 @@ defmodule Protobuf.JSON.Encode do
   defp encode_regular_fields(struct, %{field_props: field_props}, opts) do
     for {_field_num, %{name_atom: name, oneof: nil} = prop} <- field_props,
         %{^name => value} = struct,
-        opts[:emit_unpopulated] || !default?(prop, value) do
+        emit?(prop, value) || opts[:emit_unpopulated] do
       encode_field(prop, value, opts)
+    end
+  end
+
+  defp emit?(_prop, nil) do
+    false
+  end
+
+  defp emit?(prop, value) do
+    case default?(prop, value) do
+      true ->
+        prop.proto3_optional?
+
+      false ->
+        true
     end
   end
 
