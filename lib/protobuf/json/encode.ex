@@ -172,13 +172,7 @@ defmodule Protobuf.JSON.Encode do
   end
 
   defp emit?(prop, value) do
-    case default?(prop, value) do
-      true ->
-        prop.proto3_optional?
-
-      false ->
-        true
-    end
+    if default?(prop, value), do: prop.proto3_optional?, else: true
   end
 
   defp encode_oneof_fields(struct, message_props, opts) do
