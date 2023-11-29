@@ -360,6 +360,7 @@ defmodule Protobuf.JSON.Decode do
   end
 
   defp decode_float(float) when is_float(float), do: {:ok, float}
+  defp decode_float(int) when is_integer(int), do: {:ok, int + 0.0}
   defp decode_float(string) when is_binary(string), do: parse_float(string)
   defp decode_float(_bad), do: :error
 

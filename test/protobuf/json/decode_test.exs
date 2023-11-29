@@ -229,6 +229,12 @@ defmodule Protobuf.JSON.DecodeTest do
       assert decode(data, Scalars) == {:ok, decoded}
     end
 
+    test "coerce int to float" do
+      data = %{"float" => 100, "double" => 100}
+      decoded = Scalars.new!(float: 100.0, double: 100.0)
+      assert decode(data, Scalars) == {:ok, decoded}
+    end
+
     test "constants are valid" do
       data = %{"float" => "NaN", "double" => "NaN"}
       decoded = Scalars.new!(float: :nan, double: :nan)
@@ -413,7 +419,7 @@ defmodule Protobuf.JSON.DecodeTest do
       msg = "Field 'mapbi' has an invalid map key (bool: true)"
       assert decode(data, Maps) == error(msg)
 
-      data = %{"mapsi" => %{'chars' => 1}}
+      data = %{"mapsi" => %{~c"chars" => 1}}
       msg = "Field 'mapsi' has an invalid map key (string: 'chars')"
       assert decode(data, Maps) == error(msg)
     end
