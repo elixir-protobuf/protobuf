@@ -14,6 +14,16 @@ defmodule Protobuf.JSON.EncodeTest do
     Scalars
   }
 
+  test "encodes proto3 optional fields zero values" do
+    message = %TestMsg.Proto3Optional{a: 0, c: :UNKNOWN}
+    assert encode(message) == %{"a" => 0, "c" => :UNKNOWN}
+  end
+
+  test "skips a proto3 optional field with a nil value" do
+    message = %TestMsg.Proto3Optional{a: nil, c: nil}
+    assert encode(message) == %{}
+  end
+
   test "encodes strings and booleans as they are" do
     message = %Scalars{string: "エリクサー", bool: true}
     assert encode(message) == %{"string" => "エリクサー", "bool" => true}

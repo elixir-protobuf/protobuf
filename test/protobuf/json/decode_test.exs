@@ -653,6 +653,26 @@ defmodule Protobuf.JSON.DecodeTest do
              %ContainsTransformModule{field: nil}
   end
 
+  test "decodes nil for proto3" do
+    data = %{
+      "b" => "A"
+    }
+
+    assert decode(data, TestMsg.Proto3Optional) ==
+             {:ok, %TestMsg.Proto3Optional{a: nil, b: "A", c: nil}}
+  end
+
+  test "decodes default values for proto3 optional" do
+    data = %{
+      "a" => 0,
+      "b" => "A",
+      "c" => "UNKNOWN"
+    }
+
+    assert decode(data, TestMsg.Proto3Optional) ==
+             {:ok, %TestMsg.Proto3Optional{a: 0, b: "A", c: :UNKNOWN}}
+  end
+
   describe "Google types" do
     test "Google.Protobuf.Empty" do
       data = %{}
