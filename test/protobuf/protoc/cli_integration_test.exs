@@ -278,6 +278,114 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
     assert base_mod.get_extension(message, Bugs.Ext2.PbExtension, :first_name) == "Ext2 FN"
   end
 
+  test "generates documentation tags from comments", %{tmp_dir: tmp_dir} do
+    proto_path_one = Path.join(tmp_dir, "one.proto")
+    proto_path_two = Path.join(tmp_dir, "two.proto")
+
+    File.write!(proto_path_one, """
+    syntax = "proto3";
+
+    package tests;
+
+    // This is the comment for module One
+    message One {
+      // Comment about optional name field
+      optional string name = 1;
+
+      // Here is a nested message for One
+      message NestedOne {
+        optional string name = 1;
+      }
+
+      // Field referencing nested message
+      NestedOne nested_one = 2;
+    }
+    """)
+
+    File.write!(proto_path_two, """
+    syntax = "proto3";
+
+    import "one.proto";
+
+    package tests;
+
+    // This enum represents days of the week.
+    //
+    // It is a multi line description.
+    enum TestEnum {
+      // Monday is the first day
+      MONDAY = 0;
+      // Tuesday the second
+      TUESDAY = 1;
+    }
+
+    // This is a message that might be sent somewhere.
+    message Request {
+      // An enum of colors
+      enum Color {
+        RED = 0;
+        GREEN = 1; // My favorite color!
+        BLUE = 2;
+      }
+      //  optional imp.ImportedMessage imported_message = 2;
+      optional Color hue = 3;  // no default
+      optional One one = 4;
+
+      // This is a map field. It will generate map[int32]string.
+      map<int32, string> name_mapping = 14;
+    }
+    """)
+
+    protoc!([
+      "--proto_path=#{tmp_dir}",
+      "--elixir_out=#{tmp_dir}",
+      "--plugin=./protoc-gen-elixir",
+      "--elixir_opt=include_docs=true",
+      proto_path_one,
+      proto_path_two
+    ])
+
+    elixir_one = File.read!("#{tmp_dir}/one.pb.ex")
+    elixir_two = File.read!("#{tmp_dir}/two.pb.ex")
+
+    assert elixir_one =~ """
+           defmodule Tests.One do
+             @moduledoc \"\"\"
+             This is the comment for module One
+             \"\"\"
+           """
+
+    assert elixir_one =~ """
+           defmodule Tests.One.NestedOne do
+             @moduledoc \"\"\"
+             Here is a nested message for One
+             \"\"\"
+           """
+
+    assert elixir_two =~ """
+           defmodule Tests.TestEnum do
+             @moduledoc \"\"\"
+             This enum represents days of the week.
+
+             It is a multi line description.
+             \"\"\"
+           """
+
+    assert elixir_two =~ """
+           defmodule Tests.Request do
+             @moduledoc \"\"\"
+             This is a message that might be sent somewhere.
+             \"\"\"
+           """
+
+    assert elixir_two =~ """
+           defmodule Tests.Request.Color do
+             @moduledoc \"\"\"
+             An enum of colors
+             \"\"\"
+           """
+  end
+
   @tag :skip
   test "extensions defined and used in the same protoc call", %{tmp_dir: tmp_dir} do
     proto_path = Path.join(tmp_dir, "extensions.proto")

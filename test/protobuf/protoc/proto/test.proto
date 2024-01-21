@@ -3,6 +3,7 @@ syntax = "proto2";
 // This package holds interesting messages.
 package test;  // dotted package name
 
+// This enum represents different kinds of hats.
 enum HatType {
   // deliberately skipping 0
   FEDORA = 1;
@@ -19,7 +20,10 @@ enum Days {
 }
 
 // This is a message that might be sent somewhere.
+//
+// Here is another line for a documentation example.
 message Request {
+  // This enum represents three different colors.
   enum Color {
     RED = 0;
     GREEN = 1;
@@ -71,10 +75,12 @@ message OtherBase {
 }
 
 message ReplyExtensions {
+  // Extends Reply
   extend Reply {
     optional double time = 101;
     optional ReplyExtensions carrot = 105;
   }
+  // Yet another base message
   extend OtherBase {
     optional ReplyExtensions donut = 101;
   }

@@ -64,17 +64,21 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
   end
 
   describe "generate/2 include_docs" do
-    test "does not include `@moduledoc false` when flag is true" do
-      ctx = %Context{include_docs?: true}
-      desc = %Google.Protobuf.ServiceDescriptorProto{name: "ServiceFoo"}
+    test "includes service comment for `@moduledoc` when flag is true" do
+      test_pb = Protobuf.TestHelpers.read_generated_file("service.pb.ex")
 
-      {_module, msg} = Generator.generate(ctx, desc)
-
-      refute msg =~ "@moduledoc"
+      assert test_pb =~ """
+             defmodule My.Test.TestService.Service do
+               @moduledoc \"\"\"
+               An example test service that has
+               a test method. It expects a Request
+               and returns a Reply.
+               \"\"\"
+             """
     end
 
     test "includes `@moduledoc false` by default" do
-      ctx = %Context{}
+      ctx = %Context{include_docs?: false}
       desc = %Google.Protobuf.ServiceDescriptorProto{name: "ServiceFoo"}
 
       {_module, msg} = Generator.generate(ctx, desc)
