@@ -83,7 +83,7 @@ defmodule Protobuf.Encoder do
 
   defp skip_field?(:proto3, nil, _prop), do: true
   defp skip_field?(:proto3, 0, %FieldProps{oneof: nil}), do: true
-  defp skip_field?(:proto3, 0.0, %FieldProps{oneof: nil}), do: true
+  defp skip_field?(:proto3, +0.0, %FieldProps{oneof: nil}), do: true
   defp skip_field?(:proto3, "", %FieldProps{oneof: nil}), do: true
   defp skip_field?(:proto3, false, %FieldProps{oneof: nil}), do: true
   defp skip_field?(_syntax, _val, _prop), do: false
