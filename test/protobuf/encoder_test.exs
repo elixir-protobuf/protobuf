@@ -171,6 +171,17 @@ defmodule Protobuf.EncoderTest do
     assert Encoder.encode(msg) == <<>>
   end
 
+  if :erlang.system_info(:otp_release) < ~c"27" do
+    @tag :skip
+  end
+  test "skips float positive zero, but doesn't skip negative zero" do
+    msg = %TestMsg.Foo{d: 0.0, n: 0.0}
+    assert Encoder.encode(msg) == <<>>
+
+    msg = %TestMsg.Foo{d: -0.0, n: -0.0}
+    refute Encoder.encode(msg) == <<>>
+  end
+
   test "encodes map with oneof" do
     msg = %Google.Protobuf.Struct{fields: %{"valid" => %{kind: {:bool_value, true}}}}
     bin = Google.Protobuf.Struct.encode(msg)
