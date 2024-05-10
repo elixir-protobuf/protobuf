@@ -37,8 +37,9 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
     assert msg =~ "defmodule Foo do\n"
 
-    assert msg =~
-             "use Protobuf, protoc_gen_elixir_version: \"#{Util.version()}\", syntax: :proto3\n"
+    assert msg =~ "use Protobuf"
+    assert msg =~ "protoc_gen_elixir_version: #{inspect(Util.version())}"
+    assert msg =~ "syntax: :proto3"
 
     assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
 

@@ -341,8 +341,8 @@ defmodule Protobuf.JSON.DecodeTest do
 
   describe "enums" do
     test "known integer value is valid" do
-      data = %{"j" => 4}
-      decoded = %Foo{j: :E}
+      data = %{"j" => 1}
+      decoded = %Foo{j: :A}
       assert decode(data, Foo) == {:ok, decoded}
     end
 
