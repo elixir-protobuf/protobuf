@@ -302,8 +302,12 @@ defmodule Protobuf.JSON.Encode do
   defp maybe_repeat(%{repeated?: true}, val, fun), do: Enum.map(val, fun)
 
   defp default?(_prop, +0.0), do: true
-  defp default?(_prop, -0.0), do: false
-  defp default?(_prop, value) when value in [nil, 0, false, [], "", %{}], do: true
+  defp default?(_prop, nil), do: true
+  defp default?(_prop, 0), do: true
+  defp default?(_prop, false), do: true
+  defp default?(_prop, []), do: true
+  defp default?(_prop, ""), do: true
+  defp default?(_prop, %{} = map) when map_size(map) == 0, do: true
   defp default?(%{type: {:enum, enum}}, key) when is_atom(key), do: enum.value(key) == 0
   defp default?(_prop, _value), do: false
 
