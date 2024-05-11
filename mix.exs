@@ -73,17 +73,6 @@ defmodule Protobuf.Mixfile do
     [
       maintainers: ["Bing Han", "Andrea Leopardi"],
       licenses: ["MIT"],
-      files: ~w(
-        mix.exs
-        README.md
-        lib/google
-        lib/protobuf
-        lib/*.ex
-        src
-        LICENSE
-        priv/templates
-        .formatter.exs
-      ),
       links: %{"GitHub" => @source_url}
     ]
   end
