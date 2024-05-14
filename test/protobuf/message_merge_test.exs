@@ -49,7 +49,10 @@ defmodule Protobuf.MessageMergeTest do
   test "oneof fields with the same tag are merged"
 
   test "the latest oneof field takes precedence if the two have different tags" do
-    msg1 = %TestAllTypesProto3{oneof_field: {:oneof_nested_message, %TestAllTypesProto3{}}}
+    msg1 = %TestAllTypesProto3{
+      oneof_field: {:oneof_nested_message, %TestAllTypesProto3.NestedMessage{}}
+    }
+
     msg2 = %TestAllTypesProto3{oneof_field: {:oneof_string, "foo"}}
 
     decoded = concat_and_decode([msg1, msg2])
