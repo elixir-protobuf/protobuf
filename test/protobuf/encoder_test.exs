@@ -264,6 +264,26 @@ defmodule Protobuf.EncoderTest do
     end
   end
 
+  test "raises for invalid types" do
+    message = ~r/123 is invalid for type :string/
+
+    assert_raise Protobuf.EncodeError, message, fn ->
+      Encoder.encode(%TestMsg.Foo{c: 123})
+    end
+
+    message = ~r/protocol Enumerable not implemented for 123/
+
+    assert_raise Protobuf.EncodeError, message, fn ->
+      Encoder.encode(%TestMsg.Foo{e: 123})
+    end
+
+    message = ~r/struct TestMsg.Foo.Baz can't be encoded as TestMsg.Foo.Bar/
+
+    assert_raise Protobuf.EncodeError, message, fn ->
+      Encoder.encode(%TestMsg.Foo{e: %TestMsg.Foo.Baz{a: 123}})
+    end
+  end
+
   test "encodes with transformer module" do
     msg = %TestMsg.ContainsTransformModule{field: 0}
     assert Encoder.encode(msg) == <<10, 0>>

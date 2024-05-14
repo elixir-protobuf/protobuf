@@ -143,9 +143,15 @@ defmodule Protobuf.Encoder do
 
   defp encode_from_type(mod, msg) do
     case msg do
-      %{__struct__: ^mod} -> encode_to_iodata(msg)
-      %_{} -> encode_to_iodata(struct(mod, Map.from_struct(msg)))
-      _ -> encode_to_iodata(struct(mod, msg))
+      %{__struct__: ^mod} ->
+        encode_to_iodata(msg)
+
+      %other_mod{} ->
+        raise Protobuf.EncodeError,
+          message: "struct #{inspect(other_mod)} can't be encoded as #{inspect(mod)}"
+
+      _ ->
+        encode_to_iodata(struct(mod, msg))
     end
   end
 
