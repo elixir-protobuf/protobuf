@@ -146,9 +146,10 @@ defmodule Protobuf.Encoder do
       %{__struct__: ^mod} ->
         encode_to_iodata(msg)
 
-      %other_mod{} ->
+      %other_mod{} = struct ->
         raise Protobuf.EncodeError,
-          message: "struct #{inspect(other_mod)} can't be encoded as #{inspect(mod)}"
+          message:
+            "struct #{inspect(other_mod)} can't be encoded as #{inspect(mod)}: #{inspect(struct)}"
 
       _ ->
         encode_to_iodata(struct(mod, msg))
