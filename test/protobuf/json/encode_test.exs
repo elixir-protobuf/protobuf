@@ -108,6 +108,15 @@ defmodule Protobuf.JSON.EncodeTest do
     assert encode(message) == %{"float" => "-Infinity", "double" => "-Infinity"}
   end
 
+  if System.otp_release() < "27" do
+    @tag :skip
+  end
+
+  test "encodes negative zero" do
+    message = %Scalars{float: -0.0, double: -0.0}
+    assert %{"float" => -0.0, "double" => -0.0} = encode(message)
+  end
+
   test "encodes bytes in Base64 with padding" do
     message = %Scalars{bytes: "abcde"}
     assert encode(message) == %{"bytes" => "YWJjZGU="}

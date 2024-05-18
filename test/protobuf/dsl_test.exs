@@ -165,18 +165,20 @@ defmodule Protobuf.DSLTest do
     assert TestMsg.EnumFoo.key(213_123) == 213_123
     assert TestMsg.EnumFoo.mapping() == %{UNKNOWN: 0, A: 1, B: 2, C: 4, D: 4, E: 4}
 
-    assert TestMsg.EnumFoo.__reverse_mapping__() == %{
+    assert %{
              0 => :UNKNOWN,
              1 => :A,
              2 => :B,
-             4 => :E,
              "A" => :A,
              "B" => :B,
              "C" => :C,
              "UNKNOWN" => :UNKNOWN,
              "D" => :D,
              "E" => :E
-           }
+           } = TestMsg.EnumFoo.__reverse_mapping__()
+
+    # Varies with erlang version
+    assert TestMsg.EnumFoo.__reverse_mapping__()[4] in [:C, :D, :E]
 
     assert %FieldProps{fnum: 11, type: {:enum, TestMsg.EnumFoo}, wire_type: 0} =
              Foo.__message_props__().field_props[11]
