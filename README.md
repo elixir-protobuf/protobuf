@@ -29,7 +29,7 @@ end
 
 ### Google Protos
 
-Since `:protobuf` version `0.13.0` we include all of the well known Google Protobuf modules. This conflicts with the deprecated `:google_protos` package. Please remove the `:google_protos` package from your dependencies.
+Since `:protobuf` version `0.13.0` we include all of the well known Google Protobuf modules. This conflicts with the deprecated `:google_protos` package. Please remove the `:google_protos` package from your dependencies and run `mix deps.unlock --unused`.
 
 ## Features
 
