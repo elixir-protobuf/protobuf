@@ -195,7 +195,7 @@ defmodule Protobuf.DSLTest do
     assert %Foo{
              a: 0,
              c: "",
-             d: 0.0,
+             d: +0.0,
              e: nil,
              f: 0,
              g: [],
@@ -210,7 +210,7 @@ defmodule Protobuf.DSLTest do
              a: 1,
              b: 42,
              c: "abc",
-             d: 0.0,
+             d: +0.0,
              e: %Foo.Bar{a: 2, b: "asd"},
              f: 0,
              g: [],

@@ -15,21 +15,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - otp: 25.0
-            elixir: 1.16.2
-          - otp: 25.0
-            elixir: 1.14.0
-            lint: true
-            integration: true
-            coverage: true
-          - otp: 25.0
-            elixir: 1.13.4
-          - otp: 24.0
-            elixir: 1.12.3
-          - otp: 23.3
-            elixir: 1.11.4
-          - otp: 23.3
-            elixir: 1.10.4
+          - otp: 27.0
+            elixir: 1.17.0
           - otp: 22.3
             elixir: 1.9.4
 
@@ -136,7 +123,7 @@ jobs:
       fail-fast: false
       matrix:
         otp: [24.2]
-        elixir: [1.13.1]
+        elixir: [1.14]
 
     env:
       MIX_ENV: test
