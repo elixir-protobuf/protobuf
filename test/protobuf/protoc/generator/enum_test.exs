@@ -80,7 +80,7 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
              field :HAS_UNDERSCORES_, 4
            """
 
-    assert %Google.Protobuf.EnumDescriptorProto{} = desc = compiled_mod.descriptor
+    assert %Google.Protobuf.EnumDescriptorProto{} = desc = compiled_mod.descriptor()
     assert desc.name == module
 
     assert msg =~ """
