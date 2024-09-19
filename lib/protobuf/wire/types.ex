@@ -1,5 +1,5 @@
 defmodule Protobuf.Wire.Types do
-  @moduledoc false
+  @moduledoc "Internal wire type"
 
   @type wire_type() :: 0..5
 
