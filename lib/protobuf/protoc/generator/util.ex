@@ -47,6 +47,7 @@ defmodule Protobuf.Protoc.Generator.Util do
   def options_to_str(opts) when is_map(opts) do
     opts
     |> Enum.reject(fn {_key, val} -> val in [nil, false] end)
+    |> Enum.sort()
     |> Enum.map_join(", ", fn {key, val} -> "#{key}: #{print(val)}" end)
   end
 
