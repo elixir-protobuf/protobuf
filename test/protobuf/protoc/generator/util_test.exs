@@ -50,6 +50,20 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
       assert options_to_str(%{default: "42", enum: false}) == "default: 42"
       assert options_to_str(%{json_name: "\"theFieldName\""}) == "json_name: \"theFieldName\""
     end
+
+    test "keep options string in alphabetical order" do
+      opts = %{
+        syntax: :proto3,
+        map: true,
+        deprecated: true,
+        protoc_gen_elixir_version: "1.2.3"
+      }
+
+      sorted_str =
+        "deprecated: true, map: true, protoc_gen_elixir_version: 1.2.3, syntax: :proto3"
+
+      assert options_to_str(opts) == sorted_str
+    end
   end
 
   describe "type_from_type_name/2" do
