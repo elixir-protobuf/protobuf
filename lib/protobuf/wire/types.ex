@@ -1,7 +1,5 @@
 defmodule Protobuf.Wire.Types do
-  @moduledoc "Internal wire type"
-
-  @type wire_type() :: 0..5
+  @moduledoc false
 
   # From: https://developers.google.com/protocol-buffers/docs/encoding
   defmacro wire_varint, do: 0

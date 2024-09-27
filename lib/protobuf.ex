@@ -38,6 +38,19 @@ defmodule Protobuf do
 
   """
 
+  @typedoc """
+  Internal wire type
+  """
+  @type wire_type() :: 0..5
+
+  @typedoc """
+  Represents a field that existed in a decoded message, but didn't exist in the
+  used protobuf definition.
+
+  See `get_unknown_fields/1` for more information.
+  """
+  @type unknown_field() :: {field_number :: integer(), wire_type(), value :: any()}
+
   defmacro __using__(opts) do
     quote location: :keep do
       import Protobuf.DSL, only: [field: 3, field: 2, oneof: 2, extend: 4, extensions: 1]
@@ -219,7 +232,7 @@ defmodule Protobuf do
   a payload, update the resulting message somehow, and re-encode it for future use. In these
   cases, you would probably want to re-encode the unknown fields to maintain symmetry.
 
-  The returned value of this function is a list of `{field_number, field_value}` tuples where
+  The returned value of this function is a list of `{field_number, wire_type, field_value}` tuples where
   `field_number` is the number of the unknown field in the schema used for its encoding and
   `field_value` is its value. The library does not make any assumptions on the value of the
   field since it can't know for sure. This means that, for example, it can't properly decode
@@ -239,7 +252,7 @@ defmodule Protobuf do
 
   You encode this:
 
-      payload = Protobuf.encode(User.new!(email: "user@example.com))
+      payload = Protobuf.encode(User.new!(email: "user@example.com"))
       #=> <<...>>
 
   Now, you try to decode this payload using this schema instead:
@@ -252,13 +265,12 @@ defmodule Protobuf do
 
       message = User.decode(<<...>>)
       Protobuf.get_unknown_fields(message)
-      #=> [{_field_number = 1, _wire_type = 3, "user@example.com}]
+      #=> [{_field_number = 1, _wire_type = 3, "user@example.com"}]
 
   """
   @doc since: "0.10.0"
-  @spec get_unknown_fields(struct()) :: [unknown_field]
-        when unknown_field:
-               {field_number :: integer(), Protobuf.Wire.Types.wire_type(), value :: any()}
+  @spec get_unknown_fields(struct()) :: [unknown_field()]
+
   def get_unknown_fields(message)
 
   def get_unknown_fields(%_{__unknown_fields__: unknown_fields}) do
