@@ -20,10 +20,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
                quote(
                  do:
                    t() :: %Foo{
-                     __unknown_fields__: [
-                       {field_number :: integer(), Protobuf.Wire.Types.wire_type(),
-                        value :: term()}
-                     ]
+                     __unknown_fields__: [Protobuf.unknown_field()]
                    }
                )
              )
@@ -48,10 +45,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
                quote(
                  do:
                    t() :: %Foo{
-                     __unknown_fields__: [
-                       {field_number :: integer(), Protobuf.Wire.Types.wire_type(),
-                        value :: term()}
-                     ]
+                     __unknown_fields__: [Protobuf.unknown_field()]
                    }
                )
              )
@@ -177,10 +171,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
                quote(
                  do:
                    t() :: %Foo{
-                     __unknown_fields__: [
-                       {field_number :: integer(), Protobuf.Wire.Types.wire_type(),
-                        value :: term()}
-                     ],
+                     __unknown_fields__: [Protobuf.unknown_field()],
                      a: integer(),
                      b: String.t(),
                      c: [integer()]
@@ -371,10 +362,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
                quote(
                  do:
                    t() :: %Foo{
-                     __unknown_fields__: [
-                       {field_number :: integer(), Protobuf.Wire.Types.wire_type(),
-                        value :: term()}
-                     ],
+                     __unknown_fields__: [Protobuf.unknown_field()],
                      bar: Bar.t() | nil,
                      baz: [Baz.t()]
                    }
@@ -443,10 +431,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
                quote(
                  do:
                    t() :: %FooBar.AbCd.Foo{
-                     __unknown_fields__: [
-                       {field_number :: integer(), Protobuf.Wire.Types.wire_type(),
-                        value :: term()}
-                     ],
+                     __unknown_fields__: [Protobuf.unknown_field()],
                      a: %{optional(integer()) => FooBar.AbCd.Bar.t() | nil}
                    }
                )
@@ -535,10 +520,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
                quote(
                  do:
                    t() :: %FooBar.AbCd.Foo{
-                     __unknown_fields__: [
-                       {field_number :: integer(), Protobuf.Wire.Types.wire_type(),
-                        value :: term()}
-                     ],
+                     __unknown_fields__: [Protobuf.unknown_field()],
                      a: OtherPkg.MsgFoo.t() | nil
                    }
                )
@@ -598,10 +580,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
                quote(
                  do:
                    t() :: %MyPkg.Foo{
-                     __unknown_fields__: [
-                       {field_number :: integer(), Protobuf.Wire.Types.wire_type(),
-                        value :: term()}
-                     ],
+                     __unknown_fields__: [Protobuf.unknown_field()],
                      a: MyPkg.Foo.Nested.t() | nil
                    }
                )
@@ -702,10 +681,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
                quote(
                  do:
                    t() :: %Foo{
-                     __unknown_fields__: [
-                       {field_number :: integer(), Protobuf.Wire.Types.wire_type(),
-                        value :: term()}
-                     ],
+                     __unknown_fields__: [Protobuf.unknown_field()],
                      first: {:a, integer()} | {:b, integer()} | nil,
                      other: integer() | nil,
                      second: {:c, integer()} | {:d, integer()} | nil
@@ -809,10 +785,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
                quote(
                  do:
                    t() :: %FooBar.AbCd.Foo{
-                     __unknown_fields__: [
-                       {field_number :: integer(), Protobuf.Wire.Types.wire_type(),
-                        value :: term()}
-                     ],
+                     __unknown_fields__: [Protobuf.unknown_field()],
                      a: [FooBar.AbCd.EnumFoo.t()]
                    }
                )
