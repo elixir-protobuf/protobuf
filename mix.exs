@@ -9,7 +9,7 @@ defmodule Protobuf.Mixfile do
     [
       app: :protobuf,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.12",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       dialyzer: [plt_add_apps: [:mix, :jason], flags: [:no_improper_lists]],
