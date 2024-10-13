@@ -65,10 +65,34 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
 
   describe "generate/2 include_docs" do
     test "includes service comment for `@moduledoc` when flag is true" do
-      test_pb = Protobuf.TestHelpers.read_generated_file("service.pb.ex")
+      ctx = %Context{
+        package: "foo",
+        include_docs?: true,
+        comments: %{
+          "" => "An example test service that has\n" <>
+                 "a test method. It expects a Request\n" <>
+                 "and returns a Reply."
+        },
+        dep_type_mapping: %{
+          ".foo.Input0" => %{type_name: "Foo.Input0"},
+          ".foo.Output0" => %{type_name: "Foo.Output0"},
+        },
+        module_prefix: "Foo"
+      }
 
-      assert test_pb =~ """
-             defmodule My.Test.TestService.Service do
+      desc = %Google.Protobuf.ServiceDescriptorProto{
+        name: "ServiceFoo",
+        method: [
+          %Google.Protobuf.MethodDescriptorProto{
+            name: "MethodA",
+            input_type: ".foo.Input0",
+            output_type: ".foo.Output0"
+          },
+        ]
+      }
+
+      assert {"Foo.ServiceFoo", msg} = Generator.generate(ctx, desc)
+      assert msg =~ """
                @moduledoc \"\"\"
                An example test service that has
                a test method. It expects a Request
