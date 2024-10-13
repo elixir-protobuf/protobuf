@@ -14,6 +14,15 @@ defmodule TestMsg do
     field :b, 2, type: :string
   end
 
+  defmodule Foo.Baz do
+    @moduledoc false
+    use Protobuf, syntax: :proto3
+
+    field :a, 1, type: :int32
+    field :b, 2, type: :string
+    field :c, 3, type: :string
+  end
+
   defmodule EnumFoo do
     @moduledoc false
     use Protobuf, enum: true, syntax: :proto3

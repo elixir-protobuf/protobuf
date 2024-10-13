@@ -341,8 +341,8 @@ defmodule Protobuf.JSON.DecodeTest do
 
   describe "enums" do
     test "known integer value is valid" do
-      data = %{"j" => 4}
-      decoded = %Foo{j: :E}
+      data = %{"j" => 1}
+      decoded = %Foo{j: :A}
       assert decode(data, Foo) == {:ok, decoded}
     end
 
@@ -651,6 +651,26 @@ defmodule Protobuf.JSON.DecodeTest do
 
     assert Protobuf.JSON.decode!(~S|{}|, ContainsTransformModule) ==
              %ContainsTransformModule{field: nil}
+  end
+
+  test "decodes nil for proto3" do
+    data = %{
+      "b" => "A"
+    }
+
+    assert decode(data, TestMsg.Proto3Optional) ==
+             {:ok, %TestMsg.Proto3Optional{a: nil, b: "A", c: nil}}
+  end
+
+  test "decodes default values for proto3 optional" do
+    data = %{
+      "a" => 0,
+      "b" => "A",
+      "c" => "UNKNOWN"
+    }
+
+    assert decode(data, TestMsg.Proto3Optional) ==
+             {:ok, %TestMsg.Proto3Optional{a: 0, b: "A", c: :UNKNOWN}}
   end
 
   describe "Google types" do

@@ -34,7 +34,7 @@ defmodule Protobuf.Wire do
   @uint32_range 0..0xFFFFFFFF
   @uint64_range 0..0xFFFFFFFFFFFFFFFF
 
-  @spec wire_type(proto_type() | module()) :: Protobuf.Wire.Types.wire_type()
+  @spec wire_type(proto_type() | module()) :: Protobuf.wire_type()
   def wire_type(:int32), do: wire_varint()
   def wire_type(:int64), do: wire_varint()
   def wire_type(:uint32), do: wire_varint()
@@ -53,7 +53,7 @@ defmodule Protobuf.Wire do
   def wire_type(:float), do: wire_32bits()
   def wire_type(mod) when is_atom(mod), do: wire_delimited()
 
-  @spec encode_from_wire_type(Protobuf.Wire.Types.wire_type(), term()) :: iodata()
+  @spec encode_from_wire_type(Protobuf.wire_type(), term()) :: iodata()
   def encode_from_wire_type(wire_type, value)
 
   def encode_from_wire_type(wire_varint(), int) when is_integer(int), do: Varint.encode(int)

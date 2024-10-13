@@ -171,6 +171,18 @@ defmodule Protobuf.EncoderTest do
     assert Encoder.encode(msg) == <<>>
   end
 
+  if System.otp_release() < "27" do
+    @tag :skip
+  end
+
+  test "skips float positive zero, but doesn't skip negative zero" do
+    msg = %TestMsg.Foo{d: 0.0, n: 0.0}
+    assert Encoder.encode(msg) == <<>>
+
+    msg = %TestMsg.Foo{d: -0.0, n: -0.0}
+    refute Encoder.encode(msg) == <<>>
+  end
+
   test "encodes map with oneof" do
     msg = %Google.Protobuf.Struct{fields: %{"valid" => %{kind: {:bool_value, true}}}}
     bin = Google.Protobuf.Struct.encode(msg)
@@ -261,6 +273,26 @@ defmodule Protobuf.EncoderTest do
 
     assert_raise Protobuf.EncodeError, message, fn ->
       Encoder.encode(%TestMsg.Scalars{string: <<255>>})
+    end
+  end
+
+  test "raises for invalid types" do
+    message = ~r/123 is invalid for type :string/
+
+    assert_raise Protobuf.EncodeError, message, fn ->
+      Encoder.encode(%TestMsg.Foo{c: 123})
+    end
+
+    message = ~r/protocol Enumerable not implemented for 123/
+
+    assert_raise Protobuf.EncodeError, message, fn ->
+      Encoder.encode(%TestMsg.Foo{e: 123})
+    end
+
+    message = ~r/struct TestMsg.Foo.Baz can't be encoded as TestMsg.Foo.Bar/
+
+    assert_raise Protobuf.EncodeError, message, fn ->
+      Encoder.encode(%TestMsg.Foo{e: %TestMsg.Foo.Baz{a: 123}})
     end
   end
 

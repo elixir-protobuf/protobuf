@@ -7,10 +7,7 @@ defmodule Protobuf.DSL.TypespecsTest do
 
   @unknown_fields_spec quote(
                          do: [
-                           __unknown_fields__: [
-                             {field_number :: integer(), Protobuf.Wire.Types.wire_type(),
-                              value :: term()}
-                           ]
+                           __unknown_fields__: [Protobuf.unknown_field()]
                          ]
                        )
 

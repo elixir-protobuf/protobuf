@@ -167,7 +167,7 @@ $ protoc --elixir_out=./lib --elixir_opt=include_docs=true *.proto
 ### gRPC Support
 
 If you write [services](https://developers.google.com/protocol-buffers/docs/proto#services) in
-protobuf, you can generate [gRPC](https://github.com/tony612/grpc-elixir) code by passing
+protobuf, you can generate [gRPC](https://github.com/elixir-grpc/grpc) code by passing
 `plugins=grpc` in `--elixir_out`:
 
 ```

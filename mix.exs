@@ -2,7 +2,7 @@ defmodule Protobuf.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/elixir-protobuf/protobuf"
-  @version "0.12.0"
+  @version "0.13.0"
   @description "A pure Elixir implementation of Google Protobuf."
 
   def project do
@@ -74,17 +74,6 @@ defmodule Protobuf.Mixfile do
     [
       maintainers: ["Bing Han", "Andrea Leopardi"],
       licenses: ["MIT"],
-      files: ~w(
-        mix.exs
-        README.md
-        lib/google
-        lib/protobuf
-        lib/*.ex
-        src
-        LICENSE
-        priv/templates
-        .formatter.exs
-      ),
       links: %{"GitHub" => @source_url}
     ]
   end
