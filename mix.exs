@@ -149,15 +149,15 @@ defmodule Protobuf.Mixfile do
     proto_src = path_in_protobuf_source(["src"])
 
     protoc!(
-      "-I #{proto_src} -I src -I test/protobuf/protoc/proto",
+      "-I #{proto_src} -I src -I test/protobuf/protoc/proto --elixir_opt=include_docs=true",
       "./generated",
       ["test/protobuf/protoc/proto/extension.proto"]
     )
 
     protoc!(
-      "-I test/protobuf/protoc/proto --elixir_opt=package_prefix=my",
+      "-I test/protobuf/protoc/proto --elixir_opt=package_prefix=my,include_docs=true",
       "./generated",
-      ["test/protobuf/protoc/proto/test.proto"]
+      ["test/protobuf/protoc/proto/test.proto", "test/protobuf/protoc/proto/service.proto"]
     )
 
     protoc!(
@@ -168,7 +168,7 @@ defmodule Protobuf.Mixfile do
     )
 
     protoc!(
-      "-I test/protobuf/protoc/proto",
+      "-I test/protobuf/protoc/proto --elixir_opt=include_docs=true",
       "./generated",
       ["test/protobuf/protoc/proto/no_package.proto"]
     )
@@ -194,7 +194,7 @@ defmodule Protobuf.Mixfile do
       google/protobuf/test_messages_proto3.proto
     )
 
-    protoc!("-I \"#{proto_root}\"", "./generated", files)
+    protoc!("-I \"#{proto_root}\" --elixir_opt=include_docs=true", "./generated", files)
   end
 
   defp gen_conformance_protos(_args) do

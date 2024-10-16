@@ -86,6 +86,19 @@ defmodule Protobuf.Protoc.Generator.Util do
     |> IO.iodata_to_binary()
   end
 
+  @spec pad_comment(String.t(), non_neg_integer()) :: String.t()
+  def pad_comment(comment, size) do
+    padding = String.duplicate(" ", size)
+
+    comment
+    |> String.split("\n")
+    |> Enum.map(fn line ->
+      trimmed = String.trim_leading(line, " ")
+      padding <> trimmed
+    end)
+    |> Enum.join("\n")
+  end
+
   @spec version() :: String.t()
   def version do
     {:ok, value} = :application.get_key(:protobuf, :vsn)
