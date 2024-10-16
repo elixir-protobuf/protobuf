@@ -34,7 +34,8 @@ defmodule Protobuf.Protoc.Generator.Extension do
           comment: Comment.get(ctx),
           use_options: use_options,
           module: mod_name,
-          extends: extensions
+          extends: extensions,
+          module_doc?: ctx.include_docs?
         )
       )
 
@@ -110,7 +111,8 @@ defmodule Protobuf.Protoc.Generator.Extension do
           comment: Comment.get(ctx),
           module: module_name,
           use_options: use_options,
-          extends: Enum.map(desc.extension, &generate_extend_dsl(ctx, &1, _ns = ""))
+          extends: Enum.map(desc.extension, &generate_extend_dsl(ctx, &1, _ns = "")),
+          module_doc?: ctx.include_docs?
         )
       )
 

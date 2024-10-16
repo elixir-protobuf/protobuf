@@ -1,8 +1,10 @@
 defmodule <%= @module %>.Service do
+  <%= if @module_doc? do %>
   <%= if @comment != "" do %>
   @moduledoc """
   <%= @comment %>
   """
+  <% end %>
   <% else %>
   @moduledoc false
   <% end %>

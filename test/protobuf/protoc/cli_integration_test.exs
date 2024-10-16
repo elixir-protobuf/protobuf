@@ -72,53 +72,52 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
       assert descriptor.name == "User"
     end
 
-    if System.version() < "1.14" do
-      test "include_docs option", %{tmp_dir: tmp_dir, proto_path: proto_path} do
-        protoc!([
-          "--proto_path=#{tmp_dir}",
-          "--elixir_out=#{tmp_dir}",
-          "--elixir_opt=include_docs=true",
-          "--plugin=./protoc-gen-elixir",
-          proto_path
-        ])
+    test "include_docs option", %{tmp_dir: tmp_dir, proto_path: proto_path} do
+      protoc!([
+        "--proto_path=#{tmp_dir}",
+        "--elixir_out=#{tmp_dir}",
+        "--elixir_opt=include_docs=true",
+        "--plugin=./protoc-gen-elixir",
+        proto_path
+      ])
 
-        modules_and_docs = get_docs_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
+      modules_and_docs = get_docs_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
+      assert [{Foo.User, docs}] = modules_and_docs
+      assert {:docs_v1, _, :elixir, _, module_doc, _, _} = docs
+      assert module_doc != :hidden
+    end
 
-        assert [{Foo.User, docs}] = modules_and_docs
-        assert {:docs_v1, _, :elixir, _, module_doc, _, _} = docs
-        assert module_doc != :hidden
-      end
+    test "hides docs when include_docs is not true", %{tmp_dir: tmp_dir, proto_path: proto_path} do
+      protoc!([
+        "--proto_path=#{tmp_dir}",
+        "--elixir_out=#{tmp_dir}",
+        "--plugin=./protoc-gen-elixir",
+        proto_path
+      ])
 
-      test "hides docs when include_docs is not true", %{tmp_dir: tmp_dir, proto_path: proto_path} do
-        protoc!([
-          "--proto_path=#{tmp_dir}",
-          "--elixir_out=#{tmp_dir}",
-          "--plugin=./protoc-gen-elixir",
-          proto_path
-        ])
+      modules_and_docs = get_docs_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
 
-        modules_and_docs = get_docs_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
+      assert [{Foo.User, docs}] = modules_and_docs
+      assert {:docs_v1, _, :elixir, _, :hidden, _, _} = docs
+    end
 
-        assert [{Foo.User, docs}] = modules_and_docs
-        assert {:docs_v1, _, :elixir, _, :hidden, _, _} = docs
-      end
+    defp get_docs_and_clean_modules_on_exit(path) do
+      Code.put_compiler_option(:docs, true)
 
-      defp get_docs_and_clean_modules_on_exit(path) do
-        modules_and_docs =
-          path
-          |> Code.compile_file()
-          |> Enum.map(fn {mod, bytecode} ->
-            {mod, fetch_docs_from_bytecode(bytecode)}
-          end)
-
-        on_exit(fn ->
-          modules_and_docs
-          |> Enum.map(fn {mod, _bytecode} -> mod end)
-          |> TestHelpers.purge_modules()
+      modules_and_docs =
+        path
+        |> Code.compile_file()
+        |> Enum.map(fn {mod, bytecode} ->
+          {mod, fetch_docs_from_bytecode(bytecode)}
         end)
 
+      on_exit(fn ->
         modules_and_docs
-      end
+        |> Enum.map(fn {mod, _docs} -> mod end)
+        |> TestHelpers.purge_modules()
+      end)
+
+      modules_and_docs
     end
 
     test "package_prefix mypkg", %{tmp_dir: tmp_dir, proto_path: proto_path} do
