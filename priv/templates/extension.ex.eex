@@ -2,7 +2,7 @@ defmodule <%= @module %> do
   <%= if @module_doc? do %>
   <%= if @comment != "" do %>
   @moduledoc """
-  <%= @comment %>
+<%= Protobuf.Protoc.Generator.Util.pad_comment(@comment, 2) %>
   """
   <% end %>
   <% else %>
