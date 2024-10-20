@@ -57,10 +57,11 @@ defmodule Protobuf.Protoc.GeneratorIntegrationTest do
 
   describe "custom options" do
     # These fail the first time, when extensions are not loaded. Then, they start to pass.
-    @describetag :skip
+    #@describetag :skip
 
     test "with enums" do
       descriptor = Test.EnumWithCustomOptions.descriptor()
+      IO.inspect(descriptor, label: :desc)
 
       assert %Google.Protobuf.EnumValueDescriptorProto{} =
                value = Enum.find(descriptor.value, &(&1.number == 1))
@@ -71,6 +72,7 @@ defmodule Protobuf.Protoc.GeneratorIntegrationTest do
 
     test "with messages" do
       descriptor = Test.MessageWithCustomOptions.descriptor()
+      IO.inspect(descriptor, label: :desc)
 
       assert %Google.Protobuf.MessageOptions{__pb_extensions__: extensions} = descriptor.options
 

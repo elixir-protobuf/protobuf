@@ -166,6 +166,7 @@ defmodule Protobuf.Wire.Varint do
     for {pattern, expression} <- @varints do
       quote do
         defp unquote(name)(<<unquote(pattern), rest::bits>>, unquote_splicing(args)) do
+          IO.inspect(:stderr, unquote({pattern, expression}), label: :pattern_exp)
           var!(value) = unquote(expression)
           var!(rest) = rest
           unquote(body)

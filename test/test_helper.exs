@@ -1,4 +1,4 @@
-ExUnit.configure(exclude: [integration: true])
+ExUnit.configure(exclude: [integration: false])
 ExUnit.start()
 
 Protobuf.load_extensions()

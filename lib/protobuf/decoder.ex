@@ -150,7 +150,10 @@ defmodule Protobuf.Decoder do
   end
 
   defdecoderp decode_delimited(field_number, message, props) do
+    #IO.inspect(:stderr, [field_number: field_number, message: message, props: props], [])
+
     bytes_remaining = byte_size(rest)
+    IO.inspect(:stderr, Map.get(props.field_props, field_number), label: :fprops)
 
     if value <= bytes_remaining do
       <<bytes::bytes-size(value), rest::bits>> = rest
@@ -162,9 +165,11 @@ defmodule Protobuf.Decoder do
           _ -> "field_number #{field_number}"
         end
 
+      IO.inspect(:stderr, %Google.Protobuf.ExtensionRangeOptions{}, label: :xaxa)
+
       msg =
         "insufficient data decoding #{field}, " <>
-          "expected #{inspect(rest)} to be at least #{value} bytes"
+          "expected #{inspect(rest)} to be at least #{value} bytes, but it's only #{byte_size(rest)} bytes"
 
       raise Protobuf.DecodeError, message: msg
     end

@@ -226,20 +226,9 @@ defmodule Protobuf.Protoc.CLI do
     Map.put(types, "." <> mapping_name, %{type_name: type_name})
   end
 
-  if Version.match?(System.version(), "~> 1.13") do
-    defp binread_all!(device) do
-      case IO.binread(device, :eof) do
-        data when is_binary(data) -> data
-        :eof -> _previous_behavior = ""
-        other -> raise "reading from #{inspect(device)} failed: #{inspect(other)}"
-      end
-    end
-  else
-    defp binread_all!(device) do
-      case IO.binread(device, :all) do
-        data when is_binary(data) -> data
-        other -> raise "reading from #{inspect(device)} failed: #{inspect(other)}"
-      end
-    end
+  defp binread_all!(device) do
+    device
+    |> IO.getn(:eof)
+    |> IO.chardata_to_string()
   end
 end
