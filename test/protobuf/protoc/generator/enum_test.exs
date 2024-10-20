@@ -111,17 +111,33 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
   end
 
   describe "generate/2 include_docs" do
-    test "does not include `@moduledoc false` when flag is true" do
-      ctx = %Context{include_docs?: true}
-      desc = %Google.Protobuf.EnumDescriptorProto{name: "valueType"}
+    test "includes enum comment for `@moduledoc` when flag is true" do
+      test_pb = TestHelpers.read_generated_file("test.pb.ex")
 
-      {_module, msg} = Generator.generate(ctx, desc)
+      assert test_pb =~ """
+             defmodule My.Test.Days do
+               @moduledoc \"\"\"
+               This enum represents days of the week.
+               \"\"\"
+             """
 
-      refute msg =~ "@moduledoc\n"
+      assert test_pb =~ """
+             defmodule My.Test.HatType do
+               @moduledoc \"\"\"
+               This enum represents different kinds of hats.
+               \"\"\"
+             """
+
+      assert test_pb =~ """
+             defmodule My.Test.Request.Color do
+               @moduledoc \"\"\"
+               This enum represents three different colors.
+               \"\"\"
+             """
     end
 
     test "includes `@moduledoc false` by default" do
-      ctx = %Context{}
+      ctx = %Context{include_docs?: false}
       desc = %Google.Protobuf.EnumDescriptorProto{name: "valueType"}
 
       {_module, msg} = Generator.generate(ctx, desc)

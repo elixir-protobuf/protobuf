@@ -64,17 +64,47 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
   end
 
   describe "generate/2 include_docs" do
-    test "does not include `@moduledoc false` when flag is true" do
-      ctx = %Context{include_docs?: true}
-      desc = %Google.Protobuf.ServiceDescriptorProto{name: "ServiceFoo"}
+    test "includes service comment for `@moduledoc` when flag is true" do
+      ctx = %Context{
+        package: "foo",
+        include_docs?: true,
+        comments: %{
+          "" =>
+            "An example test service that has\n" <>
+              "a test method. It expects a Request\n" <>
+              "and returns a Reply."
+        },
+        dep_type_mapping: %{
+          ".foo.Input0" => %{type_name: "Foo.Input0"},
+          ".foo.Output0" => %{type_name: "Foo.Output0"}
+        },
+        module_prefix: "Foo"
+      }
 
-      {_module, msg} = Generator.generate(ctx, desc)
+      desc = %Google.Protobuf.ServiceDescriptorProto{
+        name: "ServiceFoo",
+        method: [
+          %Google.Protobuf.MethodDescriptorProto{
+            name: "MethodA",
+            input_type: ".foo.Input0",
+            output_type: ".foo.Output0"
+          }
+        ]
+      }
 
-      refute msg =~ "@moduledoc"
+      assert {"Foo.ServiceFoo", msg} = Generator.generate(ctx, desc)
+
+      assert msg =~ """
+               @moduledoc \"\"\"
+               An example test service that has
+               a test method. It expects a Request
+               and returns a Reply.
+               \"\"\"
+             """
     end
 
     test "includes `@moduledoc false` by default" do
-      ctx = %Context{}
+      ctx = %Context{include_docs?: false}
       desc = %Google.Protobuf.ServiceDescriptorProto{name: "ServiceFoo"}
 
       {_module, msg} = Generator.generate(ctx, desc)

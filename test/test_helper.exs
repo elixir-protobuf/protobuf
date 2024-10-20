@@ -28,6 +28,12 @@ defmodule Protobuf.TestHelpers do
     Map.put(context, :tmp_dir, tmp_dir_name)
   end
 
+  def read_generated_file(relative_path) do
+    [__DIR__, "../generated", relative_path]
+    |> Path.join()
+    |> File.read!()
+  end
+
   def get_type_spec_as_string(module, bytecode, type)
       when is_atom(module) and is_binary(bytecode) and is_atom(type) do
     # This code is taken from Code.Typespec in Elixir (v1.13 in particular).

@@ -795,17 +795,21 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   end
 
   describe "generate/2 include_docs" do
-    test "does not include `@moduledoc false` when flag is true" do
-      ctx = %Context{include_docs?: true}
-      desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
+    test "includes message comment for `@moduledoc` when flag is true" do
+      test_pb = TestHelpers.read_generated_file("test.pb.ex")
 
-      {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
+      assert test_pb =~ """
+             defmodule My.Test.Request do
+               @moduledoc \"\"\"
+               This is a message that might be sent somewhere.
 
-      refute msg =~ "@moduledoc\n"
+               Here is another line for a documentation example.
+               \"\"\"
+             """
     end
 
     test "includes `@moduledoc false` by default" do
-      ctx = %Context{}
+      ctx = %Context{include_docs?: false}
       desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
 
       {[], [{_mod, msg}]} = Generator.generate(ctx, desc)

@@ -2,6 +2,7 @@ defmodule Protobuf.Protoc.Generator.Enum do
   @moduledoc false
 
   alias Protobuf.Protoc.Context
+  alias Protobuf.Protoc.Generator.Comment
   alias Protobuf.Protoc.Generator.Util
 
   require EEx
@@ -34,6 +35,7 @@ defmodule Protobuf.Protoc.Generator.Enum do
 
     content =
       enum_template(
+        comment: Comment.get(ctx),
         module: msg_name,
         use_options: use_options,
         fields: desc.value,
