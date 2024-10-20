@@ -113,6 +113,7 @@ defmodule TestMsg do
     field :c, 3, optional: true, type: :int32, oneof: 1
     field :d, 4, optional: true, type: :string, oneof: 1
     field :e, 6, optional: true, type: EnumFoo, enum: true, default: :A, oneof: 0
+    field :f, 7, optional: true, type: Foo.Bar, oneof: 0
     field :other, 5, optional: true, type: :string
   end
 
@@ -127,6 +128,7 @@ defmodule TestMsg do
     field :c, 3, optional: true, type: :int32, oneof: 1
     field :d, 4, optional: true, type: :string, oneof: 1
     field :e, 6, type: EnumFoo, enum: true, oneof: 0
+    field :f, 7, optional: true, type: Foo.Bar, oneof: 0
     field :other, 5, optional: true, type: :string
   end
 

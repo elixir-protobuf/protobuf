@@ -146,6 +146,10 @@ defmodule Protobuf.EncoderTest do
     msg = %TestMsg.Oneof{first: {:e, :UNKNOWN}}
     assert Encoder.encode(msg) == <<48, 0>>
     assert TestMsg.Oneof.decode(<<48, 0>>) == msg
+    # map
+    msg = %TestMsg.Oneof{first: {:f, %{}}}
+    assert Encoder.encode(msg) == <<58, 0>>
+    assert TestMsg.Oneof.decode(<<58, 0>>) == %TestMsg.Oneof{first: {:f, %TestMsg.Foo.Bar{}}}
 
     # proto3
     # int and string
@@ -159,6 +163,13 @@ defmodule Protobuf.EncoderTest do
     msg = %TestMsg.OneofProto3{first: {:e, :UNKNOWN}}
     assert Encoder.encode(msg) == <<48, 0>>
     assert TestMsg.OneofProto3.decode(<<48, 0>>) == msg
+    # map
+    msg = %TestMsg.OneofProto3{first: {:f, %{}}}
+    assert Encoder.encode(msg) == <<58, 0>>
+
+    assert TestMsg.OneofProto3.decode(<<58, 0>>) == %TestMsg.OneofProto3{
+             first: {:f, %TestMsg.Foo.Bar{}}
+           }
   end
 
   test "encodes proto3 optional fields zero values" do
