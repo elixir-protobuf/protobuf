@@ -14,6 +14,16 @@ defmodule Protobuf.JSON.EncodeTest do
     Scalars
   }
 
+  test "encodes proto3 optional fields zero values" do
+    message = %TestMsg.Proto3Optional{a: 0, c: :UNKNOWN}
+    assert encode(message) == %{"a" => 0, "c" => :UNKNOWN}
+  end
+
+  test "skips a proto3 optional field with a nil value" do
+    message = %TestMsg.Proto3Optional{a: nil, c: nil}
+    assert encode(message) == %{}
+  end
+
   test "encodes strings and booleans as they are" do
     message = %Scalars{string: "エリクサー", bool: true}
     assert encode(message) == %{"string" => "エリクサー", "bool" => true}
@@ -96,6 +106,15 @@ defmodule Protobuf.JSON.EncodeTest do
 
     message = %Scalars{float: :negative_infinity, double: :negative_infinity}
     assert encode(message) == %{"float" => "-Infinity", "double" => "-Infinity"}
+  end
+
+  if System.otp_release() < "27" do
+    @tag :skip
+  end
+
+  test "encodes negative zero" do
+    message = %Scalars{float: -0.0, double: -0.0}
+    assert %{"float" => -0.0, "double" => -0.0} = encode(message)
   end
 
   test "encodes bytes in Base64 with padding" do

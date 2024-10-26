@@ -8,6 +8,10 @@ defmodule Protobuf.Protoc.Context do
 
             ### All files scope
 
+            # All parsed comments from the source file (mapping from path to comment)
+            # %{"1.4.2" => "this is a comment", "1.5.2.4.2" => "more comment\ndetails"}
+            comments: %{},
+
             # Mapping from file name to (mapping from type name to metadata, like elixir type name)
             # %{"example.proto" => %{".example.FooMsg" => %{type_name: "Example.FooMsg"}}}
             global_type_mapping: %{},
@@ -42,7 +46,11 @@ defmodule Protobuf.Protoc.Context do
             include_docs?: false,
 
             # Elixirpb.FileOptions
-            custom_file_options: %{}
+            custom_file_options: %{},
+
+            # Current comment path. The locations are encoded into with a joining "."
+            # character. E.g. "4.2.3.0"
+            current_comment_path: ""
 
   @spec custom_file_options_from_file_desc(t(), Google.Protobuf.FileDescriptorProto.t()) :: t()
   def custom_file_options_from_file_desc(ctx, desc)
@@ -67,5 +75,18 @@ defmodule Protobuf.Protoc.Context do
       | custom_file_options: custom_file_opts,
         module_prefix: Map.get(custom_file_opts, :module_prefix)
     }
+  end
+
+  @doc """
+  Appends a comment path to the current comment path.
+
+  ## Examples
+
+      iex> append_comment_path(%{current_comment_path: "4"}, "2.4")
+      %{current_comment_path: "4.2.4"}
+
+  """
+  def append_comment_path(ctx, path) do
+    %{ctx | current_comment_path: String.trim(ctx.current_comment_path <> "." <> path, ".")}
   end
 end

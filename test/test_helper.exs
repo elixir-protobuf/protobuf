@@ -28,6 +28,12 @@ defmodule Protobuf.TestHelpers do
     Map.put(context, :tmp_dir, tmp_dir_name)
   end
 
+  def read_generated_file(relative_path) do
+    [__DIR__, "../generated", relative_path]
+    |> Path.join()
+    |> File.read!()
+  end
+
   def get_type_spec_as_string(module, bytecode, type)
       when is_atom(module) and is_binary(bytecode) and is_atom(type) do
     # This code is taken from Code.Typespec in Elixir (v1.13 in particular).
@@ -51,7 +57,7 @@ defmodule Protobuf.TestHelpers do
 
   # This code is taken from Code.fetch_docs/1 in Elixir (v1.13 in particular).
   def fetch_docs_from_bytecode(bytecode) when is_binary(bytecode) do
-    docs_chunk = 'Docs'
+    docs_chunk = ~c"Docs"
     assert {:ok, {_module, [{^docs_chunk, bin}]}} = :beam_lib.chunks(bytecode, [docs_chunk])
     :erlang.binary_to_term(bin)
   end

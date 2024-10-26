@@ -47,6 +47,7 @@ defmodule Protobuf.Protoc.Generator.Util do
   def options_to_str(opts) when is_map(opts) do
     opts
     |> Enum.reject(fn {_key, val} -> val in [nil, false] end)
+    |> Enum.sort()
     |> Enum.map_join(", ", fn {key, val} -> "#{key}: #{print(val)}" end)
   end
 
@@ -83,6 +84,19 @@ defmodule Protobuf.Protoc.Generator.Util do
     code
     |> Code.format_string!(locals_without_parens: @locals_without_parens)
     |> IO.iodata_to_binary()
+  end
+
+  @spec pad_comment(String.t(), non_neg_integer()) :: String.t()
+  def pad_comment(comment, size) do
+    padding = String.duplicate(" ", size)
+
+    comment
+    |> String.split("\n")
+    |> Enum.map(fn line ->
+      trimmed = String.trim_leading(line, " ")
+      padding <> trimmed
+    end)
+    |> Enum.join("\n")
   end
 
   @spec version() :: String.t()

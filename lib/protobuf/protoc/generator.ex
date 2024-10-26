@@ -36,13 +36,20 @@ defmodule Protobuf.Protoc.Generator do
     ctx =
       %Context{
         ctx
-        | syntax: syntax(desc.syntax),
+        | comments: Protobuf.Protoc.Generator.Comment.parse(desc),
+          syntax: syntax(desc.syntax),
           package: desc.package,
           dep_type_mapping: get_dep_type_mapping(ctx, desc.dependency, desc.name)
       }
       |> Protobuf.Protoc.Context.custom_file_options_from_file_desc(desc)
 
-    enum_defmodules = Enum.map(desc.enum_type, &Generator.Enum.generate(ctx, &1))
+    enum_defmodules =
+      desc.enum_type
+      |> Enum.with_index()
+      |> Enum.map(fn {enum, index} ->
+        {Context.append_comment_path(ctx, "5.#{index}"), enum}
+      end)
+      |> Enum.map(fn {ctx, enum} -> Generator.Enum.generate(ctx, enum) end)
 
     {nested_enum_defmodules, message_defmodules} =
       Generator.Message.generate_list(ctx, desc.message_type)
@@ -51,7 +58,14 @@ defmodule Protobuf.Protoc.Generator do
 
     service_defmodules =
       if "grpc" in ctx.plugins do
-        Enum.map(desc.service, &Generator.Service.generate(ctx, &1))
+        desc.service
+        |> Enum.with_index()
+        |> Enum.map(fn {service, index} ->
+          Generator.Service.generate(
+            Context.append_comment_path(ctx, "6.#{index}"),
+            service
+          )
+        end)
       else
         []
       end

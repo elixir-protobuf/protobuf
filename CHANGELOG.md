@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.13.0
+
+### Enhancements
+
+  * Do not allow encoding structs as a different struct
+  * Support OTP 27
+
+### Bug fixes
+
+  * Add optional keys to `Protobuf.decode/2` typespecs
+  * Include `elixirpb` files in Hex package
+  * Fix JSON encoding of proto3 optional non-nil defaults
+
 ## v0.12.0
 
 ### Enhancements
