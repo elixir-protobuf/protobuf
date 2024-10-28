@@ -1,7 +1,7 @@
 defmodule Google.Protobuf.Compiler.CodeGeneratorResponse.Feature do
   @moduledoc false
 
-  use Protobuf, enum: true, syntax: :proto2, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.13.0", syntax: :proto2
 
   field :FEATURE_NONE, 0
   field :FEATURE_PROTO3_OPTIONAL, 1
