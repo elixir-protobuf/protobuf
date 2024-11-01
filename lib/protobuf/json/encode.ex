@@ -162,9 +162,17 @@ defmodule Protobuf.JSON.Encode do
   defp encode_regular_fields(struct, %{field_props: field_props}, opts) do
     for {_field_num, %{name_atom: name, oneof: nil} = prop} <- field_props,
         %{^name => value} = struct,
-        opts[:emit_unpopulated] || !default?(prop, value) do
+        emit?(prop, value) || opts[:emit_unpopulated] do
       encode_field(prop, value, opts)
     end
+  end
+
+  defp emit?(_prop, nil) do
+    false
+  end
+
+  defp emit?(prop, value) do
+    if default?(prop, value), do: prop.proto3_optional?, else: true
   end
 
   defp encode_oneof_fields(struct, message_props, opts) do
@@ -301,7 +309,13 @@ defmodule Protobuf.JSON.Encode do
   defp maybe_repeat(%{repeated?: false}, val, fun), do: fun.(val)
   defp maybe_repeat(%{repeated?: true}, val, fun), do: Enum.map(val, fun)
 
-  defp default?(_prop, value) when value in [nil, 0, false, [], "", 0.0, %{}], do: true
+  defp default?(_prop, +0.0), do: true
+  defp default?(_prop, nil), do: true
+  defp default?(_prop, 0), do: true
+  defp default?(_prop, false), do: true
+  defp default?(_prop, []), do: true
+  defp default?(_prop, ""), do: true
+  defp default?(_prop, %{} = map) when map_size(map) == 0, do: true
   defp default?(%{type: {:enum, enum}}, key) when is_atom(key), do: enum.value(key) == 0
   defp default?(_prop, _value), do: false
 

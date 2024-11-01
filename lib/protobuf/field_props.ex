@@ -3,14 +3,12 @@ defmodule Protobuf.FieldProps do
 
   # A struct containing information about a field in a Protobuf message.
 
-  alias Protobuf.Wire.Types
-
   @type t :: %__MODULE__{
           fnum: integer,
           name: String.t(),
           name_atom: atom,
           json_name: String.t(),
-          wire_type: Types.wire_type(),
+          wire_type: Protobuf.wire_type(),
           type: atom | {:enum, atom},
           default: any,
           oneof: non_neg_integer | nil,

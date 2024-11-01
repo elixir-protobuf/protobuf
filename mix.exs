@@ -2,14 +2,14 @@ defmodule Protobuf.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/elixir-protobuf/protobuf"
-  @version "0.12.0"
+  @version "0.13.0"
   @description "A pure Elixir implementation of Google Protobuf."
 
   def project do
     [
       app: :protobuf,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.12",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       dialyzer: [plt_add_apps: [:mix, :jason], flags: [:no_improper_lists]],
@@ -49,7 +49,7 @@ defmodule Protobuf.Mixfile do
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:stream_data, "~> 0.5.0", only: [:dev, :test]},
+      {:stream_data, "~> 1.0", only: [:dev, :test]},
       {:excoveralls, "~> 0.14.4", only: :test},
 
       # We use this as a dependency because we're sneaky. It's not a Mix dependency at all,
@@ -73,17 +73,6 @@ defmodule Protobuf.Mixfile do
     [
       maintainers: ["Bing Han", "Andrea Leopardi"],
       licenses: ["MIT"],
-      files: ~w(
-        mix.exs
-        README.md
-        lib/google
-        lib/protobuf
-        lib/*.ex
-        src
-        LICENSE
-        priv/templates
-        .formatter.exs
-      ),
       links: %{"GitHub" => @source_url}
     ]
   end
@@ -99,7 +88,7 @@ defmodule Protobuf.Mixfile do
 
   defp aliases do
     [
-      gen_bootstrap_protos: [&build_escript/1, &gen_bootstrap_protos/1],
+      gen_bootstrap_protos: [&build_escript/1, &gen_bootstrap_protos/1, &gen_google_protos/1],
       gen_test_protos: [&build_escript/1, &create_generated_dir/1, &gen_test_protos/1],
       test: [
         &build_escript/1,
@@ -160,15 +149,15 @@ defmodule Protobuf.Mixfile do
     proto_src = path_in_protobuf_source(["src"])
 
     protoc!(
-      "-I #{proto_src} -I src -I test/protobuf/protoc/proto",
+      "-I #{proto_src} -I src -I test/protobuf/protoc/proto --elixir_opt=include_docs=true",
       "./generated",
       ["test/protobuf/protoc/proto/extension.proto"]
     )
 
     protoc!(
-      "-I test/protobuf/protoc/proto --elixir_opt=package_prefix=my",
+      "-I test/protobuf/protoc/proto --elixir_opt=package_prefix=my,include_docs=true",
       "./generated",
-      ["test/protobuf/protoc/proto/test.proto"]
+      ["test/protobuf/protoc/proto/test.proto", "test/protobuf/protoc/proto/service.proto"]
     )
 
     protoc!(
@@ -179,7 +168,7 @@ defmodule Protobuf.Mixfile do
     )
 
     protoc!(
-      "-I test/protobuf/protoc/proto",
+      "-I test/protobuf/protoc/proto --elixir_opt=include_docs=true",
       "./generated",
       ["test/protobuf/protoc/proto/no_package.proto"]
     )
@@ -190,8 +179,8 @@ defmodule Protobuf.Mixfile do
     protoc!("-I \"#{proto_bench}\"", "./bench/lib", benchmark_proto_files())
   end
 
-  defp gen_google_test_protos(_args) do
-    proto_root = path_in_protobuf_source(["src"])
+  defp gen_google_protos(_args) do
+    proto_src = path_in_protobuf_source(["src"])
 
     files = ~w(
       google/protobuf/any.proto
@@ -201,11 +190,20 @@ defmodule Protobuf.Mixfile do
       google/protobuf/struct.proto
       google/protobuf/timestamp.proto
       google/protobuf/wrappers.proto
+    )
+
+    protoc!("-I \"#{proto_src}\"", "./lib", files)
+  end
+
+  defp gen_google_test_protos(_args) do
+    proto_root = path_in_protobuf_source(["src"])
+
+    files = ~w(
       google/protobuf/test_messages_proto2.proto
       google/protobuf/test_messages_proto3.proto
     )
 
-    protoc!("-I \"#{proto_root}\"", "./generated", files)
+    protoc!("-I \"#{proto_root}\" --elixir_opt=include_docs=true", "./generated", files)
   end
 
   defp gen_conformance_protos(_args) do

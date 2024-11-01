@@ -83,7 +83,7 @@ defmodule Protobuf.Encoder do
 
   defp skip_field?(:proto3, nil, _prop), do: true
   defp skip_field?(:proto3, 0, %FieldProps{oneof: nil}), do: true
-  defp skip_field?(:proto3, 0.0, %FieldProps{oneof: nil}), do: true
+  defp skip_field?(:proto3, +0.0, %FieldProps{oneof: nil}), do: true
   defp skip_field?(:proto3, "", %FieldProps{oneof: nil}), do: true
   defp skip_field?(:proto3, false, %FieldProps{oneof: nil}), do: true
   defp skip_field?(_syntax, _val, _prop), do: false
@@ -143,9 +143,16 @@ defmodule Protobuf.Encoder do
 
   defp encode_from_type(mod, msg) do
     case msg do
-      %{__struct__: ^mod} -> encode_to_iodata(msg)
-      %_{} -> encode_to_iodata(struct(mod, Map.from_struct(msg)))
-      _ -> encode_to_iodata(struct(mod, msg))
+      %{__struct__: ^mod} ->
+        encode_to_iodata(msg)
+
+      %other_mod{} = struct ->
+        raise Protobuf.EncodeError,
+          message:
+            "struct #{inspect(other_mod)} can't be encoded as #{inspect(mod)}: #{inspect(struct)}"
+
+      _ ->
+        encode_to_iodata(struct(mod, msg))
     end
   end
 
