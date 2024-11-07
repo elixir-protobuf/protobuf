@@ -3,7 +3,7 @@ defmodule Google.ProtobufTest do
 
   import Google.Protobuf
 
-  alias Google.Protobuf.{Duration, Struct, Timestamp}
+  alias Google.Protobuf.{Struct, Timestamp}
 
   @basic_json """
   {
@@ -48,43 +48,6 @@ defmodule Google.ProtobufTest do
       }
     }
   }
-
-  describe "to_time_unit/1" do
-    test "converts nil values to 0 seconds" do
-      assert {0, :second} == to_time_unit(%Duration{})
-    end
-
-    test "converts to total seconds if no nanoseconds specified" do
-      assert {4200, :second} == to_time_unit(%Duration{seconds: 4200})
-      assert {-1234, :second} == to_time_unit(%Duration{seconds: -1234})
-    end
-
-    test "converts to total nanoseconds if specified" do
-      assert {20_000_000_100, :nanosecond} ==
-               to_time_unit(%Duration{seconds: 20, nanos: 100})
-    end
-  end
-
-  describe "from_time_unit/2" do
-    test "converts :second to duration" do
-      assert %Duration{seconds: 11} == from_time_unit(11, :second)
-    end
-
-    test "converts :millisecond to duration" do
-      assert %Duration{seconds: 11, nanos: 111_000_000} ==
-               from_time_unit(11111, :millisecond)
-    end
-
-    test "converts :microsecond to duration" do
-      assert %Duration{seconds: 11, nanos: 111_111_000} ==
-               from_time_unit(11_111_111, :microsecond)
-    end
-
-    test "converts :nanosecond to duration" do
-      assert %Duration{seconds: -14, nanos: -111_423_724} ==
-               from_time_unit(-14_111_423_724, :nanosecond)
-    end
-  end
 
   describe "to_map/1" do
     test "converts nil values to empty map" do

@@ -4,74 +4,25 @@ defmodule Google.Protobuf do
   """
 
   @doc """
-  Converts a `Google.Protobuf.Duration` struct to a value and `System.time_unit()`.
-
-  ## Examples
-
-      iex> to_time_unit(%Google.Protobuf.Duration{seconds: 10})
-      {10, :second}
-
-      iex> to_time_unit(%Google.Protobuf.Duration{seconds: 20, nanos: 100})
-      {20_000_000_100, :nanosecond}
-
-  """
-  @spec to_time_unit(Google.Protobuf.Duration.t()) :: {integer(), System.time_unit()}
-  def to_time_unit(%{seconds: seconds, nanos: 0}) do
-    {seconds, :second}
-  end
-
-  def to_time_unit(%{seconds: seconds, nanos: nanos}) do
-    {seconds * 1_000_000_000 + nanos, :nanosecond}
-  end
-
-  @doc """
-  Converts a value and `System.time_unit()` to a `Google.Protobuf.Duration` struct.
-
-  ## Examples
-
-      iex> from_time_unit(420, :second)
-      %Google.Protobuf.Duration{seconds: 420}
-
-      iex> from_time_unit(11_111_111, :microsecond)
-      %Google.Protobuf.Duration{seconds: 11, nanos: 111_111_000}
-
-  """
-  @spec from_time_unit(integer(), System.time_unit()) :: Google.Protobuf.Duration.t()
-  def from_time_unit(seconds, :second) do
-    struct(Google.Protobuf.Duration, %{
-      seconds: seconds
-    })
-  end
-
-  def from_time_unit(millisecond, :millisecond) do
-    struct(Google.Protobuf.Duration, %{
-      seconds: div(millisecond, 1_000),
-      nanos: rem(millisecond, 1_000) * 1_000_000
-    })
-  end
-
-  def from_time_unit(millisecond, :microsecond) do
-    struct(Google.Protobuf.Duration, %{
-      seconds: div(millisecond, 1_000_000),
-      nanos: rem(millisecond, 1_000_000) * 1_000
-    })
-  end
-
-  def from_time_unit(millisecond, :nanosecond) do
-    struct(Google.Protobuf.Duration, %{
-      seconds: div(millisecond, 1_000_000_000),
-      nanos: rem(millisecond, 1_000_000_000)
-    })
-  end
-
-  @doc """
-  Converts a `Google.Protobuf.Struct` struct to a `map()` recursively
+  Converts a `Google.Protobuf.Struct` struct to a `t:map()` recursively
   converting values to their Elixir equivalents.
 
   ## Examples
 
       iex> to_map(%Google.Protobuf.Struct{})
       %{}
+
+      iex> to_map(%Google.Protobuf.Struct{
+        fields: %{
+          "key_one" => %Google.Protobuf.Value{
+            kind: {:string_value, "value_one"},
+          },
+          "key_two" => %Google.Protobuf.Value{
+            kind: {:number_value, 1234.0},
+          }
+        },
+      })
+      %{"key_one" => "value_one", "key_two" => 1234.0}
 
   """
   @spec to_map(Google.Protobuf.Struct.t()) :: map()
@@ -93,7 +44,7 @@ defmodule Google.Protobuf do
     do: Enum.map(values, &to_map_value/1)
 
   @doc """
-  Converts a `map()` to a `Google.Protobuf.Struct` struct recursively
+  Converts a `t:map()` to a `Google.Protobuf.Struct` struct recursively
   wrapping values in their `Google.Protobuf.Value` equivalents.
 
   ## Examples
