@@ -13,8 +13,6 @@ defmodule Protobuf.TransformModule do
       defmodule StringMessage do
         use Protobuf, syntax: :proto3
 
-        defstruct [:value]
-
         field :value, 1, type: :string
 
         def transform_module(), do: MyTransformModule
