@@ -242,7 +242,7 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp def_t_typespec(props, _extension_props, transform_module_ast) when not is_nil(transform_module_ast) do
+  defp def_t_typespec(_props, _extension_props, transform_module_ast) when not is_nil(transform_module_ast) do
     quote do
       @type t() :: unquote(transform_module_ast).t(__MODULE__)
     end
