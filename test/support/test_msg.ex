@@ -280,6 +280,8 @@ defmodule TestMsg do
   defmodule TransformModule do
     @behaviour Protobuf.TransformModule
 
+    @type t(_module) :: term()
+
     @impl true
     def encode(integer, WithTransformModule) when is_integer(integer) do
       %WithTransformModule{field: integer}
@@ -301,6 +303,8 @@ defmodule TestMsg do
 
   defmodule TransformIntegerStrings do
     @behaviour Protobuf.TransformModule
+
+    @type t(_module) :: term()
 
     @impl true
     def encode(

@@ -5,6 +5,8 @@ defmodule Protobuf.TransformModule.InferFieldsFromEnum do
   `c:Protobuf.new/1` before the value is encoded.
   """
 
+  @type t(_module) :: term()
+
   @behaviour Protobuf.TransformModule
 
   @impl true
