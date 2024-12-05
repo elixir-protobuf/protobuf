@@ -238,6 +238,10 @@ defmodule Protobuf.JSON.DecodeTest do
       data = %{"float" => 1.23e3, "double" => 1.23e-2}
       decoded = %Scalars{float: 1230.0, double: 0.0123}
       assert decode(data, Scalars) == {:ok, decoded}
+
+      data = %{"float" => 5, "double" => 9}
+      decoded = %Scalars{float: 5.0, double: 9.0}
+      assert decode(data, Scalars) == {:ok, decoded}
     end
 
     test "constants are valid" do
@@ -279,8 +283,8 @@ defmodule Protobuf.JSON.DecodeTest do
     end
 
     test "other types are invalid" do
-      data = %{"float" => 5}
-      msg = "Field 'float' has an invalid floating point (5)"
+      data = %{"float" => <<1::15>>}
+      msg = "Field 'float' has an invalid floating point (<<0, 1::size(7)>>)"
       assert decode(data, Scalars) == error(msg)
 
       data = %{"double" => true}
