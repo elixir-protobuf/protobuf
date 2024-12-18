@@ -249,6 +249,39 @@ defmodule TestMsg do
     field :mapsi, 3, repeated: true, map: true, type: MapFoo
   end
 
+  defmodule TransformModule do
+    @behaviour Protobuf.TransformModule
+
+    alias TestMsg.WithTransformModule
+
+    @impl true
+    defmacro typespec(module, default_typespec) do
+      case module do
+        WithTransformModule ->
+          quote do
+            @type t() :: integer()
+          end
+
+        _ ->
+          default_typespec
+      end
+    end
+
+    # In an actual implementation, one could write the implementations of
+    # encode/2 and decode/2 in a separate module and use the structs
+    # directly.
+
+    @impl true
+    def encode(integer, WithTransformModule) when is_integer(integer) do
+      struct(WithTransformModule, field: integer)
+    end
+
+    @impl true
+    def decode(%{__struct__: WithTransformModule, field: integer}, WithTransformModule) do
+      integer
+    end
+  end
+
   defmodule WithTransformModule do
     use Protobuf, syntax: :proto3
 
@@ -277,19 +310,23 @@ defmodule TestMsg do
     field :field, 1, type: WithNewTransformModule
   end
 
-  defmodule TransformModule do
+  defmodule TransformIntegerStrings do
     @behaviour Protobuf.TransformModule
 
-    @type t(_module) :: term()
+    alias TestMsg.ContainsIntegerStringTransformModule
 
     @impl true
-    def encode(integer, WithTransformModule) when is_integer(integer) do
-      %WithTransformModule{field: integer}
+    def encode(
+          %{__struct__: ContainsIntegerStringTransformModule, field: str},
+          ContainsIntegerStringTransformModule
+        )
+        when is_binary(str) do
+      struct(ContainsIntegerStringTransformModule, field: String.to_integer(str))
     end
 
     @impl true
-    def decode(%WithTransformModule{field: integer}, WithTransformModule) do
-      integer
+    def decode(%{__struct__: ContainsIntegerStringTransformModule} = value, _) do
+      value
     end
   end
 
@@ -299,26 +336,6 @@ defmodule TestMsg do
     field :field, 1, type: :int32
 
     def transform_module(), do: TestMsg.TransformIntegerStrings
-  end
-
-  defmodule TransformIntegerStrings do
-    @behaviour Protobuf.TransformModule
-
-    @type t(_module) :: term()
-
-    @impl true
-    def encode(
-          %ContainsIntegerStringTransformModule{field: str},
-          ContainsIntegerStringTransformModule
-        )
-        when is_binary(str) do
-      %ContainsIntegerStringTransformModule{field: String.to_integer(str)}
-    end
-
-    @impl true
-    def decode(%ContainsIntegerStringTransformModule{} = value, _) do
-      value
-    end
   end
 
   defmodule Ext.EnumFoo do

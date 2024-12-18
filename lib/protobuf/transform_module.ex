@@ -23,12 +23,22 @@ defmodule Protobuf.TransformModule do
       defmodule MyTransformModule do
         @behaviour Protobuf.TransformModule
 
-        @impl true
-        def encode(string, StringMessage) when is_binary(string), do: %StringMessage{value: string}
+        defmacro typespec(_module, _default_ast) do
+          quote do
+            @type t() :: String.t()
+          end
+        end
 
         @impl true
-        def decode(%StringMessage{value: string}, StringMessage), do: string
+        def encode(string, StringMessage) when is_binary(string), do: struct(StringMessage, value: string)
+
+        @impl true
+        def decode(%{value: string}, StringMessage), do: string
       end
+
+  Notice that since the `c:typespec/2` macro was introduced, transform modules can't
+  depend on the types that they transform anymore in compile time, meaning struct
+  syntax can't be used.
   """
 
   @type value() :: term()
@@ -50,4 +60,13 @@ defmodule Protobuf.TransformModule do
   Called after a message is decoded.
   """
   @callback decode(message(), type()) :: value()
+
+  @doc """
+  Transforms the typespec for modules using this transformer
+
+  Optional. If this callback is not present, the default typespec will be used.
+  """
+  @macrocallback typespec(module :: module(), default_typespec :: Macro.t()) :: Macro.t()
+
+  @optional_callbacks [typespec: 2]
 end

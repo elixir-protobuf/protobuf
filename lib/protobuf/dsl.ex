@@ -138,11 +138,11 @@ defmodule Protobuf.DSL do
 
   # Registered as the @on_definition compile callback for modules that call "use Protobuf"
   # Allow us to detect when `transform_module` is re-defined
-  def on_def(_env, :def, :transform_module, [], [], [do: nil]) do
+  def on_def(_env, :def, :transform_module, [], [], do: nil) do
     :ok
   end
 
-  def on_def(env, :def, :transform_module, [], [], [do: module_alias_ast]) do
+  def on_def(env, :def, :transform_module, [], [], do: module_alias_ast) do
     Module.put_attribute(env.module, :transform_module, module_alias_ast)
     :ok
   end
@@ -242,9 +242,34 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp def_t_typespec(_props, _extension_props, transform_module_ast) when not is_nil(transform_module_ast) do
+  defp def_t_typespec(props, extension_props, transform_module_ast)
+       when not is_nil(transform_module_ast) do
+    default_typespec = def_t_typespec(props, extension_props, nil)
+
     quote do
-      @type t() :: unquote(transform_module_ast).t(__MODULE__)
+      case Code.ensure_compiled(unquote(transform_module_ast)) do
+        {:module, _} ->
+          :ok
+
+        _ ->
+          raise CompileError, """
+          Transform module #{inspect(unquote(transform_module_ast))} not available
+          during protobuf definition compilation.
+
+          Since protobuf v0.14, protobuf definitions depend in compile time on
+          their transform modules. This means that transform modules can't depend
+          on protobuf structs, and must be available for compilation when protobuf
+          definitions are compiled.
+          """
+      end
+
+      require unquote(transform_module_ast)
+
+      if macro_exported?(unquote(transform_module_ast), :typespec, 2) do
+        unquote(transform_module_ast).typespec(__MODULE__, unquote(default_typespec))
+      else
+        unquote(default_typespec)
+      end
     end
   end
 
