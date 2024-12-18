@@ -87,13 +87,14 @@ defmodule Protobuf do
         nil
       end
 
-      defoverridable transform_module: 0
-
       @impl unquote(__MODULE__)
       def decode(data), do: Protobuf.Decoder.decode(data, __MODULE__)
 
       @impl unquote(__MODULE__)
       def encode(struct), do: Protobuf.Encoder.encode(struct)
+
+      @on_definition {Protobuf.DSL, :on_def}
+      defoverridable transform_module: 0
     end
   end
 
