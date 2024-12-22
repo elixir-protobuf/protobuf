@@ -247,25 +247,9 @@ defmodule Protobuf.DSL do
     default_typespec = def_t_typespec(props, extension_props, nil)
 
     quote do
-      case Code.ensure_compiled(unquote(transform_module_ast)) do
-        {:module, _} ->
-          :ok
-
-        _ ->
-          raise CompileError, """
-          Transform module #{inspect(unquote(transform_module_ast))} not available
-          during Protobuf definition compilation.
-
-          Since Protobuf v0.14, Protobuf definitions depend in compile time on
-          their transform modules. This means that transform modules can't depend
-          on Protobuf structs, and must be available for compilation when Protobuf
-          definitions are compiled.
-          """
-      end
-
       require unquote(transform_module_ast)
 
-      if macro_exported?(unquote(transform_module_ast), :typespec, 2) do
+      if macro_exported?(unquote(transform_module_ast), :typespec, 1) do
         unquote(transform_module_ast).typespec(unquote(default_typespec))
       else
         unquote(default_typespec)

@@ -256,7 +256,7 @@ defmodule TestMsg do
 
     @impl true
     defmacro typespec(default_typespec) do
-      case module do
+      case __CALLER__.module do
         WithTransformModule ->
           quote do
             @type t() :: integer()
