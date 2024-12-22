@@ -62,7 +62,7 @@ defmodule Protobuf.TransformModule do
   @callback decode(message(), type()) :: value()
 
   @doc """
-  Transforms the typespec for modules using this transformer
+  Transforms the typespec for modules using this transformer.
 
   If this callback is not present, the default typespec will be used.
   """

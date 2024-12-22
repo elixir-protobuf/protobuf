@@ -254,11 +254,11 @@ defmodule Protobuf.DSL do
         _ ->
           raise CompileError, """
           Transform module #{inspect(unquote(transform_module_ast))} not available
-          during protobuf definition compilation.
+          during Protobuf definition compilation.
 
-          Since protobuf v0.14, protobuf definitions depend in compile time on
+          Since Protobuf v0.14, Protobuf definitions depend in compile time on
           their transform modules. This means that transform modules can't depend
-          on protobuf structs, and must be available for compilation when protobuf
+          on Protobuf structs, and must be available for compilation when Protobuf
           definitions are compiled.
           """
       end
