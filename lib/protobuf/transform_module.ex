@@ -23,7 +23,7 @@ defmodule Protobuf.TransformModule do
       defmodule MyTransformModule do
         @behaviour Protobuf.TransformModule
 
-        defmacro typespec(_module, _default_ast) do
+        defmacro typespec(_default_ast) do
           quote do
             @type t() :: String.t()
           end
@@ -36,7 +36,7 @@ defmodule Protobuf.TransformModule do
         def decode(%{value: string}, StringMessage), do: string
       end
 
-  Notice that since the `c:typespec/2` macro was introduced, transform modules can't
+  Notice that since the `c:typespec/1` macro was introduced, transform modules can't
   depend on the types that they transform anymore in compile time, meaning struct
   syntax can't be used.
   """
@@ -64,9 +64,9 @@ defmodule Protobuf.TransformModule do
   @doc """
   Transforms the typespec for modules using this transformer
 
-  Optional. If this callback is not present, the default typespec will be used.
+  If this callback is not present, the default typespec will be used.
   """
-  @macrocallback typespec(module :: module(), default_typespec :: Macro.t()) :: Macro.t()
+  @macrocallback typespec(default_typespec :: Macro.t()) :: Macro.t()
 
-  @optional_callbacks [typespec: 2]
+  @optional_callbacks [typespec: 1]
 end

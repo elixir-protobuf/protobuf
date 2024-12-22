@@ -255,7 +255,7 @@ defmodule TestMsg do
     alias TestMsg.WithTransformModule
 
     @impl true
-    defmacro typespec(module, default_typespec) do
+    defmacro typespec(default_typespec) do
       case module do
         WithTransformModule ->
           quote do

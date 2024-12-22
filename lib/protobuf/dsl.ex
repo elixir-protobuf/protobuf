@@ -266,7 +266,7 @@ defmodule Protobuf.DSL do
       require unquote(transform_module_ast)
 
       if macro_exported?(unquote(transform_module_ast), :typespec, 2) do
-        unquote(transform_module_ast).typespec(__MODULE__, unquote(default_typespec))
+        unquote(transform_module_ast).typespec(unquote(default_typespec))
       else
         unquote(default_typespec)
       end
