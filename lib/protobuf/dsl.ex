@@ -136,6 +136,21 @@ defmodule Protobuf.DSL do
   alias Protobuf.MessageProps
   alias Protobuf.Wire
 
+  # Registered as the @on_definition compile callback for modules that call "use Protobuf"
+  # Allow us to detect when `transform_module` is re-defined
+  def on_def(_env, :def, :transform_module, [], [], do: nil) do
+    :ok
+  end
+
+  def on_def(env, :def, :transform_module, [], [], do: module_alias_ast) do
+    Module.put_attribute(env.module, :transform_module, module_alias_ast)
+    :ok
+  end
+
+  def on_def(_, _, _, _, _, _) do
+    :ok
+  end
+
   # Registered as the @before_compile callback for modules that call "use Protobuf".
   defmacro __before_compile__(env) do
     fields = Module.get_attribute(env.module, :fields)
@@ -151,6 +166,7 @@ defmodule Protobuf.DSL do
 
     defines_t_type? = Module.defines_type?(env.module, {:t, 0})
     defines_defstruct? = Module.defines?(env.module, {:__struct__, 1})
+    transform_module_ast = Module.get_attribute(env.module, :transform_module)
 
     quote do
       @spec __message_props__() :: Protobuf.MessageProps.t()
@@ -208,7 +224,7 @@ defmodule Protobuf.DSL do
 
         # Newest version of this library generate both the t/0 type as well as the struct.
         true ->
-          unquote(def_t_typespec(msg_props, extension_props))
+          unquote(def_t_typespec(msg_props, extension_props, transform_module_ast))
           unquote(gen_defstruct(msg_props))
       end
 
@@ -226,19 +242,34 @@ defmodule Protobuf.DSL do
     end
   end
 
-  defp def_t_typespec(%MessageProps{enum?: true} = props, _extension_props) do
+  defp def_t_typespec(props, extension_props, transform_module_ast)
+       when not is_nil(transform_module_ast) do
+    default_typespec = def_t_typespec(props, extension_props, nil)
+
+    quote do
+      require unquote(transform_module_ast)
+
+      if macro_exported?(unquote(transform_module_ast), :typespec, 1) do
+        unquote(transform_module_ast).typespec(unquote(default_typespec))
+      else
+        unquote(default_typespec)
+      end
+    end
+  end
+
+  defp def_t_typespec(%MessageProps{enum?: true} = props, _extension_props, _) do
     quote do
       @type t() :: unquote(Protobuf.DSL.Typespecs.quoted_enum_typespec(props))
     end
   end
 
-  defp def_t_typespec(%MessageProps{} = props, _extension_props = nil) do
+  defp def_t_typespec(%MessageProps{} = props, _extension_props = nil, _) do
     quote do
       @type t() :: unquote(Protobuf.DSL.Typespecs.quoted_message_typespec(props))
     end
   end
 
-  defp def_t_typespec(_props, _extension_props) do
+  defp def_t_typespec(_props, _extension_props, _) do
     nil
   end
 
