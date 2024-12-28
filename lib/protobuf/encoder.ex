@@ -60,17 +60,21 @@ defmodule Protobuf.Encoder do
       end
 
     acc =
-      case encode_field(class_field(prop), val, syntax, prop) do
+      case encode_field(prop, struct.__struct__, val, syntax) do
         {:ok, iodata} -> [acc | iodata]
         :skip -> acc
       end
 
     encode_fields(rest, syntax, struct, oneofs, acc)
+  end
+
+  defp encode_field(prop, struct_mod, val, syntax) do
+    do_encode_field(class_field(prop), val, syntax, prop)
   rescue
     error ->
       raise Protobuf.EncodeError,
         message:
-          "Got error when encoding #{inspect(struct.__struct__)}##{prop.name_atom}: #{Exception.format(:error, error)}"
+          "Got error when encoding #{inspect(struct_mod)}##{prop.name_atom}: #{Exception.format(:error, error)}"
   end
 
   defp skip_field?(_syntax, [], _prop), do: true
@@ -88,7 +92,7 @@ defmodule Protobuf.Encoder do
   defp skip_field?(:proto3, false, %FieldProps{oneof: nil}), do: true
   defp skip_field?(_syntax, _val, _prop), do: false
 
-  defp encode_field(
+  defp do_encode_field(
          :normal,
          val,
          syntax,
@@ -102,11 +106,11 @@ defmodule Protobuf.Encoder do
     end
   end
 
-  defp encode_field(:embedded, _val = nil, _syntax, _prop) do
+  defp do_encode_field(:embedded, _val = nil, _syntax, _prop) do
     :skip
   end
 
-  defp encode_field(
+  defp do_encode_field(
          :embedded,
          val,
          syntax,
@@ -131,7 +135,7 @@ defmodule Protobuf.Encoder do
     {:ok, result}
   end
 
-  defp encode_field(:packed, val, syntax, %FieldProps{type: type, encoded_fnum: fnum} = prop) do
+  defp do_encode_field(:packed, val, syntax, %FieldProps{type: type, encoded_fnum: fnum} = prop) do
     if skip_field?(syntax, val, prop) or skip_enum?(syntax, val, prop) do
       :skip
     else
@@ -251,7 +255,7 @@ defmodule Protobuf.Encoder do
     Enum.reduce(pb_exts, [], fn {{ext_mod, key}, val}, acc ->
       case Protobuf.Extension.get_extension_props(mod, ext_mod, key) do
         %{field_props: prop} ->
-          case encode_field(class_field(prop), val, :proto2, prop) do
+          case do_encode_field(class_field(prop), val, :proto2, prop) do
             {:ok, iodata} -> [acc | iodata]
             :skip -> acc
           end
