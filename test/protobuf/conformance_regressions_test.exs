@@ -104,11 +104,6 @@ defmodule Protobuf.ConformanceRegressionsTest do
     end
   end
 
-  # Fails on OTP 25.
-  if :erlang.system_info(:otp_release) >= ~c"25" do
-    @tag :skip
-  end
-
   test "memory leak and infinite loop regression" do
     mod = ProtobufTestMessages.Proto2.TestAllTypesProto2
 
