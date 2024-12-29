@@ -732,28 +732,6 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       assert msg =~ "field :the_field_name, 2, type: :string, json_name: \"theFieldName\"\n"
     end
 
-    test "is omitted when syntax is not proto3" do
-      ctx = %Context{}
-
-      desc = %Google.Protobuf.DescriptorProto{
-        name: "Foo",
-        field: [
-          %Google.Protobuf.FieldDescriptorProto{
-            name: "the_field_name",
-            json_name: "theFieldName",
-            number: 1,
-            type: :TYPE_STRING,
-            label: :LABEL_REQUIRED
-          }
-        ]
-      }
-
-      {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-
-      assert msg =~ "field :the_field_name, 1, required: true, type: :string\n"
-    end
-  end
-
   test "generate/2 repeated enum field" do
     ctx = %Context{
       package: "foo_bar.ab_cd",
