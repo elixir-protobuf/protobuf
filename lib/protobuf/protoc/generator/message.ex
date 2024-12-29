@@ -339,10 +339,10 @@ defmodule Protobuf.Protoc.Generator.Message do
   end
 
   # Omit `json_name` from the options list when it matches the original field
-  # name to keep the list small. Only Proto3 has JSON support for now.
-  defp add_json_name_to_opts(opts, :proto3, %{name: name, json_name: name}), do: opts
+  # name to keep the list small.
+  defp add_json_name_to_opts(opts, _, %{name: name, json_name: name}), do: opts
 
-  defp add_json_name_to_opts(opts, :proto3, %{json_name: json_name}),
+  defp add_json_name_to_opts(opts, _, %{json_name: json_name}),
     do: Keyword.put(opts, :json_name, json_name)
 
   defp add_json_name_to_opts(opts, _syntax, _props), do: opts
