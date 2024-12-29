@@ -731,6 +731,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
       assert msg =~ "field :simple, 1, type: :int32\n"
       assert msg =~ "field :the_field_name, 2, type: :string, json_name: \"theFieldName\"\n"
     end
+  end
 
   test "generate/2 repeated enum field" do
     ctx = %Context{
