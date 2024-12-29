@@ -5,21 +5,6 @@ defmodule Conformance.Protobuf.Runner do
 
   @spec main() :: :ok
   def main() do
-    if System.otp_release() >= "25" do
-      IO.puts(:stderr, """
-      It seems like conformance tests are broken on OTP 25 due to some memory leak
-      for some specific payloads. You can take a look at a couple of regression tests
-      related to this in: test/protobuf/conformance_regressions_test.exs
-
-      Also take a look at these:
-        * https://github.com/elixir-protobuf/protobuf/commit/19eeb0ebd17af23f4625445404a5c756675660aa
-        * https://github.com/elixir-protobuf/protobuf/commit/11e1b40a6eaa51b4d2872feaee809e2834bb9b9b#diff-5ea66cbe2186e1e3db8d8bf8e5f117a060e2fa87df3e48dbc182e55af10bef70
-
-      """)
-
-      System.halt(1)
-    end
-
     # Log things to stderr so that they don't interfere with the stdin/stdout interface
     # of the conformance runner.
     Logger.configure_backend(:console, device: :standard_error)
