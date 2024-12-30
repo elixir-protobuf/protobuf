@@ -376,8 +376,24 @@ defmodule Protobuf.JSON.Decode do
 
   defp parse_int(string) do
     case Integer.parse(string) do
-      {int, ""} -> {:ok, int}
-      _ -> :error
+      {int, ""} ->
+        {:ok, int}
+
+      _ ->
+        # We accept integers in scientific notation as well:
+        case Float.parse(string) do
+          {float, ""} ->
+            truncated = trunc(float)
+
+            if truncated == float do
+              {:ok, truncated}
+            else
+              :error
+            end
+
+          _ ->
+            :error
+        end
     end
   end
 

@@ -83,6 +83,12 @@ defmodule Protobuf.ConformanceRegressionsTest do
 
     @describetag message_type: "protobuf_test_messages.proto3.TestAllTypesProto3"
 
+    test "Required.Proto3.JsonInput.Int32FieldQuotedExponentialValue.JsonOutput" do
+      mod = ProtobufTestMessages.Proto3.TestAllTypesProto3
+      problematic_payload = ~S({"optionalInt32": "1e5"})
+      assert %{optional_int32: 100_000} = Protobuf.JSON.decode!(problematic_payload, mod)
+    end
+
     test "Recommended.Proto3.JsonInput.NullValueInOtherOneofNewFormat.Validator",
          %{message_mod: message_mod} do
       json = "{\"oneofNullValue\": null}"
