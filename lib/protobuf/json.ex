@@ -121,8 +121,8 @@ defmodule Protobuf.JSON do
   """
   @spec encode!(struct, [encode_opt]) :: String.t() | no_return
   def encode!(struct, opts \\ []) do
-    case encode(struct, opts) do
-      {:ok, json} -> json
+    case encode_to_iodata(struct, opts) do
+      {:ok, iodata} -> IO.iodata_to_binary(iodata)
       {:error, error} -> raise error
     end
   end
@@ -169,11 +169,41 @@ defmodule Protobuf.JSON do
   """
   @spec encode(struct, [encode_opt]) ::
           {:ok, String.t()} | {:error, EncodeError.t() | Exception.t()}
-  def encode(%_{} = struct, opts \\ []) when is_list(opts) do
+  def encode(struct, opts \\ []) when is_list(opts) do
+    case encode_to_iodata(struct, opts) do
+      {:ok, iodata} -> {:ok, IO.iodata_to_binary(iodata)}
+      {:error, error} -> {:error, error}
+    end
+  end
+
+  @doc """
+  Similar to `encode!/2`, but returns iodata
+
+  See `encode_to_iodata/2` for more information about when this function should
+  be preferred over `encode!/2`.
+  """
+  @spec encode_to_iodata!(struct, [encode_opt]) :: iodata()
+  def encode_to_iodata!(struct, opts \\ []) when is_list(opts) do
+    case encode_to_iodata(struct, opts) do
+      {:ok, iodata} -> iodata
+      {:error, error} -> raise error
+    end
+  end
+
+  @doc """
+  Similar to `encode/2`, but returns iodata
+
+  This function should be preferred to encode/2, if the generated JSON will be
+  handed over to one of the IO functions or sent over the socket. The Erlang
+  runtime is able to leverage vectorised writes and avoid allocating a continuous
+  buffer for the whole resulting string, lowering memory use and increasing
+  performance.
+  """
+  @spec encode_to_iodata(struct, [encode_opt]) ::
+          {:ok, iodata()} | {:error, EncodeError.t() | Exception.t()}
+  def encode_to_iodata(%_{} = struct, opts \\ []) when is_list(opts) do
     if jason = load_jason() do
-      with {:ok, map} <- to_encodable(struct, opts) do
-        jason.encode(map)
-      end
+      with {:ok, map} <- to_encodable(struct, opts), do: jason.encode_to_iodata(map)
     else
       {:error, EncodeError.new(:no_json_lib)}
     end

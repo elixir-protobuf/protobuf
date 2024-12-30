@@ -159,20 +159,12 @@ defmodule Protobuf.JSON.Encode do
     :maps.from_list(regular ++ oneofs)
   end
 
-  defp encode_regular_fields(struct, %{field_props: field_props}, opts) do
+  defp encode_regular_fields(struct, %{field_props: field_props, syntax: syntax}, opts) do
     for {_field_num, %{name_atom: name, oneof: nil} = prop} <- field_props,
         %{^name => value} = struct,
-        emit?(prop, value) || opts[:emit_unpopulated] do
+        emit?(syntax, prop, value) || opts[:emit_unpopulated] do
       encode_field(prop, value, opts)
     end
-  end
-
-  defp emit?(_prop, nil) do
-    false
-  end
-
-  defp emit?(prop, value) do
-    if default?(prop, value), do: prop.proto3_optional?, else: true
   end
 
   defp encode_oneof_fields(struct, message_props, opts) do
@@ -309,15 +301,18 @@ defmodule Protobuf.JSON.Encode do
   defp maybe_repeat(%{repeated?: false}, val, fun), do: fun.(val)
   defp maybe_repeat(%{repeated?: true}, val, fun), do: Enum.map(val, fun)
 
-  defp default?(_prop, +0.0), do: true
-  defp default?(_prop, nil), do: true
-  defp default?(_prop, 0), do: true
-  defp default?(_prop, false), do: true
-  defp default?(_prop, []), do: true
-  defp default?(_prop, ""), do: true
-  defp default?(_prop, %{} = map) when map_size(map) == 0, do: true
-  defp default?(%{type: {:enum, enum}}, key) when is_atom(key), do: enum.value(key) == 0
-  defp default?(_prop, _value), do: false
+  defp emit?(:proto2, %{default: value}, value), do: false
+  defp emit?(:proto2, %{optional?: true}, val), do: not is_nil(val)
+  defp emit?(:proto3, %{proto3_optional?: true}, val), do: not is_nil(val)
+  defp emit?(_syntax, _prop, +0.0), do: false
+  defp emit?(_syntax, _prop, nil), do: false
+  defp emit?(_syntax, _prop, 0), do: false
+  defp emit?(_syntax, _prop, false), do: false
+  defp emit?(_syntax, _prop, []), do: false
+  defp emit?(_syntax, _prop, ""), do: false
+  defp emit?(_syntax, _prop, %{} = map) when map_size(map) == 0, do: false
+  defp emit?(_syntax, %{type: {:enum, enum}}, key) when is_atom(key), do: enum.value(key) != 0
+  defp emit?(_syntax, _prop, _value), do: true
 
   defp transform_module(message, module) do
     if transform_module = module.transform_module() do

@@ -8,6 +8,12 @@ defmodule Protobuf.JSONTest do
     assert Protobuf.JSON.encode!(%TestMsg.Foo2{b: 10}) == ~S|{"b":"10"}|
   end
 
+  test "encode_to_iodata variants encode to iodata" do
+    assert iodata = Protobuf.JSON.encode_to_iodata!(%TestMsg.Foo2{b: 10})
+    assert {:ok, ^iodata} = Protobuf.JSON.encode_to_iodata(%TestMsg.Foo2{b: 10})
+    assert IO.iodata_to_binary(iodata) == ~S|{"b":"10"}|
+  end
+
   test "encoding string field with invalid UTF-8 data" do
     message = %Scalars{string: "   \xff   "}
     assert {:error, %Jason.EncodeError{}} = Protobuf.JSON.encode(message)
