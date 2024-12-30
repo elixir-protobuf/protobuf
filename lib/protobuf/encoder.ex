@@ -73,19 +73,18 @@ defmodule Protobuf.Encoder do
           "Got error when encoding #{inspect(struct.__struct__)}##{prop.name_atom}: #{Exception.format(:error, error)}"
   end
 
+  defp skip_field?(_syntax, val, %FieldProps{oneof: oneof}) when not is_nil(oneof), do: is_nil(val)
   defp skip_field?(_syntax, [], _prop), do: true
   defp skip_field?(_syntax, val, _prop) when is_map(val), do: map_size(val) == 0
   defp skip_field?(:proto2, nil, %FieldProps{optional?: optional?}), do: optional?
   defp skip_field?(:proto2, value, %FieldProps{default: value, oneof: nil}), do: true
 
-  defp skip_field?(:proto3, val, %FieldProps{proto3_optional?: true}),
-    do: is_nil(val)
-
+  defp skip_field?(:proto3, val, %FieldProps{proto3_optional?: true}), do: is_nil(val)
   defp skip_field?(:proto3, nil, _prop), do: true
-  defp skip_field?(:proto3, 0, %FieldProps{oneof: nil}), do: true
-  defp skip_field?(:proto3, +0.0, %FieldProps{oneof: nil}), do: true
-  defp skip_field?(:proto3, "", %FieldProps{oneof: nil}), do: true
-  defp skip_field?(:proto3, false, %FieldProps{oneof: nil}), do: true
+  defp skip_field?(:proto3, 0, _prop), do: true
+  defp skip_field?(:proto3, +0.0, _prop), do: true
+  defp skip_field?(:proto3, "", _prop), do: true
+  defp skip_field?(:proto3, false, _prop), do: true
   defp skip_field?(_syntax, _val, _prop), do: false
 
   defp encode_field(
