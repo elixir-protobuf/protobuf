@@ -171,7 +171,9 @@ defmodule Protobuf.JSON do
           {:ok, String.t()} | {:error, EncodeError.t() | Exception.t()}
   def encode(%_{} = struct, opts \\ []) when is_list(opts) do
     if jason = load_jason() do
-      with {:ok, map} <- to_encodable(struct, opts), do: jason.encode(map)
+      with {:ok, map} <- to_encodable(struct, opts) do
+        jason.encode(map)
+      end
     else
       {:error, EncodeError.new(:no_json_lib)}
     end
