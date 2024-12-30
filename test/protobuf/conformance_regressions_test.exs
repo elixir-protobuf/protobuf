@@ -83,7 +83,7 @@ defmodule Protobuf.ConformanceRegressionsTest do
 
     @describetag message_type: "protobuf_test_messages.proto3.TestAllTypesProto3"
 
-    test "map i32 i32" do
+    test "Required.Proto2.ProtobufInput.ValidDataMap.INT32.INT32.MissingDefault.JsonOutput" do
       mod = ProtobufTestMessages.Proto2.TestAllTypesProto2
       problematic_payload = <<194, 3, 0>>
       assert %{map_int32_int32: %{0 => 0}} = mod.decode(problematic_payload)
