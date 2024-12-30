@@ -86,7 +86,7 @@ defmodule Protobuf.ConformanceRegressionsTest do
     test "map i32 i32" do
       mod = ProtobufTestMessages.Proto2.TestAllTypesProto2
       problematic_payload = <<194, 3, 0>>
-      assert m = %{map_int32_int32: %{0 => 0}} = mod.decode(problematic_payload)
+      assert %{map_int32_int32: %{0 => 0}} = mod.decode(problematic_payload)
     end
 
     test "Recommended.Proto3.JsonInput.NullValueInOtherOneofNewFormat.Validator",
