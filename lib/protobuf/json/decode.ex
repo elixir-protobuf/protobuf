@@ -383,13 +383,7 @@ defmodule Protobuf.JSON.Decode do
         # We accept integers in scientific notation as well:
         case Float.parse(string) do
           {float, ""} ->
-            truncated = trunc(float)
-
-            if truncated == float do
-              {:ok, truncated}
-            else
-              :error
-            end
+            parse_float_as_int(float)
 
           _ ->
             :error
