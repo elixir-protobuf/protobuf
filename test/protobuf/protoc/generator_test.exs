@@ -12,7 +12,7 @@ defmodule Protobuf.Protoc.GeneratorTest do
       desc = %Google.Protobuf.FileDescriptorProto{name: "name.proto"}
 
       assert Generator.generate(ctx, desc) ==
-               {nil, [%CodeGeneratorResponse.File{name: "name.pb.ex", content: ""}]}
+               {nil, [%CodeGeneratorResponse.File{name: "name.pb.ex", content: "\n"}]}
     end
 
     test "uses the package prefix" do
