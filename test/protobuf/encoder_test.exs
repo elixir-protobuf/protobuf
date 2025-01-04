@@ -296,6 +296,17 @@ defmodule Protobuf.EncoderTest do
     end
   end
 
+  test "raises correct error for nested protobufs" do
+    message = """
+    Got error when encoding TestMsg.Foo#e: ** (Protobuf.EncodeError) Got error when \
+    encoding TestMsg.Foo.Bar#a: ** (Protobuf.EncodeError) "not_a_number" is invalid for type :int32\
+    """
+
+    assert_raise Protobuf.EncodeError, message, fn ->
+      Encoder.encode(%TestMsg.Foo{a: 90, e: %TestMsg.Foo.Bar{a: "not_a_number"}})
+    end
+  end
+
   test "encodes with transformer module" do
     msg = %TestMsg.ContainsTransformModule{field: 0}
     assert Encoder.encode(msg) == <<10, 0>>
