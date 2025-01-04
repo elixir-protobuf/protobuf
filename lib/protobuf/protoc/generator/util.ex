@@ -81,11 +81,14 @@ defmodule Protobuf.Protoc.Generator.Util do
 
   @spec format(String.t()) :: String.t()
   def format(code) when is_binary(code) do
-    formatted_code = Code.format_string!(code, locals_without_parens: @locals_without_parens)
+    formatted_code =
+      code
+      |> Code.format_string!(locals_without_parens: @locals_without_parens)
+      |> IO.iodata_to_binary()
 
     # As neither Code.format_string!/2 nor protoc automatically adds a newline
-    # at end of files, we must add ourselves
-    IO.iodata_to_binary([formatted_code, "\n"])
+    # at end of files, we must add ourselves if not present.
+    if String.ends_with?(formatted_code, "\n"), do: formatted_code, else: formatted_code <> "\n"
   end
 
   @spec pad_comment(String.t(), non_neg_integer()) :: String.t()
