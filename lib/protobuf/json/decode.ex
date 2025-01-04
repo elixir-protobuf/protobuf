@@ -278,6 +278,8 @@ defmodule Protobuf.JSON.Decode do
     end
   end
 
+  defp decode_map(_prop, nil), do: nil
+
   defp decode_map(prop, bad_map), do: throw({:bad_map, prop.name_atom, bad_map})
 
   defp decode_key(type, key, field) when is_binary(key) do
@@ -300,6 +302,8 @@ defmodule Protobuf.JSON.Decode do
   defp decode_repeated(prop, value) when is_list(value) do
     for val <- value, do: decode_singular(prop, val)
   end
+
+  defp decode_repeated(_prop, nil), do: nil
 
   defp decode_repeated(prop, value) do
     throw({:bad_repeated, prop.name_atom, value})

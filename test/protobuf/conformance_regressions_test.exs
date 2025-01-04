@@ -57,6 +57,35 @@ defmodule Protobuf.ConformanceRegressionsTest do
     end
   end
 
+  test "Required.Proto2.ProtobufInput.ValidDataMap.INT32.INT32.MissingDefault.JsonOutput" do
+    mod = ProtobufTestMessages.Proto2.TestAllTypesProto2
+    problematic_payload = <<194, 3, 0>>
+    assert %{map_int32_int32: %{0 => 0}} = mod.decode(problematic_payload)
+  end
+
+  test "Required.Proto3.JsonInput.Int32FieldQuotedExponentialValue.JsonOutput" do
+    mod = ProtobufTestMessages.Proto3.TestAllTypesProto3
+    problematic_payload = ~S({"optionalInt32": "1e5"})
+    assert %{optional_int32: 100_000} = Protobuf.JSON.decode!(problematic_payload, mod)
+  end
+
+  test "Required.Proto2.JsonInput.AllFieldAcceptNull.ProtobufOutput" do
+    mod = ProtobufTestMessages.Proto3.TestAllTypesProto3
+    problematic_payload = ~S({
+      "map_bool_bool": null,
+      "repeated_int32": null,
+      "fieldname1": null
+    })
+
+    assert %{
+             map_bool_bool: map_bool_bool,
+             repeated_int32: [],
+             fieldname1: 0
+           } = Protobuf.JSON.decode!(problematic_payload, mod)
+
+    assert is_map(map_bool_bool) and map_size(map_bool_bool) == 0
+  end
+
   describe "proto2" do
     setup :url_to_message
     setup :decode_conformance_input
@@ -82,18 +111,6 @@ defmodule Protobuf.ConformanceRegressionsTest do
     setup :url_to_message
 
     @describetag message_type: "protobuf_test_messages.proto3.TestAllTypesProto3"
-
-    test "Required.Proto2.ProtobufInput.ValidDataMap.INT32.INT32.MissingDefault.JsonOutput" do
-      mod = ProtobufTestMessages.Proto2.TestAllTypesProto2
-      problematic_payload = <<194, 3, 0>>
-      assert %{map_int32_int32: %{0 => 0}} = mod.decode(problematic_payload)
-    end
-    
-    test "Required.Proto3.JsonInput.Int32FieldQuotedExponentialValue.JsonOutput" do
-      mod = ProtobufTestMessages.Proto3.TestAllTypesProto3
-      problematic_payload = ~S({"optionalInt32": "1e5"})
-      assert %{optional_int32: 100_000} = Protobuf.JSON.decode!(problematic_payload, mod)
-    end
 
     test "Recommended.Proto3.JsonInput.NullValueInOtherOneofNewFormat.Validator",
          %{message_mod: message_mod} do
