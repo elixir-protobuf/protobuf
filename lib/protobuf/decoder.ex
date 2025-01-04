@@ -233,15 +233,16 @@ defmodule Protobuf.Decoder do
     %FieldProps{type: type, map?: map?, oneof: oneof, name_atom: name_atom, repeated?: repeated?} =
       prop
 
-    embedded_msg = decode(bin, type)
+    embed_msg = decode(bin, type)
 
     val =
-      if map?,
-        do: %{
-          (embedded_msg.key || map_default(prop, :key)) =>
-            embedded_msg.value || map_default(prop, :value)
-        },
-        else: embedded_msg
+      if map? do
+        key = if is_nil(embed_msg.key), do: map_default(prop, :key), else: embed_msg.key
+        value = if is_nil(embed_msg.value), do: map_default(prop, :value), else: embed_msg.value
+        %{key => value}
+      else
+        embed_msg
+      end
 
     val = if oneof, do: {name_atom, val}, else: val
 
