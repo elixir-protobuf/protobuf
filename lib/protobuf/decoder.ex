@@ -233,8 +233,17 @@ defmodule Protobuf.Decoder do
     %FieldProps{type: type, map?: map?, oneof: oneof, name_atom: name_atom, repeated?: repeated?} =
       prop
 
-    embedded_msg = decode(bin, type)
-    val = if map?, do: %{embedded_msg.key => embedded_msg.value}, else: embedded_msg
+    embed_msg = decode(bin, type)
+
+    val =
+      if map? do
+        key = if is_nil(embed_msg.key), do: map_default(prop, :key), else: embed_msg.key
+        value = if is_nil(embed_msg.value), do: map_default(prop, :value), else: embed_msg.value
+        %{key => value}
+      else
+        embed_msg
+      end
+
     val = if oneof, do: {name_atom, val}, else: val
 
     cond do
@@ -253,6 +262,15 @@ defmodule Protobuf.Decoder do
       true ->
         val
     end
+  end
+
+  defp map_default(prop, key_or_value) do
+    prop.type.__message_props__().field_props
+    |> Enum.find(fn {_key, field_props} -> field_props.name_atom == key_or_value end)
+    |> then(fn {_key, field_props} ->
+      # Conformance only works when we use proto3 defaults here, even for proto2...
+      Protobuf.DSL.field_default(:proto3, field_props)
+    end)
   end
 
   defp deep_merge(_oneof1 = {tag1, val1}, oneof2 = {tag2, val2}, props) do
