@@ -70,7 +70,7 @@ defmodule Protobuf.ConformanceRegressionsTest do
   end
 
   test "Required.Proto2.JsonInput.AllFieldAcceptNull.ProtobufOutput" do
-    mod = ProtobufTestMessages.Proto3.TestAllTypesProto3
+    mod = ProtobufTestMessages.Proto2.TestAllTypesProto2
     problematic_payload = ~S({
       "map_bool_bool": null,
       "repeated_int32": null,
