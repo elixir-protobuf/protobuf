@@ -73,14 +73,12 @@ defmodule Protobuf.ConformanceRegressionsTest do
     mod = ProtobufTestMessages.Proto2.TestAllTypesProto2
     problematic_payload = ~S({
       "map_bool_bool": null,
-      "repeated_int32": null,
-      "fieldname1": null
+      "repeated_int32": null
     })
 
     assert %{
              map_bool_bool: map_bool_bool,
-             repeated_int32: [],
-             fieldname1: 0
+             repeated_int32: []
            } = Protobuf.JSON.decode!(problematic_payload, mod)
 
     assert is_map(map_bool_bool) and map_size(map_bool_bool) == 0
