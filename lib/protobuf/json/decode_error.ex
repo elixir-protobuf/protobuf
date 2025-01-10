@@ -80,7 +80,8 @@ defmodule Protobuf.JSON.DecodeError do
 
   def new({:unexpected_sequence, position, sequence}) do
     %__MODULE__{
-      message: "Invalid byte at position #{inspect(position)}, sequence: #{inspect(sequence)}"
+      message:
+        "Unexpected sequence at position #{inspect(position)}, sequence: #{inspect(sequence)}"
     }
   end
 end
