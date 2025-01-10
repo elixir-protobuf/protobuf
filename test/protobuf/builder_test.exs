@@ -45,11 +45,17 @@ defmodule Protobuf.BuilderTest do
     end
 
     test "raises an error for non-list repeated embedded msgs" do
-      assert_raise Protocol.UndefinedError,
-                   ~r/protocol Enumerable not implemented for %TestMsg.Foo.Bar/,
-                   fn ->
-                     Foo.new(h: Foo.Bar.new())
-                   end
+      # TODO: remove conditional once we support only Elixir 1.18+
+      message =
+        if System.version() >= "1.18.0" do
+          ~r/protocol Enumerable not implemented for type TestMsg.Foo.Ba/
+        else
+          ~r/protocol Enumerable not implemented for %TestMsg.Foo.Bar/
+        end
+
+      assert_raise Protocol.UndefinedError, message, fn ->
+        Foo.new(h: Foo.Bar.new())
+      end
     end
 
     test "builds correct message for non matched struct" do

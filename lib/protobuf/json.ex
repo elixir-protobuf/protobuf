@@ -99,7 +99,7 @@ defmodule Protobuf.JSON do
   exist, decoding will raise an error.
   """
 
-  alias Protobuf.JSON.{Encode, EncodeError, Decode, DecodeError}
+  alias Protobuf.JSON.{Encode, EncodeError, Decode, DecodeError, JSONLibrary}
 
   @type encode_opt() ::
           {:use_proto_names, boolean()}
@@ -202,11 +202,7 @@ defmodule Protobuf.JSON do
   @spec encode_to_iodata(struct, [encode_opt]) ::
           {:ok, iodata()} | {:error, EncodeError.t() | Exception.t()}
   def encode_to_iodata(%_{} = struct, opts \\ []) when is_list(opts) do
-    if jason = load_jason() do
-      with {:ok, map} <- to_encodable(struct, opts), do: jason.encode_to_iodata(map)
-    else
-      {:error, EncodeError.new(:no_json_lib)}
-    end
+    with {:ok, map} <- to_encodable(struct, opts), do: JSONLibrary.encode_to_iodata(map)
   end
 
   @doc """
@@ -273,8 +269,11 @@ defmodule Protobuf.JSON do
   @spec decode!(iodata, module) :: struct | no_return
   def decode!(iodata, module) do
     case decode(iodata, module) do
-      {:ok, json} -> json
-      {:error, error} -> raise error
+      {:ok, json} ->
+        json
+
+      {:error, error} ->
+        raise error
     end
   end
 
@@ -311,11 +310,15 @@ defmodule Protobuf.JSON do
   """
   @spec decode(iodata, module) :: {:ok, struct} | {:error, DecodeError.t() | Exception.t()}
   def decode(iodata, module) when is_atom(module) do
-    if jason = load_jason() do
-      with {:ok, json_data} <- jason.decode(iodata),
-           do: from_decoded(json_data, module)
-    else
-      {:error, DecodeError.new(:no_json_lib)}
+    case JSONLibrary.decode(iodata) do
+      {:ok, json_data} ->
+        from_decoded(json_data, module)
+
+      {:error, exception} when is_exception(exception) ->
+        {:error, exception}
+
+      {:error, other} ->
+        {:error, DecodeError.new(other)}
     end
   end
 
@@ -344,6 +347,4 @@ defmodule Protobuf.JSON do
   catch
     error -> {:error, DecodeError.new(error)}
   end
-
-  defp load_jason, do: Code.ensure_loaded?(Jason) and Jason
 end
