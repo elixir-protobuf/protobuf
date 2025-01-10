@@ -27,6 +27,7 @@ defmodule Protobuf.JSONTest do
   end
 
   describe "bang variants of encode and decode" do
+    # TODO: remove Jason when we require Elixir 1.18
     if Code.ensure_loaded?(JSON) do
       test "decode!/2" do
         json = ~S|{"string":"   \xff   "}|
