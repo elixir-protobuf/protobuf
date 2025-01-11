@@ -15,7 +15,10 @@ defmodule Protobuf.JSON.JSONLibrary do
       end
 
       def decode(data) do
-        JSON.decode(data)
+        case JSON.decode(data) do
+          {:ok, decoded} -> {:ok, decoded}
+          {:error, error} -> {:error, Protobuf.JSON.DecodeError.new(error)}
+        end
       end
 
     Code.ensure_loaded?(Jason) ->

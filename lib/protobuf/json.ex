@@ -314,11 +314,8 @@ defmodule Protobuf.JSON do
       {:ok, json_data} ->
         from_decoded(json_data, module)
 
-      {:error, exception} when is_exception(exception) ->
+      {:error, exception} ->
         {:error, exception}
-
-      {:error, other} ->
-        {:error, DecodeError.new(other)}
     end
   end
 
