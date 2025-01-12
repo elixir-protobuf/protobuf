@@ -269,11 +269,8 @@ defmodule Protobuf.JSON do
   @spec decode!(iodata, module) :: struct | no_return
   def decode!(iodata, module) do
     case decode(iodata, module) do
-      {:ok, json} ->
-        json
-
-      {:error, error} ->
-        raise error
+      {:ok, json} -> json
+      {:error, error} -> raise error
     end
   end
 
