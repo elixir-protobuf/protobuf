@@ -16,20 +16,33 @@ defmodule Protobuf.JSONTest do
 
   test "encoding string field with invalid UTF-8 data" do
     message = %Scalars{string: "   \xff   "}
-    assert {:error, %Jason.EncodeError{}} = Protobuf.JSON.encode(message)
+    assert {:error, exception} = Protobuf.JSON.encode(message)
+    assert is_exception(exception)
   end
 
   test "decoding string field with invalid UTF-8 data" do
     json = ~S|{"string":"   \xff   "}|
-    assert {:error, %Jason.DecodeError{}} = Protobuf.JSON.decode(json, Scalars)
+    assert {:error, exception} = Protobuf.JSON.decode(json, Scalars)
+    assert is_exception(exception)
   end
 
   describe "bang variants of encode and decode" do
-    test "decode!/2" do
-      json = ~S|{"string":"   \xff   "}|
+    # TODO: remove Jason when we require Elixir 1.18
+    if Code.ensure_loaded?(JSON) do
+      test "decode!/2" do
+        json = ~S|{"string":"   \xff   "}|
 
-      assert_raise Jason.DecodeError, fn ->
-        Protobuf.JSON.decode!(json, Scalars)
+        assert_raise Protobuf.JSON.DecodeError, fn ->
+          Protobuf.JSON.decode!(json, Scalars)
+        end
+      end
+    else
+      test "decode!/2" do
+        json = ~S|{"string":"   \xff   "}|
+
+        assert_raise Jason.DecodeError, fn ->
+          Protobuf.JSON.decode!(json, Scalars)
+        end
       end
     end
   end

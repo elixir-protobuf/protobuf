@@ -69,4 +69,19 @@ defmodule Protobuf.JSON.DecodeError do
   def new({:bad_repeated, field, value}) do
     %__MODULE__{message: "Repeated field '#{field}' expected a list, got #{inspect(value)}"}
   end
+
+  def new({:unexpected_end, position}) do
+    %__MODULE__{message: "Unexpected end at position #{inspect(position)}"}
+  end
+
+  def new({:invalid_byte, position, byte}) do
+    %__MODULE__{message: "Invalid byte at position #{inspect(position)}, byte: #{inspect(byte)}"}
+  end
+
+  def new({:unexpected_sequence, position, sequence}) do
+    %__MODULE__{
+      message:
+        "Unexpected sequence at position #{inspect(position)}, sequence: #{inspect(sequence)}"
+    }
+  end
 end
