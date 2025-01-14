@@ -10,7 +10,7 @@ defmodule Protobuf.Encoder do
   def encode_to_iodata(%mod{} = struct) do
     struct
     |> transform_module(mod)
-    |> encode_with_message_props(mod.__message_props__())
+    |> do_encode_to_iodata()
   end
 
   @spec encode(struct()) :: binary()
@@ -19,6 +19,11 @@ defmodule Protobuf.Encoder do
     |> transform_module(mod)
     |> encode_with_message_props(mod.__message_props__())
     |> IO.iodata_to_binary()
+  end
+
+  defp do_encode_to_iodata(%mod{} = struct) do
+    struct
+    |> encode_with_message_props(mod.__message_props__())
   end
 
   defp encode_with_message_props(
@@ -150,7 +155,7 @@ defmodule Protobuf.Encoder do
   defp encode_from_type(mod, msg) do
     case msg do
       %{__struct__: ^mod} ->
-        encode_to_iodata(msg)
+        do_encode_to_iodata(msg)
 
       %other_mod{} = struct ->
         raise Protobuf.EncodeError,
@@ -158,7 +163,7 @@ defmodule Protobuf.Encoder do
             "struct #{inspect(other_mod)} can't be encoded as #{inspect(mod)}: #{inspect(struct)}"
 
       _ ->
-        encode_to_iodata(struct(mod, msg))
+        do_encode_to_iodata(struct(mod, msg))
     end
   end
 
