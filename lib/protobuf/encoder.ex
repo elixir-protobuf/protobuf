@@ -22,8 +22,7 @@ defmodule Protobuf.Encoder do
   end
 
   defp do_encode_to_iodata(%mod{} = struct) do
-    struct
-    |> encode_with_message_props(mod.__message_props__())
+    encode_with_message_props(struct, mod.__message_props__())
   end
 
   defp encode_with_message_props(
