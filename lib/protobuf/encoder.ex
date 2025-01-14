@@ -8,7 +8,9 @@ defmodule Protobuf.Encoder do
 
   @spec encode_to_iodata(struct()) :: iodata()
   def encode_to_iodata(%mod{} = struct) do
-    encode_with_message_props(struct, mod.__message_props__())
+    struct
+    |> transform_module(mod)
+    |> encode_with_message_props(mod.__message_props__())
   end
 
   @spec encode(struct()) :: binary()
