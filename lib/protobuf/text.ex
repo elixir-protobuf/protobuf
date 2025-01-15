@@ -15,13 +15,15 @@ defmodule Protobuf.Text do
   """
 
   alias Protobuf.FieldProps
+  alias Protobuf.MessageProps
 
   @typep acc :: %{
            pad: pos_integer(),
            pad_size: pos_integer(),
            current_line_width: pos_integer(),
            max_line_width: pos_integer(),
-           newline?: boolean()
+           newline?: boolean(),
+           should_pad?: boolean()
          }
 
   @default_acc %{
@@ -61,14 +63,9 @@ defmodule Protobuf.Text do
   @spec encode_field(
           {atom(), term()},
           :proto2 | :proto3,
-          Protobuf.MessageProp.t() | Protobuf.FieldProps.t(),
+          MessageProps.t(),
           acc()
         ) :: iodata()
-  defp encode_field({name, value}, _syntax, %Protobuf.FieldProps{} = field_props, acc) do
-    message_props = field_props.type.__message_props__()
-    encode_field({name, value}, message_props.syntax, message_props, acc)
-  end
-
   defp encode_field({name, value}, syntax, message_props, acc) do
     case Enum.find(message_props.field_props, fn {_, prop} -> prop.name_atom == name end) do
       {_fnum, field_prop} ->
@@ -106,7 +103,7 @@ defmodule Protobuf.Text do
     end
   end
 
-  @spec encode_value(term(), :proto2 | :proto3, Protobuf.FieldProps.t(), acc()) :: iodata()
+  @spec encode_value(term(), :proto2 | :proto3, FieldProps.t(), acc()) :: iodata()
   defp encode_value(value, syntax, %{repeated?: true} = field_prop, acc) when is_list(value) do
     preencoded =
       value
@@ -139,13 +136,13 @@ defmodule Protobuf.Text do
     encode_value(as_list, syntax, %{field_prop | repeated?: true}, acc)
   end
 
-  defp encode_value(value, syntax, %{embedded?: true, type: mod} = field_prop, acc) do
+  defp encode_value(value, syntax, %{embedded?: true, type: mod}, acc) do
     value
     |> transform_module(mod)
-    |> encode_struct(syntax, field_prop, acc)
+    |> encode_struct(syntax, mod.__message_props__(), acc)
   end
 
-  defp encode_value(nil, :proto2, %Protobuf.FieldProps{required?: true, name_atom: name}, _) do
+  defp encode_value(nil, :proto2, %FieldProps{required?: true, name_atom: name}, _) do
     raise "field #{inspect(name)} is required"
   end
 
@@ -157,12 +154,12 @@ defmodule Protobuf.Text do
     [pad(acc), inspect(value)]
   end
 
-  @spec encode_struct(term(), :proto2 | :proto3, Protobuf.FieldProps.t(), acc()) :: iodata()
+  @spec encode_struct(term(), :proto2 | :proto3, MessageProps.t(), acc()) :: iodata()
   defp encode_struct(nil, _, _, _) do
     [?{, ?}]
   end
 
-  defp encode_struct(%_{} = struct, syntax, field_prop, acc) do
+  defp encode_struct(%_{} = struct, syntax, message_props, acc) do
     fields =
       struct
       |> Map.from_struct()
@@ -172,7 +169,7 @@ defmodule Protobuf.Text do
     preencoded_fields =
       fields
       |> Enum.map(
-        &encode_field(&1, syntax, field_prop, %{acc | should_pad?: false, newline?: false})
+        &encode_field(&1, syntax, message_props, %{acc | should_pad?: false, newline?: false})
       )
       |> Enum.reject(&Enum.empty?/1)
       |> Enum.intersperse([?,, ?\s])
@@ -187,7 +184,7 @@ defmodule Protobuf.Text do
 
       encoded_fields =
         fields
-        |> Enum.map(&encode_field(&1, syntax, field_prop, nacc))
+        |> Enum.map(&encode_field(&1, syntax, message_props, nacc))
         |> Enum.reject(&Enum.empty?/1)
 
       [pad(acc), ?{, ?\n, encoded_fields, pad(%{acc | should_pad?: true}), ?}]
@@ -219,8 +216,7 @@ defmodule Protobuf.Text do
 
   @spec pad(acc()) :: iodata()
   defp pad(%{should_pad?: false}), do: []
-  defp pad(%{pad: pad}), do: pad(pad)
-  defp pad(qty), do: List.duplicate(?\s, qty)
+  defp pad(%{pad: pad}), do: List.duplicate(?\s, pad)
 
   @spec newline(acc()) :: iodata()
   defp newline(%{newline?: true}), do: ?\n
