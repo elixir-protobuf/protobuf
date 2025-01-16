@@ -1,5 +1,38 @@
 # Changelog
 
+## v0.14.0
+
+### Enhancements
+
+  * Include `Google` modules in this package, removing the need for
+    `:google_protos`.
+  * Include comments from the Protobuf definitions in the generated module docs
+    when generating with the `include_docs=true` option.
+  * Add native `JSON` support for Elixir 1.18+.
+  * Add `Protobuf.JSON.encode_to_iodata/1`.
+  * Add the `Protobuf.TransformModule.typespec/1` macro. It allows transform modules to transform typespecs for the message.
+  * Add the `Protobuf.unknown_fields()` type.
+  * Keep same alphabetical order in options for `use Protobuf` in generated code.
+
+### Bug fixes
+
+  * Fix `Protobuf.EncodeError` exception including unrelated fields in the message.
+  * Fix `Protobuf.Encoder.encode_to_iodata/1` not applying transformation on
+  outer struct before encoding it.
+  * Support decoding integer as floats in JSON.
+  * Support decoding scientific notation integers in JSON (conformance).
+  * Accept nulls for repeated and maps in JSON (conformance).
+  * Fix handling of defaults in map decoding (conformance).
+  * Ensure there's a newline in the end of generated files.
+
+### Breaking changes
+
+  * Inclusion of Google modules in this package **requires** the removal of the
+    `:google_protos` dependency.
+  * Protobuf struct modules now depend on their transform modules. This can
+    cause circular dependencies if the transform module has a dependency in the
+    other direction.
+
 ## v0.13.0
 
 ### Enhancements
