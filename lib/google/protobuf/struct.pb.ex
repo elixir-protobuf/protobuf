@@ -1,7 +1,26 @@
 defmodule Google.Protobuf.NullValue do
   @moduledoc false
 
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.EnumDescriptorProto{
+      name: "NullValue",
+      value: [
+        %Google.Protobuf.EnumValueDescriptorProto{
+          name: "NULL_VALUE",
+          number: 0,
+          options: nil,
+          __unknown_fields__: []
+        }
+      ],
+      options: nil,
+      reserved_range: [],
+      reserved_name: [],
+      __unknown_fields__: []
+    }
+  end
 
   field :NULL_VALUE, 0
 end
@@ -9,7 +28,63 @@ end
 defmodule Google.Protobuf.Struct.FieldsEntry do
   @moduledoc false
 
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      name: "FieldsEntry",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "key",
+          extendee: nil,
+          number: 1,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "key",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "value",
+          extendee: nil,
+          number: 2,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_MESSAGE,
+          type_name: ".google.protobuf.Value",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "value",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        }
+      ],
+      nested_type: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
+      options: %Google.Protobuf.MessageOptions{
+        message_set_wire_format: false,
+        no_standard_descriptor_accessor: false,
+        deprecated: false,
+        map_entry: true,
+        deprecated_legacy_json_field_conflicts: nil,
+        features: nil,
+        uninterpreted_option: [],
+        __pb_extensions__: %{},
+        __unknown_fields__: []
+      },
+      oneof_decl: [],
+      reserved_range: [],
+      reserved_name: [],
+      __unknown_fields__: []
+    }
+  end
 
   field :key, 1, type: :string
   field :value, 2, type: Google.Protobuf.Value
@@ -18,7 +93,92 @@ end
 defmodule Google.Protobuf.Struct do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      name: "Struct",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "fields",
+          extendee: nil,
+          number: 1,
+          label: :LABEL_REPEATED,
+          type: :TYPE_MESSAGE,
+          type_name: ".google.protobuf.Struct.FieldsEntry",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "fields",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        }
+      ],
+      nested_type: [
+        %Google.Protobuf.DescriptorProto{
+          name: "FieldsEntry",
+          field: [
+            %Google.Protobuf.FieldDescriptorProto{
+              name: "key",
+              extendee: nil,
+              number: 1,
+              label: :LABEL_OPTIONAL,
+              type: :TYPE_STRING,
+              type_name: nil,
+              default_value: nil,
+              options: nil,
+              oneof_index: nil,
+              json_name: "key",
+              proto3_optional: nil,
+              __unknown_fields__: []
+            },
+            %Google.Protobuf.FieldDescriptorProto{
+              name: "value",
+              extendee: nil,
+              number: 2,
+              label: :LABEL_OPTIONAL,
+              type: :TYPE_MESSAGE,
+              type_name: ".google.protobuf.Value",
+              default_value: nil,
+              options: nil,
+              oneof_index: nil,
+              json_name: "value",
+              proto3_optional: nil,
+              __unknown_fields__: []
+            }
+          ],
+          nested_type: [],
+          enum_type: [],
+          extension_range: [],
+          extension: [],
+          options: %Google.Protobuf.MessageOptions{
+            message_set_wire_format: false,
+            no_standard_descriptor_accessor: false,
+            deprecated: false,
+            map_entry: true,
+            deprecated_legacy_json_field_conflicts: nil,
+            features: nil,
+            uninterpreted_option: [],
+            __pb_extensions__: %{},
+            __unknown_fields__: []
+          },
+          oneof_decl: [],
+          reserved_range: [],
+          reserved_name: [],
+          __unknown_fields__: []
+        }
+      ],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
+      options: nil,
+      oneof_decl: [],
+      reserved_range: [],
+      reserved_name: [],
+      __unknown_fields__: []
+    }
+  end
 
   field :fields, 1, repeated: true, type: Google.Protobuf.Struct.FieldsEntry, map: true
 end
@@ -26,7 +186,111 @@ end
 defmodule Google.Protobuf.Value do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      name: "Value",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "null_value",
+          extendee: nil,
+          number: 1,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_ENUM,
+          type_name: ".google.protobuf.NullValue",
+          default_value: nil,
+          options: nil,
+          oneof_index: 0,
+          json_name: "nullValue",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "number_value",
+          extendee: nil,
+          number: 2,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_DOUBLE,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: 0,
+          json_name: "numberValue",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "string_value",
+          extendee: nil,
+          number: 3,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: 0,
+          json_name: "stringValue",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "bool_value",
+          extendee: nil,
+          number: 4,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_BOOL,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: 0,
+          json_name: "boolValue",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "struct_value",
+          extendee: nil,
+          number: 5,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_MESSAGE,
+          type_name: ".google.protobuf.Struct",
+          default_value: nil,
+          options: nil,
+          oneof_index: 0,
+          json_name: "structValue",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "list_value",
+          extendee: nil,
+          number: 6,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_MESSAGE,
+          type_name: ".google.protobuf.ListValue",
+          default_value: nil,
+          options: nil,
+          oneof_index: 0,
+          json_name: "listValue",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        }
+      ],
+      nested_type: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
+      options: nil,
+      oneof_decl: [
+        %Google.Protobuf.OneofDescriptorProto{name: "kind", options: nil, __unknown_fields__: []}
+      ],
+      reserved_range: [],
+      reserved_name: [],
+      __unknown_fields__: []
+    }
+  end
 
   oneof :kind, 0
 
@@ -46,7 +310,39 @@ end
 defmodule Google.Protobuf.ListValue do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      name: "ListValue",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "values",
+          extendee: nil,
+          number: 1,
+          label: :LABEL_REPEATED,
+          type: :TYPE_MESSAGE,
+          type_name: ".google.protobuf.Value",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "values",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        }
+      ],
+      nested_type: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
+      options: nil,
+      oneof_decl: [],
+      reserved_range: [],
+      reserved_name: [],
+      __unknown_fields__: []
+    }
+  end
 
   field :values, 1, repeated: true, type: Google.Protobuf.Value
 end
