@@ -1,7 +1,7 @@
 defmodule Elixirpb.PbExtension do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0"
 
   extend Google.Protobuf.FileOptions, :file, 1047, optional: true, type: Elixirpb.FileOptions
 end
