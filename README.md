@@ -61,8 +61,9 @@ Since `:protobuf` version `0.14.0` we include all of the well known Google Proto
    that `protoc-gen-elixir` works:
 
     ```bash
-    $ mix escript.install hex protobuf
+    $ mix escript.install hex protobuf 0.14.0
     ```
+    Note: make sure to use the same version of the escript and dependency in your application.
 
 3. Generate Elixir code for [helloworld.proto](https://raw.githubusercontent.com/grpc/grpc/master/examples/protos/helloworld.proto) using `protoc`:
 
