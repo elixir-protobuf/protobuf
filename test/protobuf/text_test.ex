@@ -44,6 +44,12 @@ defmodule Protobuf.TextTest do
   end
 
   test "encoding nested structs" do
+    result = Text.encode(%TestMsg.Foo{e: nil})
+    assert result == ~S({})
+
+    result = Text.encode(%TestMsg.Foo{e: %TestMsg.Foo.Bar{}})
+    assert result == ~S({e: {}})
+
     result = Text.encode(%TestMsg.Foo{e: %TestMsg.Foo.Bar{a: 1, b: "Hello"}})
 
     assert result == ~S({e: {a: 1, b: "Hello"}})

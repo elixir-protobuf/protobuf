@@ -1,14 +1,25 @@
 defmodule Protobuf.Text do
+  @moduledoc """
+  Text encoding of Protobufs
+
+  Compliant with the
+  [textproto spec](https://protobuf.dev/reference/protobuf/textformat-spec/),
+  but without extensions or `Google.Protobuf.Any` support (yet).
+
+  Useful for inspecting Protobuf data.
+  """
+
   alias Protobuf.FieldProps
   alias Protobuf.MessageProps
   alias Inspect.Algebra
 
   @doc """
-  Encodes a protobuf struct to text.
+  Encodes a Protobuf struct to text.
 
   Accepts the following options:
 
-  - `:max_line_width` - maximum line width, in columns. Defaults to 80.
+  - `:max_line_width` - maximum line width, in columns. Defaults to 80. Lines
+  may still be bigger than the limit, depending on the data.
 
   Doesn't perform type validations. If input data is invalid, it produces
   undecodable output.
@@ -70,7 +81,7 @@ defmodule Protobuf.Text do
               Algebra.empty()
 
             _ ->
-              raise "Invalid value for oneof `#{inspect(name)}`: #{inspect(value)}"
+              raise "invalid value for oneof `#{inspect(name)}`: #{inspect(value)}"
           end
         else
           raise "unknown field #{inspect(name)}"
@@ -117,6 +128,7 @@ defmodule Protobuf.Text do
     end
   end
 
+  # Copied from Protobuf.Encoder. Should it be shared?
   defp skip_field?(_syntax, [], _prop), do: true
   defp skip_field?(_syntax, val, _prop) when is_map(val), do: map_size(val) == 0
   defp skip_field?(:proto2, nil, %FieldProps{optional?: optional?}), do: optional?
@@ -130,7 +142,7 @@ defmodule Protobuf.Text do
   defp skip_field?(:proto3, false, %FieldProps{oneof: nil}), do: true
 
   # This is actually new. Should it be ported to Protobuf.Encoder?
-  defp skip_field?(:proto3, value, %FieldProps{type: {:enum, enum_mod}}) do
+  defp skip_field?(:proto3, value, %FieldProps{type: {:enum, enum_mod}, oneof: nil}) do
     enum_props = enum_mod.__message_props__()
     [first_tag | _] = enum_props.ordered_tags
     %{name_atom: name_atom, fnum: fnum} = enum_props.field_props[first_tag]
