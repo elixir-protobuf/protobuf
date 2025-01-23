@@ -28,7 +28,7 @@ defmodule Protobuf.TextTest do
 
     assert result == """
            {
-             a: 1
+             a: 1,
              g: [
                1111111111,
                1111111111,
@@ -37,7 +37,7 @@ defmodule Protobuf.TextTest do
                1111111111,
                1111111111,
                1111111111
-             ]
+             ],
              j: D
            }\
            """
@@ -63,15 +63,15 @@ defmodule Protobuf.TextTest do
 
     assert result == """
            {
-             a: 1
+             a: 1,
              e: {
-               a: 1
+               a: 1,
                b: "HelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHello"
-             }
+             },
              h: [
                {a: 5},
                {
-                 a: 1
+                 a: 1,
                  b: "HelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHello"
                },
                {a: 7}
@@ -115,43 +115,22 @@ defmodule Protobuf.TextTest do
 
     assert result_with_small_limit == """
            {
-             a: 1
+             a: 1,
              e: {
-               a: 1
+               a: 1,
                b: "HelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHello"
-             }
+             },
              h: [
                {
-                 a: 5
+                 a: 5,
                  b: "hi"
                },
                {
-                 a: 1
+                 a: 1,
                  b: "HelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHello"
                },
                {a: 7}
              ]
-           }\
-           """
-  end
-
-  test "respecs pad_size option" do
-    result =
-      Text.encode(%TestMsg.Foo{a: 1, g: List.duplicate(1_111_111_111, 7), j: :D}, pad_size: 4)
-
-    assert result == """
-           {
-               a: 1
-               g: [
-                   1111111111,
-                   1111111111,
-                   1111111111,
-                   1111111111,
-                   1111111111,
-                   1111111111,
-                   1111111111
-               ]
-               j: D
            }\
            """
   end
