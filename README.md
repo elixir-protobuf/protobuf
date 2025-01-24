@@ -22,7 +22,7 @@ The package can be installed by adding `:protobuf` to your list of dependencies 
 ```elixir
 def deps do
   [
-    {:protobuf, "~> 0.14.0"}
+    {:protobuf, "~> 0.14.1"}
   ]
 end
 ```
