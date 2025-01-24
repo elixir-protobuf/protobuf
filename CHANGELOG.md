@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.14.1
+
+### Bug fixes
+
+  * Include descriptor when generating google_protos.
+
 ## v0.14.0
 
 ### Enhancements
