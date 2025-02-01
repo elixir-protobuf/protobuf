@@ -25,12 +25,12 @@ defmodule Protobuf.Text do
   undecodable output.
   """
   @spec encode(struct(), Keyword.t()) :: binary()
-  def encode(struct, opts \\ []) do
+  def encode(%mod{} = struct, opts \\ []) do
     max_line_width = Keyword.get(opts, :max_line_width, 80)
-    message_props = struct.__struct__.__message_props__()
+    message_props = mod.__message_props__()
 
     struct
-    |> transform_module(struct.__struct__)
+    |> transform_module(mod)
     |> encode_struct(message_props)
     |> Algebra.format(max_line_width)
     |> IO.iodata_to_binary()
@@ -42,7 +42,6 @@ defmodule Protobuf.Text do
 
     fields =
       struct
-      |> Map.from_struct()
       |> Map.drop([:__unknown_fields__, :__struct__, :__pb_extensions__])
       |> Enum.sort()
 
@@ -51,10 +50,6 @@ defmodule Protobuf.Text do
     end
 
     Algebra.container_doc("{", fields, "}", inspect_opts(), fun, break: :strict)
-  end
-
-  defp encode_struct(nil, _) do
-    "{}"
   end
 
   @spec encode_struct_field({atom(), term()}, :proto2 | :proto3, MessageProps.t()) :: Algebra.t()
