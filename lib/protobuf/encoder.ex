@@ -90,6 +90,13 @@ defmodule Protobuf.Encoder do
   defp skip_field?(:proto3, +0.0, %FieldProps{oneof: nil}), do: true
   defp skip_field?(:proto3, "", %FieldProps{oneof: nil}), do: true
   defp skip_field?(:proto3, false, %FieldProps{oneof: nil}), do: true
+
+  defp skip_field?(:proto3, value, %FieldProps{type: {:enum, enum_mod}, oneof: nil}) do
+    enum_props = enum_mod.__message_props__()
+    %{name_atom: name_atom, name: name} = enum_props.field_props[0]
+    value == name_atom or value == name
+  end
+
   defp skip_field?(_syntax, _val, _prop), do: false
 
   defp do_encode_field(
