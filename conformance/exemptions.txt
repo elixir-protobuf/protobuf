@@ -11,3 +11,8 @@ Recommended.Proto2.JsonInput.IgnoreUnknownEnumStringValueInRepeatedField.Protobu
 Recommended.Proto2.JsonInput.IgnoreUnknownEnumStringValueInRepeatedPart.ProtobufOutput
 Recommended.Proto3.JsonInput.IgnoreUnknownEnumStringValueInMapPart.ProtobufOutput
 Recommended.Proto3.JsonInput.IgnoreUnknownEnumStringValueInRepeatedPart.ProtobufOutput
+
+# Any
+Required.Proto3.JsonInput.AnyWithNoType.JsonOutput
+Required.Proto3.JsonInput.AnyWktRepresentationWithBadType
+Required.Proto3.JsonInput.AnyWktRepresentationWithEmptyTypeAndValue
