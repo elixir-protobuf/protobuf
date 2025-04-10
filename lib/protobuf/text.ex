@@ -44,32 +44,20 @@ defmodule Protobuf.Text do
   defp encode_struct(%_{} = struct, message_props, root?, print_unknown?) do
     %{syntax: syntax} = message_props
 
-    fields =
-      struct
-      |> Map.drop([:__unknown_fields__, :__struct__, :__pb_extensions__])
-      |> Enum.sort()
-
-    unknown_fields =
-      if print_unknown? do
-        struct
-        |> Map.get(:__unknown_fields__)
-        |> Enum.map(fn {field_number, _wire_type, value} -> {field_number, value} end)
-      else
-        []
-      end
+    fields = prepare_fields(struct, print_unknown?)
 
     if root? do
-      Enum.reduce(fields ++ unknown_fields, [], fn value, acc ->
-        doc = encode_struct_field(value, syntax, message_props, print_unknown?)
+      empty = Algebra.empty()
 
-        if doc == Algebra.empty() do
-          acc
-        else
-          [doc | acc]
+      fields
+      |> Enum.reduce([], fn value, acc ->
+        case encode_struct_field(value, syntax, message_props, print_unknown?) do
+          ^empty -> acc
+          doc -> [Algebra.break(", "), doc | acc]
         end
       end)
+      |> safe_tail()
       |> Enum.reverse()
-      |> Enum.intersperse(Algebra.break(", "))
       |> Algebra.concat()
       |> Algebra.group()
     else
@@ -77,11 +65,28 @@ defmodule Protobuf.Text do
         encode_struct_field(value, syntax, message_props, print_unknown?)
       end
 
-      Algebra.container_doc("{", fields ++ unknown_fields, "}", inspect_opts(), fun,
-        break: :strict
-      )
+      Algebra.container_doc("{", fields, "}", inspect_opts(), fun, break: :strict)
     end
   end
+
+  defp prepare_fields(struct, print_unknown?) do
+    unknown_fields =
+      if print_unknown? do
+        Enum.map(struct.__unknown_fields__, fn {field_number, _wire_type, value} ->
+          {field_number, value}
+        end)
+      else
+        []
+      end
+
+    struct
+    |> Map.drop([:__unknown_fields__, :__struct__, :__pb_extensions__])
+    |> Enum.sort()
+    |> Kernel.++(unknown_fields)
+  end
+
+  defp safe_tail([]), do: []
+  defp safe_tail([_head | tail]), do: tail
 
   @spec encode_struct_field(
           {atom() | integer(), term()},
