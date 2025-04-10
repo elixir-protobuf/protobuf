@@ -123,10 +123,10 @@ defmodule Protobuf.Text do
               Algebra.empty()
 
             _ ->
-              raise "invalid value for oneof `#{inspect(name)}`: #{inspect(value)}"
+              raise Protobuf.EncodeError, message: "invalid value for oneof `#{inspect(name)}`: #{inspect(value)}"
           end
         else
-          raise "unknown field #{inspect(name)}"
+          raise Protobuf.EncodeError, message: "unknown field #{inspect(name)}"
         end
     end
   end
@@ -157,7 +157,7 @@ defmodule Protobuf.Text do
   end
 
   defp encode_value(nil, :proto2, %FieldProps{required?: true, name_atom: name}, _) do
-    raise "field #{inspect(name)} is required"
+    raise Protobuf.EncodeError, message: "field #{inspect(name)} is required"
   end
 
   defp encode_value(value, _, _, _) when is_atom(value) do
