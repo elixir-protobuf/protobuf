@@ -189,6 +189,16 @@ defmodule Google.Protobuf.FeatureSet.JsonFormat do
   field :LEGACY_BEST_EFFORT, 2
 end
 
+defmodule Google.Protobuf.FeatureSet.EnforceNamingStyle do
+  @moduledoc false
+
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.13.0", syntax: :proto2
+
+  field :ENFORCE_NAMING_STYLE_UNKNOWN, 0
+  field :STYLE2024, 1
+  field :STYLE_LEGACY, 2
+end
+
 defmodule Google.Protobuf.GeneratedCodeInfo.Annotation.Semantic do
   @moduledoc false
 
@@ -819,6 +829,13 @@ defmodule Google.Protobuf.FeatureSet do
     optional: true,
     type: Google.Protobuf.FeatureSet.JsonFormat,
     json_name: "jsonFormat",
+    enum: true,
+    deprecated: false
+
+  field :enforce_naming_style, 7,
+    optional: true,
+    type: Google.Protobuf.FeatureSet.EnforceNamingStyle,
+    json_name: "enforceNamingStyle",
     enum: true,
     deprecated: false
 
