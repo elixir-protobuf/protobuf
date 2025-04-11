@@ -77,27 +77,14 @@ defmodule Protobuf.Encoder do
           "Got error when encoding #{inspect(struct_mod)}##{prop.name_atom}: #{Exception.format(:error, error)}"
   end
 
-  defp skip_field?(_syntax, [], _prop), do: true
-  defp skip_field?(_syntax, val, _prop) when is_map(val), do: map_size(val) == 0
-  defp skip_field?(:proto2, nil, %FieldProps{optional?: optional?}), do: optional?
-  defp skip_field?(:proto2, value, %FieldProps{default: value, oneof: nil}), do: true
-
-  defp skip_field?(:proto3, val, %FieldProps{proto3_optional?: true}),
-    do: is_nil(val)
-
-  defp skip_field?(:proto3, nil, _prop), do: true
-  defp skip_field?(:proto3, 0, %FieldProps{oneof: nil}), do: true
-  defp skip_field?(:proto3, +0.0, %FieldProps{oneof: nil}), do: true
-  defp skip_field?(:proto3, "", %FieldProps{oneof: nil}), do: true
-  defp skip_field?(:proto3, false, %FieldProps{oneof: nil}), do: true
-
-  defp skip_field?(:proto3, value, %FieldProps{type: {:enum, enum_mod}, oneof: nil}) do
-    enum_props = enum_mod.__message_props__()
-    %{name_atom: name_atom, name: name} = enum_props.field_props[0]
-    value == name_atom or value == name
+  defp skip_field?(syntax, value, field_prop) do
+    case Protobuf.Presence.get_field_presence(syntax, value, field_prop) do
+      :present -> false
+      # Proto2 required isn't skipped even if not present
+      :maybe -> not(syntax == :proto2 && field_prop.required?)
+      :not_present -> not(syntax == :proto2 && field_prop.required?)
+    end
   end
-
-  defp skip_field?(_syntax, _val, _prop), do: false
 
   defp do_encode_field(
          :normal,
@@ -105,7 +92,7 @@ defmodule Protobuf.Encoder do
          syntax,
          %FieldProps{encoded_fnum: fnum, type: type, repeated?: repeated?} = prop
        ) do
-    if skip_field?(syntax, val, prop) or skip_enum?(syntax, val, prop) do
+    if skip_field?(syntax, val, prop) do
       :skip
     else
       iodata = apply_or_map(val, repeated?, &[fnum | Wire.encode(type, &1)])
@@ -143,7 +130,7 @@ defmodule Protobuf.Encoder do
   end
 
   defp do_encode_field(:packed, val, syntax, %FieldProps{type: type, encoded_fnum: fnum} = prop) do
-    if skip_field?(syntax, val, prop) or skip_enum?(syntax, val, prop) do
+    if skip_field?(syntax, val, prop) do
       :skip
     else
       encoded = Enum.map(val, &Wire.encode(type, &1))
@@ -197,20 +184,6 @@ defmodule Protobuf.Encoder do
 
   defp apply_or_map(val, _repeated? = true, func), do: Enum.map(val, func)
   defp apply_or_map(val, _repeated? = false, func), do: func.(val)
-
-  defp skip_enum?(:proto2, _value, _prop), do: false
-  defp skip_enum?(:proto3, _value, %FieldProps{proto3_optional?: true}), do: false
-  defp skip_enum?(_syntax, _value, %FieldProps{enum?: false}), do: false
-
-  defp skip_enum?(_syntax, _value, %FieldProps{enum?: true, oneof: oneof}) when not is_nil(oneof),
-    do: false
-
-  defp skip_enum?(_syntax, _value, %FieldProps{required?: true}), do: false
-  defp skip_enum?(_syntax, value, %FieldProps{type: type}), do: enum_default?(type, value)
-
-  defp enum_default?({:enum, enum_mod}, val) when is_atom(val), do: enum_mod.value(val) == 0
-  defp enum_default?({:enum, _enum_mod}, val) when is_integer(val), do: val == 0
-  defp enum_default?({:enum, _enum_mod}, list) when is_list(list), do: false
 
   # Returns a map of %{field_name => field_value} from oneofs. For example, if you have:
   # oneof body {

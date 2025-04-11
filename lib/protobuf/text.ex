@@ -176,28 +176,14 @@ defmodule Protobuf.Text do
     end
   end
 
-  # Copied from Protobuf.Encoder. Should it be shared?
-  defp skip_field?(_syntax, [], _prop), do: true
-  defp skip_field?(_syntax, val, _prop) when is_map(val), do: map_size(val) == 0
-  defp skip_field?(:proto2, nil, %FieldProps{optional?: optional?}), do: optional?
-  defp skip_field?(:proto2, value, %FieldProps{default: value, oneof: nil}), do: true
-  defp skip_field?(:proto3, val, %FieldProps{proto3_optional?: true}), do: is_nil(val)
-
-  defp skip_field?(:proto3, nil, _prop), do: true
-  defp skip_field?(:proto3, 0, %FieldProps{oneof: nil}), do: true
-  defp skip_field?(:proto3, +0.0, %FieldProps{oneof: nil}), do: true
-  defp skip_field?(:proto3, "", %FieldProps{oneof: nil}), do: true
-  defp skip_field?(:proto3, false, %FieldProps{oneof: nil}), do: true
-
-  # This is actually new. Should it be ported to Protobuf.Encoder?
-  defp skip_field?(:proto3, value, %FieldProps{type: {:enum, enum_mod}, oneof: nil}) do
-    enum_props = enum_mod.__message_props__()
-    %{name_atom: name_atom, name: name, json_name: name_json} = enum_props.field_props[0]
-
-    value == name_atom or value == name or value == name_json
+  defp skip_field?(syntax, value, field_prop) do
+    case Protobuf.Presence.get_field_presence(syntax, value, field_prop) do
+      :present -> false
+      # Proto2 required isn't skipped even if not present
+      :maybe -> not(syntax == :proto2 && field_prop.required?)
+      :not_present -> not(syntax == :proto2 && field_prop.required?)
+    end
   end
-
-  defp skip_field?(_, _, _), do: false
 
   defp inspect_opts(), do: %Inspect.Opts{limit: :infinity}
 end
