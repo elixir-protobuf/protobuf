@@ -111,11 +111,12 @@ defmodule Protobuf.Presence do
     end
   end
 
-  # Defaults for different field types: implicit presence means they are maybe set
+  # Messages have explicit presence tracking in proto3
   def get_field_presence(:proto3, nil, _prop) do
-    :maybe
+    :not_present
   end
 
+  # Defaults for different field types: implicit presence means they are maybe set
   def get_field_presence(:proto3, 0, _prop) do
     :maybe
   end

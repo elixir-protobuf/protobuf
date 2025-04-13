@@ -53,6 +53,14 @@ defmodule Protobuf.PresenceTest do
       msg = %OneofProto3{first: {:e, :UNKNOWN}}
       assert Presence.field_presence(msg, :e) == :present
     end
+
+    test "message fields have explicit presence" do
+      msg = %Foo{}
+      assert Presence.field_presence(msg, :e) == :not_present
+
+      msg = %Foo{e: %Foo.Bar{}}
+      assert Presence.field_presence(msg, :e) == :present
+    end
   end
 
   describe "field_presence/2 for proto2" do
@@ -100,6 +108,14 @@ defmodule Protobuf.PresenceTest do
       assert Presence.field_presence(msg, :a) == :present
 
       msg = %Oneof{first: {:e, :UNKNOWN}}
+      assert Presence.field_presence(msg, :e) == :present
+    end
+
+    test "message fields have explicit presence" do
+      msg = %Foo2{}
+      assert Presence.field_presence(msg, :e) == :not_present
+
+      msg = %Foo2{e: %Foo.Bar{}}
       assert Presence.field_presence(msg, :e) == :present
     end
   end
