@@ -143,7 +143,7 @@ defmodule Protobuf.TextTest do
   end
 
   test "raises on absent proto2 required" do
-    assert_raise RuntimeError, "field :a is required", fn ->
+    assert_raise Protobuf.EncodeError, "field :a is required", fn ->
       Text.encode(%TestMsg.Foo2{})
     end
   end
