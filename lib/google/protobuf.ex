@@ -13,15 +13,15 @@ defmodule Google.Protobuf do
       %{}
 
       iex> to_map(%Google.Protobuf.Struct{
-        fields: %{
-          "key_one" => %Google.Protobuf.Value{
-            kind: {:string_value, "value_one"},
-          },
-          "key_two" => %Google.Protobuf.Value{
-            kind: {:number_value, 1234.0},
-          }
-        },
-      })
+      ...>   fields: %{
+      ...>     "key_one" => %Google.Protobuf.Value{
+      ...>       kind: {:string_value, "value_one"},
+      ...>     },
+      ...>     "key_two" => %Google.Protobuf.Value{
+      ...>       kind: {:number_value, 1234.0},
+      ...>     }
+      ...>   },
+      ...> })
       %{"key_one" => "value_one", "key_two" => 1234.0}
 
   """
@@ -133,5 +133,46 @@ defmodule Google.Protobuf do
       seconds: div(nanoseconds, 1_000_000_000),
       nanos: rem(nanoseconds, 1_000_000_000)
     })
+  end
+
+  if Code.ensure_loaded?(Duration) do
+    @doc """
+    Converts a `Google.Protobuf.Duration` struct to a `Duration` struct.
+
+    > #### Requires `Duration` {: .warning}
+    > This function requires `Duration`, which was introduced in Elixir 1.17.
+
+    ## Examples
+
+        iex> to_duration(%Google.Protobuf.Duration{seconds: 1, nanos: 500_000_000})
+        Duration.new!(second: 1, microsecond: {500_000, 6})
+    """
+    @doc since: "0.15.0"
+    @spec to_duration(Google.Protobuf.Duration.t()) :: Duration.t()
+    def to_duration(%Google.Protobuf.Duration{} = duration) do
+      Duration.new!(second: duration.seconds, microsecond: {div(duration.nanos, 1_000), 6})
+    end
+
+    @doc """
+    Converts a `Duration` struct to a `Google.Protobuf.Duration` struct.
+
+    > #### Requires `Duration` {: .warning}
+    > This function requires `Duration`, which was introduced in Elixir 1.17.
+
+    ## Examples
+
+        iex> from_duration(Duration.new!(second: 1, microsecond: {500_000, 6}))
+        %Google.Protobuf.Duration{seconds: 1, nanos: 500_000_000}
+    """
+    @doc since: "0.15.0"
+    @spec from_duration(Duration.t()) :: Google.Protobuf.Duration.t()
+    def from_duration(%Duration{} = duration) do
+      {microsecond, _precision} = duration.microsecond
+
+      struct(Google.Protobuf.Duration, %{
+        seconds: duration.second,
+        nanos: microsecond * 1_000
+      })
+    end
   end
 end

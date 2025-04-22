@@ -5,6 +5,8 @@ defmodule Google.ProtobufTest do
 
   alias Google.Protobuf.{Struct, Timestamp}
 
+  doctest Google.Protobuf
+
   @basic_json """
   {
     "key_one": "value_one",
