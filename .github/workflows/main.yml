@@ -43,7 +43,7 @@ jobs:
 
       - name: Cache dependencies
         id: cache-deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: deps
           key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}-elixir-${{ matrix.elixir }}-erlang-${{ matrix.otp }}
@@ -55,7 +55,7 @@ jobs:
       # Don't cache PLTs based on mix.lock hash, as Dialyzer can incrementally update even old ones
       # Cache key based on Elixir & Erlang version (also useful when running in matrix)
       - name: Cache Dialyzer's PLT
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache-plt
         with:
           path: priv/plts
@@ -140,7 +140,7 @@ jobs:
 
       - name: Cache Elixir dependencies with compiled protoc
         id: cache-deps-with-built-protoc
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: deps
           key: ${{ runner.os }}-mix-deps-with-protoc-${{ hashFiles('**/mix.lock') }}
