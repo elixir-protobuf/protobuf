@@ -199,7 +199,10 @@ defmodule Google.Protobuf.FieldMask do
   `INVALID_ARGUMENT` error if any path is unmappable.
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.FieldMask",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line

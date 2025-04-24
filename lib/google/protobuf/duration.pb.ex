@@ -60,7 +60,10 @@ defmodule Google.Protobuf.Duration do
   microsecond should be expressed in JSON format as "3.000001s".
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.Duration",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
