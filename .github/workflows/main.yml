@@ -9,8 +9,7 @@ on:
 jobs:
   test:
     name: Test (Elixir ${{ matrix.elixir }} | Erlang/OTP ${{ matrix.otp }})
-    # We need Ubuntu 20.04 for now to test old OTP and Elixir versions.
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -44,7 +43,7 @@ jobs:
 
       - name: Cache dependencies
         id: cache-deps
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: deps
           key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}-elixir-${{ matrix.elixir }}-erlang-${{ matrix.otp }}
@@ -56,7 +55,7 @@ jobs:
       # Don't cache PLTs based on mix.lock hash, as Dialyzer can incrementally update even old ones
       # Cache key based on Elixir & Erlang version (also useful when running in matrix)
       - name: Cache Dialyzer's PLT
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         id: cache-plt
         with:
           path: priv/plts
@@ -141,7 +140,7 @@ jobs:
 
       - name: Cache Elixir dependencies with compiled protoc
         id: cache-deps-with-built-protoc
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: deps
           key: ${{ runner.os }}-mix-deps-with-protoc-${{ hashFiles('**/mix.lock') }}
