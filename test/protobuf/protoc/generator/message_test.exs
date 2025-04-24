@@ -7,11 +7,13 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
   alias Protobuf.TestHelpers
 
   test "generate/2 has right name" do
-    ctx = %Context{}
+    ctx = %Context{package: "pkg.name"}
     desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "defmodule Foo do\n"
-    assert msg =~ "use Protobuf, protoc_gen_elixir_version: \"#{Util.version()}\"\n"
+    assert msg =~ "defmodule Pkg.Name.Foo do\n"
+
+    assert msg =~
+             "use Protobuf, full_name: \"pkg.name.Foo\", protoc_gen_elixir_version: \"#{Util.version()}\"\n"
 
     assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
 
@@ -19,7 +21,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
              Macro.to_string(
                quote(
                  do:
-                   t() :: %Foo{
+                   t() :: %Pkg.Name.Foo{
                      __unknown_fields__: [Protobuf.unknown_field()]
                    }
                )
@@ -81,7 +83,9 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     }
 
     {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
-    assert msg =~ "use Protobuf, map: true, protoc_gen_elixir_version: \"#{Util.version()}\"\n"
+
+    assert msg =~
+             "use Protobuf, full_name: \"pkg.name.Foo\", map: true, protoc_gen_elixir_version: \"#{Util.version()}\"\n"
   end
 
   test "generate/2 has right fields" do
@@ -611,12 +615,16 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     }
 
     {[[{_mod, msg}]], _} = Generator.generate(ctx, desc)
-    assert msg =~ "defmodule Foo.Nested.EnumFoo do\n"
-    assert msg =~ "use Protobuf, enum: true, protoc_gen_elixir_version: \"#{Util.version()}\"\n"
 
-    assert msg =~ """
+    assert msg == """
+           defmodule Foo.Nested.EnumFoo do
+             @moduledoc false
+
+             use Protobuf, enum: true, full_name: "Foo.Nested.EnumFoo", protoc_gen_elixir_version: "#{Util.version()}"
+
              field :a, 0
              field :b, 1
+           end
            """
   end
 

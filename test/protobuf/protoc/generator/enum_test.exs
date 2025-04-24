@@ -28,17 +28,21 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
     assert [{compiled_mod, bytecode}] = Code.compile_string(msg)
     assert inspect(compiled_mod) == module
 
-    assert msg =~ "defmodule #{module} do\n"
-    assert msg =~ "use Protobuf, enum: true, protoc_gen_elixir_version: \"#{Util.version()}\"\n"
+    assert msg == """
+           defmodule ProtobufProtocGeneratorEnumTestEnumFoo do
+             @moduledoc false
 
-    refute msg =~ "defstruct "
+             use Protobuf,
+               enum: true,
+               full_name: "ProtobufProtocGeneratorEnumTestEnumFoo",
+               protoc_gen_elixir_version: "#{Util.version()}"
 
-    assert msg =~ """
              field :A, 0
              field :B, 1
              field :HAS_UNDERSCORES, 2
              field :HAS_UNDERSCORES_X, 3
              field :HAS_UNDERSCORES_, 4
+           end
            """
 
     assert TestHelpers.get_type_spec_as_string(compiled_mod, bytecode, :t) ==
@@ -68,7 +72,9 @@ defmodule Protobuf.Protoc.Generator.EnumTest do
     assert inspect(compiled_mod) == module
 
     assert msg =~ "defmodule #{module} do\n"
-    assert msg =~ "use Protobuf, enum: true, protoc_gen_elixir_version: \"#{Util.version()}\"\n"
+
+    assert msg =~
+             "use Protobuf,\n    enum: true,\n    full_name: \"ProtobufProtocGeneratorEnumTestEnumFooDesc\",\n    protoc_gen_elixir_version: \"#{Util.version()}\"\n\n"
 
     refute msg =~ "defstruct "
 

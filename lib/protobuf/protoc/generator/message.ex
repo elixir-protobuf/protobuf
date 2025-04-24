@@ -36,6 +36,11 @@ defmodule Protobuf.Protoc.Generator.Message do
     fields = get_fields(ctx, desc)
     extensions = get_extensions(desc)
 
+    full_name =
+      ([ctx.package] ++ ctx.namespace ++ [desc.name])
+      |> Enum.reject(&is_nil/1)
+      |> Enum.join(".")
+
     descriptor_fun_body =
       if ctx.gen_descriptors? do
         Util.descriptor_fun_body(desc)
@@ -52,7 +57,7 @@ defmodule Protobuf.Protoc.Generator.Message do
          message_template(
            comment: Comment.get(ctx),
            module: msg_name,
-           use_options: msg_opts_str(ctx, desc.options),
+           use_options: msg_opts_str(ctx, desc.options, full_name),
            oneofs: desc.oneof_decl,
            fields: gen_fields(ctx.syntax, fields),
            descriptor_fun_body: descriptor_fun_body,
@@ -98,14 +103,15 @@ defmodule Protobuf.Protoc.Generator.Message do
     ":#{f[:name]}, #{f[:number]}, #{label_str}type: #{f[:type]}#{opts_str}"
   end
 
-  defp msg_opts_str(%{syntax: syntax}, opts) do
+  defp msg_opts_str(%{syntax: syntax}, opts, full_name) do
     msg_options = opts
 
     opts = %{
       syntax: syntax,
       map: msg_options && msg_options.map_entry,
       deprecated: msg_options && msg_options.deprecated,
-      protoc_gen_elixir_version: "\"#{Util.version()}\""
+      protoc_gen_elixir_version: "\"#{Util.version()}\"",
+      full_name: "\"#{full_name}\""
     }
 
     str = Util.options_to_str(opts)

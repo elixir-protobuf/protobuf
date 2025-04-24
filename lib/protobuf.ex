@@ -65,6 +65,9 @@ defmodule Protobuf do
       @behaviour Protobuf
 
       @impl unquote(__MODULE__)
+      def full_name(), do: @options[:full_name]
+
+      @impl unquote(__MODULE__)
       def transform_module() do
         nil
       end
@@ -103,6 +106,12 @@ defmodule Protobuf do
   This function is overridable in your module.
   """
   @callback transform_module() :: module() | nil
+
+  @doc """
+  Returns the fully qualified name of the descriptor's target.
+  """
+  @doc since: "0.15.0"
+  @callback full_name() :: String.t()
 
   @doc """
   Decodes the given binary data interpreting it as the Protobuf message `module`.
