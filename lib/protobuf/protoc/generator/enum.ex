@@ -19,11 +19,17 @@ defmodule Protobuf.Protoc.Generator.Enum do
   def generate(%Context{namespace: ns} = ctx, %Google.Protobuf.EnumDescriptorProto{} = desc) do
     msg_name = Util.mod_name(ctx, ns ++ [Macro.camelize(desc.name)])
 
+    full_name =
+      ([ctx.package] ++ ctx.namespace ++ [desc.name])
+      |> Enum.reject(&is_nil/1)
+      |> Enum.join(".")
+
     use_options =
       Util.options_to_str(%{
         syntax: ctx.syntax,
         enum: true,
-        protoc_gen_elixir_version: "\"#{Util.version()}\""
+        protoc_gen_elixir_version: "\"#{Util.version()}\"",
+        full_name: "\"#{full_name}\""
       })
 
     descriptor_fun_body =

@@ -172,6 +172,12 @@ defmodule Protobuf.Mixfile do
       "./generated",
       ["test/protobuf/protoc/proto/no_package.proto"]
     )
+
+    protoc!(
+      "-I test/protobuf/protoc/proto --elixir_opt=include_docs=true",
+      "./generated",
+      ["test/protobuf/protoc/proto/full_name.proto"]
+    )
   end
 
   defp gen_bench_protos(_args) do
