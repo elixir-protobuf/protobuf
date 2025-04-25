@@ -58,10 +58,7 @@ defmodule Protobuf.DSL.Typespecs do
   end
 
   defp field_prop_to_spec(_syntax, %FieldProps{map?: true, type: map_mod} = prop) do
-    if not Code.ensure_loaded?(map_mod) do
-      raise "module #{inspect(map_mod)} was not loaded, but was expected to be since it's used as a map entry"
-    end
-
+    Code.ensure_compiled!(map_mod)
     map_props = map_mod.__message_props__()
 
     key_spec = scalar_type_to_spec(map_props.field_props[map_props.field_tags.key].type)
