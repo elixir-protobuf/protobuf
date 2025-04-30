@@ -163,15 +163,22 @@ defmodule Google.Protobuf do
 
         iex> from_duration(Duration.new!(second: 1, microsecond: {500_000, 6}))
         %Google.Protobuf.Duration{seconds: 1, nanos: 500_000_000}
+
+        iex> from_duration(Duration.new!(hour: 1, minute: 2, microsecond: {500_000, 6}))
+        %Google.Protobuf.Duration{seconds: 3720, nanos: 500_000_000}
+
+        iex> from_duration(Duration.new!(minute: 2, microsecond: {6_500_000, 6}))
+        %Google.Protobuf.Duration{seconds: 126, nanos: 500_000_000}
     """
     @doc since: "0.15.0"
     @spec from_duration(Duration.t()) :: Google.Protobuf.Duration.t()
     def from_duration(%Duration{} = duration) do
       {microsecond, _precision} = duration.microsecond
+      seconds = div(to_timeout(duration), 1000)
 
       struct(Google.Protobuf.Duration, %{
-        seconds: duration.second,
-        nanos: microsecond * 1_000
+        seconds: seconds,
+        nanos: rem(microsecond, 1_000_000) * 1_000
       })
     end
   end
