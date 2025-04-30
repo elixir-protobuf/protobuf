@@ -321,7 +321,7 @@ defmodule Protobuf do
       Protobuf.field_presence(%MyMessage{}, :bar)
       #=> :not_present
 
-      # Lists
+      # Repeated
       Protobuf.field_presence(%MyMessage{repeated_field: []}, :repeated_field)
       #=> :maybe
 
