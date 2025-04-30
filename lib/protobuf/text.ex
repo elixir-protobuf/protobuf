@@ -26,6 +26,7 @@ defmodule Protobuf.Text do
   Doesn't perform type validations. If input data is invalid, it produces
   undecodable output.
   """
+  @doc since: "0.15.0"
   @spec encode(struct(), Keyword.t()) :: binary()
   def encode(%mod{} = struct, opts \\ []) do
     max_line_width = Keyword.get(opts, :max_line_width, 80)
