@@ -286,6 +286,56 @@ defmodule Protobuf do
   end
 
   @doc """
+  Returns whether a field or oneof is present, not present, or maybe present
+
+  `:present` and `:not present` mean that a field is **explicitly** present or not,
+  respectively.
+
+  Some values may be implicitly present. For example, lists in `repeated` fields
+  always have implicit presence. In these cases, if the presence is ambiguous,
+  returns `:maybe`.
+
+  For more information about field presence tracking rules, refer to the official
+  [Field Presence docs](https://protobuf.dev/programming-guides/field_presence/).
+
+
+  ## Examples
+
+      # Non-optional proto3 field:
+      Protobuf.field_presence(%MyMessage{foo: 42}, :foo)
+      #=> :present
+
+      Protobuf.field_presence(%MyMessage{foo: 0}, :foo)
+      #=> :maybe
+
+      Protobuf.field_presence(%MyMessage{}, :foo)
+      #=> :maybe
+
+      # Optional proto3 field:
+      Protobuf.field_presence(%MyMessage{bar: 42}, :bar)
+      #=> :present
+
+      Protobuf.field_presence(%MyMessage{bar: 0}, :bar)
+      #=> :present
+
+      Protobuf.field_presence(%MyMessage{}, :bar)
+      #=> :not_present
+
+      # Lists
+      Protobuf.field_presence(%MyMessage{repeated_field: []}, :repeated_field)
+      #=> :maybe
+
+      Protobuf.field_presence(%MyMessage{repeated_field: [1}, :repeated_field)
+      #=> :present
+
+  """
+  @doc since: "0.15.0"
+  @spec field_presence(message :: struct(), field :: atom()) :: :present | :not_present | :maybe
+  def field_presence(message, field) do
+    Protobuf.Presence.field_presence(message, field)
+  end
+
+  @doc """
   Loads extensions modules.
 
   This function should be called in your application's `c:Application.start/2` callback,
