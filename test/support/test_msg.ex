@@ -296,20 +296,6 @@ defmodule TestMsg do
     field :field, 1, type: WithTransformModule
   end
 
-  defmodule WithNewTransformModule do
-    use Protobuf, syntax: :proto3
-
-    field :field, 1, type: :int32
-
-    def transform_module(), do: Protobuf.TransformModule.InferFieldsFromEnum
-  end
-
-  defmodule ContainsNewTransformModule do
-    use Protobuf, syntax: :proto3
-
-    field :field, 1, type: WithNewTransformModule
-  end
-
   defmodule TransformIntegerStrings do
     @behaviour Protobuf.TransformModule
 

@@ -45,7 +45,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
       protoc!([
         "--proto_path=#{tmp_dir}",
         "--elixir_out=#{tmp_dir}",
-        "--elixir_opt=transform_module=Protobuf.TransformModule.InferFieldsFromEnum",
+        "--elixir_opt=transform_module=TestMsg.TransformModule",
         "--plugin=./protoc-gen-elixir",
         proto_path
       ])
@@ -53,7 +53,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
       assert [mod] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
       assert mod == Foo.User
 
-      assert mod.transform_module() == Protobuf.TransformModule.InferFieldsFromEnum
+      assert mod.transform_module() == TestMsg.TransformModule
     end
 
     test "gen_descriptors option", %{tmp_dir: tmp_dir, proto_path: proto_path} do
