@@ -177,9 +177,10 @@ defmodule Protobuf.DSL do
       if unquote(defines_defstruct?) or unquote(defines_t_type?) do
         raise Protobuf.InvalidError, """
         since v0.10.0 of the :protobuf library, the t/0 type and the struct are automatically \
-        generated for modules that call "use Protobuf" if they are Protobuf enums or messages. \
-        Remove your explicit definition of both of these or regenerate the files with the \
-        latest version of the protoc-gen-elixir plugin.\
+        generated for modules that call "use Protobuf" if they are Protobuf enums or messages, \
+        and their usage was deprecated. Since v0.15.0, they are errors. Remove your explicit \
+        definition of both of these or regenerate the files with the latest version of the \
+        protoc-gen-elixir plugin.\
         """
       else
         unquote(def_t_typespec(msg_props, extension_props, transform_module_ast))
