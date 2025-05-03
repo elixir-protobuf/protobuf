@@ -95,7 +95,8 @@ defmodule Protobuf.PresenceTest do
       msg = %Foo2{}
       assert Presence.field_presence(msg, :b) == :maybe
 
-      msg = %Foo2{b: 5} # 5 is the default value for :b
+      # 5 is the default value for :b
+      msg = %Foo2{b: 5}
       assert Presence.field_presence(msg, :b) == :maybe
 
       msg = %Foo2{b: 6}

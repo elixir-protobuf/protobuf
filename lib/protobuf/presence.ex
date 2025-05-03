@@ -47,7 +47,8 @@ defmodule Protobuf.Presence do
   # it until we add editions support, since we definitely don't want to add
   # `syntax` in a public API
   @doc false
-  @spec get_field_presence(:proto2 | :proto3, term(), FieldProps.t()) :: :present | :not_present | :maybe
+  @spec get_field_presence(:proto2 | :proto3, term(), FieldProps.t()) ::
+          :present | :not_present | :maybe
   def get_field_presence(syntax, value, field_prop)
 
   # Repeated and maps are always implicit.

@@ -124,7 +124,8 @@ defmodule Protobuf.Text do
               Algebra.empty()
 
             _ ->
-              raise Protobuf.EncodeError, message: "invalid value for oneof `#{inspect(name)}`: #{inspect(value)}"
+              raise Protobuf.EncodeError,
+                message: "invalid value for oneof `#{inspect(name)}`: #{inspect(value)}"
           end
         else
           raise Protobuf.EncodeError, message: "unknown field #{inspect(name)}"
@@ -169,7 +170,10 @@ defmodule Protobuf.Text do
   end
 
   defp encode_list(list, syntax, field_prop, print_unknown?) do
-    fun = fn val, _opts -> encode_value(val, syntax, %{field_prop | repeated?: false, map?: false}, print_unknown?) end
+    fun = fn val, _opts ->
+      encode_value(val, syntax, %{field_prop | repeated?: false, map?: false}, print_unknown?)
+    end
+
     Algebra.container_doc("[", list, "]", inspect_opts(), fun, break: :strict)
   end
 
@@ -185,8 +189,8 @@ defmodule Protobuf.Text do
     case Protobuf.Presence.get_field_presence(syntax, value, field_prop) do
       :present -> false
       # Proto2 required isn't skipped even if not present
-      :maybe -> not(syntax == :proto2 && field_prop.required?)
-      :not_present -> not(syntax == :proto2 && field_prop.required?)
+      :maybe -> not (syntax == :proto2 && field_prop.required?)
+      :not_present -> not (syntax == :proto2 && field_prop.required?)
     end
   end
 
