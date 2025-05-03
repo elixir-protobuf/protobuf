@@ -184,7 +184,10 @@ defmodule Protobuf.EncoderTest do
   end
 
   test "encodes map with oneof" do
-    msg = %Google.Protobuf.Struct{fields: %{"valid" => %{kind: {:bool_value, true}}}}
+    msg = %Google.Protobuf.Struct{
+      fields: %{"valid" => %Google.Protobuf.Value{kind: {:bool_value, true}}}
+    }
+
     bin = Google.Protobuf.Struct.encode(msg)
 
     assert Google.Protobuf.Struct.decode(bin) ==
@@ -307,6 +310,15 @@ defmodule Protobuf.EncoderTest do
     assert_raise Protobuf.EncodeError, message, fn ->
       Encoder.encode(%TestMsg.Foo{a: 90, e: %TestMsg.Foo.Bar{a: "not_a_number"}})
     end
+  end
+
+  test "gives a warning for implicitly cast structs" do
+    warning =
+      ExUnit.CaptureIO.capture_io(:stderr, fn ->
+        assert <<50, 2, 8, 1>> = Encoder.encode(%TestMsg.Foo{e: %{a: 1}})
+      end)
+
+    assert warning =~ "Implicit casting from %{a: 1} to TestMsg.Foo.Bar"
   end
 
   test "encodes with transformer module" do
