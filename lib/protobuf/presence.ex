@@ -55,7 +55,7 @@ defmodule Protobuf.Presence do
     :maybe
   end
 
-  def get_field_presence(_syntax, val, _prop) when is_map(val) do
+  def get_field_presence(_syntax, val, %FieldProps{map?: true}) when is_map(val) do
     if map_size(val) == 0 do
       :maybe
     else

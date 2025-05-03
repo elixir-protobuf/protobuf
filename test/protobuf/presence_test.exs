@@ -50,6 +50,9 @@ defmodule Protobuf.PresenceTest do
       msg = %OneofProto3{first: {:a, 0}}
       assert Presence.field_presence(msg, :a) == :present
 
+      msg = %OneofProto3{first: {:f, %{}}}
+      assert Presence.field_presence(msg, :f) == :present
+
       msg = %OneofProto3{first: {:e, :UNKNOWN}}
       assert Presence.field_presence(msg, :e) == :present
     end
@@ -59,6 +62,11 @@ defmodule Protobuf.PresenceTest do
       assert Presence.field_presence(msg, :e) == :not_present
 
       msg = %Foo{e: %Foo.Bar{}}
+      assert Presence.field_presence(msg, :e) == :present
+
+      # We (still) accept maps and cast them into structs, so empty maps must
+      # be present
+      msg = %Foo{e: %{}}
       assert Presence.field_presence(msg, :e) == :present
     end
   end
@@ -103,9 +111,11 @@ defmodule Protobuf.PresenceTest do
       assert Presence.field_presence(msg, :a) == :present
       assert Presence.field_presence(msg, :b) == :not_present
 
-      # Even if the value is default, it is present
       msg = %Oneof{first: {:a, 0}}
       assert Presence.field_presence(msg, :a) == :present
+
+      msg = %Oneof{first: {:f, %{}}}
+      assert Presence.field_presence(msg, :f) == :present
 
       msg = %Oneof{first: {:e, :UNKNOWN}}
       assert Presence.field_presence(msg, :e) == :present
@@ -116,6 +126,11 @@ defmodule Protobuf.PresenceTest do
       assert Presence.field_presence(msg, :e) == :not_present
 
       msg = %Foo2{e: %Foo.Bar{}}
+      assert Presence.field_presence(msg, :e) == :present
+
+      # We (still) accept maps and cast them into structs, so empty maps must
+      # be present
+      msg = %Foo2{e: %{}}
       assert Presence.field_presence(msg, :e) == :present
     end
   end
