@@ -161,7 +161,7 @@ defmodule Protobuf.Encoder do
           message:
             "struct #{inspect(other_mod)} can't be encoded as #{inspect(mod)}: #{inspect(struct)}"
 
-      enumerable ->
+      enumerable when is_map(enumerable) or is_list(enumerable) ->
         IO.warn("""
         Implicitly casting from #{inspect(enumerable)} to #{inspect(mod)} message.
         This automatic coercion is deprecated in Protobuf 0.15 and will raise an error in future versions.
@@ -174,6 +174,10 @@ defmodule Protobuf.Encoder do
         """)
 
         do_encode_to_iodata(struct(mod, msg))
+
+      other ->
+        raise Protobuf.EncodeError,
+          message: "#{inspect(other)} is invalid for type #{inspect(mod)}"
     end
   end
 
