@@ -318,7 +318,7 @@ defmodule Protobuf.EncoderTest do
         assert <<50, 2, 8, 1>> = Encoder.encode(%TestMsg.Foo{e: %{a: 1}})
       end)
 
-    assert warning =~ "Implicit casting from %{a: 1} to TestMsg.Foo.Bar"
+    assert warning =~ "Implicitly casting from %{a: 1} to TestMsg.Foo.Bar"
   end
 
   test "encodes with transformer module" do

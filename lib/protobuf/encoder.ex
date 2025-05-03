@@ -163,7 +163,7 @@ defmodule Protobuf.Encoder do
 
       enumerable ->
         IO.warn("""
-        Implicit casting from #{inspect(enumerable)} to #{inspect(mod)} struct.
+        Implicitly casting from #{inspect(enumerable)} to #{inspect(mod)} message.
         This automatic coercion is deprecated in Protobuf 0.15 and will raise an error in future versions.
 
         Instead of:
