@@ -335,14 +335,4 @@ defmodule Protobuf.EncoderTest do
     assert Encoder.encode(msg) == <<>>
     assert TestMsg.ContainsTransformModule.decode(Encoder.encode(msg)) == msg
   end
-
-  test "NewTransform calls new/2 before encoding" do
-    msg = %TestMsg.ContainsNewTransformModule{field: [field: 123]}
-    assert msg == %TestMsg.ContainsNewTransformModule{field: [field: 123]}
-
-    assert TestMsg.ContainsNewTransformModule.decode(Encoder.encode(msg)) ==
-             %TestMsg.ContainsNewTransformModule{
-               field: %TestMsg.WithNewTransformModule{field: 123}
-             }
-  end
 end

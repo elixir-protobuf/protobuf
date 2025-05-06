@@ -190,38 +190,6 @@ defmodule Protobuf.DSLTest do
     refute msg_props.field_props[11].embedded?
   end
 
-  # TODO: remove once we remove new/0 and new/1.
-  test "generates new/0 and new/1 functions" do
-    assert %Foo{
-             a: 0,
-             c: "",
-             d: +0.0,
-             e: nil,
-             f: 0,
-             g: [],
-             h: [],
-             i: [],
-             j: :UNKNOWN,
-             k: false,
-             l: %{}
-           } = Foo.new()
-
-    assert %Foo{
-             a: 1,
-             b: 42,
-             c: "abc",
-             d: +0.0,
-             e: %Foo.Bar{a: 2, b: "asd"},
-             f: 0,
-             g: [],
-             h: [],
-             i: [],
-             j: :UNKNOWN,
-             k: false,
-             l: %{}
-           } = Foo.new(%{a: 1, b: 42, c: "abc", e: Foo.Bar.new(a: 2, b: "asd")})
-  end
-
   test "set oneof of message props" do
     msg_props = TestMsg.Oneof.__message_props__()
     assert %{oneof: [{:first, 0}, {:second, 1}]} = msg_props
