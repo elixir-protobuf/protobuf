@@ -1,8 +1,6 @@
 defmodule Protobuf.DSLTest do
   use ExUnit.Case, async: true
 
-  import ExUnit.CaptureIO
-
   alias Protobuf.{FieldProps, MessageProps}
   alias TestMsg.{Foo, Foo2, Proto3Optional}
 
@@ -205,88 +203,92 @@ defmodule Protobuf.DSLTest do
     assert TestMsg.WithTransformModule.transform_module() == TestMsg.TransformModule
   end
 
-  test "emits a warning if there is already a definition for the t/0 type for an enum" do
-    output =
-      capture_io(:stderr, fn ->
-        Code.eval_quoted(
-          quote do
-            defmodule MessageWithWarning do
-              use Protobuf, syntax: :proto3, enum: true
+  test "raises a compilation error if there is already a definition for the t/0 type for an enum" do
+    assert_raise Protobuf.InvalidError,
+                 ~r{t/0 type and the struct are automatically generated},
+                 fn ->
+                   Code.eval_quoted(
+                     quote do
+                       defmodule MessageWithWarning do
+                         use Protobuf, syntax: :proto3, enum: true
 
-              @type t() :: integer() | :FOO
+                         @type t() :: integer() | :FOO
 
-              field :FOO, 0, type: :bool
-            end
-          end
-        )
-      end)
-
-    assert output =~ "the t/0 type in Protobuf enum modules is automatically generated"
+                         field :FOO, 0, type: :bool
+                       end
+                     end
+                   )
+                 end
   end
 
-  test "emits a warning if there is already a call to defstruct/1 and a definition for the t/0 type" do
-    output =
-      capture_io(:stderr, fn ->
-        Code.eval_quoted(
-          quote do
-            defmodule MessageWithWarning do
-              use Protobuf, syntax: :proto3
+  test "raises a compilation error if there is already a call to defstruct/1 and a definition for the t/0 type" do
+    assert_raise Protobuf.InvalidError,
+                 ~r{t/0 type and the struct are automatically generated},
+                 fn ->
+                   Code.eval_quoted(
+                     quote do
+                       defmodule MessageWithWarning do
+                         use Protobuf, syntax: :proto3
 
-              @type t() :: %__MODULE__{foo: boolean()}
+                         @type t() :: %__MODULE__{foo: boolean()}
 
-              defstruct [:foo]
+                         defstruct [:foo]
 
-              field :foo, 1, type: :bool
-            end
-          end
-        )
-      end)
-
-    assert output =~ "t/0 type and the struct are automatically generated"
+                         field :foo, 1, type: :bool
+                       end
+                     end
+                   )
+                 end
   end
 
   test "raises a compilation error if there is already a call to defstruct/1 but no definition for the t/0 type" do
-    assert_raise RuntimeError, ~r{t/0 type and the struct are automatically generated}, fn ->
-      Code.eval_quoted(
-        quote do
-          defmodule MessageWithDefstructError do
-            use Protobuf, syntax: :proto3
+    assert_raise Protobuf.InvalidError,
+                 ~r{t/0 type and the struct are automatically generated},
+                 fn ->
+                   Code.eval_quoted(
+                     quote do
+                       defmodule MessageWithDefstructError do
+                         use Protobuf, syntax: :proto3
 
-            defstruct [:foo]
+                         defstruct [:foo]
 
-            field :foo, 1, type: :bool
-          end
-        end
-      )
-    end
+                         field :foo, 1, type: :bool
+                       end
+                     end
+                   )
+                 end
   end
 
   test "raises a compilation error if there is already a definition for the t/0 type but no defstruct" do
-    assert_raise RuntimeError, ~r{the t/0 type and the struct are automatically generated}, fn ->
-      Code.eval_quoted(
-        quote do
-          defmodule MessageWithTTypeError do
-            use Protobuf, syntax: :proto3
+    assert_raise Protobuf.InvalidError,
+                 ~r{the t/0 type and the struct are automatically generated},
+                 fn ->
+                   Code.eval_quoted(
+                     quote do
+                       defmodule MessageWithTTypeError do
+                         use Protobuf, syntax: :proto3
 
-            @type t() :: %__MODULE__{foo: boolean()}
+                         @type t() :: %__MODULE__{foo: boolean()}
 
-            field :foo, 1, type: :bool
-          end
-        end
-      )
-    end
+                         field :foo, 1, type: :bool
+                       end
+                     end
+                   )
+                 end
   end
 
   test "raises a compilation error if syntax is proto3 and the first enum has tag other than 0" do
-    assert_raise RuntimeError, "the first enum value must have tag 0 in proto3, got: 1", fn ->
-      Code.eval_quoted(
-        quote do
-          defmodule MessageWithProto3BadEnumTag do
-            use Protobuf, syntax: :proto3, enum: true
-            field :NOT_ZERO, 1
-          end
-        end
-      )
-    end
+    assert_raise RuntimeError,
+                 "the first enum value must have tag 0 in proto3, got: 1",
+                 fn ->
+                   Code.eval_quoted(
+                     quote do
+                       defmodule MessageWithProto3BadEnumTag do
+                         use Protobuf, syntax: :proto3, enum: true
+                         field :NOT_ZERO, 1
+                       end
+                     end
+                   )
+                 end
   end
 end
