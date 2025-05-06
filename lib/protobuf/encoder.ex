@@ -179,7 +179,7 @@ defmodule Protobuf.Encoder do
 
       other ->
         raise Protobuf.EncodeError,
-          message: "#{inspect(other)} is invalid for type #{inspect(mod)}"
+          message: "invalid value for type #{inspect(mod)}: #{inspect(other)}"
     end
   end
 
