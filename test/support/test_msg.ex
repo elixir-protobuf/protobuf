@@ -82,8 +82,8 @@ defmodule TestMsg do
     field :g, 8, repeated: true, type: :int32
     # field :h, 9, repeated: true, type: Foo.Bar
     field :i, 10, repeated: true, type: :int32, packed: true
-    # field :j, 11, optional: true, type: EnumFoo, enum: true
-    # field :k, 12, optional: true, type: :bool
+    field :j, 11, optional: true, type: EnumFoo, enum: true
+    field :k, 12, optional: true, type: :bool
     field :l, 13, repeated: true, type: MapFoo, map: true
     field :non_matched, 101, type: :int32, optional: true
   end
@@ -113,6 +113,7 @@ defmodule TestMsg do
     field :c, 3, optional: true, type: :int32, oneof: 1
     field :d, 4, optional: true, type: :string, oneof: 1
     field :e, 6, optional: true, type: EnumFoo, enum: true, default: :A, oneof: 0
+    field :f, 7, type: Foo2, oneof: 0
     field :other, 5, optional: true, type: :string
   end
 
@@ -127,6 +128,7 @@ defmodule TestMsg do
     field :c, 3, optional: true, type: :int32, oneof: 1
     field :d, 4, optional: true, type: :string, oneof: 1
     field :e, 6, type: EnumFoo, enum: true, oneof: 0
+    field :f, 7, type: Foo, oneof: 0
     field :other, 5, optional: true, type: :string
   end
 
