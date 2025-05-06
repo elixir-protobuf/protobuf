@@ -163,7 +163,9 @@ defmodule Protobuf.Encoder do
 
       enumerable when is_map(enumerable) or is_list(enumerable) ->
         IO.warn("""
-        Implicitly casting from #{inspect(enumerable)} to #{inspect(mod)} message.
+        Implicitly casting from a non-struct to a #{inspect(mod)} message:
+        
+        #{inspect(enumerable, pretty: true)}
         This automatic coercion is deprecated in Protobuf 0.15 and will raise an error in future versions.
 
         Instead of:
