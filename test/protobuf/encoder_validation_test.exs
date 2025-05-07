@@ -149,8 +149,8 @@ defmodule Protobuf.EncoderTest.Validation do
 
   test "build embedded field map when encode" do
     msg = %TestMsg.Foo{}
-    msg = %TestMsg.Foo{msg | e: %{a: 1}}
-    msg1 = %TestMsg.Foo{e: %{a: 1}}
+    msg = %TestMsg.Foo{msg | e: %TestMsg.Foo.Bar{a: 1}}
+    msg1 = %TestMsg.Foo{e: %TestMsg.Foo.Bar{a: 1}}
 
     assert Protobuf.Encoder.encode(msg) == Protobuf.Encoder.encode(msg1)
   end

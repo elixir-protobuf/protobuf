@@ -1,5 +1,11 @@
 defmodule Protobuf.EncoderTest do
-  use ExUnit.Case, async: true
+  # TODO: make async
+  #
+  # This is sync because we are using `capture_io` to get a
+  # deprecation warning when casting enumerables to structs.
+  # When the feature is removed, this module should be made
+  # sync again.
+  use ExUnit.Case, async: false
 
   import Protobuf.Wire.Types
 
@@ -286,7 +292,7 @@ defmodule Protobuf.EncoderTest do
       Encoder.encode(%TestMsg.Foo{c: 123})
     end
 
-    message = ~r/123 is invalid for type TestMsg.Foo.Bar/
+    message = ~r/invalid value for type TestMsg.Foo.Bar: 123/
 
     assert_raise Protobuf.EncodeError, message, fn ->
       Encoder.encode(%TestMsg.Foo{e: 123})
@@ -310,13 +316,15 @@ defmodule Protobuf.EncoderTest do
     end
   end
 
+  # TODO: remove when implicit struct cast is removed
   test "gives a warning for implicitly cast structs" do
     warning =
       ExUnit.CaptureIO.capture_io(:stderr, fn ->
         assert <<50, 2, 8, 1>> = Encoder.encode(%TestMsg.Foo{e: %{a: 1}})
       end)
 
-    assert warning =~ "Implicitly casting from %{a: 1} to TestMsg.Foo.Bar"
+    assert warning =~ "Implicitly casting a non-struct to a TestMsg.Foo.Bar message"
+    assert warning =~ "%{a: 1}"
   end
 
   test "encodes with transformer module" do
