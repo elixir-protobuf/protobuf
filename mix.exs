@@ -80,6 +80,7 @@ defmodule Protobuf.Mixfile do
   defp docs do
     [
       extras: ["README.md"],
+      groups_for_modules: ["Generated Protos": ~r/^Google\.Protobuf\./],
       main: "readme",
       source_url: @source_url,
       source_ref: "v#{@version}"
@@ -192,7 +193,11 @@ defmodule Protobuf.Mixfile do
       google/protobuf/wrappers.proto
     )
 
-    protoc!("-I \"#{proto_src}\" --elixir_opt=gen_descriptors=true", "./lib", files)
+    protoc!(
+      "-I \"#{proto_src}\" --elixir_opt=gen_descriptors=true,include_docs=true",
+      "./lib",
+      files
+    )
   end
 
   defp gen_google_test_protos(_args) do

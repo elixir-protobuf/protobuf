@@ -1,7 +1,15 @@
 defmodule Google.Protobuf.Empty do
-  @moduledoc false
+  @moduledoc """
+  A generic empty message that you can re-use to avoid defining duplicated
+  empty messages in your APIs. A typical example is to use it as the request
+  or the response type of an API method. For instance:
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+      service Foo {
+        rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+      }
+  """
+
+  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line

@@ -1,7 +1,12 @@
 defmodule Google.Protobuf.NullValue do
-  @moduledoc false
+  @moduledoc """
+  `NullValue` is a singleton enumeration to represent the null value for the
+  `Value` type union.
 
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  The JSON representation for `NullValue` is JSON `null`.
+  """
+
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -26,9 +31,7 @@ defmodule Google.Protobuf.NullValue do
 end
 
 defmodule Google.Protobuf.Struct.FieldsEntry do
-  @moduledoc false
-
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -91,9 +94,18 @@ defmodule Google.Protobuf.Struct.FieldsEntry do
 end
 
 defmodule Google.Protobuf.Struct do
-  @moduledoc false
+  @moduledoc """
+  `Struct` represents a structured data value, consisting of fields
+  which map to dynamically typed values. In some languages, `Struct`
+  might be supported by a native representation. For example, in
+  scripting languages like JS a struct is represented as an
+  object. The details of that representation are described together
+  with the proto support for the language.
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  The JSON representation for `Struct` is JSON object.
+  """
+
+  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -184,9 +196,16 @@ defmodule Google.Protobuf.Struct do
 end
 
 defmodule Google.Protobuf.Value do
-  @moduledoc false
+  @moduledoc """
+  `Value` represents a dynamically typed value which can be either
+  null, a number, a string, a boolean, a recursive struct value, or a
+  list of values. A producer of value is expected to set one of these
+  variants. Absence of any variant indicates an error.
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  The JSON representation for `Value` is JSON value.
+  """
+
+  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -308,9 +327,13 @@ defmodule Google.Protobuf.Value do
 end
 
 defmodule Google.Protobuf.ListValue do
-  @moduledoc false
+  @moduledoc """
+  `ListValue` is a wrapper around a repeated field of values.
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  The JSON representation for `ListValue` is JSON array.
+  """
+
+  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
