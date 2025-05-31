@@ -21,7 +21,12 @@ enum Days {
 
 // This is a message that might be sent somewhere.
 //
-// Here is another line for a documentation example.
+// Here is another line for a documentation example. This comment
+// also contains an indented example:
+//
+//     message MyMessage {
+//       Request myField = 1;
+//     }
 message Request {
   // This enum represents three different colors.
   enum Color {
