@@ -40,22 +40,27 @@ defmodule Protobuf.Protoc.Generator.Comment do
   end
 
   defp normalize_indentation(comments) do
-    indentation =
-      String.split(comments, "\n")
-      |> Enum.reject(&String.match?(&1, ~r/^\s*$/))
-      |> Enum.map(fn line ->
-        Regex.run(~r/^\s*/, line, capture: :first)
-        |> List.first()
-        |> String.length()
-      end)
-      |> Enum.min(fn -> 0 end)
+    split_comments = String.split(comments, "\n")
 
-    comments
-    |> String.split("\n")
-    |> Enum.map(fn line ->
-      String.replace_prefix(line, String.duplicate(" ", indentation), "")
+    min_indentation =
+      Enum.reduce(split_comments, :unset, fn line, min_indentation ->
+        if line =~ ~r/^\s*$/ do
+          min_indentation
+        else
+          ~r/^\s*/
+          |> Regex.run(line, capture: :first)
+          |> List.first()
+          |> String.length()
+          |> min(min_indentation)
+        end
+      end)
+
+    indentation_amount = if min_indentation == :unset, do: 0, else: min_indentation
+    indentation_string = String.duplicate(" ", indentation_amount)
+
+    Enum.map_join(split_comments, "\n", fn line ->
+      String.replace_prefix(line, indentation_string, "")
     end)
-    |> Enum.join("\n")
   end
 
   @doc """
