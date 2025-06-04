@@ -44,14 +44,13 @@ defmodule Protobuf.Protoc.Generator.Comment do
 
     min_indentation =
       Enum.reduce(split_comments, :unset, fn line, min_indentation ->
-        if line =~ ~r/^\s*$/ do
-          min_indentation
-        else
-          ~r/^\s*/
-          |> Regex.run(line, capture: :first)
-          |> List.first()
-          |> String.length()
-          |> min(min_indentation)
+        case Regex.run(~r/^(\s+)(?=\S)/, line, capture: :first) do
+          [first] ->
+            String.length(first)
+            |> min(min_indentation)
+
+          _ ->
+            min_indentation
         end
       end)
 
