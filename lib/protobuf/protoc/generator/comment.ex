@@ -46,7 +46,8 @@ defmodule Protobuf.Protoc.Generator.Comment do
       Enum.reduce(split_comments, :unset, fn line, min_indentation ->
         case Regex.run(~r/^(\s+)(?=\S)/, line, capture: :first) do
           [first] ->
-            String.length(first)
+            first
+            |> String.length()
             |> min(min_indentation)
 
           _ ->
