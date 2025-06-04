@@ -87,4 +87,11 @@ defmodule Protobuf.Protoc.GeneratorIntegrationTest do
     assert NoPackageMessage.NumberMappingEntry.__message_props__().map?
     assert NoPackageMessage.decode(output) == input
   end
+
+  test "full_name/0 returns expected value for generated modules from full_name.proto" do
+    assert Foo.Bar.Unit.full_name() == "foo.bar.Unit"
+    assert Foo.Bar.Message.full_name() == "foo.bar.Message"
+    assert Foo.Bar.Message.NestedMessage.full_name() == "foo.bar.Message.NestedMessage"
+    assert Foo.Bar.Message.NestedMessage.Kind.full_name() == "foo.bar.Message.NestedMessage.Kind"
+  end
 end
