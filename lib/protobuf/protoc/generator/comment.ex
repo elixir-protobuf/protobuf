@@ -33,10 +33,34 @@ defmodule Protobuf.Protoc.Generator.Comment do
   defp format_comment(location) do
     [location.leading_comments, location.trailing_comments | location.leading_detached_comments]
     |> Enum.reject(&is_nil/1)
-    |> Enum.map(&String.replace(&1, ~r/^\s*\*/, "", global: true))
     |> Enum.join("\n\n")
     |> String.replace(~r/\n{3,}/, "\n")
+    |> normalize_indentation()
     |> String.trim()
+  end
+
+  defp normalize_indentation(comments) do
+    split_comments = String.split(comments, "\n")
+
+    min_indentation =
+      Enum.reduce(split_comments, :unset, fn line, min_indentation ->
+        case Regex.run(~r/^(\s+)(?=\S)/, line, capture: :first) do
+          [first] ->
+            first
+            |> String.length()
+            |> min(min_indentation)
+
+          _ ->
+            min_indentation
+        end
+      end)
+
+    indentation_amount = if min_indentation == :unset, do: 0, else: min_indentation
+    indentation_string = String.duplicate(" ", indentation_amount)
+
+    Enum.map_join(split_comments, "\n", fn line ->
+      String.replace_prefix(line, indentation_string, "")
+    end)
   end
 
   @doc """

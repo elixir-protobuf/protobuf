@@ -782,7 +782,12 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
                @moduledoc \"\"\"
                This is a message that might be sent somewhere.
 
-               Here is another line for a documentation example.
+               Here is another line for a documentation example. This comment
+               also contains an indented example:
+
+                   message MyMessage {
+                     Request myField = 1;
+                   }
                \"\"\"
              """
     end

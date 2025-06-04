@@ -94,14 +94,7 @@ defmodule Protobuf.Protoc.Generator.Util do
   @spec pad_comment(String.t(), non_neg_integer()) :: String.t()
   def pad_comment(comment, size) do
     padding = String.duplicate(" ", size)
-
-    comment
-    |> String.split("\n")
-    |> Enum.map(fn line ->
-      trimmed = String.trim_leading(line, " ")
-      padding <> trimmed
-    end)
-    |> Enum.join("\n")
+    String.replace(comment, "\n", "\n" <> padding)
   end
 
   @spec version() :: String.t()
