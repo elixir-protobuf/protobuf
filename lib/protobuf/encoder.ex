@@ -52,21 +52,14 @@ defmodule Protobuf.Encoder do
   end
 
   defp encode_fields(
-         [%FieldProps{name_atom: name, oneof: oneof} = prop | rest],
+         [prop | rest],
          syntax,
          struct,
          oneofs,
          acc
        ) do
-    val =
-      if oneof do
-        oneofs[name]
-      else
-        Map.get(struct, name, nil)
-      end
-
     acc =
-      case encode_field(prop, struct.__struct__, val, syntax) do
+      case encode_field(prop, struct, oneofs, syntax) do
         {:ok, iodata} -> [acc | iodata]
         :skip -> acc
       end
@@ -74,10 +67,19 @@ defmodule Protobuf.Encoder do
     encode_fields(rest, syntax, struct, oneofs, acc)
   end
 
-  defp encode_field(prop, struct_mod, val, syntax) do
+  defp encode_field(%FieldProps{name_atom: name, oneof: oneof} = prop, struct, oneofs, syntax) do
+    val =
+      if oneof do
+        oneofs[name]
+      else
+        Map.get(struct, name, nil)
+      end
+
     do_encode_field(class_field(prop), val, syntax, prop)
   rescue
     error ->
+      struct_mod = struct.__struct__
+
       raise Protobuf.EncodeError,
         message:
           "Got error when encoding #{inspect(struct_mod)}##{prop.name_atom}: #{Exception.format(:error, error)}"
