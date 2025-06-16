@@ -34,9 +34,12 @@ defmodule Protobuf.Encoder do
 
     # We encode the fields in order since some recommended conformance tests expect us to do so.
     encoded =
-      ordered_tags
-      |> Enum.map(fn fnum -> Map.fetch!(field_props, fnum) end)
-      |> encode_fields(syntax, struct, oneofs, _acc = [])
+      for fnum <- ordered_tags,
+          prop = Map.fetch!(field_props, fnum),
+          encoded = encode_field(prop, struct, oneofs, syntax),
+          encoded != :skip do
+        encoded
+      end
 
     encoded = [encoded | encode_unknown_fields(struct)]
 
@@ -45,26 +48,6 @@ defmodule Protobuf.Encoder do
     else
       encoded
     end
-  end
-
-  defp encode_fields(_fields = [], _syntax, _struct, _oneofs, acc) do
-    acc
-  end
-
-  defp encode_fields(
-         [prop | rest],
-         syntax,
-         struct,
-         oneofs,
-         acc
-       ) do
-    acc =
-      case encode_field(prop, struct, oneofs, syntax) do
-        {:ok, iodata} -> [acc | iodata]
-        :skip -> acc
-      end
-
-    encode_fields(rest, syntax, struct, oneofs, acc)
   end
 
   defp encode_field(%FieldProps{name_atom: name, oneof: oneof} = prop, struct, oneofs, syntax) do
@@ -109,8 +92,7 @@ defmodule Protobuf.Encoder do
     if skip_field?(syntax, val, prop) or skip_enum?(syntax, val, prop) do
       :skip
     else
-      iodata = apply_or_map(val, repeated?, &[fnum | Wire.encode(type, &1)])
-      {:ok, iodata}
+      apply_or_map(val, repeated?, &[fnum | Wire.encode(type, &1)])
     end
   end
 
@@ -124,23 +106,20 @@ defmodule Protobuf.Encoder do
          syntax,
          %FieldProps{encoded_fnum: fnum, repeated?: repeated?, map?: map?, type: type} = prop
        ) do
-    result =
-      apply_or_map(val, repeated? || map?, fn val ->
-        val = transform_module(val, type)
+    apply_or_map(val, repeated? || map?, fn val ->
+      val = transform_module(val, type)
 
-        if skip_field?(syntax, val, prop) do
-          ""
-        else
-          val = if map?, do: struct(type, %{key: elem(val, 0), value: elem(val, 1)}), else: val
+      if skip_field?(syntax, val, prop) do
+        ""
+      else
+        val = if map?, do: struct(type, %{key: elem(val, 0), value: elem(val, 1)}), else: val
 
-          # so that oneof {:atom, val} can be encoded
-          encoded = encode_from_type(type, val)
-          byte_size = IO.iodata_length(encoded)
-          [fnum | Varint.encode(byte_size)] ++ encoded
-        end
-      end)
-
-    {:ok, result}
+        # so that oneof {:atom, val} can be encoded
+        encoded = encode_from_type(type, val)
+        byte_size = IO.iodata_length(encoded)
+        [fnum | Varint.encode(byte_size)] ++ encoded
+      end
+    end)
   end
 
   defp do_encode_field(:packed, val, syntax, %FieldProps{type: type, encoded_fnum: fnum} = prop) do
@@ -149,7 +128,7 @@ defmodule Protobuf.Encoder do
     else
       encoded = Enum.map(val, &Wire.encode(type, &1))
       byte_size = IO.iodata_length(encoded)
-      {:ok, [fnum | Varint.encode(byte_size)] ++ encoded}
+      [fnum | Varint.encode(byte_size)] ++ encoded
     end
   end
 
@@ -264,8 +243,8 @@ defmodule Protobuf.Encoder do
       case Protobuf.Extension.get_extension_props(mod, ext_mod, key) do
         %{field_props: prop} ->
           case do_encode_field(class_field(prop), val, :proto2, prop) do
-            {:ok, iodata} -> [acc | iodata]
             :skip -> acc
+            iodata -> [acc | iodata]
           end
 
         _ ->
