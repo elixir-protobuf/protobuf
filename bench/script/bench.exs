@@ -34,4 +34,4 @@ encode =
       into: %{},
       do: {name, module.decode(payload)}
 
-Benchee.run(%{"encode" => &Protobuf.Encoder.encode(&1, _opts = [])}, opts.("encode", encode))
+Benchee.run(%{"encode" => &Protobuf.Encoder.encode_to_iodata/1}, opts.("encode", encode))
