@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.15.0
+
+## Enhancements
+
+  * Add conversions between `Google.Protobuf.Duration` and Elixir's `Duration` (if `Duration` is available).
+  * Remove deprecated `Protobuf.new/0`, `Protobuf.new/1`, and `Protobuf.new!/1`.
+
+### Bug fixes
+
+  * Fix a possible compilation error on Elixir 1.19.
+
 ## v0.14.1
 
 ### Bug fixes
