@@ -162,7 +162,7 @@ defmodule Protobuf.JSON.Encode do
   defp encode_regular_fields(struct, %{field_props: field_props, syntax: syntax}, opts) do
     for {_field_num, %{name_atom: name, oneof: nil} = prop} <- field_props,
         %{^name => value} = struct,
-        emit?(syntax, prop, value) || opts[:emit_unpopulated] do
+        emit?(syntax, prop, value, opts[:emit_unpopulated]) do
       encode_field(prop, value, opts)
     end
   end
@@ -301,18 +301,17 @@ defmodule Protobuf.JSON.Encode do
   defp maybe_repeat(%{repeated?: false}, val, fun), do: fun.(val)
   defp maybe_repeat(%{repeated?: true}, val, fun), do: Enum.map(val, fun)
 
-  defp emit?(:proto2, %{default: value}, value), do: false
-  defp emit?(:proto2, %{optional?: true}, val), do: not is_nil(val)
-  defp emit?(:proto3, %{proto3_optional?: true}, val), do: not is_nil(val)
-  defp emit?(_syntax, _prop, +0.0), do: false
-  defp emit?(_syntax, _prop, nil), do: false
-  defp emit?(_syntax, _prop, 0), do: false
-  defp emit?(_syntax, _prop, false), do: false
-  defp emit?(_syntax, _prop, []), do: false
-  defp emit?(_syntax, _prop, ""), do: false
-  defp emit?(_syntax, _prop, %{} = map) when map_size(map) == 0, do: false
-  defp emit?(_syntax, %{type: {:enum, enum}}, key) when is_atom(key), do: enum.value(key) != 0
-  defp emit?(_syntax, _prop, _value), do: true
+  defp emit?(_syntax, _field_prop, _value, true = _emit_unpopulated?) do
+    true
+  end
+
+  defp emit?(syntax, field_prop, value, _emit_unpopulated?) do
+    case Protobuf.Presence.get_field_presence(syntax, value, field_prop) do
+      :present -> true
+      :maybe -> false
+      :not_present -> false
+    end
+  end
 
   defp transform_module(message, module) do
     if transform_module = module.transform_module() do
