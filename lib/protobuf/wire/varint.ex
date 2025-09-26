@@ -49,8 +49,6 @@ defmodule Protobuf.Wire.Varint do
   @max_bits 64
   @mask64 bsl(1, @max_bits) - 1
 
-  # generated: true is required here to silence compilation warnings in Elixir
-  # 1.10 and 1.11. OK to remove once we support only 1.12+
   @varints [
     {
       quote(do: <<0::1, value::7>>),
@@ -58,25 +56,25 @@ defmodule Protobuf.Wire.Varint do
     },
     {
       quote(do: <<1::1, x0::7, 0::1, x1::7>>),
-      quote(generated: true, do: x0 + bsl(x1, 7))
+      quote(do: x0 + bsl(x1, 7))
     },
     {
       quote(do: <<1::1, x0::7, 1::1, x1::7, 0::1, x2::7>>),
-      quote(generated: true, do: x0 + bsl(x1, 7) + bsl(x2, 14))
+      quote(do: x0 + bsl(x1, 7) + bsl(x2, 14))
     },
     {
       quote(do: <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 0::1, x3::7>>),
-      quote(generated: true, do: x0 + bsl(x1, 7) + bsl(x2, 14) + bsl(x3, 21))
+      quote(do: x0 + bsl(x1, 7) + bsl(x2, 14) + bsl(x3, 21))
     },
     {
       quote(do: <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 0::1, x4::7>>),
-      quote(generated: true, do: x0 + bsl(x1, 7) + bsl(x2, 14) + bsl(x3, 21) + bsl(x4, 28))
+      quote(do: x0 + bsl(x1, 7) + bsl(x2, 14) + bsl(x3, 21) + bsl(x4, 28))
     },
     {
       quote do
         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 0::1, x5::7>>
       end,
-      quote(generated: true) do
+      quote do
         x0 +
           bsl(x1, 7) +
           bsl(x2, 14) +
@@ -90,7 +88,7 @@ defmodule Protobuf.Wire.Varint do
         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 0::1,
           x6::7>>
       end,
-      quote(generated: true) do
+      quote do
         x0 +
           bsl(x1, 7) +
           bsl(x2, 14) +
@@ -105,7 +103,7 @@ defmodule Protobuf.Wire.Varint do
         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 1::1,
           x6::7, 0::1, x7::7>>
       end,
-      quote(generated: true) do
+      quote do
         x0 +
           bsl(x1, 7) +
           bsl(x2, 14) +
@@ -121,7 +119,7 @@ defmodule Protobuf.Wire.Varint do
         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 1::1,
           x6::7, 1::1, x7::7, 0::1, x8::7>>
       end,
-      quote(generated: true) do
+      quote do
         x0 +
           bsl(x1, 7) +
           bsl(x2, 14) +
@@ -138,7 +136,7 @@ defmodule Protobuf.Wire.Varint do
         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 1::1, x4::7, 1::1, x5::7, 1::1,
           x6::7, 1::1, x7::7, 1::1, x8::7, 0::1, x9::7>>
       end,
-      quote(generated: true) do
+      quote do
         v =
           x0 +
             bsl(x1, 7) +

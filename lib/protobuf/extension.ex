@@ -35,11 +35,8 @@ defmodule Protobuf.Extension do
 
   """
 
-  import Bitwise, only: [<<<: 2]
-
-  # TODO: replace bitshift with Integer.pow/2 when we depend on Elixir 1.12+.
   # 2^29, see https://developers.google.com/protocol-buffers/docs/proto#extensions
-  @max 1 <<< 29
+  @max Integer.pow(2, 29)
 
   @doc """
   Returns the maximum extension number.
