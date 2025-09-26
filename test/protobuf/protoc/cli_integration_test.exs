@@ -1,9 +1,6 @@
 defmodule Protobuf.Protoc.CLIIntegrationTest do
   use ExUnit.Case, async: true
 
-  # TODO: Remove when we depend on Elixir 1.13+.
-  import Protobuf.TestHelpers, only: [fetch_docs_from_bytecode: 1], warn: false
-
   alias Protobuf.TestHelpers
 
   @moduletag :tmp_dir
@@ -104,7 +101,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
         path
         |> Code.compile_file()
         |> Enum.map(fn {mod, bytecode} ->
-          {mod, fetch_docs_from_bytecode(bytecode)}
+          {mod, TestHelpers.fetch_docs_from_bytecode(bytecode)}
         end)
 
       on_exit(fn ->
