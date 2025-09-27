@@ -91,7 +91,10 @@ defmodule Google.Protobuf.Timestamp do
   ) to obtain a formatter capable of generating timestamps in this format.
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.Timestamp",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line

@@ -5,7 +5,10 @@ defmodule Google.Protobuf.DoubleValue do
   The JSON representation for `DoubleValue` is JSON number.
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.DoubleValue",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -49,7 +52,10 @@ defmodule Google.Protobuf.FloatValue do
   The JSON representation for `FloatValue` is JSON number.
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.FloatValue",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -93,7 +99,10 @@ defmodule Google.Protobuf.Int64Value do
   The JSON representation for `Int64Value` is JSON string.
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.Int64Value",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -137,7 +146,10 @@ defmodule Google.Protobuf.UInt64Value do
   The JSON representation for `UInt64Value` is JSON string.
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.UInt64Value",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -181,7 +193,10 @@ defmodule Google.Protobuf.Int32Value do
   The JSON representation for `Int32Value` is JSON number.
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.Int32Value",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -225,7 +240,10 @@ defmodule Google.Protobuf.UInt32Value do
   The JSON representation for `UInt32Value` is JSON number.
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.UInt32Value",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -269,7 +287,10 @@ defmodule Google.Protobuf.BoolValue do
   The JSON representation for `BoolValue` is JSON `true` and `false`.
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.BoolValue",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -313,7 +334,10 @@ defmodule Google.Protobuf.StringValue do
   The JSON representation for `StringValue` is JSON string.
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.StringValue",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -357,7 +381,10 @@ defmodule Google.Protobuf.BytesValue do
   The JSON representation for `BytesValue` is JSON string.
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.BytesValue",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
