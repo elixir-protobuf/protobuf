@@ -57,7 +57,7 @@ defmodule Protobuf.Mixfile do
       # and make sure it's there for tests without Git submodules or anything like that.
       {:google_protobuf,
        github: "protocolbuffers/protobuf",
-       ref: "b407e8416e3893036aee5af9a12bd9b6a0e2b2e6",
+       ref: "43e1626812c1b543e56a7bec59dc09eb18248bd2",
        submodules: true,
        app: false,
        compile: false,
@@ -284,6 +284,8 @@ defmodule Protobuf.Mixfile do
       "--enforce_recommended",
       "--failure_list",
       "conformance/exemptions.txt",
+      "--text_format_failure_list",
+      "conformance/text-exemptions.txt",
       "./conformance/runner.sh"
     ]
 
