@@ -1,0 +1,34 @@
+// From: https://protobuf.com/docs/language-spec#fully-qualified-names
+syntax = "proto3";                            // Fully-qualified name
+                                              //----------------------
+package foo.bar;                              // foo.bar
+                                              //
+import "google/protobuf/descriptor.proto";    //
+                                              //
+message Message {                             // foo.bar.Message
+    oneof id {                                // foo.bar.Message.id
+      string name = 1;                        // foo.bar.Message.name
+      uint64 num = 2;                         // foo.bar.Message.num
+    }                                         //
+    message NestedMessage {                   // foo.bar.Message.NestedMessage
+      extend google.protobuf.MessageOptions { //
+        string fizz = 49999;                  // foo.bar.Message.NestedMessage.fizz
+      }                                       //
+      option (NestedMessage.fizz) = "buzz";   //
+      enum Kind {                             // foo.bar.Message.NestedMessage.Kind
+        NULL = 0;                             // foo.bar.Message.NestedMessage.NULL
+        PRIMARY = 1;                          // foo.bar.Message.NestedMessage.PRIMARY
+        SECONDARY = 2;                        // foo.bar.Message.NestedMessage.SECONDARY
+      }                                       //
+      Kind kind = 1;                          // foo.bar.Message.NestedMessage.kind
+    }                                         //
+    NestedMessage extra = 3;                  // foo.bar.Message.extra
+}                                             //
+                                              //
+enum Unit {                                   // foo.bar.Unit
+  VOID = 0;                                   // foo.bar.VOID
+}                                             //
+                                              //
+service FooService {                          // foo.bar.FooService
+  rpc Bar(Message) returns (Message);         // foo.bar.FooService.Bar
+}                                             //

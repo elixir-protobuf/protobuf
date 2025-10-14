@@ -47,7 +47,7 @@ defmodule Protobuf.Mixfile do
 
       # Dev and test dependencies
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:stream_data, "~> 1.0", only: [:dev, :test]},
       {:excoveralls, "~> 0.14.4", only: :test},
@@ -66,7 +66,19 @@ defmodule Protobuf.Mixfile do
   end
 
   defp escript do
-    [main_module: Protobuf.Protoc.CLI, name: "protoc-gen-elixir"]
+    [
+      main_module: Protobuf.Protoc.CLI,
+      name: "protoc-gen-elixir",
+      emu_args: emu_args()
+    ]
+  end
+
+  defp emu_args do
+    if System.otp_release() in ["26", "27"] do
+      "-kernel standard_io_encoding latin1"
+    else
+      ""
+    end
   end
 
   defp package do
@@ -172,6 +184,12 @@ defmodule Protobuf.Mixfile do
       "-I test/protobuf/protoc/proto --elixir_opt=include_docs=true",
       "./generated",
       ["test/protobuf/protoc/proto/no_package.proto"]
+    )
+
+    protoc!(
+      "-I test/protobuf/protoc/proto --elixir_opt=include_docs=true",
+      "./generated",
+      ["test/protobuf/protoc/proto/full_name.proto"]
     )
   end
 

@@ -87,7 +87,10 @@ defmodule Google.Protobuf.Any do
       }
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.Any",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line

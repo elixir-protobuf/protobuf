@@ -6,7 +6,11 @@ defmodule Google.Protobuf.NullValue do
   The JSON representation for `NullValue` is JSON `null`.
   """
 
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    enum: true,
+    full_name: "google.protobuf.NullValue",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -31,7 +35,11 @@ defmodule Google.Protobuf.NullValue do
 end
 
 defmodule Google.Protobuf.Struct.FieldsEntry do
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.Struct.FieldsEntry",
+    map: true,
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -105,7 +113,10 @@ defmodule Google.Protobuf.Struct do
   The JSON representation for `Struct` is JSON object.
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.Struct",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -205,7 +216,10 @@ defmodule Google.Protobuf.Value do
   The JSON representation for `Value` is JSON value.
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.Value",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -333,7 +347,10 @@ defmodule Google.Protobuf.ListValue do
   The JSON representation for `ListValue` is JSON array.
   """
 
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+  use Protobuf,
+    full_name: "google.protobuf.ListValue",
+    protoc_gen_elixir_version: "0.15.0",
+    syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
