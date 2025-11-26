@@ -1,5 +1,36 @@
 # Changelog
 
+## v0.16.0
+
+### Enhancements
+
+  * Add `full_name/0` callback to proto messages for retrieving the full protobuf name.
+    
+    ```elixir
+    # For a message defined as:
+    # package my.package;
+    # message MyMessage { ... }
+    
+    MyPackage.MyMessage.full_name()
+    #=> "my.package.MyMessage"
+    ```
+
+  * Add support for enum `value/1` callback with string arguments.
+    
+    ```elixir
+    # For an enum defined as:
+    # enum Status {
+    #   UNKNOWN = 0;
+    #   ACTIVE = 1;
+    #   INACTIVE = 2;
+    # }
+    
+    MyPackage.Status.value("ACTIVE")
+    #=> 1
+    MyPackage.Status.value("INACTIVE") 
+    #=> 2
+    ```
+
 ## v0.15.0
 
 ## Enhancements
