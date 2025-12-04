@@ -182,6 +182,17 @@ defmodule Protobuf.DSLTest do
              Foo.__message_props__().field_props[11]
   end
 
+  test "supports enum value with string" do
+    assert TestMsg.EnumFoo.value("A") == 1
+    assert TestMsg.EnumFoo.value("B") == 2
+    assert TestMsg.EnumFoo.value("C") == 4
+    assert TestMsg.EnumFoo.value("D") == 4
+    assert TestMsg.EnumFoo.value("E") == 4
+    assert TestMsg.EnumFoo.value("UNKNOWN") == 0
+    assert_raise FunctionClauseError, fn -> TestMsg.EnumFoo.value("F") end
+    assert_raise FunctionClauseError, fn -> TestMsg.EnumFoo.value("INVALID") end
+  end
+
   test "ignores unknown options" do
     msg_props = Foo.__message_props__()
     assert msg_props.field_props[11].wire_type == 0

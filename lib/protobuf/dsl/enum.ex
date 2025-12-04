@@ -4,6 +4,7 @@ defmodule Protobuf.DSL.Enum do
   alias Protobuf.{FieldProps, MessageProps}
 
   @callback value(atom()) :: integer()
+  @callback value(String.t()) :: integer()
   @callback value(tag) :: tag when tag: integer()
 
   @callback key(integer()) :: atom() | integer()
@@ -39,12 +40,19 @@ defmodule Protobuf.DSL.Enum do
         end
       end
 
+    string_clauses =
+      for {atom, tag} <- message_props.field_tags do
+        quote do
+          def value(unquote(Atom.to_string(atom))), do: unquote(tag)
+        end
+      end
+
     int_clause =
       quote do
         def value(tag) when is_integer(tag) and tag >= 0, do: tag
       end
 
-    [bodiless_clause] ++ atom_clauses ++ [int_clause]
+    [bodiless_clause] ++ atom_clauses ++ string_clauses ++ [int_clause]
   end
 
   defp defp_key_callback(message_props) do
