@@ -15,8 +15,7 @@ defmodule Protobuf.Decoder do
 
     bin
     |> build_message(struct(module), props)
-    |> reverse_repeated(repeated_fields)
-    |> Map.update!(:__unknown_fields__, &Enum.reverse/1)
+    |> reverse_repeated([:__unknown_fields__ | repeated_fields])
     |> transform_module(module)
   end
 
