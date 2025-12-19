@@ -1,5 +1,11 @@
 defmodule Protobuf.EncoderTest do
-  use ExUnit.Case, async: true
+  # TODO: make async
+  #
+  # This is sync because we are using `capture_io` to get a
+  # deprecation warning when casting enumerables to structs.
+  # When the feature is removed, this module should be made
+  # sync again.
+  use ExUnit.Case, async: false
 
   import Protobuf.Wire.Types
 
@@ -184,7 +190,10 @@ defmodule Protobuf.EncoderTest do
   end
 
   test "encodes map with oneof" do
-    msg = %Google.Protobuf.Struct{fields: %{"valid" => %{kind: {:bool_value, true}}}}
+    msg = %Google.Protobuf.Struct{
+      fields: %{"valid" => %Google.Protobuf.Value{kind: {:bool_value, true}}}
+    }
+
     bin = Google.Protobuf.Struct.encode(msg)
 
     assert Google.Protobuf.Struct.decode(bin) ==
@@ -283,9 +292,7 @@ defmodule Protobuf.EncoderTest do
       Encoder.encode(%TestMsg.Foo{c: 123})
     end
 
-    # For Elixir 1.18+ it's `type Integer`, before, it was just `123`
-    # TODO: fix once we require Elixir 1.18+
-    message = ~r/protocol Enumerable not implemented for (123|type Integer)/
+    message = ~r/invalid value for type TestMsg.Foo.Bar: 123/
 
     assert_raise Protobuf.EncodeError, message, fn ->
       Encoder.encode(%TestMsg.Foo{e: 123})
@@ -307,6 +314,17 @@ defmodule Protobuf.EncoderTest do
     assert_raise Protobuf.EncodeError, message, fn ->
       Encoder.encode(%TestMsg.Foo{a: 90, e: %TestMsg.Foo.Bar{a: "not_a_number"}})
     end
+  end
+
+  # TODO: remove when implicit struct cast is removed
+  test "gives a warning for implicitly cast structs" do
+    warning =
+      ExUnit.CaptureIO.capture_io(:stderr, fn ->
+        assert <<50, 2, 8, 1>> = Encoder.encode(%TestMsg.Foo{e: %{a: 1}})
+      end)
+
+    assert warning =~ "Implicitly casting a non-struct to a TestMsg.Foo.Bar message"
+    assert warning =~ "%{a: 1}"
   end
 
   test "encodes with transformer module" do

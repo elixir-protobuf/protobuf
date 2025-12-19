@@ -142,8 +142,26 @@ defmodule Protobuf.Encoder do
           message:
             "struct #{inspect(other_mod)} can't be encoded as #{inspect(mod)}: #{inspect(struct)}"
 
-      _ ->
+      enumerable when is_map(enumerable) or is_list(enumerable) ->
+        IO.warn("""
+        Implicitly casting a non-struct to a #{inspect(mod)} message:
+
+        #{inspect(enumerable, pretty: true)}
+
+        This automatic coercion is deprecated in Protobuf 0.15 and will raise an error in future versions.
+
+        Instead of:
+          %Parent{child: %{name: ""}}
+
+        Build child structs explicitly:
+          %Parent{child: %Child{name: ""}}
+        """)
+
         do_encode_to_iodata(struct(mod, msg))
+
+      other ->
+        raise Protobuf.EncodeError,
+          message: "invalid value for type #{inspect(mod)}: #{inspect(other)}"
     end
   end
 
