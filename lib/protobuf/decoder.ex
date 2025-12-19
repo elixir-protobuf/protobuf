@@ -172,12 +172,12 @@ defmodule Protobuf.Decoder do
   defp handle_value(<<rest::bits>>, field_number, wire_type, value, message, props) do
     case props.field_props do
       %{^field_number => %FieldProps{packed?: true, name_atom: name_atom} = prop} ->
-        new_message = update_in_message(message, name_atom, &value_for_packed(value, &1, prop))
+        new_message = update_in_message(message, name_atom, value, &value_for_packed/3, prop)
         build_message(rest, new_message, props)
 
       %{^field_number => %FieldProps{wire_type: ^wire_type} = prop} ->
         key = field_key(prop, props)
-        new_message = update_in_message(message, key, &value_for_field(value, &1, prop))
+        new_message = update_in_message(message, key, value, &value_for_field/3, prop)
         build_message(rest, new_message, props)
 
       # Repeated fields of primitive numeric types can be "packed". Their packed? flag will be
@@ -186,7 +186,7 @@ defmodule Protobuf.Decoder do
       # https://developers.google.com/protocol-buffers/docs/encoding#packed
       %{^field_number => %FieldProps{repeated?: true, name_atom: name_atom} = prop}
       when wire_type == wire_delimited() ->
-        new_message = update_in_message(message, name_atom, &value_for_packed(value, &1, prop))
+        new_message = update_in_message(message, name_atom, value, &value_for_packed/3, prop)
         build_message(rest, new_message, props)
 
       %{^field_number => %FieldProps{wire_type: expected, name: field}} ->
@@ -398,13 +398,13 @@ defmodule Protobuf.Decoder do
     key
   end
 
-  defp update_in_message(message, key, update_fun) do
+  defp update_in_message(message, key, value, update_fun, props) do
     current =
       case message do
         %_{^key => value} -> value
         %_{} -> nil
       end
 
-    Map.put(message, key, update_fun.(current))
+    Map.put(message, key, update_fun.(value, current, props))
   end
 end
