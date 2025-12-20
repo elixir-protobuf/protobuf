@@ -374,13 +374,14 @@ defmodule Protobuf.Decoder do
   defp decode_fixed64(<<>>, _type, acc), do: acc
 
   defp reverse_repeated(message, [repeated_field | rest]) do
-    message = case message do
-      %{^repeated_field => [_ | _] = values} ->
-        %{message | repeated_field => Enum.reverse(values)}
+    message =
+      case message do
+        %{^repeated_field => [_, _ | _] = values} ->
+          %{message | repeated_field => Enum.reverse(values)}
 
-      _other ->
-        message
-    end
+        _other ->
+          message
+      end
 
     reverse_repeated(message, rest)
   end
