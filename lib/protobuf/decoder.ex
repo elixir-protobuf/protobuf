@@ -399,6 +399,9 @@ defmodule Protobuf.Decoder do
     key
   end
 
+  # Receives an update_fun and calls it with value and props params to avoid
+  # the extra memory usage of creating an anonymous function with the two
+  # two params in it's context
   defp update_in_message(message, key, value, update_fun, props) do
     current =
       case message do
