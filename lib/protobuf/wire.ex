@@ -153,9 +153,17 @@ defmodule Protobuf.Wire do
 
   def decode(:bytes, binary) when is_binary(binary), do: binary
 
+  def decode(:int32, val) when val in @sint32_range do
+    val
+  end
+
   def decode(:int32, val) do
     <<n::signed-integer-32>> = <<val::32>>
     n
+  end
+
+  def decode(:int64, val) when val in @sint64_range do
+    val
   end
 
   def decode(:int64, val) do
@@ -163,9 +171,17 @@ defmodule Protobuf.Wire do
     n
   end
 
+  def decode(:uint32, val) when val in @uint32_range do
+    val
+  end
+
   def decode(:uint32, val) do
     <<n::unsigned-integer-32>> = <<val::32>>
     n
+  end
+
+  def decode(:uint64, val) when val in @uint64_range do
+    val
   end
 
   def decode(:uint64, val) do
