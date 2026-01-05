@@ -158,6 +158,7 @@ defmodule Protobuf.Wire do
   end
 
   def decode(:int32, val) do
+    # not an int32 value, requires roundtrip to convert to one
     <<n::signed-integer-32>> = <<val::32>>
     n
   end
@@ -167,6 +168,7 @@ defmodule Protobuf.Wire do
   end
 
   def decode(:int64, val) do
+    # not an int64 value, requires roundtrip to convert to one
     <<n::signed-integer-64>> = <<val::64>>
     n
   end
@@ -176,6 +178,7 @@ defmodule Protobuf.Wire do
   end
 
   def decode(:uint32, val) do
+    # not an uint32 value, requires roundtrip to convert to one
     <<n::unsigned-integer-32>> = <<val::32>>
     n
   end
@@ -185,6 +188,7 @@ defmodule Protobuf.Wire do
   end
 
   def decode(:uint64, val) do
+    # not an uint64 value, requires roundtrip to convert to one
     <<n::unsigned-integer-64>> = <<val::64>>
     n
   end
