@@ -153,22 +153,42 @@ defmodule Protobuf.Wire do
 
   def decode(:bytes, binary) when is_binary(binary), do: binary
 
+  def decode(:int32, val) when val in @sint32_range do
+    val
+  end
+
   def decode(:int32, val) do
+    # not an int32 value, requires roundtrip to convert to one
     <<n::signed-integer-32>> = <<val::32>>
     n
   end
 
+  def decode(:int64, val) when val in @sint64_range do
+    val
+  end
+
   def decode(:int64, val) do
+    # not an int64 value, requires roundtrip to convert to one
     <<n::signed-integer-64>> = <<val::64>>
     n
   end
 
+  def decode(:uint32, val) when val in @uint32_range do
+    val
+  end
+
   def decode(:uint32, val) do
+    # not an uint32 value, requires roundtrip to convert to one
     <<n::unsigned-integer-32>> = <<val::32>>
     n
   end
 
+  def decode(:uint64, val) when val in @uint64_range do
+    val
+  end
+
   def decode(:uint64, val) do
+    # not an uint64 value, requires roundtrip to convert to one
     <<n::unsigned-integer-64>> = <<val::64>>
     n
   end
