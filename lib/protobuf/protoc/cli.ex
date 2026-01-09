@@ -102,46 +102,46 @@ defmodule Protobuf.Protoc.CLI do
     |> Enum.reduce(ctx, &parse_param/2)
   end
 
-  defp parse_param("plugins=" <> plugins, ctx) do
-    %Context{ctx | plugins: String.split(plugins, "+")}
+  defp parse_param("plugins=" <> plugins, %Context{} = ctx) do
+    %{ctx | plugins: String.split(plugins, "+")}
   end
 
-  defp parse_param("gen_descriptors=" <> value, ctx) do
+  defp parse_param("gen_descriptors=" <> value, %Context{} = ctx) do
     case value do
       "true" ->
-        %Context{ctx | gen_descriptors?: true}
+        %{ctx | gen_descriptors?: true}
 
       other ->
         raise "invalid value for gen_descriptors option, expected \"true\", got: #{inspect(other)}"
     end
   end
 
-  defp parse_param("package_prefix=" <> package, ctx) do
+  defp parse_param("package_prefix=" <> package, %Context{} = ctx) do
     if package == "" do
       raise "package_prefix can't be empty"
     else
-      %Context{ctx | package_prefix: package}
+      %{ctx | package_prefix: package}
     end
   end
 
-  defp parse_param("transform_module=" <> module, ctx) do
-    %Context{ctx | transform_module: Module.concat([module])}
+  defp parse_param("transform_module=" <> module, %Context{} = ctx) do
+    %{ctx | transform_module: Module.concat([module])}
   end
 
-  defp parse_param("one_file_per_module=" <> value, ctx) do
+  defp parse_param("one_file_per_module=" <> value, %Context{} = ctx) do
     case value do
       "true" ->
-        %Context{ctx | one_file_per_module?: true}
+        %{ctx | one_file_per_module?: true}
 
       other ->
         raise "invalid value for one_file_per_module option, expected \"true\", got: #{inspect(other)}"
     end
   end
 
-  defp parse_param("include_docs=" <> value, ctx) do
+  defp parse_param("include_docs=" <> value, %Context{} = ctx) do
     case value do
       "true" ->
-        %Context{ctx | include_docs?: true}
+        %{ctx | include_docs?: true}
 
       other ->
         raise "invalid value for include_docs option, expected \"true\", got: #{inspect(other)}"
@@ -163,7 +163,7 @@ defmodule Protobuf.Protoc.CLI do
         {filename, find_types_in_proto(ctx, desc, files_to_generate)}
       end)
 
-    %Context{ctx | global_type_mapping: global_type_mapping}
+    %{ctx | global_type_mapping: global_type_mapping}
   end
 
   defp find_types_in_proto(

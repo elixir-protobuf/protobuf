@@ -325,44 +325,44 @@ defmodule Protobuf.DSL do
 
   defp parse_field_opts_to_field_props(%FieldProps{} = props, opts) do
     Enum.reduce(opts, props, fn
-      {:optional, optional?}, acc ->
-        %FieldProps{acc | optional?: optional?}
+      {:optional, optional?}, %FieldProps{} = acc ->
+        %{acc | optional?: optional?}
 
-      {:proto3_optional, proto3_optional?}, acc ->
-        %FieldProps{acc | proto3_optional?: proto3_optional?}
+      {:proto3_optional, proto3_optional?}, %FieldProps{} = acc ->
+        %{acc | proto3_optional?: proto3_optional?}
 
-      {:required, required?}, acc ->
-        %FieldProps{acc | required?: required?}
+      {:required, required?}, %FieldProps{} = acc ->
+        %{acc | required?: required?}
 
-      {:enum, enum?}, acc ->
-        %FieldProps{acc | enum?: enum?}
+      {:enum, enum?}, %FieldProps{} = acc ->
+        %{acc | enum?: enum?}
 
-      {:map, map?}, acc ->
-        %FieldProps{acc | map?: map?}
+      {:map, map?}, %FieldProps{} = acc ->
+        %{acc | map?: map?}
 
-      {:repeated, repeated?}, acc ->
-        %FieldProps{acc | repeated?: repeated?}
+      {:repeated, repeated?}, %FieldProps{} = acc ->
+        %{acc | repeated?: repeated?}
 
-      {:embedded, embedded}, acc ->
-        %FieldProps{acc | embedded?: embedded}
+      {:embedded, embedded}, %FieldProps{} = acc ->
+        %{acc | embedded?: embedded}
 
-      {:deprecated, deprecated?}, acc ->
-        %FieldProps{acc | deprecated?: deprecated?}
+      {:deprecated, deprecated?}, %FieldProps{} = acc ->
+        %{acc | deprecated?: deprecated?}
 
-      {:packed, packed?}, acc ->
-        %FieldProps{acc | packed?: packed?}
+      {:packed, packed?}, %FieldProps{} = acc ->
+        %{acc | packed?: packed?}
 
-      {:type, type}, acc ->
-        %FieldProps{acc | type: type}
+      {:type, type}, %FieldProps{} = acc ->
+        %{acc | type: type}
 
-      {:default, default}, acc ->
-        %FieldProps{acc | default: default}
+      {:default, default}, %FieldProps{} = acc ->
+        %{acc | default: default}
 
-      {:oneof, oneof}, acc ->
-        %FieldProps{acc | oneof: oneof}
+      {:oneof, oneof}, %FieldProps{} = acc ->
+        %{acc | oneof: oneof}
 
-      {:json_name, json_name}, acc ->
-        %FieldProps{acc | json_name: json_name}
+      {:json_name, json_name}, %FieldProps{} = acc ->
+        %{acc | json_name: json_name}
     end)
   end
 
@@ -387,7 +387,7 @@ defmodule Protobuf.DSL do
   # The compiler always emits a json name, but we omit it in the DSL when it
   # matches the name, to keep it uncluttered. Now we infer it back from name.
   defp cal_json_name(%FieldProps{json_name: name} = props) when is_binary(name), do: props
-  defp cal_json_name(props), do: %FieldProps{props | json_name: props.name}
+  defp cal_json_name(%FieldProps{} = props), do: %{props | json_name: props.name}
 
   defp verify_no_default_in_proto3(%FieldProps{} = props, syntax) do
     if syntax == :proto3 and not is_nil(props.default) do
@@ -420,12 +420,12 @@ defmodule Protobuf.DSL do
 
   defp cal_packed(%FieldProps{type: type, repeated?: true} = props, :proto3) do
     packed? = (props.enum? or not props.embedded?) and type_numeric?(type)
-    %FieldProps{props | packed?: packed?}
+    %{props | packed?: packed?}
   end
 
-  defp cal_packed(props, _syntax), do: %FieldProps{props | packed?: false}
+  defp cal_packed(%FieldProps{} = props, _syntax), do: %{props | packed?: false}
 
-  defp cal_repeated(%FieldProps{map?: true} = props), do: %FieldProps{props | repeated?: false}
+  defp cal_repeated(%FieldProps{map?: true} = props), do: %{props | repeated?: false}
 
   defp cal_repeated(%FieldProps{repeated?: true, oneof: oneof}) when not is_nil(oneof),
     do: raise(":oneof can't be used with repeated")
