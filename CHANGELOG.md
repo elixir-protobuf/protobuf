@@ -4,19 +4,19 @@
 
 ### Enhancements
 
-  * Add `full_name/0` callback to proto messages for retrieving the full protobuf name.
-    
+  * Add `full_name/0` callback to Protobuf messages for retrieving the full Protobuf name.
+
     ```elixir
     # For a message defined as:
     # package my.package;
     # message MyMessage { ... }
-    
+
     MyPackage.MyMessage.full_name()
     #=> "my.package.MyMessage"
     ```
 
-  * Add support for enum `value/1` callback with string arguments.
-    
+  * Add support for string arguments in the `value/1` callback of enums.
+
     ```elixir
     # For an enum defined as:
     # enum Status {
@@ -24,12 +24,16 @@
     #   ACTIVE = 1;
     #   INACTIVE = 2;
     # }
-    
+
     MyPackage.Status.value("ACTIVE")
     #=> 1
-    MyPackage.Status.value("INACTIVE") 
+    MyPackage.Status.value("INACTIVE")
     #=> 2
     ```
+
+  * Add `Protobuf.Any.pack/1`.
+
+  * Add deprecation warning when casting a non-struct enumerable to a Protobuf struct.
 
 ## v0.15.0
 
