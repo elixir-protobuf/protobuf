@@ -85,12 +85,11 @@ defmodule Protobuf.Protoc.Generator.Extension do
     descs
     |> Enum.with_index()
     |> Enum.flat_map(fn {desc, index} ->
+      %Context{} = nested_ctx = Context.append_comment_path(ctx, "6.#{index}")
+
       generate_module(Context.append_comment_path(ctx, "7.#{index}"), use_options, desc) ++
         get_extensions_from_messages(
-          %Context{
-            Context.append_comment_path(ctx, "6.#{index}")
-            | namespace: ctx.namespace ++ [Macro.camelize(desc.name)]
-          },
+          %{nested_ctx | namespace: ctx.namespace ++ [Macro.camelize(desc.name)]},
           use_options,
           desc.nested_type
         )

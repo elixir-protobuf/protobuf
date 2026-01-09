@@ -32,9 +32,12 @@ defmodule Protobuf.Protoc.Generator do
     {package_level_extensions, files}
   end
 
-  defp generate_module_definitions(ctx, %Google.Protobuf.FileDescriptorProto{} = desc) do
+  defp generate_module_definitions(
+         %Context{} = ctx,
+         %Google.Protobuf.FileDescriptorProto{} = desc
+       ) do
     ctx =
-      %Context{
+      %{
         ctx
         | comments: Protobuf.Protoc.Generator.Comment.parse(desc),
           syntax: syntax(desc.syntax),

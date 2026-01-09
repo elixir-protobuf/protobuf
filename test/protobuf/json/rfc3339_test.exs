@@ -64,10 +64,15 @@ defmodule Protobuf.JSON.RFC3339Test do
 
     property "returns the right nanoseconds regardless of how many digits" do
       check all digits_count <- member_of([3, 6, 9]),
-                max_range = String.to_integer(String.duplicate("9", digits_count)),
-                nanos <- integer(1..max_range),
-                nanos = nanos * round(:math.pow(10, 9 - digits_count)) do
-        real_nanos = String.to_integer(String.pad_trailing(Integer.to_string(nanos), 9, "0"))
+                nanos_raw <- integer(1..999_999_999) do
+        max_range = String.to_integer(String.duplicate("9", digits_count))
+        scale = round(:math.pow(10, 9 - digits_count))
+        nanos = rem(nanos_raw - 1, max_range) + 1
+        scaled_nanos = nanos * scale
+
+        real_nanos =
+          String.to_integer(String.pad_trailing(Integer.to_string(scaled_nanos), 9, "0"))
+
         nanos_str = String.pad_leading(Integer.to_string(real_nanos), digits_count, "0")
         timestamp_str = "1970-01-01T00:00:00.#{nanos_str}Z"
 
@@ -96,10 +101,14 @@ defmodule Protobuf.JSON.RFC3339Test do
 
     property "injects the right nanoseconds regardless of how many digits" do
       check all digits_count <- member_of([3, 6, 9]),
-                max_range = String.to_integer(String.duplicate("9", digits_count)),
-                nanos <- integer(1..max_range),
-                nanos = nanos * round(:math.pow(10, 9 - digits_count)) do
-        real_nanos = String.to_integer(String.pad_trailing(Integer.to_string(nanos), 9, "0"))
+                nanos_raw <- integer(1..999_999_999) do
+        max_range = String.to_integer(String.duplicate("9", digits_count))
+        scale = round(:math.pow(10, 9 - digits_count))
+        nanos = rem(nanos_raw - 1, max_range) + 1
+        scaled_nanos = nanos * scale
+
+        real_nanos =
+          String.to_integer(String.pad_trailing(Integer.to_string(scaled_nanos), 9, "0"))
 
         nanos_str =
           String.pad_leading(Integer.to_string(real_nanos), digits_count, "0")

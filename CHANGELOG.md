@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.16.1
+
+### Enhancements
+
+  * Add Elixir 1.19/OTP 28 to the CI matrix.
+  * Update README version references to the 0.16.x series.
+
+### Bug fixes
+
+  * Fix compilation warnings on Elixir 1.19+ by using struct pattern matching and map update syntax.
+  * Fix `preferred_cli_env` deprecation warning by moving configuration into `cli/0`.
+  * Fix Elixir 1.19 warnings in RFC3339 property tests and protoc CLI integration tests.
+
 ## v0.16.0
 
 ### Enhancements
