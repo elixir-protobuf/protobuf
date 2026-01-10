@@ -1,5 +1,6 @@
 defmodule Protobuf.ProtobufTest do
   use ExUnit.Case, async: false
+  import Protobuf, only: [is_protobuf_message: 1]
 
   test "load_extensions/0 is a noop" do
     assert loaded_extensions() == 19
@@ -46,6 +47,45 @@ defmodule Protobuf.ProtobufTest do
       end
     end
   end
+
+  describe "is_protobuf_message/1" do
+    test "returns true for protobuf message structs" do
+      message = %TestMsg.Foo{a: 42}
+      assert is_protobuf_message(message)
+    end
+
+    test "returns false for non-protobuf structs" do
+      refute is_protobuf_message(%URI{})
+    end
+
+    test "returns false for non-structs" do
+      refute is_protobuf_message(%{})
+      refute is_protobuf_message("string")
+      refute is_protobuf_message(42)
+      refute is_protobuf_message(nil)
+    end
+
+    test "works in pattern matching" do
+      message = %TestMsg.Foo{a: 42}
+
+      result =
+        case message do
+          %{__protobuf__: true} -> :protobuf
+          _ -> :not_protobuf
+        end
+
+      assert result == :protobuf
+    end
+
+    test "works in guards" do
+      message = %TestMsg.Foo{a: 42}
+      assert check_protobuf_with_guard(message) == true
+      assert check_protobuf_with_guard(%URI{}) == false
+    end
+  end
+
+  defp check_protobuf_with_guard(value) when is_protobuf_message(value), do: true
+  defp check_protobuf_with_guard(_), do: false
 
   defp loaded_extensions do
     Enum.count(:persistent_term.get(), &match?({{Protobuf.Extension, _, _}, _}, &1))
