@@ -51,6 +51,37 @@ defmodule Protobuf do
   """
   @type unknown_field() :: {field_number :: integer(), wire_type(), value :: any()}
 
+  @doc """
+  Checks if the given value is a Protobuf message struct.
+
+  This guard checks for the `__protobuf__: true` marker that is automatically added
+  to all Protobuf message structs.
+
+  ## Examples
+
+      defmodule MyMessage do
+        use Protobuf, syntax: :proto3
+        field :name, 1, type: :string
+      end
+
+      message = %MyMessage{name: "test"}
+
+      iex> is_protobuf_message(message)
+      true
+
+      iex> is_protobuf_message(%{})
+      false
+
+  Can be used in guards:
+
+      def process_message(msg) when is_protobuf_message(msg) do
+        msg.name
+      end
+
+  """
+  defguard is_protobuf_message(value)
+           when is_map(value) and :erlang.is_map_key(:__protobuf__, value)
+
   defmacro __using__(opts) do
     quote location: :keep do
       import Protobuf.DSL, only: [field: 3, field: 2, oneof: 2, extend: 4, extensions: 1]

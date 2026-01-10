@@ -7,7 +7,8 @@ defmodule Protobuf.DSL.TypespecsTest do
 
   @unknown_fields_spec quote(
                          do: [
-                           __unknown_fields__: [Protobuf.unknown_field()]
+                           __unknown_fields__: [Protobuf.unknown_field()],
+                           __protobuf__: true
                          ]
                        )
 

@@ -459,8 +459,10 @@ defmodule Protobuf.DSL do
       end
 
     unknown_fields = {:__unknown_fields__, _default = []}
+    protobuf_marker = {:__protobuf__, _default = true}
 
-    struct_fields = regular_fields ++ oneof_fields ++ extension_fields ++ [unknown_fields]
+    struct_fields =
+      regular_fields ++ oneof_fields ++ extension_fields ++ [unknown_fields, protobuf_marker]
 
     quote do
       defstruct unquote(Macro.escape(struct_fields))
