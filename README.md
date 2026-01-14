@@ -22,7 +22,7 @@ The package can be installed by adding `:protobuf` to your list of dependencies 
 ```elixir
 def deps do
   [
-    {:protobuf, "~> 0.16.1"}
+    {:protobuf, "~> 0.16.0"}
   ]
 end
 ```
@@ -61,7 +61,7 @@ Since `:protobuf` version `0.14.0` we include all of the well known Google Proto
    that `protoc-gen-elixir` works:
 
     ```bash
-    $ mix escript.install hex protobuf 0.16.1
+    $ mix escript.install hex protobuf 0.16.0
     ```
     Note: make sure to use the same version of the escript and dependency in your application.
 
