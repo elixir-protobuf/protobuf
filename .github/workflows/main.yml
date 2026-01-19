@@ -14,6 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - otp: 28.0
+            elixir: 1.19.4
           - otp: 27.0
             elixir: 1.18.1
           - otp: 27.0

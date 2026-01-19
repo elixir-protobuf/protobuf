@@ -257,17 +257,23 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
 
     message = struct!(Bugs.Base, name: "Richard")
 
-    message = base_mod.put_extension(message, Bugs.PbExtension, :top_first_name, "TFN")
-    assert base_mod.get_extension(message, Bugs.PbExtension, :top_first_name) == "TFN"
+    message = apply(base_mod, :put_extension, [message, Bugs.PbExtension, :top_first_name, "TFN"])
+    assert apply(base_mod, :get_extension, [message, Bugs.PbExtension, :top_first_name]) == "TFN"
 
-    message = base_mod.put_extension(message, Bugs.PbExtension, :top_last_name, "TLN")
-    assert base_mod.get_extension(message, Bugs.PbExtension, :top_last_name) == "TLN"
+    message = apply(base_mod, :put_extension, [message, Bugs.PbExtension, :top_last_name, "TLN"])
+    assert apply(base_mod, :get_extension, [message, Bugs.PbExtension, :top_last_name]) == "TLN"
 
-    message = base_mod.put_extension(message, Bugs.Ext1.PbExtension, :first_name, "Ext1 FN")
-    assert base_mod.get_extension(message, Bugs.Ext1.PbExtension, :first_name) == "Ext1 FN"
+    message =
+      apply(base_mod, :put_extension, [message, Bugs.Ext1.PbExtension, :first_name, "Ext1 FN"])
 
-    message = base_mod.put_extension(message, Bugs.Ext2.PbExtension, :first_name, "Ext2 FN")
-    assert base_mod.get_extension(message, Bugs.Ext2.PbExtension, :first_name) == "Ext2 FN"
+    assert apply(base_mod, :get_extension, [message, Bugs.Ext1.PbExtension, :first_name]) ==
+             "Ext1 FN"
+
+    message =
+      apply(base_mod, :put_extension, [message, Bugs.Ext2.PbExtension, :first_name, "Ext2 FN"])
+
+    assert apply(base_mod, :get_extension, [message, Bugs.Ext2.PbExtension, :first_name]) ==
+             "Ext2 FN"
   end
 
   test "generates documentation tags from comments", %{tmp_dir: tmp_dir} do
