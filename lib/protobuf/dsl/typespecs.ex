@@ -45,7 +45,12 @@ defmodule Protobuf.DSL.Typespecs do
        )}
     ]
 
-    field_specs = regular_fields ++ oneof_fields ++ extension_fields ++ unknown_fields
+    protobuf_marker = [
+      {:__protobuf__, quote(do: true)}
+    ]
+
+    field_specs =
+      regular_fields ++ oneof_fields ++ extension_fields ++ unknown_fields ++ protobuf_marker
 
     quote do: %__MODULE__{unquote_splicing(field_specs)}
   end
