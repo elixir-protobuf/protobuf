@@ -19,6 +19,64 @@ defmodule Protobuf.AnyTest do
     end
   end
 
+  describe "unpack/2" do
+    test "unpacks a message from Any" do
+      message = %Google.Protobuf.Duration{seconds: 42}
+      any = Protobuf.Any.pack(message)
+
+      assert {:ok, unpacked} = Protobuf.Any.unpack(any, Protobuf.AnyTypeProviderSupport)
+      assert unpacked == message
+    end
+
+    test "returns error for unknown type_url" do
+      any = %Google.Protobuf.Any{
+        type_url: "custom.prefix/unknown.Type",
+        value: <<>>
+      }
+
+      assert {:error, "Unknown type_url"} =
+               Protobuf.Any.unpack(any, Protobuf.AnyTypeProviderSupport)
+    end
+
+    test "returns error for unmapped type_url" do
+      any = %Google.Protobuf.Any{
+        type_url: "type.googleapis.com/unknown.Message",
+        value: <<>>
+      }
+
+      assert {:error, "Unknown type_url"} =
+               Protobuf.Any.unpack(any, Protobuf.AnyTypeProviderSupport)
+    end
+
+    test "returns error when type provider returns a non-atom module" do
+      defmodule BadTypeProvider do
+        @behaviour Protobuf.Any.TypeProvider
+
+        def to_module(_type_url), do: {:ok, "not_an_atom"}
+      end
+
+      any = %Google.Protobuf.Any{
+        type_url: "type.googleapis.com/google.protobuf.Duration",
+        value: <<>>
+      }
+
+      assert {:error, %ArgumentError{message: message}} =
+               Protobuf.Any.unpack(any, BadTypeProvider)
+
+      assert message =~ "expected type provider to return an atom module"
+    end
+
+    test "returns error when decode fails" do
+      any = %Google.Protobuf.Any{
+        type_url: "type.googleapis.com/google.protobuf.Duration",
+        value: <<255, 255, 255>>
+      }
+
+      assert {:error, %Protobuf.DecodeError{}} =
+               Protobuf.Any.unpack(any, Protobuf.AnyTypeProviderSupport)
+    end
+  end
+
   describe "type_url_to_module/1" do
     test "returns the module for a valid type_url" do
       assert Protobuf.Any.type_url_to_module("type.googleapis.com/google.protobuf.Duration") ==

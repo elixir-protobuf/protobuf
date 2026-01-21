@@ -178,7 +178,8 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
       proto_path
     ])
 
-    assert [mod] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/my_type/timestamp_wrapper.pb.ex")
+    assert [mod] =
+             compile_file_and_clean_modules_on_exit("#{tmp_dir}/my_type/timestamp_wrapper.pb.ex")
 
     assert mod == MyType.TimestampWrapper
     assert Map.fetch!(mod.__message_props__().field_props, 1).type == Google.Protobuf.Timestamp
