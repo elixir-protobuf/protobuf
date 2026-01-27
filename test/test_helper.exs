@@ -14,9 +14,41 @@ defmodule Protobuf.TestHelpers do
   end
 
   def read_generated_file(relative_path) do
-    [__DIR__, "../generated", relative_path]
-    |> Path.join()
-    |> File.read!()
+    base_path = [__DIR__, "../generated", relative_path] |> Path.join()
+
+    if File.exists?(base_path) do
+      File.read!(base_path)
+    else
+      filename = Path.basename(relative_path)
+      generated_dir = [__DIR__, "../generated"] |> Path.join()
+
+      case find_file_in_dir(generated_dir, filename) do
+        {:ok, path} -> File.read!(path)
+        :not_found -> File.read!(base_path)
+      end
+    end
+  end
+
+  defp find_file_in_dir(dir, filename) do
+    case File.ls(dir) do
+      {:ok, entries} ->
+        Enum.find_value(entries, :not_found, fn entry ->
+          path = Path.join(dir, entry)
+
+          cond do
+            entry == filename -> {:ok, path}
+            File.dir?(path) ->
+              case find_file_in_dir(path, filename) do
+                {:ok, found_path} -> {:ok, found_path}
+                :not_found -> nil
+              end
+            true -> nil
+          end
+        end)
+
+      {:error, _} ->
+        :not_found
+    end
   end
 
   def get_type_spec_as_string(module, bytecode, type)
