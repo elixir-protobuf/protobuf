@@ -8,6 +8,10 @@ defmodule Protobuf.Protoc.Generator do
   @spec generate(Context.t(), %Google.Protobuf.FileDescriptorProto{}) ::
           {term(), [Google.Protobuf.Compiler.CodeGeneratorResponse.File.t()]}
   def generate(%Context{} = ctx, %Google.Protobuf.FileDescriptorProto{} = desc) do
+    ctx =
+      %{ctx | package: desc.package}
+      |> Protobuf.Protoc.Context.custom_file_options_from_file_desc(desc)
+
     {package_level_extensions, module_definitions} = generate_module_definitions(ctx, desc)
 
     files =
@@ -17,8 +21,12 @@ defmodule Protobuf.Protoc.Generator do
           %Google.Protobuf.Compiler.CodeGeneratorResponse.File{name: file_name, content: content}
         end)
       else
-        # desc.name is the filename, ending in ".proto".
-        file_name = Path.rootname(desc.name) <> ".pb.ex"
+        base_module = Generator.Util.mod_name(ctx, [])
+        file_name =
+          case base_module do
+            "" -> Path.rootname(desc.name) <> ".pb.ex"
+            _ -> Macro.underscore(base_module) <> "/" <> Path.rootname(desc.name) <> ".pb.ex"
+          end
 
         content =
           module_definitions
