@@ -133,13 +133,13 @@ defmodule Protobuf.Decoder do
   end
 
   defdecoderp skip_delimited(message, props, groups) do
-    <<_skip::bytes-size(value), rest::bits>> = rest
+    <<_skip::bytes-size(^value), rest::bits>> = rest
     skip_field(rest, message, props, groups)
   end
 
   defp skip_bits(binary, length) do
     case binary do
-      <<_::bits-size(length), rest::bits>> -> rest
+      <<_::bits-size(^length), rest::bits>> -> rest
       _ -> raise DecodeError, message: "insufficient data for skipping #{length} bits"
     end
   end
@@ -152,7 +152,7 @@ defmodule Protobuf.Decoder do
     bytes_remaining = byte_size(rest)
 
     if value <= bytes_remaining do
-      <<bytes::bytes-size(value), rest::bits>> = rest
+      <<bytes::bytes-size(^value), rest::bits>> = rest
       handle_value(rest, field_number, wire_delimited(), bytes, message, props)
     else
       field =
