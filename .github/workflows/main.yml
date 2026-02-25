@@ -20,8 +20,8 @@ jobs:
             elixir: 1.18.1
           - otp: 27.0
             elixir: 1.17.3
-          - otp: 24.3
-            elixir: 1.12.3
+          - otp: 26.0
+            elixir: 1.16.3
 
     env:
       MIX_ENV: test
@@ -125,8 +125,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        otp: [24.2]
-        elixir: [1.14]
+        otp: [26.0]
+        elixir: [1.16.3]
 
     env:
       MIX_ENV: test
