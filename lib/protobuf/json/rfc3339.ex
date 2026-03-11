@@ -154,7 +154,7 @@ defmodule Protobuf.JSON.RFC3339 do
     literal_size = byte_size(literal)
 
     case string do
-      <<^literal::bytes-size(literal_size), rest::binary>> -> rest
+      <<^literal::bytes-size(^literal_size), rest::binary>> -> rest
       other -> throw("expected literal #{inspect(literal)}, got: #{inspect(other)}")
     end
   end
@@ -179,7 +179,7 @@ defmodule Protobuf.JSON.RFC3339 do
 
   defp eat_digits(string, count) do
     case string do
-      <<digits::bytes-size(count), rest::binary>> ->
+      <<digits::bytes-size(^count), rest::binary>> ->
         case Integer.parse(digits) do
           {_digits, ""} ->
             rest
