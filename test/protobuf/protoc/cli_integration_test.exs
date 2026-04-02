@@ -30,7 +30,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
         proto_path
       ])
 
-      assert [mod] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
+      assert [mod] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/foo/user.pb.ex")
       assert mod == Foo.User
     end
 
@@ -43,7 +43,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
         proto_path
       ])
 
-      assert [mod] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
+      assert [mod] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/foo/user.pb.ex")
       assert mod == Foo.User
 
       assert mod.transform_module() == TestMsg.TransformModule
@@ -58,7 +58,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
         proto_path
       ])
 
-      assert [mod] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
+      assert [mod] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/foo/user.pb.ex")
       assert mod == Foo.User
 
       assert %Google.Protobuf.DescriptorProto{} = descriptor = mod.descriptor()
@@ -74,7 +74,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
         proto_path
       ])
 
-      modules_and_docs = get_docs_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
+      modules_and_docs = get_docs_and_clean_modules_on_exit("#{tmp_dir}/foo/user.pb.ex")
       assert [{Foo.User, docs}] = modules_and_docs
       assert {:docs_v1, _, :elixir, _, module_doc, _, _} = docs
       assert module_doc != :hidden
@@ -88,7 +88,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
         proto_path
       ])
 
-      modules_and_docs = get_docs_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
+      modules_and_docs = get_docs_and_clean_modules_on_exit("#{tmp_dir}/foo/user.pb.ex")
 
       assert [{Foo.User, docs}] = modules_and_docs
       assert {:docs_v1, _, :elixir, _, :hidden, _, _} = docs
@@ -122,7 +122,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
         proto_path
       ])
 
-      assert [mod] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/user.pb.ex")
+      assert [mod] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/mypkg/foo/user.pb.ex")
       assert mod == Mypkg.Foo.User
     end
 
@@ -178,7 +178,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
       proto_path
     ])
 
-    assert [mod] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/timestamp_wrapper.pb.ex")
+    assert [mod] = compile_file_and_clean_modules_on_exit("#{tmp_dir}/my_type/timestamp_wrapper.pb.ex")
 
     assert mod == MyType.TimestampWrapper
     assert Map.fetch!(mod.__message_props__().field_props, 1).type == Google.Protobuf.Timestamp
@@ -244,13 +244,13 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
     ])
 
     assert [Bugs.Base = base_mod] =
-             compile_file_and_clean_modules_on_exit("#{tmp_dir}/base.pb.ex")
+             compile_file_and_clean_modules_on_exit("#{tmp_dir}/bugs/base.pb.ex")
 
     assert [Bugs.Ext1, Bugs.Ext1.PbExtension] =
-             compile_file_and_clean_modules_on_exit("#{tmp_dir}/ext1.pb.ex")
+             compile_file_and_clean_modules_on_exit("#{tmp_dir}/bugs/ext1.pb.ex")
 
     assert [Bugs.Ext2, Bugs.Ext2.PbExtension] =
-             compile_file_and_clean_modules_on_exit("#{tmp_dir}/ext2.pb.ex")
+             compile_file_and_clean_modules_on_exit("#{tmp_dir}/bugs/ext2.pb.ex")
 
     assert [Bugs.PbExtension] =
              compile_file_and_clean_modules_on_exit("#{tmp_dir}/bugs/pb_extension.pb.ex")
@@ -343,8 +343,8 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
       proto_path_two
     ])
 
-    elixir_one = File.read!("#{tmp_dir}/one.pb.ex")
-    elixir_two = File.read!("#{tmp_dir}/two.pb.ex")
+    elixir_one = File.read!("#{tmp_dir}/tests/one.pb.ex")
+    elixir_two = File.read!("#{tmp_dir}/tests/two.pb.ex")
 
     assert elixir_one =~ """
            defmodule Tests.One do
@@ -414,7 +414,7 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
     ])
 
     assert [message_mod, extension_mod] =
-             compile_file_and_clean_modules_on_exit("#{tmp_dir}/extensions.pb.ex")
+             compile_file_and_clean_modules_on_exit("#{tmp_dir}/my_pkg/extensions.pb.ex")
 
     assert %Google.Protobuf.MessageOptions{} = options = message_mod.descriptor().options
     assert options.__pb_extensions__ == %{{extension_mod, :notes} => "This messge is cool"}
