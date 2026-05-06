@@ -36,13 +36,17 @@ defmodule Protobuf.TestHelpers do
           path = Path.join(dir, entry)
 
           cond do
-            entry == filename -> {:ok, path}
+            entry == filename ->
+              {:ok, path}
+
             File.dir?(path) ->
               case find_file_in_dir(path, filename) do
                 {:ok, found_path} -> {:ok, found_path}
                 :not_found -> nil
               end
-            true -> nil
+
+            true ->
+              nil
           end
         end)
 
