@@ -591,6 +591,46 @@ defmodule Protobuf.JSON.DecodeTest do
     assert decode(data, Foo) == {:ok, decoded}
   end
 
+  describe ":ignore_unknown_fields option" do
+    test "drops unknown enum string values from singular fields" do
+      data = %{"j" => "UNKNOWN_ENUM_VALUE"}
+
+      assert Protobuf.JSON.from_decoded(data, Foo, ignore_unknown_fields: true) ==
+               {:ok, %Foo{}}
+    end
+
+    test "skips unknown enum string values inside repeated fields" do
+      data = %{"o" => ["A", "UNKNOWN_ENUM_VALUE", "B"]}
+
+      assert Protobuf.JSON.from_decoded(data, Foo, ignore_unknown_fields: true) ==
+               {:ok, %Foo{o: [:A, :B]}}
+    end
+
+    test "drops unknown enum string values from oneof fields" do
+      data = %{"e" => "UNKNOWN_ENUM_VALUE"}
+
+      assert Protobuf.JSON.from_decoded(data, OneofProto3, ignore_unknown_fields: true) ==
+               {:ok, %OneofProto3{}}
+    end
+
+    test "still rejects unknown enum strings when option is false" do
+      data = %{"j" => "UNKNOWN_ENUM_VALUE"}
+
+      assert {:error, %Protobuf.JSON.DecodeError{}} =
+               Protobuf.JSON.from_decoded(data, Foo, ignore_unknown_fields: false)
+    end
+
+    test "rejects bogus option values" do
+      assert_raise ArgumentError, ~r/must be a boolean/, fn ->
+        Protobuf.JSON.from_decoded(%{}, Foo, ignore_unknown_fields: "yes")
+      end
+
+      assert_raise ArgumentError, ~r/unknown option/, fn ->
+        Protobuf.JSON.from_decoded(%{}, Foo, bogus: true)
+      end
+    end
+  end
+
   test "null values are treated as default" do
     data = %{
       "a" => nil,

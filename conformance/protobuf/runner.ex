@@ -77,17 +77,19 @@ defmodule Conformance.Protobuf.Runner do
   defp handle_conformance_request(%mod{
          requested_output_format: requested_output_format,
          message_type: message_type,
+         test_category: test_category,
          payload: {payload_kind, msg}
        })
        when mod == Conformance.ConformanceRequest and
               requested_output_format in [:PROTOBUF, :JSON] and
               payload_kind in [:protobuf_payload, :json_payload] do
     test_proto_type = to_test_proto_type(message_type)
+    json_decode_opts = json_decode_opts_for(test_category)
 
     decode_fun =
       case payload_kind do
         :protobuf_payload -> &safe_decode/2
-        :json_payload -> &Protobuf.JSON.decode/2
+        :json_payload -> &Protobuf.JSON.decode(&1, &2, json_decode_opts)
       end
 
     {encode_fun, output_payload_kind} =
@@ -117,6 +119,9 @@ defmodule Conformance.Protobuf.Runner do
   defp handle_conformance_request(_request) do
     {:skipped, "unsupported conformance test"}
   end
+
+  defp json_decode_opts_for(:JSON_IGNORE_UNKNOWN_PARSING_TEST), do: [ignore_unknown_fields: true]
+  defp json_decode_opts_for(_other), do: []
 
   defp to_test_proto_type("protobuf_test_messages.proto3.TestAllTypesProto3"),
     do: ProtobufTestMessages.Proto3.TestAllTypesProto3
