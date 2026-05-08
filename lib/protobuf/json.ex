@@ -106,6 +106,12 @@ defmodule Protobuf.JSON do
           | {:use_enum_numbers, boolean()}
           | {:emit_unpopulated, boolean()}
 
+  @typedoc """
+  A decoding option.
+  """
+  @typedoc since: "0.17.0"
+  @type decode_opt() :: {:ignore_unknown_fields, boolean()}
+
   @type json_data() :: %{optional(binary) => any}
 
   @doc """
@@ -252,7 +258,8 @@ defmodule Protobuf.JSON do
   @doc """
   Decodes a JSON `iodata` into a `module` Protobuf struct.
 
-  Similar to `decode!/2` except it will unwrap the error tuple and raise in case of errors.
+  Similar to `decode/3` except it will unwrap the error tuple and raise in case of errors.
+  Accepts the exact same options, documented in `decode/3`.
 
   ## Examples
 
@@ -266,9 +273,9 @@ defmodule Protobuf.JSON do
       %Car{color: :GREEN, top_speed: 80.0}
 
   """
-  @spec decode!(iodata, module) :: struct | no_return
-  def decode!(iodata, module) do
-    case decode(iodata, module) do
+  @spec decode!(iodata, module, [decode_opt]) :: struct | no_return
+  def decode!(iodata, module, options \\ []) when is_list(options) do
+    case decode(iodata, module, options) do
       {:ok, json} -> json
       {:error, error} -> raise error
     end
@@ -276,6 +283,13 @@ defmodule Protobuf.JSON do
 
   @doc """
   Decodes a JSON `iodata` into a `module` Protobuf struct.
+
+  ## Options
+
+    * `:ignore_unknown_fields` (boolean): when `true`, unknown enum string values are
+      treated as if the field was unset (and skipped from repeated fields and
+      map values) instead of raising. Unknown JSON object keys are always
+      ignored regardless of this option. Defaults to `false`.
 
   ## Examples
 
@@ -304,12 +318,24 @@ defmodule Protobuf.JSON do
       iex> ~S|{"color":"GREEN","topSpeed":80.0}| |> Protobuf.JSON.decode(Car)
       {:ok, %Car{color: :GREEN, top_speed: 80.0}}
 
+  By default, an unknown enum string value is rejected:
+
+      iex> {:error, %Protobuf.JSON.DecodeError{}} =
+      ...>   Protobuf.JSON.decode(~S|{"color":"BLUE"}|, Car)
+
+  Pass `ignore_unknown_fields: true` to drop the unknown value and leave the
+  field at its default instead:
+
+      iex> Protobuf.JSON.decode(~S|{"color":"BLUE"}|, Car, ignore_unknown_fields: true)
+      {:ok, %Car{color: :GREEN, top_speed: 0.0}}
+
   """
-  @spec decode(iodata, module) :: {:ok, struct} | {:error, DecodeError.t() | Exception.t()}
-  def decode(iodata, module) when is_atom(module) do
+  @spec decode(iodata, module, [decode_opt]) ::
+          {:ok, struct} | {:error, DecodeError.t() | Exception.t()}
+  def decode(iodata, module, options \\ []) when is_atom(module) and is_list(options) do
     case JSONLibrary.decode(iodata) do
       {:ok, json_data} ->
-        from_decoded(json_data, module)
+        from_decoded(json_data, module, options)
 
       {:error, exception} ->
         {:error, exception}
@@ -323,6 +349,8 @@ defmodule Protobuf.JSON do
     This is especially useful if you want to use custom JSON encoding or a custom
   JSON library.
 
+  Accepts the same options as `decode/3`.
+
   ## Examples
 
       iex> Protobuf.JSON.from_decoded(%{}, Car)
@@ -334,10 +362,37 @@ defmodule Protobuf.JSON do
       iex> Protobuf.JSON.from_decoded(%{"color" => "GREEN","topSpeed" => 80.0}, Car)
       {:ok, %Car{color: :GREEN, top_speed: 80.0}}
 
+  By default, an unknown enum string value is rejected:
+
+      iex> {:error, %Protobuf.JSON.DecodeError{}} =
+      ...>   Protobuf.JSON.from_decoded(%{"color" => "BLUE"}, Car)
+
+  Pass `ignore_unknown_fields: true` to drop it instead:
+
+      iex> Protobuf.JSON.from_decoded(%{"color" => "BLUE"}, Car, ignore_unknown_fields: true)
+      {:ok, %Car{color: :GREEN, top_speed: 0.0}}
+
   """
-  @spec from_decoded(json_data(), module()) :: {:ok, struct()} | {:error, DecodeError.t()}
-  def from_decoded(json_data, module) when is_atom(module) do
-    {:ok, Decode.from_json_data(json_data, module)}
+  @spec from_decoded(json_data(), module(), [decode_opt]) ::
+          {:ok, struct()} | {:error, DecodeError.t()}
+  def from_decoded(json_data, module, options \\ []) when is_atom(module) and is_list(options) do
+    decode_opts =
+      Enum.reduce(options, %{ignore_unknown_fields: false}, fn
+        {:ignore_unknown_fields, value}, acc when is_boolean(value) ->
+          Map.put(acc, :ignore_unknown_fields, value)
+
+        {:ignore_unknown_fields, value}, _acc ->
+          raise ArgumentError,
+                "option :ignore_unknown_fields must be a boolean, got: #{inspect(value)}"
+
+        {key, _value}, _acc ->
+          raise ArgumentError, "unknown option: #{inspect(key)}"
+
+        other, _acc ->
+          raise ArgumentError, "invalid element in options list: #{inspect(other)}"
+      end)
+
+    {:ok, Decode.from_json_data(json_data, module, decode_opts)}
   catch
     error -> {:error, DecodeError.new(error)}
   end
