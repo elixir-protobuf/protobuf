@@ -539,6 +539,25 @@ defmodule Protobuf.JSON.EncodeTest do
     end
   end
 
+  describe "Google.Protobuf.Any" do
+    test "default-valued Any encodes to an empty object" do
+      message = %TestAllTypesProto3{optional_any: %Google.Protobuf.Any{}}
+      assert encode(message) == %{"optionalAny" => %{}}
+    end
+
+    test "Empty packed into Any encodes without a value field" do
+      type_url = "type.googleapis.com/google.protobuf.Empty"
+
+      any = %Google.Protobuf.Any{
+        type_url: type_url,
+        value: Google.Protobuf.Empty.encode(%Google.Protobuf.Empty{})
+      }
+
+      message = %TestAllTypesProto3{optional_any: any}
+      assert encode(message) == %{"optionalAny" => %{"@type" => type_url}}
+    end
+  end
+
   describe "encoding performs validation" do
     test "with scalar types" do
       cases = [

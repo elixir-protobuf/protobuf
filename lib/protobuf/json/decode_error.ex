@@ -74,6 +74,10 @@ defmodule Protobuf.JSON.DecodeError do
     %__MODULE__{message: "JSON value exceeds the recursion limit of #{limit}"}
   end
 
+  def new({:bad_any_type_url, type_url}) do
+    %__MODULE__{message: "invalid type_url for Google.Protobuf.Any: #{inspect(type_url)}"}
+  end
+
   def new({:unexpected_end, position}) do
     %__MODULE__{message: "Unexpected end at position #{inspect(position)}"}
   end

@@ -200,9 +200,16 @@ defmodule Protobuf.JSON.Decode do
     end
   end
 
-  defp internal_from_json_data(%{"@type" => type_url} = data, Google.Protobuf.Any = mod, state) do
+  defp internal_from_json_data(%{"@type" => type_url} = data, Google.Protobuf.Any = mod, state)
+       when is_binary(type_url) do
+    message_mod =
+      try do
+        Protobuf.Any.type_url_to_module(type_url)
+      rescue
+        ArgumentError -> throw({:bad_any_type_url, type_url})
+      end
+
     data = Map.delete(data, "@type")
-    message_mod = Protobuf.Any.type_url_to_module(type_url)
 
     encoded =
       case Map.fetch(data, "value") do
@@ -224,6 +231,10 @@ defmodule Protobuf.JSON.Decode do
       end
 
     struct!(mod, type_url: type_url, value: encoded)
+  end
+
+  defp internal_from_json_data(%{"@type" => type_url}, Google.Protobuf.Any, _state) do
+    throw({:bad_any_type_url, type_url})
   end
 
   defp internal_from_json_data(data, module, state) when is_map(data) and is_atom(module) do

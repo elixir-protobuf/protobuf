@@ -149,6 +149,12 @@ defmodule Protobuf.JSON.Encode do
     end)
   end
 
+  # A default-valued Any (no type_url, no value) is the "raw" form and encodes
+  # to an empty JSON object. The conformance suite checks this with AnyWithNoType.
+  def encodable(%mod{type_url: ""}, _opts) when mod == Google.Protobuf.Any do
+    %{}
+  end
+
   def encodable(%mod{} = struct, opts) when mod == Google.Protobuf.Any do
     message_mod = Protobuf.Any.type_url_to_module(struct.type_url)
 
@@ -157,10 +163,17 @@ defmodule Protobuf.JSON.Encode do
       |> message_mod.decode()
       |> encodable(opts)
 
-    if message_mod in @built_in_google_messages do
-      %{"@type" => struct.type_url, "value" => value_to_encode}
-    else
-      Map.put(value_to_encode, "@type", struct.type_url)
+    cond do
+      # google.protobuf.Empty packed in Any must not round-trip with a
+      # "value": {} field — the C++ JSON parser rejects that form.
+      message_mod == Google.Protobuf.Empty ->
+        %{"@type" => struct.type_url}
+
+      message_mod in @built_in_google_messages ->
+        %{"@type" => struct.type_url, "value" => value_to_encode}
+
+      true ->
+        Map.put(value_to_encode, "@type", struct.type_url)
     end
   end
 

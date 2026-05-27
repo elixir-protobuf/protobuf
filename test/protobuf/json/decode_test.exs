@@ -997,6 +997,40 @@ defmodule Protobuf.JSON.DecodeTest do
                    })
                }
     end
+
+    test "empty object decodes to a default-valued Any" do
+      assert decode(%{}, Google.Protobuf.Any) ==
+               {:ok, %Google.Protobuf.Any{type_url: "", value: ""}}
+    end
+
+    test "Empty packed into Any without a value field" do
+      type_url = "type.googleapis.com/google.protobuf.Empty"
+
+      assert decode(%{"@type" => type_url}, Google.Protobuf.Any) ==
+               {:ok,
+                %Google.Protobuf.Any{
+                  type_url: type_url,
+                  value: Google.Protobuf.Empty.encode(%Google.Protobuf.Empty{})
+                }}
+    end
+
+    test "rejects an empty @type" do
+      msg = "invalid type_url for Google.Protobuf.Any: \"\""
+
+      assert decode(%{"@type" => "", "value" => ""}, Google.Protobuf.Any) == error(msg)
+    end
+
+    test "rejects a malformed @type" do
+      msg = "invalid type_url for Google.Protobuf.Any: \"not_a_url\""
+
+      assert decode(%{"@type" => "not_a_url", "value" => ""}, Google.Protobuf.Any) == error(msg)
+    end
+
+    test "rejects a non-string @type" do
+      msg = "invalid type_url for Google.Protobuf.Any: 1234"
+
+      assert decode(%{"@type" => 1234}, Google.Protobuf.Any) == error(msg)
+    end
   end
 
   describe ":recursion_limit option" do
