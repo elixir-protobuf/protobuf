@@ -70,6 +70,10 @@ defmodule Protobuf.JSON.DecodeError do
     %__MODULE__{message: "Repeated field '#{field}' expected a list, got #{inspect(value)}"}
   end
 
+  def new({:recursion_limit_exceeded, limit}) do
+    %__MODULE__{message: "JSON value exceeds the recursion limit of #{limit}"}
+  end
+
   def new({:unexpected_end, position}) do
     %__MODULE__{message: "Unexpected end at position #{inspect(position)}"}
   end

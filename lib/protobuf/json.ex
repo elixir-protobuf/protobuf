@@ -110,7 +110,9 @@ defmodule Protobuf.JSON do
   A decoding option.
   """
   @typedoc since: "0.17.0"
-  @type decode_opt() :: {:ignore_unknown_fields, boolean()}
+  @type decode_opt() ::
+          {:ignore_unknown_fields, boolean()}
+          | {:recursion_limit, pos_integer()}
 
   @type json_data() :: %{optional(binary) => any}
 
@@ -289,7 +291,14 @@ defmodule Protobuf.JSON do
     * `:ignore_unknown_fields` (boolean): when `true`, unknown enum string values are
       treated as if the field was unset (and skipped from repeated fields and
       map values) instead of raising. Unknown JSON object keys are always
-      ignored regardless of this option. Defaults to `false`.
+      ignored regardless of this option. Defaults to `false`. *Available
+      since v0.17.0*.
+
+    * `:recursion_limit` (positive integer): the maximum nesting depth allowed
+      when decoding the dynamically-typed `Google.Protobuf.Value`,
+      `Google.Protobuf.ListValue`, and `Google.Protobuf.Struct` wrappers.
+      Exceeding it raises a `Protobuf.JSON.DecodeError`. Defaults to `100`. *Available
+      since v0.17.0*.
 
   ## Examples
 
@@ -376,23 +385,29 @@ defmodule Protobuf.JSON do
   @spec from_decoded(json_data(), module(), [decode_opt]) ::
           {:ok, struct()} | {:error, DecodeError.t()}
   def from_decoded(json_data, module, options \\ []) when is_atom(module) and is_list(options) do
-    decode_opts =
-      Enum.reduce(options, %{ignore_unknown_fields: false}, fn
-        {:ignore_unknown_fields, value}, acc when is_boolean(value) ->
-          Map.put(acc, :ignore_unknown_fields, value)
+    Enum.each(options, fn
+      {:ignore_unknown_fields, value} when is_boolean(value) ->
+        :ok
 
-        {:ignore_unknown_fields, value}, _acc ->
-          raise ArgumentError,
-                "option :ignore_unknown_fields must be a boolean, got: #{inspect(value)}"
+      {:ignore_unknown_fields, value} ->
+        raise ArgumentError,
+              "option :ignore_unknown_fields must be a boolean, got: #{inspect(value)}"
 
-        {key, _value}, _acc ->
-          raise ArgumentError, "unknown option: #{inspect(key)}"
+      {:recursion_limit, value} when is_integer(value) and value > 0 ->
+        :ok
 
-        other, _acc ->
-          raise ArgumentError, "invalid element in options list: #{inspect(other)}"
-      end)
+      {:recursion_limit, value} ->
+        raise ArgumentError,
+              "option :recursion_limit must be a positive integer, got: #{inspect(value)}"
 
-    {:ok, Decode.from_json_data(json_data, module, decode_opts)}
+      {key, _value} ->
+        raise ArgumentError, "unknown option: #{inspect(key)}"
+
+      other ->
+        raise ArgumentError, "invalid element in options list: #{inspect(other)}"
+    end)
+
+    {:ok, Decode.from_json_data(json_data, module, options)}
   catch
     error -> {:error, DecodeError.new(error)}
   end

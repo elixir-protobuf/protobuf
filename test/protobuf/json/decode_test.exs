@@ -998,4 +998,52 @@ defmodule Protobuf.JSON.DecodeTest do
                }
     end
   end
+
+  describe ":recursion_limit option" do
+    @default_limit 100
+    defp depth_error(limit), do: error("JSON value exceeds the recursion limit of #{limit}")
+
+    test "nested Google.Protobuf.ListValue beyond the default limit is rejected" do
+      nested = Enum.reduce(1..(@default_limit + 1), 1, fn _, acc -> [acc] end)
+      assert decode(nested, Google.Protobuf.ListValue) == depth_error(@default_limit)
+    end
+
+    test "nested Google.Protobuf.Struct beyond the default limit is rejected" do
+      nested = Enum.reduce(1..(@default_limit + 1), 1, fn _, acc -> %{"k" => acc} end)
+      assert decode(nested, Google.Protobuf.Struct) == depth_error(@default_limit)
+    end
+
+    test "nested Google.Protobuf.Value beyond the default limit is rejected" do
+      # Value itself doesn't add a level; nesting comes from the wrapped lists.
+      nested = Enum.reduce(1..(@default_limit + 1), 1, fn _, acc -> [acc] end)
+      assert decode(nested, Google.Protobuf.Value) == depth_error(@default_limit)
+    end
+
+    test "nesting up to the default limit is accepted" do
+      nested = Enum.reduce(1..@default_limit, 1, fn _, acc -> [acc] end)
+      assert {:ok, %Google.Protobuf.ListValue{}} = decode(nested, Google.Protobuf.ListValue)
+    end
+
+    test "custom :recursion_limit caps nesting at the requested depth" do
+      nested = Enum.reduce(1..6, 1, fn _, acc -> [acc] end)
+
+      assert Protobuf.JSON.from_decoded(nested, Google.Protobuf.ListValue, recursion_limit: 5) ==
+               depth_error(5)
+
+      assert {:ok, %Google.Protobuf.ListValue{}} =
+               Protobuf.JSON.from_decoded(nested, Google.Protobuf.ListValue, recursion_limit: 6)
+    end
+
+    test "invalid :recursion_limit raises ArgumentError" do
+      for bad <- [0, -1, 1.0, "100", nil] do
+        assert_raise ArgumentError,
+                     "option :recursion_limit must be a positive integer, got: #{inspect(bad)}",
+                     fn ->
+                       Protobuf.JSON.from_decoded(%{}, Google.Protobuf.Struct,
+                         recursion_limit: bad
+                       )
+                     end
+      end
+    end
+  end
 end

@@ -6,9 +6,6 @@ Recommended.Proto2.ProtobufInput.ValidMessageSetEncoding.SubmessageEncoding.NotU
 Recommended.Proto3.JsonInput.FieldNameDuplicate
 Recommended.Proto3.JsonInput.FieldNameDuplicateDifferentCasing1
 Recommended.Proto3.JsonInput.FieldNameDuplicateDifferentCasing2
-Recommended.Proto3.JsonInput.ListValueDeepNesting200
-Recommended.Proto3.JsonInput.StructDeepNesting200
-Recommended.Proto3.JsonInput.ValueDeepNesting200
 Required.Proto2.ProtobufInput.BadTag_FieldNumberSlightlyTooHigh
 Required.Proto2.ProtobufInput.BadTag_FieldNumberTooHigh
 Required.Proto2.ProtobufInput.BadTag_OverlongVarint

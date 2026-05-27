@@ -50,17 +50,30 @@ defmodule Protobuf.JSON.Decode do
 
   @duration_seconds_range -315_576_000_000..315_576_000_000
 
-  @type opts() :: %{ignore_unknown_fields: boolean()}
+  # Default recursion limit, matching upstream Protobuf
+  # (ParseOptions::recursion_depth in C++, .recursion_limit in Java/Go).
+  # Applies to the dynamically-typed wrappers (Value/ListValue/Struct) where
+  # nesting is bounded only by the input, not the schema.
+  @default_recursion_limit 100
 
-  @spec from_json_data(term(), module(), opts()) :: struct()
-  def from_json_data(term, module, opts \\ %{ignore_unknown_fields: false})
+  @spec from_json_data(term(), module(), keyword()) :: struct()
+  def from_json_data(term, module, opts) when is_list(opts) and is_atom(module) do
+    state = %{
+      ignore_unknown_fields: Keyword.get(opts, :ignore_unknown_fields, false),
+      recursion_limit: Keyword.get(opts, :recursion_limit, @default_recursion_limit),
+      depth: 0
+    }
+
+    internal_from_json_data(term, module, state)
+  end
 
   # We start with all the Google built-in types that have specially-defined JSON decoding rules.
   # These rules are listed here: https://developers.google.com/protocol-buffers/docs/proto3#json
   # Note that we always have to keep the module names for the built-in types dynamic because
   # these built-in types **do not ship with our library**.
 
-  def from_json_data(string, Google.Protobuf.Duration = mod, _opts) when is_binary(string) do
+  defp internal_from_json_data(string, Google.Protobuf.Duration = mod, _state)
+       when is_binary(string) do
     # We need to check the sign from the raw string itself and can't rely on Integer.parse/1. This
     # is because if seconds is 0, then we couldn't determine whether it was "0" or "-0". For
     # example, "-0.5s".
@@ -81,63 +94,70 @@ defmodule Protobuf.JSON.Decode do
     end
   end
 
-  def from_json_data(string, Google.Protobuf.Timestamp = mod, _opts) when is_binary(string) do
+  defp internal_from_json_data(string, Google.Protobuf.Timestamp = mod, _state)
+       when is_binary(string) do
     case Protobuf.JSON.RFC3339.decode(string) do
       {:ok, seconds, nanos} -> struct!(mod, seconds: seconds, nanos: nanos)
       {:error, reason} -> throw({:bad_timestamp, string, reason})
     end
   end
 
-  def from_json_data(map, Google.Protobuf.Empty = mod, _opts) when map == %{} do
+  defp internal_from_json_data(map, Google.Protobuf.Empty = mod, _state) when map == %{} do
     struct!(mod)
   end
 
-  def from_json_data(int, Google.Protobuf.Int32Value = mod, _opts),
+  defp internal_from_json_data(int, Google.Protobuf.Int32Value = mod, _state),
     do: struct!(mod, value: decode_scalar(:int32, :unknown_name, int))
 
-  def from_json_data(int, Google.Protobuf.UInt32Value = mod, _opts),
+  defp internal_from_json_data(int, Google.Protobuf.UInt32Value = mod, _state),
     do: struct!(mod, value: decode_scalar(:uint32, :unknown_name, int))
 
-  def from_json_data(int, Google.Protobuf.UInt64Value = mod, _opts),
+  defp internal_from_json_data(int, Google.Protobuf.UInt64Value = mod, _state),
     do: struct!(mod, value: decode_scalar(:uint64, :unknown_name, int))
 
-  def from_json_data(int, Google.Protobuf.Int64Value = mod, _opts),
+  defp internal_from_json_data(int, Google.Protobuf.Int64Value = mod, _state),
     do: struct!(mod, value: decode_scalar(:int64, :unknown_name, int))
 
-  def from_json_data(number, mod, _opts)
-      when mod in [
-             Google.Protobuf.FloatValue,
-             Google.Protobuf.DoubleValue
-           ] and (is_float(number) or is_integer(number)) do
+  defp internal_from_json_data(number, mod, _state)
+       when mod in [
+              Google.Protobuf.FloatValue,
+              Google.Protobuf.DoubleValue
+            ] and (is_float(number) or is_integer(number)) do
     struct!(mod, value: number * 1.0)
   end
 
-  def from_json_data(bool, Google.Protobuf.BoolValue = mod, _opts) when is_boolean(bool) do
+  defp internal_from_json_data(bool, Google.Protobuf.BoolValue = mod, _state)
+       when is_boolean(bool) do
     struct!(mod, value: decode_scalar(:bool, :unknown_field, bool))
   end
 
-  def from_json_data(string, Google.Protobuf.StringValue = mod, _opts) when is_binary(string) do
+  defp internal_from_json_data(string, Google.Protobuf.StringValue = mod, _state)
+       when is_binary(string) do
     struct!(mod, value: decode_scalar(:string, :unknown_field, string))
   end
 
-  def from_json_data(bytes, Google.Protobuf.BytesValue = mod, _opts) when is_binary(bytes) do
+  defp internal_from_json_data(bytes, Google.Protobuf.BytesValue = mod, _state)
+       when is_binary(bytes) do
     struct!(mod, value: decode_scalar(:bytes, :unknown_field, bytes))
   end
 
-  def from_json_data(list, Google.Protobuf.ListValue = mod, opts) when is_list(list) do
-    struct!(mod, values: Enum.map(list, &from_json_data(&1, Google.Protobuf.Value, opts)))
+  defp internal_from_json_data(list, Google.Protobuf.ListValue = mod, state) when is_list(list) do
+    state = increase_depth_and_maybe_throw(state)
+    struct!(mod, values: Enum.map(list, &internal_from_json_data(&1, Google.Protobuf.Value, state)))
   end
 
-  def from_json_data(struct, Google.Protobuf.Struct = mod, opts) when is_map(struct) do
+  defp internal_from_json_data(struct, Google.Protobuf.Struct = mod, state) when is_map(struct) do
+    state = increase_depth_and_maybe_throw(state)
+
     fields =
       Map.new(struct, fn {key, val} ->
-        {key, from_json_data(val, Google.Protobuf.Value, opts)}
+        {key, internal_from_json_data(val, Google.Protobuf.Value, state)}
       end)
 
     struct!(mod, fields: fields)
   end
 
-  def from_json_data(term, Google.Protobuf.Value = mod, opts) do
+  defp internal_from_json_data(term, Google.Protobuf.Value = mod, state) do
     cond do
       is_nil(term) ->
         struct!(mod, kind: {:null_value, :NULL_VALUE})
@@ -155,17 +175,22 @@ defmodule Protobuf.JSON.Decode do
         struct!(mod, kind: {:bool_value, term})
 
       is_list(term) ->
-        struct!(mod, kind: {:list_value, from_json_data(term, Google.Protobuf.ListValue, opts)})
+        struct!(mod,
+          kind: {:list_value, internal_from_json_data(term, Google.Protobuf.ListValue, state)}
+        )
 
       is_map(term) ->
-        struct!(mod, kind: {:struct_value, from_json_data(term, Google.Protobuf.Struct, opts)})
+        struct!(mod,
+          kind: {:struct_value, internal_from_json_data(term, Google.Protobuf.Struct, state)}
+        )
 
       true ->
         throw({:bad_message, term, mod})
     end
   end
 
-  def from_json_data(data, Google.Protobuf.FieldMask = mod, _opts) when is_binary(data) do
+  defp internal_from_json_data(data, Google.Protobuf.FieldMask = mod, _state)
+       when is_binary(data) do
     paths = String.split(data, ",")
 
     cond do
@@ -175,7 +200,7 @@ defmodule Protobuf.JSON.Decode do
     end
   end
 
-  def from_json_data(%{"@type" => type_url} = data, Google.Protobuf.Any = mod, opts) do
+  defp internal_from_json_data(%{"@type" => type_url} = data, Google.Protobuf.Any = mod, state) do
     data = Map.delete(data, "@type")
     message_mod = Protobuf.Any.type_url_to_module(type_url)
 
@@ -186,7 +211,7 @@ defmodule Protobuf.JSON.Decode do
         # See: https://developers.google.com/protocol-buffers/docs/proto3#json
         {:ok, value} ->
           value
-          |> from_json_data(message_mod, opts)
+          |> internal_from_json_data(message_mod, state)
           |> message_mod.encode()
 
         # When a message doesn't have a built-in JSON representation (like
@@ -194,17 +219,17 @@ defmodule Protobuf.JSON.Decode do
         # added with the type_url for that message.
         :error ->
           data
-          |> from_json_data(message_mod, opts)
+          |> internal_from_json_data(message_mod, state)
           |> message_mod.encode()
       end
 
     struct!(mod, type_url: type_url, value: encoded)
   end
 
-  def from_json_data(data, module, opts) when is_map(data) and is_atom(module) do
+  defp internal_from_json_data(data, module, state) when is_map(data) and is_atom(module) do
     message_props = module.__message_props__()
-    regular = decode_regular_fields(data, message_props, opts)
-    oneofs = decode_oneof_fields(data, message_props, opts)
+    regular = decode_regular_fields(data, message_props, state)
+    oneofs = decode_oneof_fields(data, message_props, state)
 
     module
     |> struct(regular)
@@ -212,8 +237,14 @@ defmodule Protobuf.JSON.Decode do
     |> transform_module(module)
   end
 
-  def from_json_data(data, module, _opts) when is_atom(module),
+  defp internal_from_json_data(data, module, _state) when is_atom(module),
     do: throw({:bad_message, data, module})
+
+  defp increase_depth_and_maybe_throw(%{depth: depth, recursion_limit: limit} = opts) do
+    depth = depth + 1
+    if depth > limit, do: throw({:recursion_limit_exceeded, limit})
+    %{opts | depth: depth}
+  end
 
   defp convert_field_mask_to_underscore(mask) do
     if mask =~ ~r/^[a-zA-Z0-9\.]+$/ do
@@ -353,8 +384,8 @@ defmodule Protobuf.JSON.Decode do
     end)
   end
 
-  defp decode_singular(%{type: module, embedded?: true}, value, opts) do
-    from_json_data(value, module, opts)
+  defp decode_singular(%{type: module, embedded?: true}, value, state) do
+    internal_from_json_data(value, module, state)
   end
 
   defp decode_scalar(:string, name, value) do
