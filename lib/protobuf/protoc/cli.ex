@@ -158,12 +158,54 @@ defmodule Protobuf.Protoc.CLI do
           Context.t()
   def find_types(%Context{} = ctx, descs, files_to_generate)
       when is_list(descs) and is_list(files_to_generate) do
-    global_type_mapping =
+    base_mapping =
       Map.new(descs, fn %Google.Protobuf.FileDescriptorProto{name: filename} = desc ->
         {filename, find_types_in_proto(ctx, desc, files_to_generate)}
       end)
 
+    # `import public` re-exports types from the imported file. A file that
+    # depends on `shared.proto` should see types from anything `shared.proto`
+    # publicly imports (transitively). We fold those types into each file's
+    # mapping here so `get_dep_type_mapping/3` keeps working unchanged.
+    public_deps_by_file =
+      Map.new(descs, fn %Google.Protobuf.FileDescriptorProto{} = desc ->
+        deps = desc.dependency
+        public_deps = Enum.map(desc.public_dependency, &Enum.at(deps, &1))
+        {desc.name, public_deps}
+      end)
+
+    global_type_mapping =
+      Map.new(base_mapping, fn {filename, mapping} ->
+        transitive =
+          collect_public_deps([filename], public_deps_by_file, MapSet.new([filename]))
+          |> MapSet.delete(filename)
+
+        merged =
+          Enum.reduce(transitive, mapping, fn other, acc ->
+            Map.merge(acc, Map.get(base_mapping, other, %{}))
+          end)
+
+        {filename, merged}
+      end)
+
     %{ctx | global_type_mapping: global_type_mapping}
+  end
+
+  defp collect_public_deps([], _public_deps_by_file, visited), do: visited
+
+  defp collect_public_deps([filename | rest], public_deps_by_file, visited) do
+    deps = Map.get(public_deps_by_file, filename, [])
+
+    {new_deps, visited} =
+      Enum.reduce(deps, {[], visited}, fn dep, {to_visit, visited} ->
+        if MapSet.member?(visited, dep) do
+          {to_visit, visited}
+        else
+          {[dep | to_visit], MapSet.put(visited, dep)}
+        end
+      end)
+
+    collect_public_deps(new_deps ++ rest, public_deps_by_file, visited)
   end
 
   defp find_types_in_proto(

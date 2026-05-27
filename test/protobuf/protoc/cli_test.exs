@@ -226,5 +226,47 @@ defmodule Protobuf.Protoc.CLITest do
                }
              }
     end
+
+    test "transitively folds in types from `import public` dependencies (#351)" do
+      descs = [
+        %FileDescriptorProto{
+          name: "arm_status.proto",
+          package: "mypackage.arm_status",
+          enum_type: [%EnumDescriptorProto{name: "ArmStatus"}]
+        },
+        %FileDescriptorProto{
+          name: "leg_status.proto",
+          package: "mypackage.leg_status",
+          enum_type: [%EnumDescriptorProto{name: "LegStatus"}]
+        },
+        %FileDescriptorProto{
+          name: "shared.proto",
+          package: "mypackage",
+          dependency: ["arm_status.proto", "leg_status.proto"],
+          public_dependency: [0, 1]
+        },
+        %FileDescriptorProto{
+          name: "person.proto",
+          package: "mypackage.person",
+          dependency: ["shared.proto"],
+          message_type: [%DescriptorProto{name: "Person"}]
+        }
+      ]
+
+      mapping = find_types(%Context{}, descs, Enum.map(descs, & &1.name)).global_type_mapping
+
+      # `shared.proto` re-exports the enums from its public deps, so looking up
+      # by `shared.proto` includes them.
+      assert mapping["shared.proto"] == %{
+               ".mypackage.arm_status.ArmStatus" => %{type_name: "Mypackage.ArmStatus.ArmStatus"},
+               ".mypackage.leg_status.LegStatus" => %{type_name: "Mypackage.LegStatus.LegStatus"}
+             }
+
+      # `person.proto` only directly depends on `shared.proto` but the publicly
+      # re-exported types are still reachable.
+      assert mapping["person.proto"] == %{
+               ".mypackage.person.Person" => %{type_name: "Mypackage.Person.Person"}
+             }
+    end
   end
 end
