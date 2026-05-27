@@ -12,10 +12,6 @@ Required.Proto2.ProtobufInput.BadTag_OverlongVarint
 Required.Proto2.ProtobufInput.MessageSetEncoding.UnknownExtension.ProtobufOutput
 Required.Proto2.ProtobufInput.ValidMessageSetEncoding.OutOfOrderGroupsEntries.ProtobufOutput
 Required.Proto2.ProtobufInput.ValidMessageSetEncoding.ProtobufOutput
-Required.Proto3.DurationProtoNanosTooLarge.JsonOutput
-Required.Proto3.DurationProtoNanosTooSmall.JsonOutput
-Required.Proto3.DurationProtoNanosWrongSign.JsonOutput
-Required.Proto3.DurationProtoNanosWrongSignNegativeSecs.JsonOutput
 Required.Proto3.JsonInput.AnyEmpty.JsonOutput
 Required.Proto3.JsonInput.AnyWithNoType.JsonOutput
 Required.Proto3.JsonInput.AnyWktRepresentationWithBadType
@@ -23,4 +19,3 @@ Required.Proto3.JsonInput.AnyWktRepresentationWithEmptyTypeAndValue
 Required.Proto3.ProtobufInput.BadTag_FieldNumberSlightlyTooHigh
 Required.Proto3.ProtobufInput.BadTag_FieldNumberTooHigh
 Required.Proto3.ProtobufInput.BadTag_OverlongVarint
-Required.Proto3.TimestampProtoNegativeNanos.JsonOutput

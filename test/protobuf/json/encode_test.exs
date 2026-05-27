@@ -414,6 +414,42 @@ defmodule Protobuf.JSON.EncodeTest do
       assert catch_throw(encode(message)) ==
                {:bad_duration, :seconds_outside_of_range, -max_duration - 1}
     end
+
+    test "returns an error if the nanos of the duration are too large" do
+      message = %TestAllTypesProto3{
+        optional_duration: %Google.Protobuf.Duration{seconds: 1, nanos: 1_000_000_000}
+      }
+
+      assert catch_throw(encode(message)) ==
+               {:bad_duration, :nanos_outside_of_range, 1_000_000_000}
+    end
+
+    test "returns an error if the nanos of the duration are too small" do
+      message = %TestAllTypesProto3{
+        optional_duration: %Google.Protobuf.Duration{seconds: -1, nanos: -1_000_000_000}
+      }
+
+      assert catch_throw(encode(message)) ==
+               {:bad_duration, :nanos_outside_of_range, -1_000_000_000}
+    end
+
+    test "returns an error if the seconds and nanos have different signs (positive seconds)" do
+      message = %TestAllTypesProto3{
+        optional_duration: %Google.Protobuf.Duration{seconds: 1, nanos: -1}
+      }
+
+      assert catch_throw(encode(message)) ==
+               {:bad_duration, :seconds_and_nanos_different_signs, {1, -1}}
+    end
+
+    test "returns an error if the seconds and nanos have different signs (negative seconds)" do
+      message = %TestAllTypesProto3{
+        optional_duration: %Google.Protobuf.Duration{seconds: -1, nanos: 1}
+      }
+
+      assert catch_throw(encode(message)) ==
+               {:bad_duration, :seconds_and_nanos_different_signs, {-1, 1}}
+    end
   end
 
   describe "Google.Protobuf.Timestamp" do
@@ -436,6 +472,22 @@ defmodule Protobuf.JSON.EncodeTest do
 
       assert catch_throw(encode(message)) ==
                {:invalid_timestamp, timestamp, "timestamp is outside of allowed range"}
+    end
+
+    test "returns an error if the nanos of the timestamp are negative" do
+      timestamp = %Google.Protobuf.Timestamp{seconds: 0, nanos: -1}
+      message = %TestAllTypesProto3{optional_timestamp: timestamp}
+
+      assert catch_throw(encode(message)) ==
+               {:invalid_timestamp, timestamp, "nanos outside of allowed range 0..999999999"}
+    end
+
+    test "returns an error if the nanos of the timestamp are too large" do
+      timestamp = %Google.Protobuf.Timestamp{seconds: 0, nanos: 1_000_000_000}
+      message = %TestAllTypesProto3{optional_timestamp: timestamp}
+
+      assert catch_throw(encode(message)) ==
+               {:invalid_timestamp, timestamp, "nanos outside of allowed range 0..999999999"}
     end
   end
 

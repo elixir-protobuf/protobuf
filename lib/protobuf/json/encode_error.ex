@@ -17,6 +17,21 @@ defmodule Protobuf.JSON.EncodeError do
     }
   end
 
+  def new({:bad_duration, :nanos_outside_of_range, nanos}) do
+    %__MODULE__{
+      message:
+        "invalid Google.Protobuf.Duration, nanos must be in -999999999..999999999, got: #{nanos}"
+    }
+  end
+
+  def new({:bad_duration, :seconds_and_nanos_different_signs, {seconds, nanos}}) do
+    %__MODULE__{
+      message:
+        "invalid Google.Protobuf.Duration, seconds and nanos must have the same sign, " <>
+          "got seconds #{seconds} and nanos #{nanos}"
+    }
+  end
+
   def new({:invalid_timestamp, timestamp, reason}) do
     %__MODULE__{
       message:

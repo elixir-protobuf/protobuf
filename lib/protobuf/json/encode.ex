@@ -17,6 +17,8 @@ defmodule Protobuf.JSON.Encode do
             safe_enum_key: 2}
 
   @duration_seconds_range -315_576_000_000..315_576_000_000
+  @nanos_range -999_999_999..999_999_999
+  @timestamp_nanos_range 0..999_999_999
 
   @built_in_google_messages [
     Google.Protobuf.FieldMask,
@@ -51,6 +53,13 @@ defmodule Protobuf.JSON.Encode do
       %{seconds: seconds} when seconds not in @duration_seconds_range ->
         throw({:bad_duration, :seconds_outside_of_range, seconds})
 
+      %{nanos: nanos} when nanos not in @nanos_range ->
+        throw({:bad_duration, :nanos_outside_of_range, nanos})
+
+      %{seconds: seconds, nanos: nanos}
+      when (seconds > 0 and nanos < 0) or (seconds < 0 and nanos > 0) ->
+        throw({:bad_duration, :seconds_and_nanos_different_signs, {seconds, nanos}})
+
       %{seconds: seconds, nanos: 0} ->
         Integer.to_string(seconds) <> "s"
 
@@ -62,6 +71,10 @@ defmodule Protobuf.JSON.Encode do
 
   def encodable(%mod{} = struct, _opts) when mod == Google.Protobuf.Timestamp do
     %{seconds: seconds, nanos: nanos} = struct
+
+    if nanos not in @timestamp_nanos_range do
+      throw({:invalid_timestamp, struct, "nanos outside of allowed range 0..999999999"})
+    end
 
     case Protobuf.JSON.RFC3339.encode(seconds, nanos) do
       {:ok, string} -> string
