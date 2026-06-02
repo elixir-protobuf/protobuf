@@ -15,6 +15,8 @@ defmodule Protobuf.JSON.DecodeTest do
     WithTransformModule
   }
 
+  @duplicate_aware_json_parser? Code.ensure_loaded?(JSON)
+
   def decode(data, module) do
     Protobuf.JSON.from_decoded(data, module)
   end
@@ -458,9 +460,46 @@ defmodule Protobuf.JSON.DecodeTest do
       assert decode(data, Maps) == error(msg)
     end
 
-    # TODO: Jason ignores duplicates https://github.com/michalmuskala/jason/issues/33
-    @tag :skip
-    test "duplicated keys are invalid"
+    if @duplicate_aware_json_parser? do
+      test "duplicated keys are invalid" do
+        json = ~S|{"mapsi":{"duplicate":1,"duplicate":2}}|
+
+        assert Protobuf.JSON.decode(json, Maps) ==
+                 error(~s(JSON object contains duplicate key "duplicate"))
+      end
+    end
+  end
+
+  describe "duplicate field names" do
+    test "decoded maps cannot set the same field through both accepted JSON names" do
+      data = %{"optionalInt32" => 1, "optional_int32" => 2}
+      msg = "Field 'optional_int32' cannot be set twice in JSON object"
+
+      assert decode(data, TestAllTypesProto3) == error(msg)
+    end
+
+    if @duplicate_aware_json_parser? do
+      test "JSON objects cannot contain duplicated keys" do
+        json = ~S|{"optionalInt32":1,"optionalInt32":2}|
+
+        assert Protobuf.JSON.decode(json, TestAllTypesProto3) ==
+                 error(~s(JSON object contains duplicate key "optionalInt32"))
+      end
+
+      test "JSON objects cannot set the same field through both accepted JSON names" do
+        json = ~S|{"optionalInt32":1,"optional_int32":2}|
+        msg = "Field 'optional_int32' cannot be set twice in JSON object"
+
+        assert Protobuf.JSON.decode(json, TestAllTypesProto3) == error(msg)
+      end
+
+      test "nested message duplicate field names are rejected" do
+        json = ~S|{"optionalNestedMessage":{"a":1,"a":2}}|
+
+        assert Protobuf.JSON.decode(json, TestAllTypesProto3) ==
+                 error(~s(JSON object contains duplicate key "a"))
+      end
+    end
   end
 
   describe "embedded" do

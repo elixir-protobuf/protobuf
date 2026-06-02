@@ -13,7 +13,7 @@ defmodule Protobuf.JSON.Object do
     %__MODULE__{members: members}
   end
 
-  @spec to_map(t()) :: %{optional(binary()) => term()}
+  @spec to_map!(t()) :: %{optional(binary()) => term()}
   def to_map!(%__MODULE__{members: members}) do
     Enum.reduce(members, %{}, fn {key, value}, acc ->
       if Map.has_key?(acc, key) do

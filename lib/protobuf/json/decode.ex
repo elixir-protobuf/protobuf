@@ -3,7 +3,7 @@ defmodule Protobuf.JSON.Decode do
 
   import Bitwise, only: [bsl: 2]
 
-  alias Protobuf.JSON.Utils
+  alias Protobuf.JSON.{Object, Utils}
 
   @compile {:inline,
             fetch_field_value: 2,
@@ -106,6 +106,12 @@ defmodule Protobuf.JSON.Decode do
     struct!(mod)
   end
 
+  defp internal_from_json_data(%Object{} = object, Google.Protobuf.Empty = mod, state) do
+    object
+    |> Object.to_map!()
+    |> internal_from_json_data(mod, state)
+  end
+
   defp internal_from_json_data(int, Google.Protobuf.Int32Value = mod, _state),
     do: struct!(mod, value: decode_scalar(:int32, :unknown_name, int))
 
@@ -146,6 +152,12 @@ defmodule Protobuf.JSON.Decode do
     struct!(mod, values: Enum.map(list, &internal_from_json_data(&1, Google.Protobuf.Value, state)))
   end
 
+  defp internal_from_json_data(%Object{} = object, Google.Protobuf.Struct = mod, state) do
+    object
+    |> Object.to_map!()
+    |> internal_from_json_data(mod, state)
+  end
+
   defp internal_from_json_data(struct, Google.Protobuf.Struct = mod, state) when is_map(struct) do
     state = increase_depth_and_maybe_throw(state)
 
@@ -155,6 +167,12 @@ defmodule Protobuf.JSON.Decode do
       end)
 
     struct!(mod, fields: fields)
+  end
+
+  defp internal_from_json_data(%Object{} = object, Google.Protobuf.Value = mod, state) do
+    struct!(mod,
+      kind: {:struct_value, internal_from_json_data(object, Google.Protobuf.Struct, state)}
+    )
   end
 
   defp internal_from_json_data(term, Google.Protobuf.Value = mod, state) do
@@ -233,12 +251,34 @@ defmodule Protobuf.JSON.Decode do
     struct!(mod, type_url: type_url, value: encoded)
   end
 
+  defp internal_from_json_data(%Object{} = object, Google.Protobuf.Any = mod, state) do
+    object
+    |> Object.to_map!()
+    |> internal_from_json_data(mod, state)
+  end
+
   defp internal_from_json_data(%{"@type" => type_url}, Google.Protobuf.Any, _state) do
     throw({:bad_any_type_url, type_url})
   end
 
+  defp internal_from_json_data(%Object{} = object, module, state) when is_atom(module) do
+    message_props = module.__message_props__()
+    data = object_to_message_map!(object, message_props)
+
+    decode_message(data, module, message_props, state)
+  end
+
   defp internal_from_json_data(data, module, state) when is_map(data) and is_atom(module) do
     message_props = module.__message_props__()
+    reject_duplicated_field_names!(data, message_props)
+
+    decode_message(data, module, message_props, state)
+  end
+
+  defp internal_from_json_data(data, module, _state) when is_atom(module),
+    do: throw({:bad_message, data, module})
+
+  defp decode_message(data, module, message_props, state) do
     regular = decode_regular_fields(data, message_props, state)
     oneofs = decode_oneof_fields(data, message_props, state)
 
@@ -248,8 +288,55 @@ defmodule Protobuf.JSON.Decode do
     |> transform_module(module)
   end
 
-  defp internal_from_json_data(data, module, _state) when is_atom(module),
-    do: throw({:bad_message, data, module})
+  defp object_to_message_map!(%Object{members: members}, message_props) do
+    field_names_by_key = field_names_by_key(message_props)
+
+    {data, _seen_fields} =
+      Enum.reduce(members, {%{}, %{}}, fn {key, value}, {data, seen_fields} ->
+        if Map.has_key?(data, key), do: throw({:duplicated_json_key, key})
+
+        data = Map.put(data, key, value)
+        seen_fields = check_duplicated_field_name!(key, field_names_by_key, seen_fields)
+
+        {data, seen_fields}
+      end)
+
+    data
+  end
+
+  defp reject_duplicated_field_names!(data, message_props) do
+    field_names_by_key = field_names_by_key(message_props)
+
+    data
+    |> Map.keys()
+    |> Enum.reduce(%{}, fn key, seen_fields ->
+      check_duplicated_field_name!(key, field_names_by_key, seen_fields)
+    end)
+
+    :ok
+  end
+
+  defp field_names_by_key(%{field_props: field_props}) do
+    Enum.reduce(field_props, %{}, fn {_field_num, prop}, acc ->
+      acc
+      |> Map.put_new(prop.json_name, prop.name_atom)
+      |> Map.put_new(prop.name, prop.name_atom)
+    end)
+  end
+
+  defp check_duplicated_field_name!(key, field_names_by_key, seen_fields) do
+    case Map.fetch(field_names_by_key, key) do
+      {:ok, field_name} ->
+        if Map.has_key?(seen_fields, field_name) do
+          throw({:duplicated_field_name, field_name})
+        else
+          Map.put(seen_fields, field_name, key)
+        end
+
+      :error ->
+        seen_fields
+    end
+  end
 
   defp increase_depth_and_maybe_throw(%{depth: depth, recursion_limit: limit} = opts) do
     depth = depth + 1
@@ -329,6 +416,10 @@ defmodule Protobuf.JSON.Decode do
 
   defp decode_value(%{repeated?: false} = prop, value, opts),
     do: decode_singular(prop, value, opts)
+
+  defp decode_map(prop, %Object{} = object, opts) do
+    decode_map(prop, Object.to_map!(object), opts)
+  end
 
   defp decode_map(%{type: module, name_atom: field}, map, opts) when is_map(map) do
     %{field_props: field_props, field_tags: field_tags} = module.__message_props__()

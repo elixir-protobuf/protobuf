@@ -66,6 +66,14 @@ defmodule Protobuf.JSON.DecodeError do
     %__MODULE__{message: "Oneof field '#{oneof}' cannot be set twice"}
   end
 
+  def new({:duplicated_json_key, key}) do
+    %__MODULE__{message: "JSON object contains duplicate key #{inspect(key)}"}
+  end
+
+  def new({:duplicated_field_name, field}) do
+    %__MODULE__{message: "Field '#{field}' cannot be set twice in JSON object"}
+  end
+
   def new({:bad_repeated, field, value}) do
     %__MODULE__{message: "Repeated field '#{field}' expected a list, got #{inspect(value)}"}
   end
@@ -82,8 +90,16 @@ defmodule Protobuf.JSON.DecodeError do
     %__MODULE__{message: "Unexpected end at position #{inspect(position)}"}
   end
 
+  def new(:unexpected_end) do
+    %__MODULE__{message: "Unexpected end"}
+  end
+
   def new({:invalid_byte, position, byte}) do
     %__MODULE__{message: "Invalid byte at position #{inspect(position)}, byte: #{inspect(byte)}"}
+  end
+
+  def new({:invalid_byte, byte}) do
+    %__MODULE__{message: "Invalid byte: #{inspect(byte)}"}
   end
 
   def new({:unexpected_sequence, position, sequence}) do
@@ -91,5 +107,17 @@ defmodule Protobuf.JSON.DecodeError do
       message:
         "Unexpected sequence at position #{inspect(position)}, sequence: #{inspect(sequence)}"
     }
+  end
+
+  def new({:unexpected_sequence, sequence}) do
+    %__MODULE__{message: "Unexpected sequence: #{inspect(sequence)}"}
+  end
+
+  def new({:invalid_sequence, sequence}) do
+    %__MODULE__{message: "Invalid sequence: #{inspect(sequence)}"}
+  end
+
+  def new({:trailing_data, rest}) do
+    %__MODULE__{message: "Unexpected data after JSON value: #{inspect(rest)}"}
   end
 end

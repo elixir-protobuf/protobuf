@@ -37,8 +37,9 @@ defmodule Protobuf.JSON do
 
   ## Usage
 
-  `Protobuf.JSON` requires a JSON library to work, so first make sure you have `:jason` added
-  to your dependencies:
+  On Elixir v1.18+, `Protobuf.JSON` can decode JSON with the built-in JSON parser. On older
+  versions, or when you want Jason-based encoding, make sure you have `:jason` added to your
+  dependencies:
 
       defp deps do
         [
@@ -81,8 +82,10 @@ defmodule Protobuf.JSON do
         float f2 = 2 [json_name = "sameName"];
       }
 
-  According to the specification, when duplicated JSON keys are found in maps, the library
-  should raise a decoding error. It currently ignores duplicates and keeps the last occurrence.
+  Exact duplicate JSON object keys are rejected when decoding through Elixir's built-in `JSON`
+  module (Elixir v1.18+). On older runtimes that fall back to Jason, exact duplicate keys cannot
+  be detected because Jason decodes objects directly into maps. This checking behavior is
+  *available since v0.17.0*.
 
   ## `google.protobuf.Any`
 
