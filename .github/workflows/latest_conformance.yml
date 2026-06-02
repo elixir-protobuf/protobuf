@@ -82,6 +82,6 @@ jobs:
         run: mix compile
 
       - name: Run mix protobuf.conformance with the runner from Protobuf's main branch
-        run: mix conformance_test --verbose
+        run: mix conformance_test --verbose --profile latest
         env:
           PROTOBUF_ROOT: ./protobuf

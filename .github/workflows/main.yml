@@ -168,4 +168,4 @@ jobs:
       - name: Run conformance tests
         run: |
           echo "Using local protoc: $(protoc --version)"
-          mix conformance_test
+          mix conformance_test --profile pinned

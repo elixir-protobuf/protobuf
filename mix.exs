@@ -281,8 +281,19 @@ defmodule Protobuf.Mixfile do
     Mix.Task.rerun("format", [Path.join([elixir_out, "**", "*.pb.ex"])])
   end
 
+  @exemptions_file "conformance/exemptions.txt"
+
   defp run_conformance_tests(args) do
-    {options, _args} = OptionParser.parse!(args, switches: [verbose: :boolean])
+    {options, _args} =
+      OptionParser.parse!(args, switches: [verbose: :boolean, profile: :string])
+
+    profile = Keyword.get(options, :profile, "pinned")
+
+    if profile not in ["pinned", "latest"] do
+      Mix.raise(~s(--profile must be "pinned" or "latest", got: #{inspect(profile)}))
+    end
+
+    failure_list = build_failure_list(profile)
 
     runner = path_in_protobuf_source("conformance_test_runner")
 
@@ -306,12 +317,31 @@ defmodule Protobuf.Mixfile do
     args = [
       "--enforce_recommended",
       "--failure_list",
-      "conformance/exemptions.txt",
+      failure_list,
       "./conformance/runner.sh"
     ]
 
     args = if Keyword.get(options, :verbose, false), do: ["--verbose"] ++ args, else: args
     cmd!("#{runner} #{Enum.join(args, " ")}")
+  end
+
+  # Builds the effective failure list for the given profile ("pinned" or "latest") by dropping
+  # the entries in conformance/exemptions.txt that are tagged for the *other* protoc version
+  # (`# only-on: latest` / `# only-on: pinned`), and writing the result to a temporary file the
+  # conformance runner can consume. Untagged entries are kept for both profiles.
+  defp build_failure_list(profile) do
+    other = if profile == "latest", do: "pinned", else: "latest"
+    exclude = ~r/#\s*only-on:\s*#{other}\b/
+
+    contents =
+      @exemptions_file
+      |> File.stream!()
+      |> Enum.reject(&Regex.match?(exclude, &1))
+      |> Enum.join()
+
+    path = Path.join(System.tmp_dir!(), "protobuf_conformance_exemptions_#{profile}.txt")
+    File.write!(path, contents)
+    path
   end
 
   defp build_conformance_runner(_args) do

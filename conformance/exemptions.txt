@@ -1,1 +1,39 @@
+# Conformance failure list: tests we don't pass yet.
+#
+# This single file is shared by both conformance workflows:
+#   * the regular CI job builds protoc from the pinned Protobuf
+#     dependency (see mix.exs) and runs `mix conformance_test --profile pinned`
+#   * the scheduled job builds protoc from Protobuf's
+#     `main` branch and runs `mix conformance_test --profile latest`
+#
+# Newer protoc versions add/retire conformance tests and occasionally change a test's expected
+# result, so some entries apply to only one of those protoc versions. The conformance runner
+# treats a failure-list entry that *succeeds* or that *matches no test* as a fatal error, so each
+# run must see exactly the entries that fail for its protoc version. Tag the version-specific
+# lines with a trailing comment so `mix conformance_test` can filter them:
+#
+#   * `# only-on: latest`  -> kept only for `--profile latest`
+#   * `# only-on: pinned`  -> kept only for `--profile pinned`
+#
+# Untagged lines apply to both profiles. Remove entries as the underlying issues are fixed.
+
+# JSON extension field names are not supported yet.
 Recommended.Proto2.JsonInput.FieldNameExtension.Validator
+
+# Rejecting JSON objects with duplicate keys (including the same field spelled in two different
+# casings, e.g. "optionalInt32" and "optional_int32") requires a JSON parser that surfaces
+# duplicate keys, which neither Jason nor the built-in JSON module does. The pinned protoc accepts
+# duplicates; Protobuf's `main` requires them to be rejected. These are "Recommended".
+Recommended.Proto2.JsonInput.FieldNameDuplicate # only-on: latest
+Recommended.Proto2.JsonInput.FieldNameDuplicateDifferentCasing1 # only-on: latest
+Recommended.Proto2.JsonInput.FieldNameDuplicateDifferentCasing2 # only-on: latest
+Recommended.Proto3.JsonInput.FieldNameDuplicate # only-on: latest
+Recommended.Proto3.JsonInput.FieldNameDuplicateDifferentCasing1 # only-on: latest
+Recommended.Proto3.JsonInput.FieldNameDuplicateDifferentCasing2 # only-on: latest
+
+# The proto2-only MessageSet wire format is not implemented. These tests do not exist in the
+# pinned Protobuf dependency yet.
+Recommended.Proto2.ProtobufInput.ValidMessageSetEncoding.SubmessageEncoding.NotUnknown.ProtobufOutput # only-on: latest
+Required.Proto2.ProtobufInput.MessageSetEncoding.UnknownExtension.ProtobufOutput # only-on: latest
+Required.Proto2.ProtobufInput.ValidMessageSetEncoding.OutOfOrderGroupsEntries.ProtobufOutput # only-on: latest
+Required.Proto2.ProtobufInput.ValidMessageSetEncoding.ProtobufOutput # only-on: latest
