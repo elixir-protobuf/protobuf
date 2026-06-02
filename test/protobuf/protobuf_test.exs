@@ -48,6 +48,85 @@ defmodule Protobuf.ProtobufTest do
     end
   end
 
+  describe "field_presence/2" do
+    test "returns presence for proto3 scalar fields" do
+      assert Protobuf.field_presence(%TestMsg.Foo{a: 42}, :a) == :present
+      assert Protobuf.field_presence(%TestMsg.Foo{a: 0}, :a) == :maybe
+      assert Protobuf.field_presence(%TestMsg.Foo{}, :a) == :maybe
+
+      assert Protobuf.field_presence(%TestMsg.Foo{c: "value"}, :c) == :present
+      assert Protobuf.field_presence(%TestMsg.Foo{c: ""}, :c) == :maybe
+
+      assert Protobuf.field_presence(%TestMsg.Foo{k: true}, :k) == :present
+      assert Protobuf.field_presence(%TestMsg.Foo{k: false}, :k) == :maybe
+    end
+
+    test "returns presence for proto3 optional fields" do
+      assert Protobuf.field_presence(%TestMsg.Proto3Optional{a: 0}, :a) == :present
+      assert Protobuf.field_presence(%TestMsg.Proto3Optional{a: nil}, :a) == :not_present
+      assert Protobuf.field_presence(%TestMsg.Proto3Optional{c: :UNKNOWN}, :c) == :present
+      assert Protobuf.field_presence(%TestMsg.Proto3Optional{c: nil}, :c) == :not_present
+    end
+
+    test "returns presence for embedded fields" do
+      assert Protobuf.field_presence(%TestMsg.Foo{e: %TestMsg.Foo.Bar{}}, :e) == :present
+      assert Protobuf.field_presence(%TestMsg.Foo{e: nil}, :e) == :not_present
+    end
+
+    test "returns presence for repeated fields and maps" do
+      assert Protobuf.field_presence(%TestMsg.Foo{g: [0]}, :g) == :present
+      assert Protobuf.field_presence(%TestMsg.Foo{g: []}, :g) == :maybe
+
+      assert Protobuf.field_presence(%TestMsg.Foo{l: %{"key" => 0}}, :l) == :present
+      assert Protobuf.field_presence(%TestMsg.Foo{l: %{}}, :l) == :maybe
+    end
+
+    test "returns presence for oneof fields" do
+      assert Protobuf.field_presence(%TestMsg.OneofProto3{first: {:a, 0}}, :a) == :present
+      assert Protobuf.field_presence(%TestMsg.OneofProto3{first: {:b, ""}}, :a) == :not_present
+      assert Protobuf.field_presence(%TestMsg.OneofProto3{first: nil}, :a) == :not_present
+      assert Protobuf.field_presence(%TestMsg.Oneof{first: {:e, :A}}, :e) == :present
+    end
+
+    test "returns presence for proto2 fields" do
+      assert Protobuf.field_presence(%TestMsg.Foo2{a: 0}, :a) == :present
+      assert Protobuf.field_presence(%TestMsg.Foo2{}, :a) == :not_present
+
+      assert Protobuf.field_presence(%TestMsg.Foo2{b: 5}, :b) == :maybe
+      assert Protobuf.field_presence(%TestMsg.Foo2{b: 0}, :b) == :present
+
+      assert Protobuf.field_presence(%TestMsg.Foo2{c: ""}, :c) == :present
+      assert Protobuf.field_presence(%TestMsg.Foo2{c: nil}, :c) == :not_present
+    end
+
+    test "returns presence for enum fields" do
+      assert Protobuf.field_presence(%TestMsg.Foo{j: :UNKNOWN}, :j) == :maybe
+      assert Protobuf.field_presence(%TestMsg.Foo{j: :A}, :j) == :present
+      assert Protobuf.field_presence(%TestMsg.Foo{j: 0}, :j) == :maybe
+      assert Protobuf.field_presence(%TestMsg.Foo{j: 1}, :j) == :present
+
+      assert Protobuf.field_presence(%TestMsg.EnumFoo2{a: 0}, :a) == :present
+    end
+
+    test "uses transform modules for embedded fields" do
+      assert Protobuf.field_presence(%TestMsg.ContainsTransformModule{field: 0}, :field) ==
+               :present
+
+      assert Protobuf.field_presence(%TestMsg.ContainsTransformModule{field: nil}, :field) ==
+               :not_present
+
+      assert Protobuf.field_presence(
+               %TestMsg.ContainsIntegerStringTransformModule{field: "42"},
+               :field
+             ) == :present
+
+      assert Protobuf.field_presence(
+               %TestMsg.ContainsIntegerStringTransformModule{field: "0"},
+               :field
+             ) == :maybe
+    end
+  end
+
   describe "is_protobuf_message/1" do
     test "returns true for protobuf message structs" do
       message = %TestMsg.Foo{a: 42}

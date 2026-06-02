@@ -33,6 +33,8 @@
 
   * Add `Protobuf.Any.pack/1`.
 
+  * Add `Protobuf.field_presence/2`.
+
   * Add deprecation warning when casting a non-struct enumerable to a Protobuf struct.
 
 ## v0.15.0
