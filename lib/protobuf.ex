@@ -51,6 +51,15 @@ defmodule Protobuf do
   """
   @type unknown_field() :: {field_number :: integer(), wire_type(), value :: any()}
 
+  @typedoc """
+  Describes whether a field is present in a Protobuf message.
+
+  `:maybe` means that the field uses implicit presence and its value is equal to
+  the generated default, so the struct cannot tell whether it was explicitly set.
+  """
+  @typedoc since: "0.17.0"
+  @type field_presence() :: :present | :not_present | :maybe
+
   @doc """
   Checks if the given value is a Protobuf message struct.
 
@@ -253,6 +262,50 @@ defmodule Protobuf do
             "likely means that its definition was not compiled with :protobuf 0.10.0+, which is the " <>
             "version that introduced implicit struct generation"
   end
+
+  @doc """
+  Returns whether a field is present, not present, or maybe present.
+
+  `:present` and `:not_present` mean that a field is explicitly present or not
+  present, respectively.
+
+  Some fields use implicit presence. For example, an empty repeated field and a
+  non-optional proto3 scalar set to its default value are indistinguishable from
+  their generated defaults. In these cases, this function returns `:maybe`.
+
+  For more information about field presence tracking rules, refer to the official
+  [Field Presence docs](https://protobuf.dev/programming-guides/field_presence/).
+
+  ## Examples
+
+      # Non-optional proto3 field:
+      Protobuf.field_presence(%MyMessage{foo: 42}, :foo)
+      #=> :present
+
+      Protobuf.field_presence(%MyMessage{foo: 0}, :foo)
+      #=> :maybe
+
+      # Optional proto3 field:
+      Protobuf.field_presence(%MyMessage{bar: 42}, :bar)
+      #=> :present
+
+      Protobuf.field_presence(%MyMessage{bar: 0}, :bar)
+      #=> :present
+
+      Protobuf.field_presence(%MyMessage{}, :bar)
+      #=> :not_present
+
+      # Repeated field:
+      Protobuf.field_presence(%MyMessage{items: []}, :items)
+      #=> :maybe
+
+      Protobuf.field_presence(%MyMessage{items: [1]}, :items)
+      #=> :present
+
+  """
+  @doc since: "0.17.0"
+  @spec field_presence(message :: struct(), field :: atom()) :: field_presence()
+  defdelegate field_presence(message, field), to: Protobuf.Presence
 
   @doc """
   Loads extensions modules.
