@@ -105,6 +105,42 @@ defmodule Protobuf.ConformanceRegressionsTest do
     end
   end
 
+  # Upstream conformance "BadTag" tests. A field tag is a varint encoding
+  # (field_number << 3) | wire_type. Since the field number is at most 2^29 - 1, a valid tag fits
+  # in an unsigned 32-bit integer (at most 5 varint bytes, the 5th carrying only 4 bits). The
+  # byte sequences below all encode field 1 with an invalid tag and must be rejected. They are
+  # built exactly like protobuf's binary_json_conformance_suite.cc: a continuation-bit-tagged
+  # field-1 varint tag (0x88) followed by the malformed continuation and a varint(1234) payload.
+  describe "bad tags" do
+    # 0x88 + "\x80\x80\x80\x80\x80\x0F" + varint(1234): tag value exceeds 2^32 - 1.
+    @field_number_too_high <<0x88, 0x80, 0x80, 0x80, 0x80, 0x80, 0x0F, 0xD2, 0x09>>
+
+    # 0x88 + "\x80\x80\x80\x40" + varint(1234): tag value exceeds 2^32 - 1 (just barely).
+    @field_number_slightly_too_high <<0x88, 0x80, 0x80, 0x80, 0x40, 0xD2, 0x09>>
+
+    # 0x88 + "\x80\x80\x80\x80\x80\x80\x80\x00" + varint(1234): tag varint is overlong (> 5 bytes).
+    @overlong_varint <<0x88, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x00, 0xD2, 0x09>>
+
+    for mod <- [
+          ProtobufTestMessages.Proto2.TestAllTypesProto2,
+          ProtobufTestMessages.Proto3.TestAllTypesProto3
+        ] do
+      test "BadTag_FieldNumberTooHigh (#{inspect(mod)})" do
+        assert_raise Protobuf.DecodeError, fn -> unquote(mod).decode(@field_number_too_high) end
+      end
+
+      test "BadTag_FieldNumberSlightlyTooHigh (#{inspect(mod)})" do
+        assert_raise Protobuf.DecodeError, fn ->
+          unquote(mod).decode(@field_number_slightly_too_high)
+        end
+      end
+
+      test "BadTag_OverlongVarint (#{inspect(mod)})" do
+        assert_raise Protobuf.DecodeError, fn -> unquote(mod).decode(@overlong_varint) end
+      end
+    end
+  end
+
   describe "JSON" do
     setup :url_to_message
 

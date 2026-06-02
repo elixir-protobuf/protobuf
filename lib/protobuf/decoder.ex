@@ -1,13 +1,17 @@
 defmodule Protobuf.Decoder do
   @moduledoc false
 
-  import Bitwise, only: [bsr: 2, band: 2]
+  import Bitwise, only: [bsr: 2, bsl: 2, band: 2]
   import Protobuf.{Wire.Types, Wire.Varint}
 
   alias Protobuf.{DecodeError, FieldProps, MessageProps, Wire}
 
   @compile {:inline,
-            decode_field: 3, skip_varint: 4, skip_delimited: 4, reverse_repeated: 2, field_key: 2}
+            dispatch_field: 4,
+            skip_varint: 4,
+            skip_delimited: 4,
+            reverse_repeated: 2,
+            field_key: 2}
 
   @spec decode(binary(), module()) :: term()
   def decode(bin, module) when is_binary(bin) and is_atom(module) do
@@ -33,13 +37,58 @@ defmodule Protobuf.Decoder do
     decode_field(bin, message, props)
   end
 
-  defdecoderp decode_field(message, props) do
-    # From the docs:
-    # "Each key in the streamed message is a varint with the value
-    # (field_number << 3) | wire_type, in other words, the last three bits of
-    # the number store the wire type."
-    field_number = bsr(value, 3)
-    wire_type = band(value, 0b00000111)
+  # From the docs:
+  # "Each key in the streamed message is a varint with the value
+  # (field_number << 3) | wire_type, in other words, the last three bits of
+  # the number store the wire type."
+  #
+  # Since the field number is at most 2^29 - 1, a valid tag fits in an unsigned 32-bit integer,
+  # whose varint encoding is at most 5 bytes long (and whose 5th byte can carry only 4 significant
+  # bits). We decode the tag with dedicated clauses that enforce this so that malformed tags are
+  # rejected (as required by the conformance suite): a field number that is too high produces a
+  # tag value larger than 2^32 - 1, and an overlong varint uses more than 5 bytes. Anything that
+  # doesn't match one of these clauses falls through to the catch-all that raises.
+  defp decode_field(<<0::1, x0::7, rest::bits>>, message, props) do
+    dispatch_field(x0, rest, message, props)
+  end
+
+  defp decode_field(<<1::1, x0::7, 0::1, x1::7, rest::bits>>, message, props) do
+    dispatch_field(x0 + bsl(x1, 7), rest, message, props)
+  end
+
+  defp decode_field(<<1::1, x0::7, 1::1, x1::7, 0::1, x2::7, rest::bits>>, message, props) do
+    dispatch_field(x0 + bsl(x1, 7) + bsl(x2, 14), rest, message, props)
+  end
+
+  defp decode_field(
+         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 0::1, x3::7, rest::bits>>,
+         message,
+         props
+       ) do
+    dispatch_field(x0 + bsl(x1, 7) + bsl(x2, 14) + bsl(x3, 21), rest, message, props)
+  end
+
+  defp decode_field(
+         <<1::1, x0::7, 1::1, x1::7, 1::1, x2::7, 1::1, x3::7, 0::1, x4::7, rest::bits>>,
+         message,
+         props
+       )
+       when x4 <= 0x0F do
+    dispatch_field(
+      x0 + bsl(x1, 7) + bsl(x2, 14) + bsl(x3, 21) + bsl(x4, 28),
+      rest,
+      message,
+      props
+    )
+  end
+
+  defp decode_field(<<_::bits>>, _message, _props) do
+    raise Protobuf.DecodeError, message: "cannot decode binary data: invalid field tag"
+  end
+
+  defp dispatch_field(tag, rest, message, props) do
+    field_number = bsr(tag, 3)
+    wire_type = band(tag, 0b00000111)
 
     if field_number != 0 do
       handle_field(rest, field_number, wire_type, message, props)
