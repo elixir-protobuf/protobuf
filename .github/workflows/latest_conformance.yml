@@ -19,8 +19,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - otp: 26.0
-            elixir: 1.16.3
+          - otp: 28.0
+            elixir: 1.19.4
 
     env:
       MIX_ENV: test
