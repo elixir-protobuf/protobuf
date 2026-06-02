@@ -20,17 +20,6 @@
 # JSON extension field names are not supported yet.
 Recommended.Proto2.JsonInput.FieldNameExtension.Validator
 
-# Rejecting JSON objects with duplicate keys (including the same field spelled in two different
-# casings, e.g. "optionalInt32" and "optional_int32") requires a JSON parser that surfaces
-# duplicate keys, which neither Jason nor the built-in JSON module does. The pinned protoc accepts
-# duplicates; Protobuf's `main` requires them to be rejected. These are "Recommended".
-Recommended.Proto2.JsonInput.FieldNameDuplicate # only-on: latest
-Recommended.Proto2.JsonInput.FieldNameDuplicateDifferentCasing1 # only-on: latest
-Recommended.Proto2.JsonInput.FieldNameDuplicateDifferentCasing2 # only-on: latest
-Recommended.Proto3.JsonInput.FieldNameDuplicate # only-on: latest
-Recommended.Proto3.JsonInput.FieldNameDuplicateDifferentCasing1 # only-on: latest
-Recommended.Proto3.JsonInput.FieldNameDuplicateDifferentCasing2 # only-on: latest
-
 # The proto2-only MessageSet wire format is not implemented. These tests do not exist in the
 # pinned Protobuf dependency yet.
 Recommended.Proto2.ProtobufInput.ValidMessageSetEncoding.SubmessageEncoding.NotUnknown.ProtobufOutput # only-on: latest
