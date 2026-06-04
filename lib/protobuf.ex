@@ -113,7 +113,7 @@ defmodule Protobuf do
       end
 
       @impl unquote(__MODULE__)
-      def decode(data), do: Protobuf.Decoder.decode(data, __MODULE__)
+      def decode(data), do: Protobuf.Decoder.decode(data, __MODULE__, [])
 
       @impl unquote(__MODULE__)
       def encode(struct), do: Protobuf.Encoder.encode(struct)
@@ -136,6 +136,9 @@ defmodule Protobuf do
   Decodes a Protobuf binary into a struct.
 
   Errors may be raised if there's something wrong in the binary.
+
+  This callback does not take decoding options. To pass options (such as `:max_nesting_depth`),
+  use `Protobuf.decode/3` instead.
   """
   @callback decode(binary()) :: struct()
 
@@ -158,6 +161,13 @@ defmodule Protobuf do
 
   This function raises an error if anything goes wrong with decoding.
 
+  ## Options
+
+    * `:max_nesting_depth` - the maximum number of nested embedded messages allowed before
+      decoding raises a `Protobuf.DecodeError`. Decoding a deeply-nested or self-referential
+      message can otherwise drive unbounded recursion and exhaust memory and CPU. Defaults to
+      `100`, matching the reference Protobuf implementations. *Available since v0.17.0*.
+
   ## Examples
 
       Protobuf.decode(<<...>>, MyMessage)
@@ -167,12 +177,12 @@ defmodule Protobuf do
       #=> ** (Protobuf.DecodeError) ...
 
   """
-  @spec decode(binary(), message) :: %{
+  @spec decode(binary(), message, keyword()) :: %{
           required(:__struct__) => message,
           optional(atom()) => any()
         }
         when message: module()
-  defdelegate decode(data, module), to: Protobuf.Decoder
+  def decode(data, module, opts \\ []), do: Protobuf.Decoder.decode(data, module, opts)
 
   @doc """
   Encodes the given Protobuf struct into a binary.

@@ -14,6 +14,14 @@ defmodule TestMsg do
     field :b, 2, type: :string
   end
 
+  # A self-referential message, used to exercise the decoder's nesting-depth limit.
+  defmodule Tree do
+    @moduledoc false
+    use Protobuf, syntax: :proto3
+
+    field :child, 1, type: __MODULE__
+  end
+
   defmodule Foo.Baz do
     @moduledoc false
     use Protobuf, syntax: :proto3
