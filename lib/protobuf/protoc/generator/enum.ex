@@ -28,8 +28,8 @@ defmodule Protobuf.Protoc.Generator.Enum do
       Util.options_to_str(%{
         syntax: ctx.syntax,
         enum: true,
-        protoc_gen_elixir_version: "\"#{Util.version()}\"",
-        full_name: "\"#{full_name}\""
+        protoc_gen_elixir_version: Util.version(),
+        full_name: full_name
       })
 
     descriptor_fun_body =

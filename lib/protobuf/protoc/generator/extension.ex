@@ -25,7 +25,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
     use_options =
       Util.options_to_str(%{
         syntax: ctx.syntax,
-        protoc_gen_elixir_version: "\"#{Util.version()}\""
+        protoc_gen_elixir_version: Util.version()
       })
 
     module_contents =
@@ -50,7 +50,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
     use_options =
       Util.options_to_str(%{
         syntax: ctx.syntax,
-        protoc_gen_elixir_version: "\"#{Util.version()}\""
+        protoc_gen_elixir_version: Util.version()
       })
 
     nested_modules = get_extensions_from_messages(ctx, use_options, file_desc.message_type)

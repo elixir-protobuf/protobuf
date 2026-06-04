@@ -51,8 +51,10 @@ defmodule Protobuf.Protoc.Generator.Util do
     |> Enum.map_join(", ", fn {key, val} -> "#{key}: #{print(val)}" end)
   end
 
-  defp print(atom) when is_atom(atom), do: inspect(atom)
-  defp print(val), do: val
+  # Every value is rendered through inspect/1 so that strings become quoted,
+  # properly escaped Elixir literals rather than raw source. Callers must pass
+  # plain values (e.g. a string), not pre-quoted source fragments.
+  defp print(val), do: inspect(val)
 
   @spec type_from_type_name(Context.t(), String.t()) :: String.t()
   def type_from_type_name(%Context{dep_type_mapping: mapping}, type_name)

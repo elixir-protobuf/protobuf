@@ -45,10 +45,17 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
       assert options_to_str(%{}) == ""
       assert options_to_str(%{enum: true, syntax: nil}) == "enum: true"
       assert options_to_str(%{syntax: :proto2}) == "syntax: :proto2"
-      assert options_to_str(%{default: nil, enum: false}) == ""
+      assert options_to_str(%{full_name: nil, enum: false}) == ""
       assert options_to_str(%{deprecated: nil, map: nil, syntax: nil}) == ""
-      assert options_to_str(%{default: "42", enum: false}) == "default: 42"
-      assert options_to_str(%{json_name: "\"theFieldName\""}) == "json_name: \"theFieldName\""
+      # Atoms and integers render as bare literals...
+      assert options_to_str(%{enum: true, oneof: 0}) == "enum: true, oneof: 0"
+      # ...while strings render as quoted literals.
+      assert options_to_str(%{full_name: "Foo.Bar"}) == "full_name: \"Foo.Bar\""
+    end
+
+    test "renders string values as quoted, escaped literals (no source injection)" do
+      payload = ~s|true, evil: System.halt()|
+      assert options_to_str(%{full_name: payload}) == ~s|full_name: "true, evil: System.halt()"|
     end
 
     test "keep options string in alphabetical order" do
@@ -60,7 +67,7 @@ defmodule Protobuf.Protoc.Generator.UtilTest do
       }
 
       sorted_str =
-        "deprecated: true, map: true, protoc_gen_elixir_version: 1.2.3, syntax: :proto3"
+        ~s|deprecated: true, map: true, protoc_gen_elixir_version: "1.2.3", syntax: :proto3|
 
       assert options_to_str(opts) == sorted_str
     end
