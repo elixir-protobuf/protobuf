@@ -31,6 +31,11 @@ defmodule Protobuf.Protoc.Generator.Message do
 
   @spec generate(Context.t(), Google.Protobuf.DescriptorProto.t()) :: {any(), any()}
   def generate(%Context{} = ctx, %Google.Protobuf.DescriptorProto{} = desc) do
+    # Field and oneof names are interpolated verbatim into `field`/`oneof` macro
+    # calls (atom position), so they must be plain identifiers. Message names go
+    # through Util.mod_name/2, which validates each module segment.
+    Enum.each(desc.oneof_decl, fn oneof -> Util.validate_proto_name!(oneof.name) end)
+
     new_ns = ctx.namespace ++ [Macro.camelize(desc.name)]
     msg_name = Util.mod_name(ctx, new_ns)
     fields = get_fields(ctx, desc)
@@ -163,7 +168,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     type = field_type_name(ctx, field_desc)
 
     %{
-      name: field_desc.name,
+      name: Util.validate_proto_name!(field_desc.name),
       comment: Comment.get(ctx),
       number: field_desc.number,
       label: label_name(field_desc.label),

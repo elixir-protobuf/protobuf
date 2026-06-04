@@ -17,6 +17,11 @@ defmodule Protobuf.Protoc.Generator.Enum do
   @spec generate(Context.t(), Google.Protobuf.EnumDescriptorProto.t()) ::
           {module_name :: String.t(), file_contents :: String.t()}
   def generate(%Context{namespace: ns} = ctx, %Google.Protobuf.EnumDescriptorProto{} = desc) do
+    # Enum value names are interpolated verbatim into `field` macro calls (atom
+    # position), so they must be plain identifiers. The enum name itself goes
+    # through Util.mod_name/2, which validates each module segment.
+    Enum.each(desc.value, fn value -> Util.validate_proto_name!(value.name) end)
+
     msg_name = Util.mod_name(ctx, ns ++ [Macro.camelize(desc.name)])
 
     full_name =

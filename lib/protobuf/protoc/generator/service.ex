@@ -17,6 +17,8 @@ defmodule Protobuf.Protoc.Generator.Service do
   @spec generate(Context.t(), Google.Protobuf.ServiceDescriptorProto.t()) ::
           {String.t(), String.t()}
   def generate(%Context{} = ctx, %Google.Protobuf.ServiceDescriptorProto{} = desc) do
+    # The service name goes through Util.mod_name/2, which validates each module
+    # segment; RPC method names are validated in generate_service_method/2.
     # service can't be nested
     mod_name = Util.mod_name(ctx, [Macro.camelize(desc.name)])
     name = Util.prepend_package_prefix(ctx.package, desc.name)
@@ -45,6 +47,7 @@ defmodule Protobuf.Protoc.Generator.Service do
   end
 
   defp generate_service_method(ctx, method) do
+    Util.validate_proto_name!(method.name)
     input = service_arg(Util.type_from_type_name(ctx, method.input_type), method.client_streaming)
 
     output =

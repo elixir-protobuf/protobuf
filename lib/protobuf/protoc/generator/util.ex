@@ -32,7 +32,42 @@ defmodule Protobuf.Protoc.Generator.Util do
   defp proto_name_to_module_name(name) when is_binary(name) do
     name
     |> String.split(".")
-    |> Enum.map_join(".", &Macro.camelize/1)
+    |> Enum.map_join(".", fn
+      # An empty segment (e.g. an empty package/module prefix) contributes
+      # nothing to the module name and can't carry injected code, so leave it be.
+      "" -> ""
+      part -> part |> validate_proto_name!() |> Macro.camelize()
+    end)
+  end
+
+  # Protobuf identifiers (the names of messages, enums, services, fields, ...)
+  # match this grammar, and `protoc` enforces it when it parses `.proto` text.
+  # The generator, however, can also be handed descriptors that never went
+  # through `protoc` — a `FileDescriptorSet`, a server-reflection response, or
+  # hand-crafted `CodeGeneratorRequest` bytes piped to the plugin's stdin.
+  # Because these names are interpolated into generated Elixir source, a name
+  # containing newlines and code would be emitted verbatim and then compiled by
+  # the consuming project. We reject anything that isn't a bare identifier
+  # before it can reach the generated output.
+  @proto_identifier ~r/\A[A-Za-z_][A-Za-z0-9_]*\z/
+
+  # Descriptor names decoded from the wire are strings, but callers (and tests)
+  # sometimes pass atoms; both are rendered identically into the generated
+  # source, so validate either form.
+  @spec validate_proto_name!(String.t() | atom()) :: String.t() | atom()
+  def validate_proto_name!(name) when is_atom(name) and not is_nil(name) do
+    _ = validate_proto_name!(Atom.to_string(name))
+    name
+  end
+
+  def validate_proto_name!(name) when is_binary(name) do
+    if Regex.match?(@proto_identifier, name) do
+      name
+    else
+      raise "invalid protobuf identifier #{inspect(name)}: names must match " <>
+              "[A-Za-z_][A-Za-z0-9_]* (refusing to generate code from an untrusted " <>
+              "or malformed descriptor)"
+    end
   end
 
   @spec prepend_package_prefix(String.t() | nil, String.t() | nil) :: String.t()

@@ -31,6 +31,39 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     TestHelpers.purge_modules([Foo])
   end
 
+  test "generate/2 refuses to inject code via a malicious field name" do
+    ctx = %Context{syntax: :proto3}
+
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Victim",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "pwn, 1, type: :int32\n  System.halt()\n  field :pad",
+          number: 1,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_INT32
+        }
+      ]
+    }
+
+    assert_raise RuntimeError, ~r/invalid protobuf identifier/, fn ->
+      Generator.generate(ctx, desc)
+    end
+  end
+
+  test "generate/2 refuses to inject code via a malicious module name" do
+    ctx = %Context{syntax: :proto3}
+
+    desc = %Google.Protobuf.DescriptorProto{
+      name: "Victim, do: (System.halt())\ndefmodule Dummy",
+      field: []
+    }
+
+    assert_raise RuntimeError, ~r/invalid protobuf identifier/, fn ->
+      Generator.generate(ctx, desc)
+    end
+  end
+
   test "generate/2 has right syntax" do
     ctx = %Context{syntax: :proto3}
     desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
