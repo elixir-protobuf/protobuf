@@ -371,6 +371,19 @@ defmodule Protobuf.JSON.EncodeTest do
 
       assert encode(message) == %{"optionalFieldMask" => "foo.bar,fooBar.bazBong"}
     end
+
+    test "rejects a path containing the canonical separator or other invalid characters" do
+      # A "," inside a single path would otherwise survive validation and be
+      # joined into the comma-separated canonical string, so a single authorized
+      # path would be re-parsed as multiple paths on decode.
+      for bad_path <- ["safe_field,admin_role", "foo;bar", "foo bar", "foo-bar", ""] do
+        message = %TestAllTypesProto3{
+          optional_field_mask: %Google.Protobuf.FieldMask{paths: [bad_path]}
+        }
+
+        assert catch_throw(encode(message)) == {:bad_field_mask, bad_path}
+      end
+    end
   end
 
   describe "Google.Protobuf.Duration" do

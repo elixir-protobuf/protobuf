@@ -142,6 +142,14 @@ defmodule Protobuf.JSON.Encode do
         path =~ ~r/[A-Z0-9]/ ->
           throw({:bad_field_mask, path})
 
+        # A field mask path must be a non-empty, dot-separated list of
+        # lower_snake_case field names. Any other character (most importantly
+        # ",", the separator used in the canonical comma-joined output) would
+        # let a single path be re-parsed as multiple paths on the way back in,
+        # so we reject it here.
+        not (path =~ ~r/^[a-z_][a-z_.]*$/) ->
+          throw({:bad_field_mask, path})
+
         true ->
           {first, rest} = path |> Macro.camelize() |> String.next_codepoint()
           String.downcase(first) <> rest
