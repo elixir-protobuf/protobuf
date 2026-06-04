@@ -44,7 +44,7 @@ defmodule Protobuf.Protoc.CLI do
     # Read the standard input that protoc feeds us.
     bin = binread_all!(:stdio)
 
-    request = Protobuf.Decoder.decode(bin, Google.Protobuf.Compiler.CodeGeneratorRequest)
+    request = Protobuf.Decoder.decode(bin, Google.Protobuf.Compiler.CodeGeneratorRequest, [])
 
     ctx =
       %Context{}

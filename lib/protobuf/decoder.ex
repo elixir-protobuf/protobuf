@@ -7,14 +7,29 @@ defmodule Protobuf.Decoder do
   alias Protobuf.{DecodeError, FieldProps, MessageProps, Wire}
 
   @compile {:inline,
-            decode_field: 3, skip_varint: 4, skip_delimited: 4, reverse_repeated: 2, field_key: 2}
+            decode_field: 4, skip_varint: 5, skip_delimited: 5, reverse_repeated: 2, field_key: 2}
 
-  @spec decode(binary(), module()) :: term()
-  def decode(bin, module) when is_binary(bin) and is_atom(module) do
+  # The reference Protobuf implementations (C++, Java, ...) cap the nesting depth of embedded
+  # messages at 100 to keep a deeply-nested message (such as a self-referential schema like
+  # `message Tree { Tree child = 1; }`) from driving unbounded recursion and exhausting the
+  # decoder's memory/CPU. We match that default; it can be overridden per call via the
+  # `:max_nesting_depth` option to decode/3.
+  @default_max_nesting_depth 100
+
+  @spec decode(binary(), module(), keyword()) :: term()
+  def decode(bin, module, opts) when is_binary(bin) and is_atom(module) and is_list(opts) do
+    max_nesting_depth = Keyword.get(opts, :max_nesting_depth, @default_max_nesting_depth)
+    do_decode(bin, module, {_nesting_depth = 0, max_nesting_depth})
+  end
+
+  # `nesting` is the `{current_nesting_depth, max_nesting_depth}` pair threaded through decoding so
+  # that decode_embedded/3 can enforce the maximum without re-reading any configuration at every
+  # level. The top-level message is at depth 0; each embedded message is decoded one level deeper.
+  defp do_decode(bin, module, nesting) do
     %MessageProps{repeated_fields: repeated_fields} = props = module.__message_props__()
 
     bin
-    |> build_message(struct(module), props)
+    |> build_message(struct(module), props, nesting)
     |> reverse_repeated([:__unknown_fields__ | repeated_fields])
     |> transform_module(module)
   end
@@ -27,13 +42,13 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  defp build_message(<<>>, message, _props), do: message
+  defp build_message(<<>>, message, _props, _nesting), do: message
 
-  defp build_message(<<bin::bits>>, message, props) do
-    decode_field(bin, message, props)
+  defp build_message(<<bin::bits>>, message, props, nesting) do
+    decode_field(bin, message, props, nesting)
   end
 
-  defdecoderp decode_field(message, props) do
+  defdecoderp decode_field(message, props, nesting) do
     # From the docs:
     # "Each key in the streamed message is a varint with the value
     # (field_number << 3) | wire_type, in other words, the last three bits of
@@ -42,59 +57,59 @@ defmodule Protobuf.Decoder do
     wire_type = band(value, 0b00000111)
 
     if field_number != 0 do
-      handle_field(rest, field_number, wire_type, message, props)
+      handle_field(rest, field_number, wire_type, message, props, nesting)
     else
       raise Protobuf.DecodeError, message: "invalid field number 0 when decoding binary data"
     end
   end
 
-  defp handle_field(<<bin::bits>>, field_number, wire_start_group(), message, props) do
-    skip_field(bin, message, props, [field_number])
+  defp handle_field(<<bin::bits>>, field_number, wire_start_group(), message, props, nesting) do
+    skip_field(bin, message, props, [field_number], nesting)
   end
 
-  defp handle_field(<<_bin::bits>>, closing, wire_end_group(), _message, _props) do
+  defp handle_field(<<_bin::bits>>, closing, wire_end_group(), _message, _props, _nesting) do
     msg = "closing group #{inspect(closing)} but no groups are open"
     raise Protobuf.DecodeError, message: msg
   end
 
-  defp handle_field(<<bin::bits>>, field_number, wire_varint(), message, props) do
-    decode_varint(bin, field_number, message, props)
+  defp handle_field(<<bin::bits>>, field_number, wire_varint(), message, props, nesting) do
+    decode_varint(bin, field_number, message, props, nesting)
   end
 
-  defp handle_field(<<bin::bits>>, field_number, wire_delimited(), message, props) do
-    decode_delimited(bin, field_number, message, props)
+  defp handle_field(<<bin::bits>>, field_number, wire_delimited(), message, props, nesting) do
+    decode_delimited(bin, field_number, message, props, nesting)
   end
 
-  defp handle_field(<<bin::bits>>, field_number, wire_32bits(), message, props) do
+  defp handle_field(<<bin::bits>>, field_number, wire_32bits(), message, props, nesting) do
     <<value::bits-32, rest::bits>> = bin
-    handle_value(rest, field_number, wire_32bits(), value, message, props)
+    handle_value(rest, field_number, wire_32bits(), value, message, props, nesting)
   end
 
-  defp handle_field(<<bin::bits>>, field_number, wire_64bits(), message, props) do
+  defp handle_field(<<bin::bits>>, field_number, wire_64bits(), message, props, nesting) do
     <<value::bits-64, rest::bits>> = bin
-    handle_value(rest, field_number, wire_64bits(), value, message, props)
+    handle_value(rest, field_number, wire_64bits(), value, message, props, nesting)
   end
 
-  defp handle_field(_bin, _field_number, wire_type, _message, _props) do
+  defp handle_field(_bin, _field_number, wire_type, _message, _props, _nesting) do
     raise Protobuf.DecodeError,
       message: "cannot decode binary data, unknown wire type: #{inspect(wire_type)}"
   end
 
-  defdecoderp skip_field(message, props, groups) do
+  defdecoderp skip_field(message, props, groups, nesting) do
     field_number = bsr(value, 3)
     wire_type = band(value, 7)
 
     case wire_type do
       wire_start_group() ->
-        skip_field(rest, message, props, [field_number | groups])
+        skip_field(rest, message, props, [field_number | groups], nesting)
 
       wire_end_group() ->
         case groups do
           [^field_number] ->
-            build_message(rest, message, props)
+            build_message(rest, message, props, nesting)
 
           [^field_number | groups] ->
-            skip_field(rest, message, props, groups)
+            skip_field(rest, message, props, groups, nesting)
 
           [group | _] ->
             msg = "closing group #{inspect(field_number)} but group #{inspect(group)} is open"
@@ -102,16 +117,16 @@ defmodule Protobuf.Decoder do
         end
 
       wire_varint() ->
-        skip_varint(rest, message, props, groups)
+        skip_varint(rest, message, props, groups, nesting)
 
       wire_delimited() ->
-        skip_delimited(rest, message, props, groups)
+        skip_delimited(rest, message, props, groups, nesting)
 
       wire_32bits() ->
-        rest |> skip_bits(32) |> skip_field(message, props, groups)
+        rest |> skip_bits(32) |> skip_field(message, props, groups, nesting)
 
       wire_64bits() ->
-        rest |> skip_bits(64) |> skip_field(message, props, groups)
+        rest |> skip_bits(64) |> skip_field(message, props, groups, nesting)
 
       wire_type ->
         message =
@@ -127,14 +142,14 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  defdecoderp skip_varint(message, props, groups) do
+  defdecoderp skip_varint(message, props, groups, nesting) do
     _ = value
-    skip_field(rest, message, props, groups)
+    skip_field(rest, message, props, groups, nesting)
   end
 
-  defdecoderp skip_delimited(message, props, groups) do
+  defdecoderp skip_delimited(message, props, groups, nesting) do
     <<_skip::bytes-size(value), rest::bits>> = rest
-    skip_field(rest, message, props, groups)
+    skip_field(rest, message, props, groups, nesting)
   end
 
   defp skip_bits(binary, length) do
@@ -144,16 +159,16 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  defdecoderp decode_varint(field_number, message, props) do
-    handle_value(rest, field_number, wire_varint(), value, message, props)
+  defdecoderp decode_varint(field_number, message, props, nesting) do
+    handle_value(rest, field_number, wire_varint(), value, message, props, nesting)
   end
 
-  defdecoderp decode_delimited(field_number, message, props) do
+  defdecoderp decode_delimited(field_number, message, props, nesting) do
     bytes_remaining = byte_size(rest)
 
     if value <= bytes_remaining do
       <<bytes::bytes-size(value), rest::bits>> = rest
-      handle_value(rest, field_number, wire_delimited(), bytes, message, props)
+      handle_value(rest, field_number, wire_delimited(), bytes, message, props, nesting)
     else
       field =
         case props.field_props do
@@ -169,16 +184,18 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  defp handle_value(<<rest::bits>>, field_number, wire_type, value, message, props) do
+  defp handle_value(<<rest::bits>>, field_number, wire_type, value, message, props, nesting) do
     case props.field_props do
       %{^field_number => %FieldProps{packed?: true, name_atom: name_atom} = prop} ->
-        new_message = update_in_message(message, name_atom, value, &value_for_packed/3, prop)
-        build_message(rest, new_message, props)
+        new_message =
+          update_in_message(message, name_atom, value, &value_for_packed/4, prop, nesting)
+
+        build_message(rest, new_message, props, nesting)
 
       %{^field_number => %FieldProps{wire_type: ^wire_type} = prop} ->
         key = field_key(prop, props)
-        new_message = update_in_message(message, key, value, &value_for_field/3, prop)
-        build_message(rest, new_message, props)
+        new_message = update_in_message(message, key, value, &value_for_field/4, prop, nesting)
+        build_message(rest, new_message, props, nesting)
 
       # Repeated fields of primitive numeric types can be "packed". Their packed? flag will be
       # false, but they will be encoded as wire_delimited() one after the other. In proto2, this
@@ -186,8 +203,10 @@ defmodule Protobuf.Decoder do
       # https://developers.google.com/protocol-buffers/docs/encoding#packed
       %{^field_number => %FieldProps{repeated?: true, name_atom: name_atom} = prop}
       when wire_type == wire_delimited() ->
-        new_message = update_in_message(message, name_atom, value, &value_for_packed/3, prop)
-        build_message(rest, new_message, props)
+        new_message =
+          update_in_message(message, name_atom, value, &value_for_packed/4, prop, nesting)
+
+        build_message(rest, new_message, props, nesting)
 
       %{^field_number => %FieldProps{wire_type: expected, name: field}} ->
         raise DecodeError,
@@ -200,7 +219,7 @@ defmodule Protobuf.Decoder do
           case Protobuf.Extension.get_extension_props_by_tag(mod, field_number) do
             {ext_mod, %{field_props: %FieldProps{} = prop}} ->
               current_value = Protobuf.Extension.get(message, ext_mod, prop.name_atom, nil)
-              new_value = value_for_field(value, current_value, prop)
+              new_value = value_for_field(value, current_value, prop, nesting)
               Protobuf.Extension.put(mod, message, ext_mod, prop.name_atom, new_value)
 
             # Unknown field (the list is reversed after decoding the whole message so that the
@@ -210,11 +229,11 @@ defmodule Protobuf.Decoder do
               %{message | __unknown_fields__: [new_field | unknown_fields]}
           end
 
-        build_message(rest, new_message, props)
+        build_message(rest, new_message, props, nesting)
     end
   end
 
-  defp value_for_field(value, current, %FieldProps{embedded?: false} = prop) do
+  defp value_for_field(value, current, %FieldProps{embedded?: false} = prop, _nesting) do
     %FieldProps{type: type, name_atom: name_atom, oneof: oneof, repeated?: repeated?} = prop
 
     val = Wire.decode(type, value)
@@ -228,11 +247,11 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  defp value_for_field(bin, current, %FieldProps{embedded?: true} = prop) do
+  defp value_for_field(bin, current, %FieldProps{embedded?: true} = prop, nesting) do
     %FieldProps{type: type, map?: map?, oneof: oneof, name_atom: name_atom, repeated?: repeated?} =
       prop
 
-    embed_msg = decode(bin, type)
+    embed_msg = decode_embedded(bin, type, nesting)
 
     val =
       if map? do
@@ -261,6 +280,22 @@ defmodule Protobuf.Decoder do
       true ->
         val
     end
+  end
+
+  # Decodes an embedded message one level deeper, enforcing the maximum nesting depth so that a
+  # deeply-nested (and possibly self-referential) message can't drive unbounded recursion and
+  # exhaust the node's memory/CPU.
+  defp decode_embedded(bin, type, {nesting_depth, max_nesting_depth}) do
+    nesting_depth = nesting_depth + 1
+
+    if nesting_depth > max_nesting_depth do
+      raise Protobuf.DecodeError,
+        message:
+          "embedded message nesting depth exceeds the maximum of #{max_nesting_depth} " <>
+            "(configurable via the `:max_nesting_depth` option to decode/3)"
+    end
+
+    do_decode(bin, type, {nesting_depth, max_nesting_depth})
   end
 
   defp map_default(prop, key_or_value) do
@@ -333,13 +368,13 @@ defmodule Protobuf.Decoder do
   # The "packed" flag is, essentially, a suggestion. If a field says it's packed, it could be
   # packed but it could also _not_ be. For this reason, here we're only decoding fields as packed
   # if we get a binary. Otherwise, we already decoded the field, so we pass this down to
-  # value_for_field/3.
+  # value_for_field/4.
   # Reference in the docs:
   # https://developers.google.com/protocol-buffers/docs/encoding#packed
   # Reference comment from @britto:
   # https://github.com/elixir-protobuf/protobuf/pull/207#discussion_r758480828
 
-  defp value_for_packed(bin, current, %FieldProps{type: type, wire_type: wire_type})
+  defp value_for_packed(bin, current, %FieldProps{type: type, wire_type: wire_type}, _nesting)
        when is_binary(bin) do
     # List.wrap/1 wraps nil into [].
     current = List.wrap(current)
@@ -351,8 +386,8 @@ defmodule Protobuf.Decoder do
     end
   end
 
-  defp value_for_packed(value, current, prop) do
-    value_for_field(value, current, prop)
+  defp value_for_packed(value, current, prop, nesting) do
+    value_for_field(value, current, prop, nesting)
   end
 
   defp decode_varints(<<>>, _type, acc), do: acc
@@ -399,16 +434,15 @@ defmodule Protobuf.Decoder do
     key
   end
 
-  # Receives an update_fun and calls it with value and props params to avoid
-  # the extra memory usage of creating an anonymous function with the two
-  # params in its context.
-  defp update_in_message(message, key, value, update_fun, props) do
+  # Receives an update_fun and calls it with value, props, and nesting params to avoid
+  # the extra memory usage of creating an anonymous function with the params in its context.
+  defp update_in_message(message, key, value, update_fun, props, nesting) do
     current =
       case message do
         %_{^key => value} -> value
         %_{} -> nil
       end
 
-    Map.put(message, key, update_fun.(value, current, props))
+    Map.put(message, key, update_fun.(value, current, props, nesting))
   end
 end
