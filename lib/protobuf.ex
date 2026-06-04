@@ -166,7 +166,7 @@ defmodule Protobuf do
     * `:max_nesting_depth` - the maximum number of nested embedded messages allowed before
       decoding raises a `Protobuf.DecodeError`. Decoding a deeply-nested or self-referential
       message can otherwise drive unbounded recursion and exhaust memory and CPU. Defaults to
-      `100`, matching the reference Protobuf implementations. *Available since v0.17.0*.
+      `100`, matching the reference Protobuf implementations. *Available since v0.16.1*.
 
   ## Examples
 

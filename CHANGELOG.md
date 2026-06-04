@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.16.1
+
+### Security
+
+  * Fix an unbounded-recursion denial of service when decoding deeply-nested embedded messages
+    ([GHSA-rv48-qqj5-crxg](https://github.com/elixir-protobuf/protobuf/security/advisories/GHSA-rv48-qqj5-crxg)).
+    Decoding now caps embedded-message nesting depth at `100` (matching the reference Protobuf
+    implementations), raising `Protobuf.DecodeError` when the limit is exceeded. The limit can be
+    overridden per call via the `:max_nesting_depth` option to `Protobuf.decode/3`.
+
 ## v0.16.0
 
 ### Enhancements
