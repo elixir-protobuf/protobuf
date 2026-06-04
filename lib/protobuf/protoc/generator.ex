@@ -22,6 +22,7 @@ defmodule Protobuf.Protoc.Generator do
         end)
       else
         base_module = Generator.Util.mod_name(ctx, [])
+
         file_name =
           case base_module do
             "" -> Path.rootname(desc.name) <> ".pb.ex"

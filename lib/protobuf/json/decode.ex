@@ -149,7 +149,10 @@ defmodule Protobuf.JSON.Decode do
 
   defp internal_from_json_data(list, Google.Protobuf.ListValue = mod, state) when is_list(list) do
     state = increase_depth_and_maybe_throw(state)
-    struct!(mod, values: Enum.map(list, &internal_from_json_data(&1, Google.Protobuf.Value, state)))
+
+    struct!(mod,
+      values: Enum.map(list, &internal_from_json_data(&1, Google.Protobuf.Value, state))
+    )
   end
 
   defp internal_from_json_data(%Object{} = object, Google.Protobuf.Struct = mod, state) do
@@ -226,6 +229,16 @@ defmodule Protobuf.JSON.Decode do
       rescue
         ArgumentError -> throw({:bad_any_type_url, type_url})
       end
+
+    # Make sure the resolved module is actually a Protobuf message before we dispatch
+    # any message functions on it. Otherwise a type_url that camelizes to some other
+    # existing module would raise an uncaught UndefinedFunctionError instead of a clean
+    # decoding error. We ensure the module is loaded first since the resolved atom may
+    # name a message module that hasn't been lazily loaded into the VM yet.
+    if not (Code.ensure_loaded?(message_mod) and
+              function_exported?(message_mod, :__message_props__, 0)) do
+      throw({:bad_any_type_url, type_url})
+    end
 
     data = Map.delete(data, "@type")
 

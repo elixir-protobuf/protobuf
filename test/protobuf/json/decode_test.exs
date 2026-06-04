@@ -1070,6 +1070,16 @@ defmodule Protobuf.JSON.DecodeTest do
 
       assert decode(%{"@type" => 1234}, Google.Protobuf.Any) == error(msg)
     end
+
+    test "rejects a @type that resolves to a loaded module that is not a Protobuf message" do
+      # "string" camelizes to the existing Elixir.String module, which is loaded but is
+      # not a Protobuf message. This must be a clean decoding error, not an
+      # UndefinedFunctionError from dispatching message functions on an arbitrary module.
+      type_url = "type.googleapis.com/string"
+      msg = "invalid type_url for Google.Protobuf.Any: #{inspect(type_url)}"
+
+      assert decode(%{"@type" => type_url, "value" => ""}, Google.Protobuf.Any) == error(msg)
+    end
   end
 
   describe ":recursion_limit option" do
