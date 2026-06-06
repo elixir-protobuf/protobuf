@@ -185,6 +185,64 @@ defmodule Protobuf.Protoc.CLIIntegrationTest do
     assert Map.fetch!(mod.__message_props__().field_props, 1).type == Google.Protobuf.Timestamp
   end
 
+  # Regression test for #333.
+  #
+  # protoc feeds the CodeGeneratorRequest to the plugin as raw Protobuf bytes on
+  # stdin. Those bytes are not valid UTF-8, so when standard_io defaults to
+  # unicode mode (OTP 26+) reading them silently corrupts the binary, which used
+  # to surface as "invalid field number 0 when decoding binary data". This proto
+  # (a map of string to google.protobuf.Any, plus a service) is the schema from
+  # the original report; it exercises that decode path end-to-end.
+  test "with a map of google.protobuf.Any (issue #333)", %{tmp_dir: tmp_dir} do
+    proto_path = Path.join(tmp_dir, "guild.proto")
+
+    File.write!(proto_path, """
+    syntax = "proto3";
+
+    import "google/protobuf/any.proto";
+
+    package derailed.grpc;
+
+    service Guild {
+      rpc publish (Publ) returns (Publr) {};
+    }
+
+    message Message {
+      string event = 1;
+      map<string, google.protobuf.Any> data = 2;
+    }
+
+    message Publ {
+      string guild_id = 1;
+      Message message = 2;
+    }
+
+    message Publr {
+      string message = 1;
+    }
+    """)
+
+    protoc!([
+      "--proto_path=#{tmp_dir}",
+      "--proto_path=#{Mix.Project.deps_paths().google_protobuf}/src",
+      "--elixir_out=#{tmp_dir}",
+      "--plugin=./protoc-gen-elixir",
+      proto_path
+    ])
+
+    assert [data_entry_mod, message_mod, publ_mod, publr_mod] =
+             compile_file_and_clean_modules_on_exit("#{tmp_dir}/derailed/grpc/guild.pb.ex")
+
+    assert data_entry_mod == Derailed.Grpc.Message.DataEntry
+    assert message_mod == Derailed.Grpc.Message
+    assert publ_mod == Derailed.Grpc.Publ
+    assert publr_mod == Derailed.Grpc.Publr
+
+    data_entry_props = data_entry_mod.__message_props__()
+    assert data_entry_props.map?
+    assert data_entry_props.field_props[2].type == Google.Protobuf.Any
+  end
+
   test "multiple extensions defined in different scopes", %{tmp_dir: tmp_dir} do
     proto_path_base = Path.join(tmp_dir, "base.proto")
     proto_path_ext1 = Path.join(tmp_dir, "ext1.proto")
