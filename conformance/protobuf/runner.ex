@@ -78,10 +78,11 @@ defmodule Conformance.Protobuf.Runner do
          requested_output_format: requested_output_format,
          message_type: message_type,
          test_category: test_category,
-         payload: {payload_kind, msg}
+         payload: {payload_kind, msg},
+         print_unknown_fields: print_unknown_fields
        })
        when mod == Conformance.ConformanceRequest and
-              requested_output_format in [:PROTOBUF, :JSON] and
+              requested_output_format in [:PROTOBUF, :JSON, :TEXT_FORMAT] and
               payload_kind in [:protobuf_payload, :json_payload] do
     test_proto_type = to_test_proto_type(message_type)
     json_decode_opts = json_decode_opts_for(test_category)
@@ -96,6 +97,7 @@ defmodule Conformance.Protobuf.Runner do
       case requested_output_format do
         :PROTOBUF -> {&safe_encode/1, :protobuf_payload}
         :JSON -> {&Protobuf.JSON.encode/1, :json_payload}
+        :TEXT_FORMAT -> {&safe_text_encode(&1, print_unknown_fields), :text_payload}
       end
 
     with {:decode, {:ok, decoded_msg}} <- {:decode, decode_fun.(msg, test_proto_type)},
@@ -140,6 +142,12 @@ defmodule Conformance.Protobuf.Runner do
 
   defp safe_encode(%mod{} = struct) do
     {:ok, mod.encode(struct)}
+  rescue
+    exception -> {:error, exception, __STACKTRACE__}
+  end
+
+  defp safe_text_encode(struct, print_unknown_fields?) do
+    {:ok, Protobuf.Text.encode(struct, print_unknown_fields?: print_unknown_fields?)}
   rescue
     exception -> {:error, exception, __STACKTRACE__}
   end

@@ -322,6 +322,8 @@ defmodule Protobuf.Mixfile do
       "--enforce_recommended",
       "--failure_list",
       failure_list,
+      "--text_format_failure_list",
+      "conformance/text-exemptions.txt",
       "./conformance/runner.sh"
     ]
 
