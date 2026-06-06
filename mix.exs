@@ -333,10 +333,17 @@ defmodule Protobuf.Mixfile do
     other = if profile == "latest", do: "pinned", else: "latest"
     exclude = ~r/#\s*only-on:\s*#{other}\b/
 
+    # The conformance runner treats any text after `#` on a failure-list line as the *expected*
+    # failure message for that test, so our `# only-on: <profile>` tag must be stripped from the
+    # entries we keep — otherwise the runner compares "only-on: latest" against the real failure
+    # message and reports a (fatal) mismatch.
+    strip_tag = ~r/\s*#\s*only-on:\s*\w+\b.*$/
+
     contents =
       @exemptions_file
       |> File.stream!()
       |> Enum.reject(&Regex.match?(exclude, &1))
+      |> Enum.map(&Regex.replace(strip_tag, &1, ""))
       |> Enum.join()
 
     path = Path.join(System.tmp_dir!(), "protobuf_conformance_exemptions_#{profile}.txt")
