@@ -1,0 +1,4 @@
+# We do a best effort for printing unknown values but don't try to expand them
+Recommended.Proto3.ProtobufInput.GroupUnknownFields_Print.TextFormatOutput
+Recommended.Proto3.ProtobufInput.MessageUnknownFields_Print.TextFormatOutput
+Recommended.Proto3.ProtobufInput.RepeatedUnknownFields_Print.TextFormatOutput
