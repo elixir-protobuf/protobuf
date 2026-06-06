@@ -108,7 +108,7 @@ defmodule Protobuf.Protoc.Generator.Message do
     ":#{f[:name]}, #{f[:number]}, #{label_str}type: #{f[:type]}#{opts_str}"
   end
 
-  defp msg_opts_str(%{syntax: syntax}, opts, full_name) do
+  defp msg_opts_str(%Context{syntax: syntax} = ctx, opts, full_name) do
     msg_options = opts
 
     opts = %{
@@ -116,7 +116,8 @@ defmodule Protobuf.Protoc.Generator.Message do
       map: msg_options && msg_options.map_entry,
       deprecated: msg_options && msg_options.deprecated,
       protoc_gen_elixir_version: Util.version(),
-      full_name: full_name
+      full_name: full_name,
+      proto_source: ctx.gen_proto_source? && ctx.proto_file_name
     }
 
     str = Util.options_to_str(opts)

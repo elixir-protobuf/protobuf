@@ -51,6 +51,7 @@ defmodule Protobuf.Protoc.Generator do
         | comments: Protobuf.Protoc.Generator.Comment.parse(desc),
           syntax: syntax(desc.syntax),
           package: desc.package,
+          proto_file_name: desc.name,
           dep_type_mapping: get_dep_type_mapping(ctx, desc.dependency, desc.name)
       }
       |> Protobuf.Protoc.Context.custom_file_options_from_file_desc(desc)

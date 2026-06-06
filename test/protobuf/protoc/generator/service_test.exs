@@ -63,6 +63,59 @@ defmodule Protobuf.Protoc.Generator.ServiceTest do
     assert msg =~ "rpc :MethodD, stream(Foo.Input3), stream(Foo.Output3)\n"
   end
 
+  test "generate/2 adds proto_source/0 when gen_proto_source? is set" do
+    ctx = %Context{
+      package: "foo",
+      gen_proto_source?: true,
+      proto_file_name: "foo/service.proto",
+      dep_type_mapping: %{
+        ".foo.Input0" => %{type_name: "Foo.Input0"},
+        ".foo.Output0" => %{type_name: "Foo.Output0"}
+      },
+      module_prefix: "Foo"
+    }
+
+    desc = %Google.Protobuf.ServiceDescriptorProto{
+      name: "ServiceFoo",
+      method: [
+        %Google.Protobuf.MethodDescriptorProto{
+          name: "MethodA",
+          input_type: ".foo.Input0",
+          output_type: ".foo.Output0"
+        }
+      ]
+    }
+
+    assert {"Foo.ServiceFoo", msg} = Generator.generate(ctx, desc)
+    assert msg =~ "def proto_source(), do: \"foo/service.proto\""
+  end
+
+  test "generate/2 does not add proto_source/0 by default" do
+    ctx = %Context{
+      package: "foo",
+      proto_file_name: "foo/service.proto",
+      dep_type_mapping: %{
+        ".foo.Input0" => %{type_name: "Foo.Input0"},
+        ".foo.Output0" => %{type_name: "Foo.Output0"}
+      },
+      module_prefix: "Foo"
+    }
+
+    desc = %Google.Protobuf.ServiceDescriptorProto{
+      name: "ServiceFoo",
+      method: [
+        %Google.Protobuf.MethodDescriptorProto{
+          name: "MethodA",
+          input_type: ".foo.Input0",
+          output_type: ".foo.Output0"
+        }
+      ]
+    }
+
+    assert {"Foo.ServiceFoo", msg} = Generator.generate(ctx, desc)
+    refute msg =~ "proto_source"
+  end
+
   describe "generate/2 include_docs" do
     test "includes service comment for `@moduledoc` when flag is true" do
       ctx = %Context{
