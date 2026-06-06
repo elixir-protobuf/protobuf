@@ -79,7 +79,11 @@ defmodule Protobuf.Mixfile do
   end
 
   defp emu_args do
-    if System.otp_release() in ["26", "27"] do
+    # Starting with OTP 26, the standard_io device defaults to unicode mode. protoc's
+    # CodeGeneratorRequest is raw protobuf that contains bytes which are invalid UTF-8,
+    # so reading it from stdin crashes with {:no_translation, :unicode, :latin1} unless
+    # we force latin1 for standard IO. See https://github.com/elixir-protobuf/protobuf/issues/420.
+    if String.to_integer(System.otp_release()) >= 26 do
       "-kernel standard_io_encoding latin1"
     else
       ""
