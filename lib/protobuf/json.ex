@@ -351,6 +351,13 @@ defmodule Protobuf.JSON do
 
   Accepts the same options as `decode/3`.
 
+  Field keys in `json_data` must be **strings** (either the proto field name or
+  the JSON name). Data produced by `Jason.decode(..., keys: :atoms)` is not
+  supported: proto `map<...>` fields are themselves decoded as maps whose keys
+  come from the wire, so atom-keyed input cannot be reliably distinguished from
+  a `map<string, _>` value and nested maps would not round-trip. Convert keys
+  to strings before calling `from_decoded/2` if you need this.
+
   ## Examples
 
       iex> Protobuf.JSON.from_decoded(%{}, Car)
