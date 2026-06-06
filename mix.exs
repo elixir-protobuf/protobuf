@@ -196,7 +196,7 @@ defmodule Protobuf.Mixfile do
     )
 
     protoc!(
-      "-I test/protobuf/protoc/proto --elixir_opt=include_docs=true",
+      "-I test/protobuf/protoc/proto --elixir_opt=gen_proto_source=true,include_docs=true",
       "./generated",
       ["test/protobuf/protoc/proto/full_name.proto"]
     )

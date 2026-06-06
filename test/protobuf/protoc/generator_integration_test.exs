@@ -94,4 +94,10 @@ defmodule Protobuf.Protoc.GeneratorIntegrationTest do
     assert Foo.Bar.Message.NestedMessage.full_name() == "foo.bar.Message.NestedMessage"
     assert Foo.Bar.Message.NestedMessage.Kind.full_name() == "foo.bar.Message.NestedMessage.Kind"
   end
+
+  test "proto_source/0 returns the source .proto file for modules generated with gen_proto_source" do
+    # full_name.proto is generated with the gen_proto_source=true option (see mix.exs).
+    assert Foo.Bar.Message.proto_source() == "full_name.proto"
+    assert Foo.Bar.Message.NestedMessage.proto_source() == "full_name.proto"
+  end
 end

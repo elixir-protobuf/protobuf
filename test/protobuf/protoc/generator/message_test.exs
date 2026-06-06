@@ -31,6 +31,37 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
     TestHelpers.purge_modules([Foo])
   end
 
+  test "generate/2 adds proto_source/0 when gen_proto_source? is set" do
+    ctx = %Context{
+      package: "pkg.name",
+      gen_proto_source?: true,
+      proto_file_name: "pkg/name/foo.proto"
+    }
+
+    desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
+
+    assert msg =~ "proto_source: \"pkg/name/foo.proto\""
+
+    assert [{compiled_mod, _bytecode}] = Code.compile_string(msg)
+    assert compiled_mod.proto_source() == "pkg/name/foo.proto"
+  after
+    TestHelpers.purge_modules([Pkg.Name.Foo])
+  end
+
+  test "generate/2 does not add proto_source/0 by default" do
+    ctx = %Context{package: "pkg.name", proto_file_name: "pkg/name/foo.proto"}
+    desc = %Google.Protobuf.DescriptorProto{name: "Foo"}
+    {[], [{_mod, msg}]} = Generator.generate(ctx, desc)
+
+    refute msg =~ "proto_source"
+
+    assert [{compiled_mod, _bytecode}] = Code.compile_string(msg)
+    assert compiled_mod.proto_source() == nil
+  after
+    TestHelpers.purge_modules([Pkg.Name.Foo])
+  end
+
   test "generate/2 refuses to inject code via a malicious field name" do
     ctx = %Context{syntax: :proto3}
 

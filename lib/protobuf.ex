@@ -108,6 +108,9 @@ defmodule Protobuf do
       def full_name(), do: @options[:full_name]
 
       @impl unquote(__MODULE__)
+      def proto_source(), do: @options[:proto_source]
+
+      @impl unquote(__MODULE__)
       def transform_module() do
         nil
       end
@@ -155,6 +158,16 @@ defmodule Protobuf do
   """
   @doc since: "0.15.0"
   @callback full_name() :: String.t()
+
+  @doc """
+  Returns the name of the source `.proto` file that defined this message, or `nil`.
+
+  This is the file name as known to `protoc` (for example `"my/test/test.proto"`),
+  taken from the `FileDescriptorProto`. It is only populated when code is generated
+  with the `gen_proto_source=true` plugin option; otherwise it returns `nil`.
+  """
+  @doc since: "0.17.0"
+  @callback proto_source() :: String.t() | nil
 
   @doc """
   Decodes the given binary data interpreting it as the Protobuf message `module`.

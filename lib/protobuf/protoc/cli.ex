@@ -116,6 +116,16 @@ defmodule Protobuf.Protoc.CLI do
     end
   end
 
+  defp parse_param("gen_proto_source=" <> value, %Context{} = ctx) do
+    case value do
+      "true" ->
+        %{ctx | gen_proto_source?: true}
+
+      other ->
+        raise "invalid value for gen_proto_source option, expected \"true\", got: #{inspect(other)}"
+    end
+  end
+
   defp parse_param("package_prefix=" <> package, %Context{} = ctx) do
     if package == "" do
       raise "package_prefix can't be empty"

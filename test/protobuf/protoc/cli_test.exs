@@ -40,6 +40,7 @@ defmodule Protobuf.Protoc.CLITest do
         %{
           "plugins" => "grpc",
           "gen_descriptors" => "true",
+          "gen_proto_source" => "true",
           "one_file_per_module" => "true",
           "package_prefix" => "elixir.protobuf",
           "transform_module" => "My.Transform.Module",
@@ -53,6 +54,7 @@ defmodule Protobuf.Protoc.CLITest do
       assert ctx == %Context{
                plugins: ["grpc"],
                gen_descriptors?: true,
+               gen_proto_source?: true,
                one_file_per_module?: true,
                package_prefix: "elixir.protobuf",
                transform_module: My.Transform.Module,
@@ -67,6 +69,10 @@ defmodule Protobuf.Protoc.CLITest do
     test "raises an error with invalid arguments" do
       assert_raise RuntimeError, ~r/invalid value for gen_descriptors option/, fn ->
         parse_params(%Context{}, "gen_descriptors=false")
+      end
+
+      assert_raise RuntimeError, ~r/invalid value for gen_proto_source option/, fn ->
+        parse_params(%Context{}, "gen_proto_source=false")
       end
 
       assert_raise RuntimeError, ~r/invalid value for one_file_per_module option/, fn ->

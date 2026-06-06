@@ -113,6 +113,29 @@ $ protoc --elixir_out=gen_descriptors=true:./lib/ *.proto
 $ protoc --elixir_out=gen_descriptors=true,plugins=grpc:./lib/ *.proto
 ```
 
+### Proto source traceability
+
+You can use the `gen_proto_source=true` option to record, on each generated
+message and service module, the name of the `.proto` file that defined it.
+
+With `gen_proto_source=true`, each module exposes a `proto_source/0` function
+that returns the source file name as known to `protoc` (for example
+`"my/package/foo.proto"`). This is useful when you need to map a compiled module
+back to its originating `.proto` file, such as for gRPC reflection. Without the
+option, `proto_source/0` returns `nil`.
+
+```
+$ protoc --elixir_out=./lib --elixir_opt=gen_proto_source=true *.proto
+```
+
+> #### Note about paths {: .warning}
+>
+> The recorded name is the file name as passed to `protoc` (relative to the
+> import paths given with `-I`), not an absolute path on your machine. Still, if
+> you compile with absolute import paths, that path becomes part of the
+> generated code, so review your `-I` flags if you want to avoid leaking local
+> filesystem details.
+
 ### Package prefix
 
 You can use the `package_prefix` option to prefix generated Elixir code.

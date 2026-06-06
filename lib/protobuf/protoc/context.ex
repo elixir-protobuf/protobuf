@@ -35,6 +35,14 @@ defmodule Protobuf.Protoc.Context do
             # And expose them via the `descriptor/0` function
             gen_descriptors?: false,
 
+            # Expose the source .proto file name (the FileDescriptorProto name) on
+            # generated message and service modules via the `proto_source/0` function
+            gen_proto_source?: false,
+
+            # Name of the source .proto file for the file currently being generated
+            # (the FileDescriptorProto `name` field, like "my/test/test.proto")
+            proto_file_name: nil,
+
             # Module to transform values before and after encode and decode
             transform_module: nil,
 

@@ -41,6 +41,7 @@ defmodule Protobuf.Protoc.Generator.Service do
          methods: methods,
          descriptor_fun_body: descriptor_fun_body,
          version: Util.version(),
+         proto_source: ctx.gen_proto_source? && ctx.proto_file_name,
          module_doc?: ctx.include_docs?
        )
      )}
