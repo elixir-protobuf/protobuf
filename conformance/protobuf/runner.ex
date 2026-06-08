@@ -6,8 +6,11 @@ defmodule Conformance.Protobuf.Runner do
   @spec main() :: :ok
   def main() do
     # Log things to stderr so that they don't interfere with the stdin/stdout interface
-    # of the conformance runner.
-    :ok = :logger.update_handler_config(:default, :config, %{type: :standard_error})
+    # of the conformance runner. We remove and re-add the default handler instead of
+    # updating its config in place, because OTP 28+ rejects changing a logger_std_h
+    # handler's :type at runtime with an {:illegal_config_change, ...} error.
+    :ok = :logger.remove_handler(:default)
+    :ok = :logger.add_handler(:default, :logger_std_h, %{config: %{type: :standard_error}})
 
     # Force encoding on stdio.
     :ok = :io.setopts(:standard_io, binary: true, encoding: :latin1)
