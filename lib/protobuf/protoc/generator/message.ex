@@ -357,8 +357,6 @@ defmodule Protobuf.Protoc.Generator.Message do
   defp add_json_name_to_opts(opts, _, %{json_name: json_name}),
     do: Keyword.put(opts, :json_name, json_name)
 
-  defp add_json_name_to_opts(opts, _syntax, _props), do: opts
-
   defp from_enum(:TYPE_DOUBLE), do: :double
   defp from_enum(:TYPE_FLOAT), do: :float
   defp from_enum(:TYPE_INT64), do: :int64

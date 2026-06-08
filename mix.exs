@@ -22,7 +22,7 @@ defmodule Protobuf.Mixfile do
       package: package(),
       docs: docs(),
       aliases: aliases(),
-      xref: [exclude: [Google.Protobuf.Any]]
+      elixirc_options: [no_warn_undefined: [Google.Protobuf.Any]]
     ]
   end
 

@@ -88,6 +88,7 @@ defmodule Protobuf do
       end
 
   """
+  @doc since: "0.17.0"
   defguard is_protobuf_message(value)
            when is_map(value) and :erlang.is_map_key(:__protobuf__, value)
 

@@ -145,15 +145,15 @@ defmodule Protobuf.ProtobufTest do
     end
 
     test "works in pattern matching" do
-      message = %TestMsg.Foo{a: 42}
-
-      result =
-        case message do
+      classify = fn value ->
+        case value do
           %{__protobuf__: true} -> :protobuf
           _ -> :not_protobuf
         end
+      end
 
-      assert result == :protobuf
+      assert classify.(%TestMsg.Foo{a: 42}) == :protobuf
+      assert classify.(%URI{}) == :not_protobuf
     end
 
     test "works in guards" do

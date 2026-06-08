@@ -51,6 +51,7 @@ defmodule Protobuf.Any do
       Protobuf.Any.unpack(any, MyApp.AnyTypeProvider)
       #=> {:ok, %MyApp.Events.UserCreated{...}}
   """
+  @doc since: "0.17.0"
   @spec unpack(Google.Protobuf.Any.t(), module()) ::
           {:ok, struct()} | {:error, reason :: any()}
   def unpack(%Google.Protobuf.Any{type_url: type_url, value: value}, type_provider) do

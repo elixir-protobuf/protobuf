@@ -691,10 +691,7 @@ defmodule Protobuf.Protoc.Generator.MessageTest do
            defmodule Foo.Nested.EnumFoo do
              @moduledoc false
 
-             use Protobuf,
-               enum: true,
-               full_name: "Foo.Nested.EnumFoo",
-               protoc_gen_elixir_version: "#{Util.version()}"
+             use Protobuf, enum: true, full_name: "Foo.Nested.EnumFoo", protoc_gen_elixir_version: "#{Util.version()}"
 
              field :a, 0
              field :b, 1

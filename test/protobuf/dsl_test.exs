@@ -155,7 +155,9 @@ defmodule Protobuf.DSLTest do
     assert TestMsg.EnumFoo.value(:C) == 4
     assert TestMsg.EnumFoo.value(:D) == 4
     assert TestMsg.EnumFoo.value(:E) == 4
-    assert_raise FunctionClauseError, fn -> TestMsg.EnumFoo.value(:F) end
+    # Called via apply/3 with an intentionally-invalid key so the type checker
+    # doesn't flag the unknown enum value at compile time.
+    assert_raise FunctionClauseError, fn -> apply(TestMsg.EnumFoo, :value, [:F]) end
     assert TestMsg.EnumFoo.value(1000) == 1000
     assert TestMsg.EnumFoo.key(1) == :A
     assert TestMsg.EnumFoo.key(2) == :B

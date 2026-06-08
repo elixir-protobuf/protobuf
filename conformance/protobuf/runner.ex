@@ -7,7 +7,7 @@ defmodule Conformance.Protobuf.Runner do
   def main() do
     # Log things to stderr so that they don't interfere with the stdin/stdout interface
     # of the conformance runner.
-    Logger.configure_backend(:console, device: :standard_error)
+    :ok = :logger.update_handler_config(:default, :config, %{type: :standard_error})
 
     # Force encoding on stdio.
     :ok = :io.setopts(:standard_io, binary: true, encoding: :latin1)

@@ -7,10 +7,11 @@ defmodule Protobuf.Text do
   but without extensions or `Google.Protobuf.Any` support (yet).
   """
 
+  @moduledoc since: "0.17.0"
+
   alias Inspect.Algebra
 
   alias Protobuf.FieldProps
-  alias Protobuf.MessageProps
 
   @doc """
   Encodes a Protobuf struct to text.
@@ -26,7 +27,6 @@ defmodule Protobuf.Text do
   Doesn't perform type validations. If input data is invalid, it produces
   undecodable output.
   """
-  @doc since: "0.17.0"
   @spec encode(struct(), keyword()) :: binary()
   def encode(%mod{} = struct, opts \\ []) when is_list(opts) do
     max_line_width = Keyword.get(opts, :max_line_width, 80)
