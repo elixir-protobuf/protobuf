@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.17.0
+
+### Enhancements
+
+  * Add support for the `textproto` encoding in `Protobuf.Text`.
+  * Add `Protobuf.is_protobuf_message/1` guard.
+  * Add `Protobuf.field_presence/2`.
+  * Add `Protobuf.Any.unpack/2`.
+  * Add `:ignore_unknown_fields` and `:recursion_limit` options to `Protobuf.JSON.decode/3`.
+  * Add `gen_proto_source=true` option to `protoc` plugin. This adds the `proto_source/0` callback to generated modules.
+
+### Bug fixes
+
+  * Validate timestamps when encoding JSON.
+  * Detect duplicate keys in decoded JSON objects.
+  * Validate encoding of field masks (protocol).
+  * Validate varint tags (protocol).
+  * Resolve types from transitive `import public` deps.
+  * Handle JSON edge cases for the `Any` type.
+  * Use the `module_prefix` option in extension files.
+  * Fix Elixir 1.19 and Elixir 1.20 warnings.
+  * Validate non-`protoc` field names to avoid code injection.
+  * Quote strings generated in `protoc` files to avoid code injection.
+
 ## v0.16.1
 
 ### Security
