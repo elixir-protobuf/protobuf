@@ -43,6 +43,11 @@ defmodule Protobuf.JSON.RFC3339Test do
       assert reason == ~s(bad time secfrac after ".", got: "nonanoZ")
     end
 
+    test "returns an error when nanoseconds contain invalid characters" do
+      assert {:error, reason} = RFC3339.decode("1970-01-01T00:00:00.123aZ")
+      assert reason == ~s(invalid time offset: "aZ")
+    end
+
     test "returns {:error, reason} with bad digit something" do
       assert {:error, reason} = RFC3339.decode("000-01-01T00:00:00Z")
       assert reason == ~s(expected 4 digits but got unparsable integer: "000-")

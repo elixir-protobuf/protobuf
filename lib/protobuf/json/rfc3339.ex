@@ -174,6 +174,10 @@ defmodule Protobuf.JSON.RFC3339 do
     throw("expected time offset, but it's missing")
   end
 
+  defp eat_time_offset(other) do
+    throw("invalid time offset: #{inspect(other)}")
+  end
+
   defp ensure_empty(""), do: :ok
   defp ensure_empty(other), do: throw("expected empty string, got: #{inspect(other)}")
 
