@@ -64,6 +64,26 @@ defmodule Protobuf.Protoc.FilePathTest do
              "Expected 'my_app/v1/foo.pb.ex' but got '#{file.name}'"
     end
 
+    test "file path does not duplicate a source directory in module_prefix" do
+      ctx = %Context{
+        module_prefix: "MyApp.PB.Foo",
+        package: nil,
+        syntax: :proto2,
+        one_file_per_module?: false,
+        dep_type_mapping: %{},
+        global_type_mapping: %{"foo/example.proto" => %{}}
+      }
+
+      desc = %FileDescriptorProto{
+        name: "foo/example.proto",
+        message_type: [%DescriptorProto{name: "ExampleRequest"}]
+      }
+
+      {_package_level_exts, [file]} = Generator.generate(ctx, desc)
+
+      assert file.name == "my_app/pb/foo/example.pb.ex"
+    end
+
     test "file path should respect module_prefix with extensions" do
       ctx = %Context{
         module_prefix: "Protobuf.Protoc.ExtTest",

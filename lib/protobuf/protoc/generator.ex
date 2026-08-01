@@ -26,7 +26,7 @@ defmodule Protobuf.Protoc.Generator do
         file_name =
           case base_module do
             "" -> Path.rootname(desc.name) <> ".pb.ex"
-            _ -> Macro.underscore(base_module) <> "/" <> Path.rootname(desc.name) <> ".pb.ex"
+            _ -> prefixed_file_name(base_module, desc.name)
           end
 
         content =
@@ -39,6 +39,21 @@ defmodule Protobuf.Protoc.Generator do
       end
 
     {package_level_extensions, files}
+  end
+
+  defp prefixed_file_name(base_module, source_file) do
+    base_segments = base_module |> Macro.underscore() |> Path.split()
+    source_segments = Path.split(Path.rootname(source_file) <> ".pb.ex")
+    {source_directories, [file_name]} = Enum.split(source_segments, -1)
+
+    max_overlap = min(length(base_segments), length(source_directories))
+
+    overlap =
+      Enum.find(max_overlap..1//-1, 0, fn count ->
+        Enum.take(base_segments, -count) == Enum.take(source_directories, count)
+      end)
+
+    Enum.join(base_segments ++ Enum.drop(source_directories, overlap) ++ [file_name], "/")
   end
 
   defp generate_module_definitions(
