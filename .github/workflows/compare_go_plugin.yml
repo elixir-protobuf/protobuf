@@ -1,0 +1,96 @@
+name: Compare Go protoc-gen-elixir
+
+# Side-by-side byte identity (after Code.format_string!/1) between this repo's
+# escript and the TrogonStack Go reimplementation.
+# See scripts/compare_go_plugin/run.sh.
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      go_plugin_version:
+        description: "TrogonStack protoc-gen-elixir release tag (without protoc-gen-elixir@ prefix)"
+        required: false
+        default: "v0.1.1"
+      go_plugin_sha256:
+        description: "SHA-256 of the Linux x86_64 release asset (required when overriding go_plugin_version)"
+        required: false
+        default: ""
+
+jobs:
+  compare-go-plugin:
+    name: Compare escript vs Go plugin
+    runs-on: ubuntu-22.04
+    # Informational only, do not remove: the Go plugin is an external
+    # reimplementation pinned to a release tag, so a mismatch can be caused by
+    # the Go side (or an intentional change here that the Go side has not
+    # shipped yet) and must not block merging this repo's PRs. Note the
+    # trade-off: with job-level continue-on-error the check reports green even
+    # on failure, so parity drift is only visible in the run logs.
+    continue-on-error: true
+    env:
+      MIX_ENV: prod
+      GO_PLUGIN_VERSION: ${{ inputs.go_plugin_version || 'v0.1.1' }}
+      # Pinned to the v0.1.1 Linux x86_64 asset; bump together with the default
+      # go_plugin_version above.
+      GO_PLUGIN_SHA256: ${{ inputs.go_plugin_sha256 || '5c0fe77b7d24a4e9310bc8c8988a8c0795e32e8e4682877bc23ed00c5d4c0c25' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3.0.0
+        with:
+          version: "25.2"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install OTP and Elixir
+        uses: erlef/setup-beam@v1.24.1
+        with:
+          otp-version: "27.0"
+          elixir-version: "1.17.3"
+
+      - name: Cache dependencies
+        id: cache-deps
+        uses: actions/cache@v6.1.0
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-compare-go-${{ hashFiles('**/mix.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: mix deps.get
+        env:
+          MIX_ENV: test
+
+      # google_protobuf is test/dev-only; ensure it is present for include paths.
+      - name: Ensure google_protobuf dep
+        run: MIX_ENV=test mix deps.get
+
+      - name: Build escript
+        run: mix escript.build
+
+      - name: Download Go protoc-gen-elixir ${{ env.GO_PLUGIN_VERSION }}
+        run: |
+          set -euo pipefail
+          asset="protoc-gen-elixir@${GO_PLUGIN_VERSION}_Linux_x86_64.tar.gz"
+          url="https://github.com/TrogonStack/protoc-gen/releases/download/protoc-gen-elixir%40${GO_PLUGIN_VERSION}/${asset}"
+          mkdir -p "$HOME/bin"
+          curl -fsSL -o /tmp/protoc-gen-elixir.tar.gz "$url"
+          echo "${GO_PLUGIN_SHA256}  /tmp/protoc-gen-elixir.tar.gz" | sha256sum --check --strict -
+          tar -xzf /tmp/protoc-gen-elixir.tar.gz -C "$HOME/bin" protoc-gen-elixir
+          chmod +x "$HOME/bin/protoc-gen-elixir"
+          "$HOME/bin/protoc-gen-elixir" --version
+
+      - name: Compare escript vs Go plugin (after format)
+        run: |
+          set -euo pipefail
+          chmod +x ./scripts/compare_go_plugin/run.sh
+          PROTOC_GEN_ELIXIR_ESCRIPT="$PWD/protoc-gen-elixir" \
+          PROTOC_GEN_ELIXIR_GO="$HOME/bin/protoc-gen-elixir" \
+          GOOGLE_PROTOBUF_SRC="$PWD/deps/google_protobuf/src" \
+          ./scripts/compare_go_plugin/run.sh
