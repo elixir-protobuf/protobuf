@@ -22,6 +22,9 @@ Recommended.Proto2.JsonInput.FieldNameExtension.Validator
 
 # The proto2-only MessageSet wire format is not implemented. These tests do not exist in the
 # pinned Protobuf dependency yet.
+Recommended.Proto2.ProtobufInput.ValidMessageSetEncoding.DuplicateDifferentTypeId.ProtobufOutput # only-on: latest
+Recommended.Proto2.ProtobufInput.ValidMessageSetEncoding.DuplicateValue.ProtobufOutput # only-on: latest
+Recommended.Proto2.ProtobufInput.ValidMessageSetEncoding.DuplicateValueOutOfOrder.ProtobufOutput # only-on: latest
 Recommended.Proto2.ProtobufInput.ValidMessageSetEncoding.SubmessageEncoding.NotUnknown.ProtobufOutput # only-on: latest
 Required.Proto2.ProtobufInput.MessageSetEncoding.UnknownExtension.ProtobufOutput # only-on: latest
 Required.Proto2.ProtobufInput.ValidMessageSetEncoding.OutOfOrderGroupsEntries.ProtobufOutput # only-on: latest
