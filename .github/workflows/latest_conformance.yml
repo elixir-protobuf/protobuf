@@ -39,15 +39,14 @@ jobs:
       - name: Get a stable SHA from Protobuf repo's main branch
         id: get-protobuf-sha
         run: |
-          # Protobuf can commit source changes before its generated files. Use a
-          # one-day delay so both commits are available before we build main.
-          cutoff="$(date --utc --date="24 hours ago" +"%Y-%m-%dT%H:%M:%SZ")"
+          # Protobuf commits source changes and generated files separately. Pick
+          # the latest generated-file commit so we do not build between them.
           sha="$(
             curl --fail --silent --show-error \
               --header "Authorization: Bearer ${{ github.token }}" \
               --header "X-GitHub-Api-Version: 2022-11-28" \
-              "https://api.github.com/repos/protocolbuffers/protobuf/commits?sha=main&until=${cutoff}&per_page=1" |
-              jq --raw-output '.[0].sha'
+              "https://api.github.com/repos/protocolbuffers/protobuf/commits?sha=main&per_page=100" |
+              jq --raw-output 'map(select(.commit.message | startswith("Auto-generate files")))[0].sha'
           )"
           test -n "${sha}" && test "${sha}" != "null"
           echo "sha=${sha}" >> "$GITHUB_OUTPUT"
