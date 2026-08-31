@@ -189,6 +189,8 @@ defmodule Protobuf.DSL do
 
       unquote(msg_props.enum? && Protobuf.DSL.Enum.quoted_enum_functions(msg_props))
 
+      unquote(Protobuf.DSL.Encoder.quoted_encode_functions(msg_props, transform_module_ast))
+
       if unquote(Macro.escape(extension_props)) != nil do
         def __protobuf_info__(:extension_props) do
           unquote(Macro.escape(extension_props))

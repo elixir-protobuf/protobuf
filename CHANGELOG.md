@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Enhancements
+
+  * Generate specialized encoder functions at compile time, making `Protobuf.encode/1` 3-6x faster.
+
 ## v0.17.0
 
 ### Enhancements
