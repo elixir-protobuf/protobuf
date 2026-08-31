@@ -96,6 +96,24 @@ defmodule TestMsg do
     field :non_matched, 101, type: :int32, optional: true
   end
 
+  # Repeated enums are packed by default, so an unpacked one is needed to check
+  # that its elements keep the zero value the field itself would drop.
+  defmodule EnumRepeatedUnpacked do
+    @moduledoc false
+    use Protobuf, syntax: :proto3
+
+    field :a, 1, repeated: true, type: EnumFoo, enum: true, packed: false
+  end
+
+  # A 0.0 default must compile without the "pattern matching on 0.0" warning
+  # and still be skipped like any other proto2 declared default.
+  defmodule FloatZeroDefault do
+    @moduledoc false
+    use Protobuf, syntax: :proto2
+
+    field :a, 1, optional: true, type: :double, default: 0.0
+  end
+
   defmodule SignedInt32Repeated do
     @moduledoc false
     use Protobuf, syntax: :proto2

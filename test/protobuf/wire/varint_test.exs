@@ -49,6 +49,16 @@ defmodule Protobuf.Wire.VarintTest do
                <<255, 255, 255, 255, 255, 255, 255, 255, 255, 1>>
     end
 
+    test "raises for integers that don't fit in 64 bits" do
+      assert_raise ArgumentError, ~r/must fit in 64 bits/, fn ->
+        Varint.encode(18_446_744_073_709_551_616)
+      end
+
+      assert_raise ArgumentError, ~r/must fit in 64 bits/, fn ->
+        Varint.encode(-9_223_372_036_854_775_809)
+      end
+    end
+
     defp encode(n) do
       n
       |> Varint.encode()
