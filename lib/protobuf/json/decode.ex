@@ -294,55 +294,12 @@ defmodule Protobuf.JSON.Decode do
   defp decode_message(data, module, message_props, state) do
     regular = decode_regular_fields(data, message_props, state)
     oneofs = decode_oneof_fields(data, message_props, state)
-    extensions = decode_extension_fields(data, module, state)
 
-    message =
-      module
-      |> struct(regular)
-      |> struct(oneofs)
-
-    message =
-      if extensions == %{} do
-        message
-      else
-        struct(message, __pb_extensions__: extensions)
-      end
-
-    transform_module(message, module)
+    module
+    |> struct(regular)
+    |> struct(oneofs)
+    |> transform_module(module)
   end
-
-  defp decode_extension_fields(data, module, opts) do
-    Enum.reduce(data, %{}, fn {key, value}, acc ->
-      case extension_name_from_key(key) do
-        nil ->
-          acc
-
-        extension_name ->
-          case Protobuf.Extension.get_extension_props_by_name(module, extension_name) do
-            {ext_mod, %Protobuf.Extension.Props.Extension{field_props: prop}} ->
-              case decode_value(prop, value, opts) do
-                nil -> acc
-                @skip_unknown -> acc
-                decoded -> Map.put(acc, {ext_mod, prop.name_atom}, decoded)
-              end
-
-            nil ->
-              acc
-          end
-      end
-    end)
-  end
-
-  defp extension_name_from_key(<<"[", name::binary>>) do
-    if String.ends_with?(name, "]") do
-      name = binary_part(name, 0, byte_size(name) - 1)
-      if name == "", do: nil, else: name
-    else
-      nil
-    end
-  end
-
-  defp extension_name_from_key(_key), do: nil
 
   defp object_to_message_map!(%Object{members: members}, message_props) do
     field_names_by_key = field_names_by_key(message_props)

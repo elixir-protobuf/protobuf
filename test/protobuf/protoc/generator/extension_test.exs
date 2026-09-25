@@ -163,13 +163,11 @@ defmodule Protobuf.Protoc.Generator.ExtensionTest do
                 {"Ext.MyMessage.NestedMessage.PbExtension", nested_message}
               ]} = Generator.generate(ctx, desc)
 
-      assert Enum.join(file_message, "\n") =~ "Ext.Foo, :file_level, 1048,"
-      assert Enum.join(file_message, "\n") =~ ~s|full_name: "file_level"|
+      assert Enum.join(file_message, "\n") =~
+               "Ext.Foo, :file_level, 1048, optional: true, type: :string"
 
-      assert my_message =~ "Ext.Foo, :in_msg, 1049,"
-      assert my_message =~ ~s|full_name: "MyMessage.in_msg"|
-      assert nested_message =~ "Ext.Foo, :in_nested, 1050,"
-      assert nested_message =~ ~s|full_name: "MyMessage.NestedMessage.in_nested"|
+      assert my_message =~ "Ext.Foo, :in_msg, 1049, optional: true, type: :string"
+      assert nested_message =~ "Ext.Foo, :in_nested, 1050, optional: true, type: :string"
     end
   end
 end

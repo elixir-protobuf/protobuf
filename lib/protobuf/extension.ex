@@ -124,40 +124,4 @@ defmodule Protobuf.Extension do
         end
     end
   end
-
-  @doc false
-  @spec get_extension_props_by_name(module, String.t()) ::
-          {module, Protobuf.Extension.Props.Extension.t()} | nil
-  def get_extension_props_by_name(extendee, name) when is_binary(name) do
-    :persistent_term.get({Protobuf.Extension, :name, extendee, name}, nil)
-  end
-
-  @doc false
-  @spec extension_name(module, module, atom()) :: String.t() | nil
-  def extension_name(extendee, ext_mod, field) do
-    case get_extension_props(extendee, ext_mod, field) do
-      %Protobuf.Extension.Props.Extension{full_name: full_name}
-      when is_binary(full_name) and full_name != "" ->
-        full_name
-
-      %Protobuf.Extension.Props.Extension{field_props: %{name: field_name}} ->
-        inferred_extension_name(extendee, field_name)
-
-      _ ->
-        nil
-    end
-  end
-
-  defp inferred_extension_name(extendee, field_name) do
-    with true <- function_exported?(extendee, :full_name, 0),
-         full_name when is_binary(full_name) and full_name != "" <- extendee.full_name() do
-      full_name
-      |> String.split(".")
-      |> Enum.drop(-1)
-      |> Kernel.++([field_name])
-      |> Enum.join(".")
-    else
-      _ -> field_name
-    end
-  end
 end

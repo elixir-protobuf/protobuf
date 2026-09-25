@@ -1,7 +1,6 @@
 defmodule Protobuf.JSON.EncodeTest do
   use ExUnit.Case, async: true
 
-  alias ProtobufTestMessages.Proto2.{PbExtension, TestAllTypesProto2}
   alias ProtobufTestMessages.Proto3.TestAllTypesProto3
 
   alias TestMsg.{
@@ -237,18 +236,6 @@ defmodule Protobuf.JSON.EncodeTest do
       encoded = %{"simple" => 1, "camel_case" => 2, "custom" => 3}
       assert encode(message, use_proto_names: true) == encoded
     end
-  end
-
-  test "encodes proto2 extensions with their fully qualified names" do
-    message =
-      TestAllTypesProto2.put_extension(
-        %TestAllTypesProto2{},
-        PbExtension,
-        :extension_int32,
-        1
-      )
-
-    assert encode(message) == %{"[protobuf_test_messages.proto2.extension_int32]" => 1}
   end
 
   test "always emits all fields when emit_unpopulated is on" do

@@ -5,12 +5,10 @@ defmodule Protobuf.Extension.Props do
     @moduledoc false
     @type t :: %__MODULE__{
             extendee: module,
-            field_props: Protobuf.FieldProps.t(),
-            full_name: String.t() | nil
+            field_props: FieldProps.T
           }
     defstruct extendee: nil,
-              field_props: nil,
-              full_name: nil
+              field_props: nil
   end
 
   @type t :: %__MODULE__{

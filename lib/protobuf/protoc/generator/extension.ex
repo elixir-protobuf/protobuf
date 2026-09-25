@@ -78,14 +78,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
         inspect("#{ns}.#{f.name}")
       end
 
-    full_name =
-      ([ctx.package] ++ ctx.namespace ++ [f.name])
-      |> Enum.reject(&is_nil/1)
-      |> Enum.reject(&(&1 == ""))
-      |> Enum.join(".")
-
-    "#{extendee}, :#{name}, #{f.number}, #{f.label}: true, type: #{f.type}#{f.opts_str}, " <>
-      "full_name: #{inspect(full_name)}"
+    "#{extendee}, :#{name}, #{f.number}, #{f.label}: true, type: #{f.type}#{f.opts_str}"
   end
 
   defp get_extensions_from_messages(%Context{} = ctx, use_options, descs) do
@@ -110,7 +103,6 @@ defmodule Protobuf.Protoc.Generator.Extension do
   defp generate_module(%Context{} = ctx, use_options, %DescriptorProto{} = desc) do
     ns = ctx.namespace ++ [Macro.camelize(desc.name)]
     module_name = Util.mod_name(ctx, ns ++ [Macro.camelize(@ext_postfix)])
-    extension_ctx = %{ctx | namespace: ctx.namespace ++ [desc.name]}
 
     module_contents =
       Util.format(
@@ -118,7 +110,7 @@ defmodule Protobuf.Protoc.Generator.Extension do
           comment: Comment.get(ctx),
           module: module_name,
           use_options: use_options,
-          extends: Enum.map(desc.extension, &generate_extend_dsl(extension_ctx, &1, _ns = "")),
+          extends: Enum.map(desc.extension, &generate_extend_dsl(ctx, &1, _ns = "")),
           module_doc?: ctx.include_docs?
         )
       )
