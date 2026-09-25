@@ -1,6 +1,7 @@
 defmodule Protobuf.JSON.DecodeTest do
   use ExUnit.Case, async: true
 
+  alias ProtobufTestMessages.Proto2.{PbExtension, TestAllTypesProto2}
   alias ProtobufTestMessages.Proto3.TestAllTypesProto3
 
   alias TestMsg.{
@@ -468,6 +469,14 @@ defmodule Protobuf.JSON.DecodeTest do
                  error(~s(JSON object contains duplicate key "duplicate"))
       end
     end
+  end
+
+  test "decodes proto2 extensions by their fully qualified names" do
+    json = ~S|{"[protobuf_test_messages.proto2.extension_int32]": 1}|
+
+    message = Protobuf.JSON.decode!(json, TestAllTypesProto2)
+
+    assert Protobuf.Extension.get(message, PbExtension, :extension_int32, nil) == 1
   end
 
   describe "duplicate field names" do

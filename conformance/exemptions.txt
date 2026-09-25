@@ -17,9 +17,6 @@
 #
 # Untagged lines apply to both profiles. Remove entries as the underlying issues are fixed.
 
-# JSON extension field names are not supported yet.
-Recommended.Proto2.JsonInput.FieldNameExtension.Validator
-
 # The proto2-only MessageSet wire format is not implemented. These tests do not exist in the
 # pinned Protobuf dependency yet.
 Recommended.Proto2.ProtobufInput.ValidMessageSetEncoding.DuplicateDifferentTypeId.ProtobufOutput # only-on: latest

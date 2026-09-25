@@ -354,9 +354,13 @@ defmodule Protobuf do
         function_exported?(mod, :__protobuf_info__, 1),
         %{extensions: extensions} = mod.__protobuf_info__(:extension_props) do
       Enum.each(extensions, fn {_, ext} ->
+        extendee = ext.extendee
         fnum = ext.field_props.fnum
-        fnum_key = {Protobuf.Extension, ext.extendee, fnum}
-        :persistent_term.put(fnum_key, mod)
+        :persistent_term.put({Protobuf.Extension, extendee, fnum}, mod)
+
+        if name = Protobuf.Extension.extension_name(extendee, mod, ext.field_props.name_atom) do
+          :persistent_term.put({Protobuf.Extension, :name, extendee, name}, {mod, ext})
+        end
       end)
     end
 

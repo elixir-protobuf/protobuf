@@ -189,8 +189,9 @@ defmodule Protobuf.JSON.Encode do
     message_props = mod.__message_props__()
     regular = encode_regular_fields(struct, message_props, opts)
     oneofs = encode_oneof_fields(struct, message_props, opts)
+    extensions = encode_extension_fields(struct, opts)
 
-    :maps.from_list(regular ++ oneofs)
+    :maps.from_list(regular ++ oneofs ++ extensions)
   end
 
   defp encode_regular_fields(struct, %{field_props: field_props, syntax: syntax}, opts) do
@@ -211,6 +212,31 @@ defmodule Protobuf.JSON.Encode do
       encode_field(prop, value, opts)
     end
   end
+
+  defp encode_extension_fields(%mod{__pb_extensions__: extensions}, opts)
+       when is_map(extensions) do
+    Enum.flat_map(extensions, fn {{ext_mod, field}, value} ->
+      case Protobuf.Extension.get_extension_props(mod, ext_mod, field) do
+        %Protobuf.Extension.Props.Extension{field_props: prop} ->
+          if emit?(:proto2, prop, value, opts[:emit_unpopulated]) do
+            extension_name = Protobuf.Extension.extension_name(mod, ext_mod, field)
+
+            if extension_name do
+              [{"[#{extension_name}]", encode_value(value, prop, opts)}]
+            else
+              []
+            end
+          else
+            []
+          end
+
+        _ ->
+          []
+      end
+    end)
+  end
+
+  defp encode_extension_fields(_struct, _opts), do: []
 
   # TODO: handle invalid values? check types?
   defp encode_field(prop, value, opts) do

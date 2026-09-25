@@ -15,6 +15,8 @@ defmodule Conformance.Protobuf.Runner do
     # Force encoding on stdio.
     :ok = :io.setopts(:standard_io, binary: true, encoding: :latin1)
 
+    :ok = Protobuf.load_extensions()
+
     loop()
   end
 

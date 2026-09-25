@@ -7,8 +7,8 @@ defmodule Protobuf.JSON do
   such as [well-known](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf)
   types are not fully supported yet.
 
-  Proto3 is supported as per the specification. Proto2 is supported in practice, but some of its
-  features might not work correctly, such as extensions.
+  Proto3 is supported as per the specification. Proto2 is supported in practice. Call
+  `Protobuf.load_extensions/0` before encoding or decoding messages with extensions.
 
   ## Types
 

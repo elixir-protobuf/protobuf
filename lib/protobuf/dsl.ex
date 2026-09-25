@@ -284,11 +284,13 @@ defmodule Protobuf.DSL do
     extensions =
       Map.new(extends, fn {extendee, name_atom, fnum, opts} ->
         # Only proto2 has extensions
-        props = field_props(:proto2, name_atom, fnum, opts)
+        full_name = Keyword.get(opts, :full_name)
+        props = field_props(:proto2, name_atom, fnum, Keyword.delete(opts, :full_name))
 
         props = %Protobuf.Extension.Props.Extension{
           extendee: extendee,
-          field_props: props
+          field_props: props,
+          full_name: full_name
         }
 
         {{extendee, fnum}, props}
