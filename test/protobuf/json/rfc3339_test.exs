@@ -87,6 +87,66 @@ defmodule Protobuf.JSON.RFC3339Test do
   end
 
   describe "encode/1" do
+    test "returns {:error, reason} for timestamps outside of the allowed range" do
+      for seconds <- [
+            -62_135_596_801,
+            253_402_300_800,
+            -377_705_116_800,
+            -377_705_116_801
+          ] do
+        assert RFC3339.encode(seconds, 0) == reference_encode(seconds, 0)
+      end
+
+      assert RFC3339.encode(-62_135_596_801, 0) ==
+               {:error, "timestamp is outside of allowed range"}
+
+      assert RFC3339.encode(253_402_300_800, 0) == {:error, ":invalid_unix_time"}
+    end
+
+    test "matches the DateTime-based formatter on edge cases" do
+      edge_datetimes = [
+        "0001-01-01T00:00:00Z",
+        "9999-12-31T23:59:59Z",
+        "1970-01-01T00:00:00Z",
+        "1969-12-31T23:59:59Z",
+        "2000-02-29T12:34:56Z",
+        "1900-02-28T23:59:59Z",
+        "1900-03-01T00:00:00Z",
+        "1999-12-31T23:59:59Z",
+        "2000-01-01T00:00:00Z",
+        "0999-12-31T23:59:59Z",
+        "1000-01-01T00:00:00Z",
+        "0099-12-31T23:59:59Z",
+        "0100-01-01T00:00:00Z",
+        "2038-01-19T03:14:08Z"
+      ]
+
+      for iso <- edge_datetimes,
+          nanos <- [0, 1, 10, 999, 1_000, 1_001, 1_000_000, 1_000_001, 123_456_789, 999_999_999] do
+        {:ok, datetime, 0} = DateTime.from_iso8601(iso)
+        seconds = DateTime.to_unix(datetime)
+
+        assert {:ok, _} = encoded = RFC3339.encode(seconds, nanos)
+        assert encoded == reference_encode(seconds, nanos)
+      end
+    end
+
+    test "matches the DateTime-based formatter across the whole allowed range" do
+      for _ <- 1..200_000 do
+        seconds = Enum.random(-62_135_596_800..253_402_300_799)
+
+        nanos =
+          case :rand.uniform(4) do
+            1 -> 0
+            2 -> :rand.uniform(999) * 1_000_000
+            3 -> :rand.uniform(999_999) * 1_000
+            4 -> :rand.uniform(999_999_999)
+          end
+
+        assert RFC3339.encode(seconds, nanos) == reference_encode(seconds, nanos)
+      end
+    end
+
     test "returns {:ok, formatted_string} with the right nanos and seconds" do
       {:ok, dt, _offset} = DateTime.from_iso8601("2021-11-26T16:19:13Z")
       unix_sec = dt |> DateTime.truncate(:second) |> DateTime.to_unix(:second)
@@ -124,6 +184,33 @@ defmodule Protobuf.JSON.RFC3339Test do
 
         assert RFC3339.encode(0, real_nanos) == {:ok, timestamp_str}
       end
+    end
+  end
+
+  # The DateTime-based encoder that RFC3339.encode/2 replaced, kept as the reference its output
+  # must match byte for byte.
+  defp reference_encode(seconds, nanos) do
+    case DateTime.from_unix(seconds, :second) do
+      {:ok, datetime} ->
+        if DateTime.compare(datetime, ~U[0001-01-01 00:00:00Z]) != :lt and
+             DateTime.compare(datetime, ~U[9999-12-31 23:59:59Z]) != :gt do
+          string = DateTime.to_iso8601(datetime)
+
+          if nanos > 0 do
+            {before_secfrac, after_secfrac} = String.split_at(string, 19)
+
+            {:ok,
+             before_secfrac <>
+               "." <> Protobuf.JSON.Utils.format_nanoseconds(nanos) <> after_secfrac}
+          else
+            {:ok, string}
+          end
+        else
+          {:error, "timestamp is outside of allowed range"}
+        end
+
+      {:error, reason} ->
+        {:error, inspect(reason)}
     end
   end
 end

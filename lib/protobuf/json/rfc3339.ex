@@ -12,10 +12,10 @@ defmodule Protobuf.JSON.RFC3339 do
   # of them. Then, we use the ISO8601-based Elixir functions to actually parse the datetimes with
   # calendar awareness, we throw away anything after the seconds, and replace them with the
   # nanoseconds we parsed. It seems to work very well, as proved by the conformance tests!
-  # For encoding, we have to use a "dirtier" trick. We encode using Elixir's ISO8601 without
-  # anything after the seconds, then we split the string and shove the nanoseconds in it. It works
-  # because the DD-MM-YYYYTHH:MM:SS part has always the same size so we always know where to
-  # inject the nanoseconds. Again, a bit dirty? Yes. Does it pass conformance tests? Yes!
+  # Encoding is on the hot path of every Timestamp in a JSON payload, so it skips DateTime
+  # entirely: the allowed range is checked on the integer seconds, :calendar splits them into
+  # date and time, and the fixed-width digits are written straight into a binary. Nanoseconds
+  # are rendered with 3, 6 or 9 digits, as the proto3 JSON mapping asks.
 
   # The grammar for RFC3339 dates is taken straight out of the RFC
   # (https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and is reported here for ease of
@@ -76,6 +76,11 @@ defmodule Protobuf.JSON.RFC3339 do
     :throw, reason -> {:error, reason}
   end
 
+  # 0001-01-01T00:00:00Z and 9999-12-31T23:59:59Z as Unix seconds.
+  @min_seconds -62_135_596_800
+  @max_seconds 253_402_300_799
+  @unix_epoch_gregorian_seconds 62_167_219_200
+
   @spec encode(integer(), non_neg_integer()) :: {:ok, String.t()} | {:error, String.t()}
   def encode(seconds, nanos)
 
@@ -84,27 +89,46 @@ defmodule Protobuf.JSON.RFC3339 do
     {:error, "nanos can't be bigger than 1000000000, got: #{nanos}"}
   end
 
+  def encode(seconds, nanos)
+      when is_integer(seconds) and is_integer(nanos) and nanos >= 0 and
+             seconds >= @min_seconds and seconds <= @max_seconds do
+    {{year, month, day}, {hour, minute, second}} =
+      :calendar.gregorian_seconds_to_datetime(seconds + @unix_epoch_gregorian_seconds)
+
+    {:ok,
+     <<digits4(year)::binary, ?-, digits2(month)::binary, ?-, digits2(day)::binary, ?T,
+       digits2(hour)::binary, ?:, digits2(minute)::binary, ?:, digits2(second)::binary,
+       format_secfrac(nanos)::binary, ?Z>>}
+  end
+
+  # Outside the allowed range: keep the errors DateTime.from_unix/2 has always produced.
   def encode(seconds, nanos) when is_integer(seconds) and is_integer(nanos) and nanos >= 0 do
     case DateTime.from_unix(seconds, :second) do
-      {:ok, datetime} ->
-        if datetime_in_allowed_range?(datetime) do
-          string = DateTime.to_iso8601(datetime)
-
-          if nanos > 0 do
-            bytes_before_time_secfrac = unquote(byte_size("1970-01-01T00:00:00"))
-            {before_secfrac, after_secfrac} = String.split_at(string, bytes_before_time_secfrac)
-            {:ok, before_secfrac <> "." <> Utils.format_nanoseconds(nanos) <> after_secfrac}
-          else
-            {:ok, string}
-          end
-        else
-          {:error, "timestamp is outside of allowed range"}
-        end
-
-      {:error, reason} ->
-        {:error, inspect(reason)}
+      {:ok, _datetime} -> {:error, "timestamp is outside of allowed range"}
+      {:error, reason} -> {:error, inspect(reason)}
     end
   end
+
+  defp format_secfrac(0), do: ""
+
+  defp format_secfrac(nanos) when rem(nanos, 1_000_000) == 0,
+    do: <<?., digits3(div(nanos, 1_000_000))::binary>>
+
+  defp format_secfrac(nanos) when rem(nanos, 1_000) == 0 do
+    micros = div(nanos, 1_000)
+    <<?., digits3(div(micros, 1_000))::binary, digits3(rem(micros, 1_000))::binary>>
+  end
+
+  defp format_secfrac(nanos) do
+    <<?., digits3(div(nanos, 1_000_000))::binary, digits3(rem(div(nanos, 1_000), 1_000))::binary,
+      digits3(rem(nanos, 1_000))::binary>>
+  end
+
+  defp digits4(n),
+    do: <<?0 + div(n, 1_000), ?0 + rem(div(n, 100), 10), digits2(rem(n, 100))::binary>>
+
+  defp digits3(n), do: <<?0 + div(n, 100), digits2(rem(n, 100))::binary>>
+  defp digits2(n), do: <<?0 + div(n, 10), ?0 + rem(n, 10)>>
 
   ## Parsing functions
 
