@@ -35,14 +35,14 @@ defmodule Protobuf.Wire.Varint do
   # Refer to [efficiency guide](http://www1.erlang.org/doc/efficiency_guide/binaryhandling.html)
   # for more on efficient binary handling.
   #
-  # Encoding on the other hand is simpler. It takes an integer and returns an iolist with its
+  # Encoding on the other hand is simpler. It takes an integer and returns a binary with its
   # varint representation:
   #
   #     iex> Protobuf.Wire.Varint.encode(35)
-  #     [35]
+  #     <<35>>
   #
   #     iex> Protobuf.Wire.Varint.encode(1_234_567)
-  #     [<<135>>, <<173>>, 75]
+  #     <<135, 173, 75>>
 
   import Bitwise
 
@@ -187,17 +187,53 @@ defmodule Protobuf.Wire.Varint do
     end
   end
 
-  @spec encode(integer) :: iolist
+  # One clause per encoded length, so that each varint is built as a single
+  # small binary in one bit-syntax instruction.
+  @spec encode(integer) :: binary
+  def encode(n) when n >= 1 <<< 64 or n < -(1 <<< 63) do
+    raise ArgumentError, "varint-encodable integers must fit in 64 bits, got: #{n}"
+  end
+
   def encode(n) when n < 0 do
     <<n::64-unsigned-native>> = <<n::64-signed-native>>
     encode(n)
   end
 
-  def encode(n) when n <= 127 do
-    [n]
-  end
+  def encode(n) when n < 1 <<< 7, do: <<n>>
 
-  def encode(n) do
-    [<<1::1, band(n, 127)::7>> | encode(bsr(n, 7))]
-  end
+  def encode(n) when n < 1 <<< 14, do: <<1::1, n::7, bsr(n, 7)>>
+
+  def encode(n) when n < 1 <<< 21, do: <<1::1, n::7, 1::1, bsr(n, 7)::7, bsr(n, 14)>>
+
+  def encode(n) when n < 1 <<< 28,
+    do: <<1::1, n::7, 1::1, bsr(n, 7)::7, 1::1, bsr(n, 14)::7, bsr(n, 21)>>
+
+  def encode(n) when n < 1 <<< 35,
+    do: <<1::1, n::7, 1::1, bsr(n, 7)::7, 1::1, bsr(n, 14)::7, 1::1, bsr(n, 21)::7, bsr(n, 28)>>
+
+  def encode(n) when n < 1 <<< 42,
+    do:
+      <<1::1, n::7, 1::1, bsr(n, 7)::7, 1::1, bsr(n, 14)::7, 1::1, bsr(n, 21)::7, 1::1,
+        bsr(n, 28)::7, bsr(n, 35)>>
+
+  def encode(n) when n < 1 <<< 49,
+    do:
+      <<1::1, n::7, 1::1, bsr(n, 7)::7, 1::1, bsr(n, 14)::7, 1::1, bsr(n, 21)::7, 1::1,
+        bsr(n, 28)::7, 1::1, bsr(n, 35)::7, bsr(n, 42)>>
+
+  def encode(n) when n < 1 <<< 56,
+    do:
+      <<1::1, n::7, 1::1, bsr(n, 7)::7, 1::1, bsr(n, 14)::7, 1::1, bsr(n, 21)::7, 1::1,
+        bsr(n, 28)::7, 1::1, bsr(n, 35)::7, 1::1, bsr(n, 42)::7, bsr(n, 49)>>
+
+  def encode(n) when n < 1 <<< 63,
+    do:
+      <<1::1, n::7, 1::1, bsr(n, 7)::7, 1::1, bsr(n, 14)::7, 1::1, bsr(n, 21)::7, 1::1,
+        bsr(n, 28)::7, 1::1, bsr(n, 35)::7, 1::1, bsr(n, 42)::7, 1::1, bsr(n, 49)::7, bsr(n, 56)>>
+
+  def encode(n),
+    do:
+      <<1::1, n::7, 1::1, bsr(n, 7)::7, 1::1, bsr(n, 14)::7, 1::1, bsr(n, 21)::7, 1::1,
+        bsr(n, 28)::7, 1::1, bsr(n, 35)::7, 1::1, bsr(n, 42)::7, 1::1, bsr(n, 49)::7, 1::1,
+        bsr(n, 56)::7, bsr(n, 63)>>
 end
