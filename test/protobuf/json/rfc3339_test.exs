@@ -4,6 +4,9 @@ defmodule Protobuf.JSON.RFC3339Test do
 
   alias Protobuf.JSON.RFC3339
 
+  @min_seconds DateTime.to_unix(~U[0001-01-01 00:00:00Z])
+  @max_seconds DateTime.to_unix(~U[9999-12-31 23:59:59Z])
+
   describe "decode/1" do
     test "returns {:ok, seconds, nanos} with the right nanos and seconds" do
       assert {:ok, seconds, nanos} = RFC3339.decode("2021-11-26T16:19:13.310017Z")
@@ -131,18 +134,16 @@ defmodule Protobuf.JSON.RFC3339Test do
       end
     end
 
-    test "matches the DateTime-based formatter across the whole allowed range" do
-      for _ <- 1..200_000 do
-        seconds = Enum.random(-62_135_596_800..253_402_300_799)
-
-        nanos =
-          case :rand.uniform(4) do
-            1 -> 0
-            2 -> :rand.uniform(999) * 1_000_000
-            3 -> :rand.uniform(999_999) * 1_000
-            4 -> :rand.uniform(999_999_999)
-          end
-
+    property "matches the DateTime-based formatter across the whole allowed range" do
+      check all seconds <- integer(@min_seconds..@max_seconds),
+                nanos <-
+                  one_of([
+                    constant(0),
+                    map(integer(0..999), &(&1 * 1_000_000)),
+                    map(integer(0..999_999), &(&1 * 1_000)),
+                    integer(0..999_999_999)
+                  ]),
+                max_runs: 5_000 do
         assert RFC3339.encode(seconds, nanos) == reference_encode(seconds, nanos)
       end
     end

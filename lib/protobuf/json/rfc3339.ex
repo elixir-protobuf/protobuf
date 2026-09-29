@@ -76,10 +76,9 @@ defmodule Protobuf.JSON.RFC3339 do
     :throw, reason -> {:error, reason}
   end
 
-  # 0001-01-01T00:00:00Z and 9999-12-31T23:59:59Z as Unix seconds.
-  @min_seconds -62_135_596_800
-  @max_seconds 253_402_300_799
-  @unix_epoch_gregorian_seconds 62_167_219_200
+  @min_seconds DateTime.to_unix(~U[0001-01-01 00:00:00Z])
+  @max_seconds DateTime.to_unix(~U[9999-12-31 23:59:59Z])
+  @unix_epoch_gregorian_seconds :calendar.datetime_to_gregorian_seconds({{1970, 1, 1}, {0, 0, 0}})
 
   @spec encode(integer(), non_neg_integer()) :: {:ok, String.t()} | {:error, String.t()}
   def encode(seconds, nanos)
@@ -90,8 +89,7 @@ defmodule Protobuf.JSON.RFC3339 do
   end
 
   def encode(seconds, nanos)
-      when is_integer(seconds) and is_integer(nanos) and nanos >= 0 and
-             seconds >= @min_seconds and seconds <= @max_seconds do
+      when is_integer(nanos) and nanos >= 0 and seconds in @min_seconds..@max_seconds do
     {{year, month, day}, {hour, minute, second}} =
       :calendar.gregorian_seconds_to_datetime(seconds + @unix_epoch_gregorian_seconds)
 
