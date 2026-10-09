@@ -52,8 +52,8 @@ defmodule Protobuf.JSON.Decode do
 
   # Default recursion limit, matching upstream Protobuf
   # (ParseOptions::recursion_depth in C++, .recursion_limit in Java/Go).
-  # Applies to the dynamically-typed wrappers (Value/ListValue/Struct) where
-  # nesting is bounded only by the input, not the schema.
+  # Counts ordinary messages, Any, Struct and ListValue. Value dispatch and
+  # conversion from Object to map do not add a level.
   @default_recursion_limit 100
 
   @spec from_json_data(term(), module(), keyword()) :: struct()
@@ -223,6 +223,8 @@ defmodule Protobuf.JSON.Decode do
 
   defp internal_from_json_data(%{"@type" => type_url} = data, Google.Protobuf.Any = mod, state)
        when is_binary(type_url) do
+    state = increase_depth_and_maybe_throw(state)
+
     message_mod =
       try do
         Protobuf.Any.type_url_to_module(type_url)
@@ -292,6 +294,7 @@ defmodule Protobuf.JSON.Decode do
     do: throw({:bad_message, data, module})
 
   defp decode_message(data, module, message_props, state) do
+    state = increase_depth_and_maybe_throw(state)
     regular = decode_regular_fields(data, message_props, state)
     oneofs = decode_oneof_fields(data, message_props, state)
 

@@ -297,11 +297,15 @@ defmodule Protobuf.JSON do
       ignored regardless of this option. Defaults to `false`. *Available
       since v0.17.0*.
 
-    * `:recursion_limit` (positive integer): the maximum nesting depth allowed
-      when decoding the dynamically-typed `Google.Protobuf.Value`,
-      `Google.Protobuf.ListValue`, and `Google.Protobuf.Struct` wrappers.
-      Exceeding it raises a `Protobuf.JSON.DecodeError`. Defaults to `100`. *Available
-      since v0.17.0*.
+    * `:recursion_limit` (positive integer): the maximum message depth allowed
+      during decoding. Each ordinary message, `Google.Protobuf.Any`,
+      `Google.Protobuf.ListValue`, and `Google.Protobuf.Struct` adds one level,
+      including the root. `Google.Protobuf.Value` uses the depth of its contents
+      without adding a level of its own. Sibling fields do not add to each other's
+      depth. Exceeding the limit returns a `Protobuf.JSON.DecodeError`;
+      `decode!/3` raises it. Defaults to `100`. *Available since v0.17.0*.
+      This limit applies after JSON parsing; it does not bound the size or depth
+      of the input passed to the JSON parser.
 
   ## Examples
 
