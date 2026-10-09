@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.17.1
+
+  * Harden depth limits when decoding. Each ordinary message, `Google.Protobuf.Any`, `Google.Protobuf.ListValue`, and `Google.Protobuf.Struct` adds one level, including the root. `Google.Protobuf.Value` uses the depth of its contents without adding a level of its own. This addresses [**CVE-2026-104635**](https://github.com/elixir-protobuf/protobuf/security/advisories/GHSA-m497-c2h9-rvw6).
+
 ## v0.17.0
 
 ### Enhancements
