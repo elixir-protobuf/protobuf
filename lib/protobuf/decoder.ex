@@ -256,7 +256,8 @@ defmodule Protobuf.Decoder do
 
   defp handle_value(<<rest::bits>>, field_number, wire_type, value, message, props, nesting) do
     case props.field_props do
-      %{^field_number => %FieldProps{packed?: true, name_atom: name_atom} = prop} ->
+      %{^field_number => %FieldProps{packed?: true, name_atom: name_atom} = prop}
+      when wire_type == wire_delimited() ->
         new_message =
           update_in_message(message, name_atom, value, &value_for_packed/4, prop, nesting)
 
@@ -281,10 +282,10 @@ defmodule Protobuf.Decoder do
 
         build_message(rest, new_message, props, nesting)
 
-      %{^field_number => %FieldProps{wire_type: expected, name: field}} ->
-        raise DecodeError,
-          message: "wrong wire_type for field #{field}: got #{wire_type}, expected #{expected}"
-
+      # A known field whose wire type matches none of the clauses above is kept as an unknown
+      # field, like the reference implementations (C++, Java, Go, upb) do, instead of failing the
+      # whole message. The value has already been consumed according to its own wire type, so the
+      # rest of the message decodes normally and re-encoding preserves the original bytes.
       %{} ->
         %mod{__unknown_fields__: unknown_fields} = message
 

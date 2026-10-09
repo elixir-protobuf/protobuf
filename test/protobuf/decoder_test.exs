@@ -26,9 +26,67 @@ defmodule Protobuf.DecoderTest do
     assert struct == %TestMsg.Foo{a: 42, c: "str", d: 123.5}
   end
 
-  test "raises for wrong wire type" do
-    assert_raise Protobuf.DecodeError, ~r{wrong wire_type for field a: got 1, expected 0}, fn ->
-      decode(<<9, 42, 0, 0, 0, 0, 0, 0, 0>>, TestMsg.Foo)
+  describe "known field with mismatched wire type" do
+    # Like the reference implementations (C++, Java, Go, upb), a known field whose wire type
+    # doesn't match the schema is kept as an unknown field instead of failing the whole message.
+
+    test "int32 field encoded as fixed64 is kept as an unknown field" do
+      bin = <<9, 42, 0, 0, 0, 0, 0, 0, 0>>
+      struct = decode(bin, TestMsg.Foo)
+
+      assert struct.a == 0
+      assert struct.__unknown_fields__ == [{1, wire_64bits(), <<42, 0, 0, 0, 0, 0, 0, 0>>}]
+      assert Protobuf.Encoder.encode(struct) == bin
+    end
+
+    test "string field encoded as varint is kept as an unknown field" do
+      # a = 42, then field 3 (string c) as varint 0
+      bin = <<8, 42, 24, 0>>
+      struct = decode(bin, TestMsg.Foo)
+
+      assert struct.a == 42
+      assert struct.c == ""
+      assert struct.__unknown_fields__ == [{3, wire_varint(), 0}]
+      assert Protobuf.Encoder.encode(struct) == bin
+    end
+
+    test "fields after the mismatched one are still decoded" do
+      # field 3 (string c) as varint 7, then a = 42
+      struct = decode(<<24, 7, 8, 42>>, TestMsg.Foo)
+
+      assert struct.a == 42
+      assert struct.__unknown_fields__ == [{3, wire_varint(), 7}]
+    end
+
+    test "embedded message field encoded as varint is kept as an unknown field" do
+      # field 6 (Foo.Bar e) as varint 1
+      struct = decode(<<48, 1>>, TestMsg.Foo)
+
+      assert struct.e == nil
+      assert struct.__unknown_fields__ == [{6, wire_varint(), 1}]
+    end
+
+    test "packed repeated field encoded as fixed32 is kept as an unknown field" do
+      # field 10 (repeated int32 i, packed by default in proto3) as fixed32
+      struct = decode(<<85, 1, 2, 3, 4>>, TestMsg.Foo)
+
+      assert struct.i == []
+      assert struct.__unknown_fields__ == [{10, wire_32bits(), <<1, 2, 3, 4>>}]
+    end
+
+    test "map entry value encoded with a mismatched wire type falls back to the default" do
+      # field 13 (map<string, int32> l) entry: key = "k", value (int32) as fixed32
+      struct = decode(<<106, 8, 10, 1, ?k, 21, 1, 0, 0, 0>>, TestMsg.Foo)
+
+      assert struct.l == %{"k" => 0}
+    end
+
+    test "packed repeated field still accepts the unpacked encoding" do
+      # field 10 (repeated int32 i) as two separate varints
+      struct = decode(<<80, 5, 80, 6>>, TestMsg.Foo)
+
+      assert struct.i == [5, 6]
+      assert struct.__unknown_fields__ == []
     end
   end
 

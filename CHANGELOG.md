@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Bug fixes
+
+  * When decoding, a known field that arrives with a wire type other than the one its type uses is now kept in `__unknown_fields__` instead of raising `Protobuf.DecodeError` ("wrong wire_type for field ..."). This matches the reference implementations (C++, Java, Go, upb). A packed repeated field that arrives with a non-length-delimited wire type other than its element's is treated the same way instead of being decoded as packed data.
+
 ## 0.17.1
 
   * Harden depth limits when decoding. Each ordinary message, `Google.Protobuf.Any`, `Google.Protobuf.ListValue`, and `Google.Protobuf.Struct` adds one level, including the root. `Google.Protobuf.Value` uses the depth of its contents without adding a level of its own. This addresses [**CVE-2026-104635**](https://github.com/elixir-protobuf/protobuf/security/advisories/GHSA-m497-c2h9-rvw6).
