@@ -277,26 +277,26 @@ defmodule Protobuf.JSON.Decode do
   end
 
   defp internal_from_json_data(%Object{} = object, module, state) when is_atom(module) do
-    message_props = module.__message_props__()
-    data = object_to_message_map!(object, message_props)
+    {message_props, index} = message_index(module)
+    data = object_to_message_map!(object, index)
 
-    decode_message(data, module, message_props, state)
+    decode_message(data, module, message_props, index, state)
   end
 
   defp internal_from_json_data(data, module, state) when is_map(data) and is_atom(module) do
-    message_props = module.__message_props__()
-    reject_duplicated_field_names!(data, message_props)
+    {message_props, index} = message_index(module)
+    reject_duplicated_field_names!(data, index)
 
-    decode_message(data, module, message_props, state)
+    decode_message(data, module, message_props, index, state)
   end
 
   defp internal_from_json_data(data, module, _state) when is_atom(module),
     do: throw({:bad_message, data, module})
 
-  defp decode_message(data, module, message_props, state) do
+  defp decode_message(data, module, message_props, index, state) do
     state = increase_depth_and_maybe_throw(state)
-    regular = decode_regular_fields(data, message_props, state)
-    oneofs = decode_oneof_fields(data, message_props, state)
+    regular = decode_regular_fields(data, message_props, index, state)
+    oneofs = decode_oneof_fields(data, message_props, index, state)
 
     module
     |> struct(regular)
@@ -304,9 +304,7 @@ defmodule Protobuf.JSON.Decode do
     |> transform_module(module)
   end
 
-  defp object_to_message_map!(%Object{members: members}, message_props) do
-    field_names_by_key = field_names_by_key(message_props)
-
+  defp object_to_message_map!(%Object{members: members}, %{field_names_by_key: field_names_by_key}) do
     {data, _seen_fields} =
       Enum.reduce(members, {%{}, %{}}, fn {key, value}, {data, seen_fields} ->
         if Map.has_key?(data, key), do: throw({:duplicated_json_key, key})
@@ -320,9 +318,7 @@ defmodule Protobuf.JSON.Decode do
     data
   end
 
-  defp reject_duplicated_field_names!(data, message_props) do
-    field_names_by_key = field_names_by_key(message_props)
-
+  defp reject_duplicated_field_names!(data, %{field_names_by_key: field_names_by_key}) do
     data
     |> Map.keys()
     |> Enum.reduce(%{}, fn key, seen_fields ->
@@ -332,12 +328,60 @@ defmodule Protobuf.JSON.Decode do
     :ok
   end
 
-  defp field_names_by_key(%{field_props: field_props}) do
-    Enum.reduce(field_props, %{}, fn {_field_num, prop}, acc ->
-      acc
-      |> Map.put_new(prop.json_name, prop.name_atom)
-      |> Map.put_new(prop.name, prop.name_atom)
-    end)
+  # What decoding a message needs from its props, computed once per message
+  # when `Protobuf.DSL` builds them, rather than on every decode:
+  #
+  #   * `field_names_by_key`: each JSON key (a field's JSON name or proto
+  #     name) to the field it names, for the duplicated-name check.
+  #   * `regular_fields_by_key`: each JSON key to the non-oneof fields
+  #     `fetch_field_value/2` would find a value for under it, each as
+  #     `{position, field_num}`, `position` being the field's place in
+  #     `field_props`. Decoding looks up only the keys present, then decodes
+  #     those fields in `field_props` order, as visiting every field did, so
+  #     the same field's error is the one reported.
+  #   * `oneofs`: each oneof with its fields' numbers, in `field_props` order.
+  #
+  # Every map here is built by iterating `field_props` exactly as the code it
+  # replaces did, so collisions between names resolve the same way.
+  @doc false
+  @spec json_index(Protobuf.MessageProps.t()) :: map()
+  def json_index(%{field_props: field_props, oneof: oneofs}) do
+    field_names_by_key =
+      Enum.reduce(field_props, %{}, fn {_field_num, prop}, acc ->
+        acc
+        |> Map.put_new(prop.json_name, prop.name_atom)
+        |> Map.put_new(prop.name, prop.name_atom)
+      end)
+
+    regular_fields_by_key =
+      field_props
+      |> Enum.with_index(fn {field_num, prop}, position -> {position, field_num, prop} end)
+      |> Enum.filter(fn {_position, _field_num, prop} -> prop.oneof == nil end)
+      |> Enum.flat_map(fn {position, field_num, prop} ->
+        Enum.uniq([{prop.json_name, {position, field_num}}, {prop.name, {position, field_num}}])
+      end)
+      |> Enum.group_by(fn {key, _field} -> key end, fn {_key, field} -> field end)
+
+    oneofs =
+      for {oneof, index} <- oneofs do
+        {oneof, for({field_num, %{oneof: ^index}} <- field_props, do: field_num)}
+      end
+
+    %{
+      field_names_by_key: field_names_by_key,
+      regular_fields_by_key: regular_fields_by_key,
+      oneofs: oneofs
+    }
+  end
+
+  # Props built before `json_index` existed, or by hand, carry none.
+  defp message_index(module) do
+    message_props = module.__message_props__()
+
+    case Map.get(message_props, :json_index) do
+      nil -> {message_props, json_index(message_props)}
+      index -> {message_props, index}
+    end
   end
 
   defp check_duplicated_field_name!(key, field_names_by_key, seen_fields) do
@@ -370,29 +414,43 @@ defmodule Protobuf.JSON.Decode do
     end
   end
 
-  defp decode_regular_fields(data, %{field_props: field_props}, opts) do
-    Enum.flat_map(field_props, fn
-      {_field_num, %Protobuf.FieldProps{oneof: nil} = prop} ->
-        case fetch_field_value(prop, data) do
-          {:ok, value} ->
-            case decode_value(prop, value, opts) do
-              nil -> []
-              @skip_unknown -> []
-              value -> [{prop.name_atom, value}]
-            end
-
-          :error ->
-            []
+  # Only the fields with a key in `data`, in `field_props` order.
+  defp decode_regular_fields(
+         data,
+         %{field_props: field_props},
+         %{regular_fields_by_key: fields_by_key},
+         opts
+       ) do
+    fields =
+      Enum.reduce(data, [], fn {key, _value}, acc ->
+        case fields_by_key do
+          %{^key => fields} -> fields ++ acc
+          _ -> acc
         end
+      end)
 
-      {_field_num, _prop} ->
-        []
+    fields =
+      case fields do
+        [_, _ | _] -> fields |> Enum.sort() |> Enum.dedup()
+        _ -> fields
+      end
+
+    Enum.flat_map(fields, fn {_position, field_num} ->
+      prop = Map.fetch!(field_props, field_num)
+      {:ok, value} = fetch_field_value(prop, data)
+
+      case decode_value(prop, value, opts) do
+        nil -> []
+        @skip_unknown -> []
+        value -> [{prop.name_atom, value}]
+      end
     end)
   end
 
-  defp decode_oneof_fields(data, %{field_props: field_props, oneof: oneofs}, opts) do
-    for {oneof, index} <- oneofs,
-        {_field_num, %{oneof: ^index} = prop} <- field_props,
+  defp decode_oneof_fields(data, %{field_props: field_props}, %{oneofs: oneofs}, opts) do
+    for {oneof, field_nums} <- oneofs,
+        field_num <- field_nums,
+        prop = Map.fetch!(field_props, field_num),
         result = fetch_field_value(prop, data),
         match?({:ok, _value}, result),
         {:ok, value} = result,

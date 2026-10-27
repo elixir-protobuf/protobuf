@@ -265,7 +265,7 @@ defmodule Protobuf.DSL do
       for {_fnum, %FieldProps{embedded?: true, map?: false, name_atom: name}} <- field_props,
           do: name
 
-    %MessageProps{
+    message_props = %MessageProps{
       tags_map: Map.new(fields, fn {_, fnum, _} -> {fnum, fnum} end),
       ordered_tags: field_props |> Map.keys() |> Enum.sort(),
       field_props: field_props,
@@ -278,6 +278,12 @@ defmodule Protobuf.DSL do
       map?: Keyword.get(options, :map) == true,
       extension_range: extensions
     }
+
+    if message_props.enum? do
+      message_props
+    else
+      %{message_props | json_index: Protobuf.JSON.Decode.json_index(message_props)}
+    end
   end
 
   defp gen_extension_props([_ | _] = extends) do

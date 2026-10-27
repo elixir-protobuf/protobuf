@@ -24,7 +24,10 @@ defmodule Protobuf.MessageProps do
           map?: boolean(),
 
           # See Protobuf.DSL.extensions/1.
-          extension_range: [{non_neg_integer(), non_neg_integer()}] | nil
+          extension_range: [{non_neg_integer(), non_neg_integer()}] | nil,
+
+          # See Protobuf.JSON.Decode.json_index/1.
+          json_index: map() | nil
         }
 
   defstruct ordered_tags: [],
@@ -38,5 +41,6 @@ defmodule Protobuf.MessageProps do
             enum?: false,
             extendable?: false,
             map?: false,
-            extension_range: []
+            extension_range: [],
+            json_index: nil
 end
